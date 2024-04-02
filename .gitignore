@@ -12,3 +12,6 @@ venv/
 
 # Ignore Jupyter notebook checkpoints
 .ipynb_checkpoints/
+
+# Ignore temp .m files:
+.asv
