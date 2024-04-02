@@ -8,20 +8,7 @@ function unpackData(inFileNames, outFilePath, verbose)
 % not work on mac with Matlab >= 2023b which run natively on apple silicon.
 
 
-% 1. Timestamps   
-% 2. Sc Numbers
-% 3. Cell Numbers
-% 4. Params
-% 5. Data Points
-FieldSelection(1) = 1;
-FieldSelection(2) = 1;
-FieldSelection(3) = 1;
-FieldSelection(4) = 1;
-FieldSelection(5) = 1;
 
-ExtractHeader = 1;
-ExtractMode = 1;
-ModeArray=[]; %all.
 
 if nargin < 3
     verbose = 1;

@@ -20,6 +20,7 @@ if ~exist(outFilePath, "dir")
 end
 
 unpackData(macroFiles, outFilePath)
+disp('unpack finished!')
 
 
 
