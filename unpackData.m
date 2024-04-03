@@ -24,15 +24,12 @@ timestampFileName = 'lfpTimeStamps.mat';
 [data, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{1}, computeTS, outFilePath);
 
 num_samples = length(data);
-samp_freq_hz = 1/samplingInterval*1000;
-
-regularTimeStamps = 0:1/samp_freq_hz:((num_samples-1)*(1/samp_freq_hz));
 time0 = 0; 
-timeend = regularTimeStamps(end);
+timeend = (num_samples-1) * (samplingInterval/1000); % in seconds
 
 [~, filename, ~] = fileparts(inFileNames{1});
 save(fullfile(outFilePath, [filename, '.mat']), 'data', 'samplingInterval', 'time0', 'timeend', '-v7.3');
-save(fullfile(outFilePath, timestampFileName), 'timeStamps','time0','timeend','-v7.3');
+save(fullfile(outFilePath, timestampFileName), 'timeStamps', 'samplingInterval', 'time0', 'timeend', '-v7.3');
 
 % unpack the remainning files without computing the timestamp:
 computeTS = false;
@@ -46,7 +43,6 @@ parfor i = 2:length(inFileNames)
     end
 
     [signal, ~ , samplingInterval, ~] = Nlx_readCSC(inFileName, computeTS)
-    
     matobj = matfile(outFileName, 'Writable', true);
     matobj.samplingInterval = samplingInterval;
     matobj.data = signal;
