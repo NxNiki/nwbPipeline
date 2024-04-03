@@ -21,6 +21,11 @@ function [signal, computedTimeStamps, samplingInterval, channelNumber] = Nlx_rea
 % attribution. Code is offered without warranty, but tries hard to be
 % correct.
 
+% Xin added log warning message
+% Xin added check InputInverted in header.
+% Xin simplified algorithm to computeTS.
+
+
 if ~exist('computeTS','var') || isempty(computeTS)
     computeTS = 1;
 end
@@ -50,7 +55,6 @@ end
 [~, fname] = fileparts(fileName);
 logFile = fullfile(logPath, [fname, 'log']);
 
-% TO DO: log this info to run it on cluster:
 if length(unique(sampleFrequency))~=1
     message = 'Sampling Frequency is not uniform across data set, please proceed with caution...';
     logMessage(logFile, message);
@@ -70,7 +74,7 @@ if isempty(header)
     logMessage(logFile, message);
 else
     findADBitVolts = cellfun(@(x)~isempty(regexp(x, 'ADBitVolts', 'once')), header);
-    ADBitVolts = regexp(header{findADBitVolts},'(?<=ADBitVolts\s)[\d\.e\-]+','match');
+    ADBitVolts = regexp(header{findADBitVolts},'(?<=ADBitVolts\s)[\d\.e\-]+', 'match');
     if isempty(ADBitVolts)
         ADBitVolts = NaN;
         message = 'Cannot extract header info: ADBitVolts';
@@ -109,20 +113,17 @@ timeStamps = timeStamps * 1e-6; % ts now in seconds
 samplingInterval = 1/sampleFrequency; % not in seconds, but gets multiplied by 1e-3 later
 
 if computeTS
-    totalSamples = cumsum(numSamples);
-    computedTimeStamps = zeros(1,totalSamples(end));
+    sampleIdx = cumsum([1; numSamples(:)]);
+    computedTimeStamps = zeros(1, sampleIdx(end) - 1);
 
-    for t = 1:length(timeStamps)
-        if t==1
-            startSample = 1;
-        else
-            startSample = totalSamples(t-1) + 1;
-        end
-        endSample = startSample + numSamples(t)-1;
-        startTS = timeStamps(t);
-        theseTS = (1:numSamples(t)) * samplingInterval * 1e-3 + startTS;
-        computedTimeStamps(startSample:endSample) = theseTS;
+    for i = 1:length(timeStamps)
+        startSample = sampleIdx(i);
+        endSample = sampleIdx(i+1)-1;
+        startTS = timeStamps(i);
+        theseTS = (1:numSamples(i)) * samplingInterval * 1e-3 + startTS;
+        computedTimeStamps(startSample: endSample) = theseTS;
     end
 else
     computedTimeStamps = NaN;
 end
+
