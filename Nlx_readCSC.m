@@ -110,7 +110,7 @@ else
 end
 
 timeStamps = timeStamps * 1e-6; % ts now in seconds
-samplingInterval = 1/sampleFrequency; % not in seconds, but gets multiplied by 1e-3 later
+samplingInterval = 1/sampleFrequency; % in milli-seconds.
 
 if computeTS
     sampleIdx = cumsum([1; numSamples(:)]);
