@@ -1,4 +1,4 @@
-function [signal, computedTimeStamps, samplingInterval, channelNumber] = Nlx_readCSC(fileName,computeTS)
+function [signal, computedTimeStamps, samplingInterval, channelNumber] = Nlx_readCSC(fileName, computeTS, logPath)
 
 % SYNTAX: [data,timeStamps,samplingInterval,chNum] = Nlx_readCSC(fileName,computeTS)
 %
@@ -21,7 +21,7 @@ function [signal, computedTimeStamps, samplingInterval, channelNumber] = Nlx_rea
 % attribution. Code is offered without warranty, but tries hard to be
 % correct.
 
-if ~exist('computeTS','var')||isempty(computeTS)
+if ~exist('computeTS','var') || isempty(computeTS)
     computeTS = 1;
 end
 
@@ -44,28 +44,54 @@ ModeArray=[]; %all.
 
 incompleteBlocks = find(numSamples ~= size(signal,1));
 for i = 1:length(incompleteBlocks)
-    signal(numSamples(incompleteBlocks(i))+1:end,incompleteBlocks(i)) = NaN;
+    signal(numSamples(incompleteBlocks(i))+1:end, incompleteBlocks(i)) = NaN;
 end
+
+[~, fname] = fileparts(fileName);
+logFile = fullfile(logPath, [fname, 'log']);
 
 % TO DO: log this info to run it on cluster:
 if length(unique(sampleFrequency))~=1
-    warning('Sampling Frequency is not uniform across data set, please proceed with caution...')
+    message = 'Sampling Frequency is not uniform across data set, please proceed with caution...';
+    logMessage(logFile, message);
 end
 if length(unique(channelNumber))~=1
-    warning('You appear to be reading data from more than one channel. This code is not equipped for that...')
+    message = 'You appear to be reading data from more than one channel. This code is not equipped for that...';
+    logMessage(logFile, message);
 end
 
-sampleFrequency = sampleFrequency(1)*1e-3; % converts to nSamples per millisecond to be consistent with how we store data for Black Rock
+sampleFrequency = sampleFrequency(1) * 1e-3; % converts to nSamples per millisecond to be consistent with how we store data for Black Rock
 
 if isempty(header)
+    % log this.
     ADBitVolts = NaN;
+    InputInverted = -1;
+    message = 'Empty header info.';
+    logMessage(logFile, message);
 else
-    findADBitVolts = cellfun(@(x)~isempty(regexp(x,'ADBitVolts', 'once')),header);
+    findADBitVolts = cellfun(@(x)~isempty(regexp(x, 'ADBitVolts', 'once')), header);
     ADBitVolts = regexp(header{findADBitVolts},'(?<=ADBitVolts\s)[\d\.e\-]+','match');
     if isempty(ADBitVolts)
         ADBitVolts = NaN;
+        message = 'Cannot extract header info: ADBitVolts';
+        logMessage(logFile, message);
     else
         ADBitVolts = str2double(ADBitVolts{1});
+    end
+
+    findInputInverted = cellfun(@(x)~isempty(regexp(x, 'InputInverted', 'once')), header);
+    InputInverted = regexp(header{findInputInverted}, '(?<=InputInverted\s)[a-zA-Z]+', 'match');
+
+    if isempty(InputInverted)
+        message = 'Cannot extract header info: InputInverted';
+        logMessage(logFile, message);
+    elseif strcmpi(InputInverted{1}, 'false')
+        InputInverted = 1;
+    elseif strcmpi(InputInverted{1}, 'true')
+        InputInverted = -1;
+    else
+        message = 'Unrecognized header info: InputInverted';
+        logMessage(logFile, message);
     end
 end
 
@@ -73,9 +99,10 @@ signal = reshape(signal,[],1);
 signal(isnan(signal)) = [];
 
 if ~isnan(ADBitVolts)
-    signal = -signal*ADBitVolts*1e6;
+    signal = InputInverted * signal * ADBitVolts * 1e6; % convert signal to micro volt (need to confirm)
 else
-    warning('ADBitVolts is NaN; your CSC data will not be scaled')
+    message = 'ADBitVolts is NaN; your CSC data will not be scaled';
+    logMessage(logFile, message);
 end
 
 timeStamps = timeStamps * 1e-6; % ts now in seconds
