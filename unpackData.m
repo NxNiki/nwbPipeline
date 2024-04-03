@@ -15,11 +15,13 @@ if nargin < 3
     verbose = 1;
 end
 
-% unpack the first file with timestamp information:
+if verbose
+    fprintf('unpack the first file: %s with timestamp information...\n', inFileNames{1});
+end
 computeTS = true;
-% TO DO: probably don't want to hard code file name of timestamp.
+% TO DO: probably don't want to hard code timestamp file name.
 timestampFileName = 'lfpTimeStamps.mat';
-[data, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{1}, computeTS);
+[data, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{1}, computeTS, outFilePath);
 
 num_samples = length(data);
 samp_freq_hz = 1/samplingInterval*1000;
@@ -39,11 +41,11 @@ parfor i = 2:length(inFileNames)
     [~, filename, ~] = fileparts(inFileName);
     outFileName = fullfile(outFilePath, [filename, '.mat']);
 
-    if verbose == 1
+    if verbose
         fprintf('unpack: %s\n', inFileName);
     end
 
-    [signal, ~ , samplingInterval, ~] = Nlx_readCSC(fileName, computeTS)
+    [signal, ~ , samplingInterval, ~] = Nlx_readCSC(inFileName, computeTS)
     
     matobj = matfile(outFileName, 'Writable', true);
     matobj.samplingInterval = samplingInterval;
