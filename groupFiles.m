@@ -52,8 +52,8 @@ function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(direct
 %   created by Xin based on work by Chris Dao. Feb-22-2024.
 
 
-% set true for testing:
-REVERSE_TEMPORAL_ORDER = true;
+% if true, organize files in reverse temporal order:
+REVERSE_TEMPORAL_ORDER = false;
 
 
 if nargin < 2 || isempty(groupRegPattern)
@@ -97,13 +97,12 @@ for i = 1:length(directories)
     iGroupFileNames = removeNonExistFile(iGroupFileNames, true);
 
     if orderByCreateTime && length(fileSuffix)>1
-        order = zeros(size(iGroupFileNames));
-        %---------- use parfor to do parallel processing: 
-        parfor j = 1: size(order, 1)
-            fprintf("groupFiles: order files by create time for group: %s.\n", fileGroup{j});
-            order(j,:) = orderFilesByTime(iGroupFileNames(j,:), REVERSE_TEMPORAL_ORDER);
-        end
-        iGroupFileNames = iGroupFileNames(order);
+        % we assume the temporal order of files in each channel is
+        % consistent, so just check the order of the first channel and apply
+        % it to the remaining channels.
+        fprintf("groupFiles: order files by create time for group: %s.\n", fileGroup{1});
+        order = orderFilesByTime(iGroupFileNames(1,:), REVERSE_TEMPORAL_ORDER);
+        iGroupFileNames = iGroupFileNames(:, order);
     elseif length(fileSuffix)>1
         warning("groupFiles: order files by file name. Make sure the order is correct by checking header of raw data!")
     end
@@ -112,7 +111,7 @@ for i = 1:length(directories)
     iGroupFileNames.Properties.VariableNames{1} = 'fileGroup';
     groupFileNamesList(i) = {iGroupFileNames};
 
-    % nev files:
+    % .nev files:
     filenames = getNeuralynxFiles(directories{i}, '.nev', ignoreFilesWithSizeBelow);
     filenames = cellfun(@(x) fullfile(directories{i}, x), filenames, 'UniformOutput', false);
     if length(filenames) > 1
@@ -175,7 +174,7 @@ end
 [~, order] = sort(createTimes);
 
 if reverse
-    warning('groupFiles: reverse temporal order of files. This is only used for testing!')
+    warning('groupFiles: reverse temporal order of files.')
     order = order(length(files):-1:1);
 end
 end

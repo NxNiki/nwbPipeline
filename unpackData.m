@@ -1,8 +1,8 @@
-function unpackData(inFileNames, outFilePath, verbose)
+function unpackData(inFileNames, outFileNames, outFilePath, verbose)
 % unpackData(inFileNames, outFilePath, verbose): read neuralynx file and 
 % save to .mat files. 
 
-% inFileName: cell(n, 1). '.ncs' files for one experiment. Should have same
+% inFileName: datatable(m, 1). '.ncs' files for one experiment. Should have same
 % timestamps.
 
 % This function uses library developed by Ueli Rutishauser:
@@ -11,7 +11,7 @@ function unpackData(inFileNames, outFilePath, verbose)
 % not work on mac with Matlab >= 2023b which run natively on apple silicon.
 
 
-if nargin < 3
+if nargin < 4
     verbose = 1;
 end
 
@@ -27,22 +27,22 @@ num_samples = length(data);
 time0 = 0; 
 timeend = (num_samples-1) * (samplingInterval/1000); % in seconds
 
-[~, filename, ~] = fileparts(inFileNames{1});
+[~, filename, ~] = fileparts(outFileNames{1});
 save(fullfile(outFilePath, [filename, '.mat']), 'data', 'samplingInterval', 'time0', 'timeend', '-v7.3');
 save(fullfile(outFilePath, timestampFileName), 'timeStamps', 'samplingInterval', 'time0', 'timeend', '-v7.3');
 
 % unpack the remainning files without computing the timestamp:
 computeTS = false;
-parfor i = 2:length(inFileNames)
+for i = 2:length(inFileNames)
     inFileName = inFileNames{i};
-    [~, filename, ~] = fileparts(inFileName);
+    [~, filename, ~] = fileparts(outFileNames{i});
     outFileName = fullfile(outFilePath, [filename, '.mat']);
 
     if verbose
         fprintf('unpack: %s\n', inFileName);
     end
 
-    [signal, ~ , samplingInterval, ~] = Nlx_readCSC(inFileName, computeTS)
+    [signal, ~ , samplingInterval, ~] = Nlx_readCSC(inFileName, computeTS, outFilePath);
     matobj = matfile(outFileName, 'Writable', true);
     matobj.samplingInterval = samplingInterval;
     matobj.data = signal;
