@@ -6,30 +6,55 @@ expId = 5;
 filePath = '/Volumes/DATA/NLData/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
 outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
-% we assume the macro files always start with 'R' or 'L' in the file name:
-groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
-suffixRegPattern =  '(?<=\_)\d*';
-orderByCreateTime = true;
-ignoreFilesWithSizeBelow = 17384;
+%% list csc and event files. 
+% csc files are grouped for each channel.
+expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
 
-tic
-[groups, fileNames, groupFileNames, eventFileNames] = groupFiles(filePath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
-toc
-
-% select macro files:
-
-% files = getFileNames(filePath, '.ncs', 17384);
-% macroFiles = regexp(files, '^[RL].*[0-9]*.ncs', 'match', 'once');
-% macroFiles = macroFiles(cellfun(@(x)~isempty(x), macroFiles));
-% macroFiles = cellfun(@(x)fullfile(filePath, x), macroFiles, UniformOutput=false);
-
-outFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
-if ~exist(outFilePath, "dir")
-    mkdir(outFilePath);
+if ~exist(expOutFilePath, "dir")
+    mkdir(expOutFilePath);
 end
 
-unpackData(macroFiles, outFilePath)
-disp('unpack finished!')
+groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
+suffixRegPattern = '(?<=\_)\d*';
+orderByCreateTime = true;
+
+ignoreFilesWithSizeBelow = 16384 + 500;
+
+tic
+[groups, fileNames, channelFileNames, eventFileNames] = groupFiles(filePath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
+toc
+
+writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
+
+%% unpack macro files:
+macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
+
+if ~exist(macroOutFilePath, "dir")
+    mkdir(macroOutFilePath);
+end
+
+channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
+channelFileNames = channelFileNames(2:end,:);
+
+% select macro files and rename output file names so that alphabetic order 
+% is consistent with temporal order. The macro files always start with 'R' 
+% or 'L' in the file name
+macroIdx = cellfun(@(x)~isempty(regexp(x, '^[RL].*[0-9]', 'match', 'once')), channelFileNames(:, 1));
+macroFileNames = channelFileNames(macroIdx, :);
+
+writecell(macroFileNames, fullfile(macroOutFilePath, 'macroFileNames.csv'));
+
+inMacroFiles = macroFileNames(:, 2:end);
+macroChannles = macroFileNames(:, 1);
+numFilesEachChannel = size(inMacroFiles, 2);
+suffix = arrayfun(@(y) sprintf('%03d.mat', y), 1:numFilesEachChannel, 'UniformOutput', false);
+outMacroFiles = combineCellArrays(macroChannles, suffix);
+
+emptyIdx = cellfun(@isempty, inMacroFiles(:));
+tic
+unpackData(inMacroFiles(~emptyIdx), outMacroFiles(~emptyIdx), macroOutFilePath)
+toc
+disp('macro files unpack finished!')
 
 
 
