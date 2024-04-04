@@ -83,6 +83,7 @@ for i = 1:length(directories)
 
     % .ncs files:
     filenames = getNeuralynxFiles(directories{i}, '.ncs', ignoreFilesWithSizeBelow);
+
     fileGroup = unique(cellfun(@(x)regexp(x, groupRegPattern, 'once', 'match'), filenames, 'UniformOutput', false));
     fileSuffix = unique(cellfun(@(x)regexp(x, suffixRegPattern, 'once', 'match'), filenames, 'UniformOutput', false));
 
@@ -97,7 +98,8 @@ for i = 1:length(directories)
 
     if orderByCreateTime && length(fileSuffix)>1
         order = zeros(size(iGroupFileNames));
-        for j = 1: size(order, 1)
+        %---------- use parfor to do parallel processing: 
+        parfor j = 1: size(order, 1)
             fprintf("groupFiles: order files by create time for group: %s.\n", fileGroup{j});
             order(j,:) = orderFilesByTime(iGroupFileNames(j,:), REVERSE_TEMPORAL_ORDER);
         end
@@ -111,7 +113,7 @@ for i = 1:length(directories)
     groupFileNamesList(i) = {iGroupFileNames};
 
     % nev files:
-    filenames = getFileNames(directories{i}, '*.nev', ignoreFilesWithSizeBelow);
+    filenames = getNeuralynxFiles(directories{i}, '.nev', ignoreFilesWithSizeBelow);
     filenames = cellfun(@(x) fullfile(directories{i}, x), filenames, 'UniformOutput', false);
     if length(filenames) > 1
         % order .nev files by start time stamp:
@@ -133,6 +135,7 @@ groups = table2cell(groupFileNames(:, 1));
 fileNames = table2cell(groupFileNames(:, 2:end));
 
 end
+
 
 function files = removeNonExistFile(files, parallel)
 fprintf('groupFiles: remove non-existing files...\n');
@@ -158,10 +161,12 @@ files(~existIdx) = {''};
 files = reshape(files, r, c);
 end
 
+
 function order = orderFilesByTime(files, reverse)
 if nargin < 2
     reverse = false;
 end
+
 createTimes = NaT(length(files), 1);
 parfor i = 1:length(files)
     [~, ~, createTime, ~] = Nlx_getStartAndEndTimes(files{i});
