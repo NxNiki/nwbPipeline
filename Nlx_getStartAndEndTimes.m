@@ -7,34 +7,37 @@ function [startTime, endTime, createdTime, closedTime] = Nlx_getStartAndEndTimes
 
 % Xin use datetime to convert posixtime to dt object.
 
+
+startTime = NaT; endTime = NaT; createdTime = NaT; closedTime = NaT;
+
+if ~exist(filename, 'file')
+    warning('Nlx_getStartAndEndTimes: File not exists: %s', filename)
+    return
+end
+
 [~,~, ext] = fileparts(filename);
 switch ext
     case '.ncs'
         [timeStamps, header] = Nlx2MatCSC_v3(filename, [1 0 0 0 0],1, 1, []);
-        startTime = timeStamps(1);
-        endTime = timeStamps(end);
+        startTime = datetime(timeStamps(1), 'ConvertFrom', 'posixtime');
+        endTime = datetime(timeStamps(end), 'ConvertFrom', 'posixtime');
     case '.nev'
         [timeStamps, EventStrings, header] =...
             Nlx2MatEV_v3( filename, [1 0 0 0 1], 1,1, []);
-        startEvent = cellfun(@(x)strcmp(x,'Starting Recording'),EventStrings);
-        startTime = timeStamps(startEvent);
+        startEvent = cellfun(@(x)strcmp(x,'Starting Recording'), EventStrings);
+        startTime = datetime(timeStamps(startEvent), 'ConvertFrom', 'posixtime');
         
-        endEvent = cellfun(@(x)strcmp(x,'Stopping Recording'),EventStrings);
-        endTime = timeStamps(endEvent);
-      
+        endEvent = cellfun(@(x)strcmp(x,'Stopping Recording'), EventStrings);
+        endTime = datetime(timeStamps(endEvent), 'ConvertFrom', 'posixtime');
     otherwise
-        warning('File type %s not currently supported by this function. Returning NaN', ext);
-        startTime = NaN; endTime = NaN; createdTime = NaN; closedTime = NaN;
+        warning('File type %s not currently supported by this function. Returning NaT', ext);
         return
 end
 
-startTime = datetime(startTime, 'ConvertFrom', 'posixtime');
-endTime = datetime(endTime, 'ConvertFrom', 'posixtime');
-
 timeCreated = regexp(header, '(?<=\-TimeCreated ).*', 'match', 'once');
 empties = cellfun(@isempty, timeCreated);
-createdTime = datetime(timeCreated{~empties});
+createdTime = datetime(timeCreated{~empties}, InputFormat='yyyy/MM/dd HH:mm:ss');
 
 timeClosed = regexp(header, '(?<=\-TimeClosed ).*', 'match', 'once');
 empties = cellfun(@isempty, timeClosed);
-closedTime = datetime(timeClosed{~empties});
+closedTime = datetime(timeClosed{~empties}, InputFormat='yyyy/MM/dd HH:mm:ss');
