@@ -13,6 +13,7 @@ IGNORE_FILES = {
     '^Analogue2.*\.ncs';
     '^Ez.*\.ncs';
     '^HR_Ref.*\.ncs';
+    '^HR.ncs'
     '^MICROPHONE.*\.ncs';
     '^PZ.*\.ncs';
 };
