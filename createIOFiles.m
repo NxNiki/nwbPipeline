@@ -1,6 +1,10 @@
 function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath, pattern)
-%UNTITLED8 Summary of this function goes here
-%   Detailed explanation goes here
+%createIOFiles create input/output file names to unpack.
+%   A single recording may have multiple segments with different files. The
+%   issue is the suffix of files for a single channel may not be correctly
+%   ordered. So we create the output file with suffix correctly ordered.
+%   The output file has a suffix with pattern '001.mat'. File name is the
+%   same as the .ncs file.
 
 channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
 channelFileNames = channelFileNames(2:end,:);
