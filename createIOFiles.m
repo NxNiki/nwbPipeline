@@ -2,17 +2,6 @@ function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath,
 %UNTITLED8 Summary of this function goes here
 %   Detailed explanation goes here
 
-if ~exist(channelOutFilePath, "dir")
-    mkdir(channelOutFilePath);
-elseif ~skipExist
-    % create an empty dir to avoid not able to resume with unprocessed
-    % files in the future if this job fails. e.g. if we have 10 files
-    % processed in t1, t2 stops with 5 files processed, we cannot start
-    % with the 6th file in t3 as we have 10 files saved.
-    rmdir(channelOutFilePath, 's');
-    mkdir(channelOutFilePath);
-end
-
 channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
 channelFileNames = channelFileNames(2:end,:);
 
