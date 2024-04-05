@@ -6,6 +6,7 @@ end
 
 % load configure variables:
 run('config.m')
+% IGNORE_FILES
 
 d = dir([directory, filesep, '*', fileExt]);
 d([d.isdir]) = [];
