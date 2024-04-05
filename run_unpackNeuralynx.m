@@ -6,8 +6,6 @@ expId = 5;
 filePath = '/Volumes/DATA/NLData/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
 outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
-skipExist = 0;
-
 %% list csc and event files. 
 % csc files are grouped for each channel.
 expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
@@ -47,14 +45,14 @@ macroFileNames = channelFileNames(macroIdx, :);
 writecell(macroFileNames, fullfile(macroOutFilePath, 'macroFileNames.csv'));
 
 inMacroFiles = macroFileNames(:, 2:end);
-macroChannels = macroFileNames(:, 1);
+macroChannles = macroFileNames(:, 1);
 numFilesEachChannel = size(inMacroFiles, 2);
 suffix = arrayfun(@(y) sprintf('%03d.mat', y), 1:numFilesEachChannel, 'UniformOutput', false);
-outMacroFiles = combineCellArrays(macroChannels, suffix);
+outMacroFiles = combineCellArrays(macroChannles, suffix);
 
 emptyIdx = cellfun(@isempty, inMacroFiles(:));
 tic
-unpackData(inMacroFiles(~emptyIdx), outMacroFiles(~emptyIdx), macroOutFilePath, 1, skipExist)
+unpackData(inMacroFiles(~emptyIdx), outMacroFiles(~emptyIdx), macroOutFilePath)
 toc
 disp('macro files unpack finished!')
 
@@ -72,19 +70,7 @@ channelFileNames = channelFileNames(2:end,:);
 microIdx = cellfun(@(x)~isempty(regexp(x, '^G[A-D].*[0-9]', 'match', 'once')), channelFileNames(:, 1));
 microFileNames = channelFileNames(microIdx, :);
 
-writecell(microFileNames, fullfile(microOutFilePath, 'macroFileNames.csv'));
 
-inMicroFiles = microFileNames(:, 2:end);
-microChannels = microFileNames(:, 1);
-numFilesEachChannel = size(inMicroFiles, 2);
-suffix = arrayfun(@(y) sprintf('%03d.mat', y), 1:numFilesEachChannel, 'UniformOutput', false);
-outMicroFiles = combineCellArrays(microChannels, suffix);
-
-emptyIdx = cellfun(@isempty, inMicroFiles(:));
-tic
-unpackData(inMicroFiles(~emptyIdx), outMicroFiles(~emptyIdx), microOutFilePath)
-toc
-disp('macro files unpack finished!')
 
 
 
