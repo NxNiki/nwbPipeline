@@ -1,4 +1,4 @@
-function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(directories, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow)
+function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(inputPath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow)
 % groupFiles: group files based on their name pattern.
 % Details:
 %    This function lists files in the directory that matches specific
@@ -9,9 +9,9 @@ function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(direct
 %
 %
 % Inputs:
-%    directories - string, cell [1 n]. A list of directories in which the
-%    files will be grouped based on their name pattern. Files in different
-%    directories will be concatenated by column.
+%    inputPath - string. The path in which the files will be grouped based
+%    on their name pattern. Files in different directories will be
+%    concatenated by column.
 %
 %    groupRegPattern - string. A regular expression used to determine the
 %    group name of files in the directory. File names is decomposed to
@@ -72,62 +72,43 @@ if nargin < 5 || isempty(ignoreFilesWithSizeBelow)
     ignoreFilesWithSizeBelow = 16384;
 end
 
-if ischar(directories)
-    directories = {directories};
+
+% .ncs files:
+filenames = getNeuralynxFiles(inputPath, '.ncs', ignoreFilesWithSizeBelow);
+
+fileGroup = unique(cellfun(@(x)regexp(x, groupRegPattern, 'once', 'match'), filenames, 'UniformOutput', false));
+fileSuffix = unique(cellfun(@(x)regexp(x, suffixRegPattern, 'once', 'match'), filenames, 'UniformOutput', false));
+
+idx = ~cellfun('isempty', fileSuffix);
+fileSuffix(idx) = sort(cellfun(@(x) ['_', x], fileSuffix(idx), 'UniformOutput', false));
+
+[rowMat, colMat] = meshgrid(fileSuffix, fileGroup);
+groupFileNames = arrayfun(@(x, y) fullfile(inputPath, [y{:}, x{:}, '.ncs']), rowMat, colMat, 'UniformOutput', false);
+
+% remove file if it does not exists:
+groupFileNames = removeNonExistFile(groupFileNames, true);
+
+if orderByCreateTime && length(fileSuffix)>1
+    % we assume the temporal order of files in each channel is
+    % consistent, so just check the order of the first channel and apply
+    % it to the remaining channels.
+    fprintf("groupFiles: order files by create time for group: %s.\n", fileGroup{1});
+    order = orderFilesByTime(groupFileNames(1,:), REVERSE_TEMPORAL_ORDER);
+    groupFileNames = groupFileNames(:, order);
+elseif length(fileSuffix)>1
+    warning("groupFiles: order files by file name. Make sure the order is correct by checking header of raw data!")
 end
 
-groupFileNamesList = cell(1, length(directories));
-eventFileNames = cell(1, length(directories));
+groupFileNames = cell2table([fileGroup(:), groupFileNames]);
+groupFileNames.Properties.VariableNames{1} = 'fileGroup';
 
-for i = 1:length(directories)
-
-    % .ncs files:
-    filenames = getNeuralynxFiles(directories{i}, '.ncs', ignoreFilesWithSizeBelow);
-
-    fileGroup = unique(cellfun(@(x)regexp(x, groupRegPattern, 'once', 'match'), filenames, 'UniformOutput', false));
-    fileSuffix = unique(cellfun(@(x)regexp(x, suffixRegPattern, 'once', 'match'), filenames, 'UniformOutput', false));
-
-    idx = ~cellfun('isempty', fileSuffix);
-    fileSuffix(idx) = sort(cellfun(@(x) ['_', x], fileSuffix(idx), 'UniformOutput', false));
-
-    [rowMat, colMat] = meshgrid(fileSuffix, fileGroup);
-    iGroupFileNames = arrayfun(@(x, y) fullfile(directories{i}, [y{:}, x{:}, '.ncs']), rowMat, colMat, 'UniformOutput', false);
-
-    % remove file if it does not exists:
-    iGroupFileNames = removeNonExistFile(iGroupFileNames, true);
-
-    if orderByCreateTime && length(fileSuffix)>1
-        % we assume the temporal order of files in each channel is
-        % consistent, so just check the order of the first channel and apply
-        % it to the remaining channels.
-        fprintf("groupFiles: order files by create time for group: %s.\n", fileGroup{1});
-        order = orderFilesByTime(iGroupFileNames(1,:), REVERSE_TEMPORAL_ORDER);
-        iGroupFileNames = iGroupFileNames(:, order);
-    elseif length(fileSuffix)>1
-        warning("groupFiles: order files by file name. Make sure the order is correct by checking header of raw data!")
-    end
-
-    iGroupFileNames = cell2table([fileGroup(:), iGroupFileNames]);
-    iGroupFileNames.Properties.VariableNames{1} = 'fileGroup';
-    groupFileNamesList(i) = {iGroupFileNames};
-
-    % .nev files:
-    filenames = getNeuralynxFiles(directories{i}, '.nev', ignoreFilesWithSizeBelow);
-    filenames = cellfun(@(x) fullfile(directories{i}, x), filenames, 'UniformOutput', false);
-    if length(filenames) > 1
-        % order .nev files by start time stamp:
-        order = orderFilesByTime(filenames);
-        filenames = filenames(order);
-    end
-    eventFileNames{i} = filenames;
-
-end
-
-eventFileNames = flatten(eventFileNames);
-
-groupFileNames = groupFileNamesList{1};
-for i = 2:length(groupFileNamesList)
-    groupFileNames = outerjoin(groupFileNames, groupFileNamesList{i}, 'Keys', 'fileGroup', 'MergeKeys', true);
+% .nev files:
+eventFileNames = getNeuralynxFiles(inputPath, '.nev', ignoreFilesWithSizeBelow);
+eventFileNames = cellfun(@(x) fullfile(inputPath, x), eventFileNames, 'UniformOutput', false);
+if length(eventFileNames) > 1
+    % order .nev files by start time stamp:
+    order = orderFilesByTime(eventFileNames);
+    eventFileNames = eventFileNames(order);
 end
 
 groups = table2cell(groupFileNames(:, 1));
@@ -179,16 +160,4 @@ if reverse
 end
 end
 
-
-function res = flatten(cellArray)
-if ~iscell(cellArray)
-    res = {cellArray};
-    return
-else
-    res = [];
-    for i = 1:length(cellArray)
-        res = [res, flatten(cellArray{i})];
-    end
-end
-end
 
