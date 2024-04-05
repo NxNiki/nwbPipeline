@@ -48,7 +48,7 @@ disp('macro files unpack finished!')
 
 microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
 microPattern = '^G[A-D].*[0-9]';
-[inMacroFiles, outMacroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern);
+[inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern);
 
 tic
 unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
