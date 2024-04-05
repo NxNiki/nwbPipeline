@@ -118,7 +118,7 @@ end
 
 
 function files = removeNonExistFile(files, parallel)
-fprintf('groupFiles: remove non-existing files...\n');
+fprintf('groupFiles: check file existence...\n');
 [r, c] = size(files);
 files = files(:);
 
