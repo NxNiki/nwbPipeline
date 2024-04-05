@@ -1,4 +1,4 @@
-function unpackData(inFileNames, outFileNames, outFilePath, verbose)
+function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % unpackData(inFileNames, outFilePath, verbose): read neuralynx file and
 % save to .mat files.
 
@@ -11,51 +11,53 @@ function unpackData(inFileNames, outFileNames, outFilePath, verbose)
 % not work on mac with Matlab >= 2023b which run natively on apple silicon.
 
 
-if nargin < 4
+if nargin < 4 || isempty(verbose)
     verbose = 1;
 end
 
-if verbose
-    fprintf('unpack the first file: %s with timestamp information...\n', inFileNames{1});
+if nargin < 5
+    skipExist = 1;
 end
 
 % TO DO: probably don't want to hard code timestamp file name.
 timestampFileName = 'lfpTimeStamps';
 
 % unpack the remainning files without computing the timestamp:
-for i = 2:length(inFileNames)
+parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
-    suffix = regexp(outFileName, '(?<=_)\d{3}.mat', 'match', 'once');
+    if exist(outFileName, "file") && skipExist
+        continue
+    end
 
     if verbose
         fprintf('unpack: %s\n', inFileName);
     end
 
+    suffix = regexp(outFileName, '(?<=_)\d{3}.mat', 'match', 'once');
     timestampFullFile = fullfile(outFilePath, [timestampFileName, suffix]);
     if ~exist(timestampFullFile, "file")
         computeTS = true;
-
     else
         computeTS = false;
     end
-    [~, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{1}, computeTS, outFilePath);
-    num_samples = length(data);
-    time0 = 0;
+
+    [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS, outFilePath);
+    num_samples = length(signal);
     timeend = (num_samples-1) * (samplingInterval/1000); % in seconds
 
     matobj = matfile(outFileName, 'Writable', true);
     matobj.samplingInterval = samplingInterval;
     matobj.data = signal;
-    matobj.time0 = time0;
+    matobj.time0 = 0;
     matobj.timeend = timeend;
 
     if computeTS
         matobj = matfile(timestampFullFile, Writable=true);
         matobj.timeStamps = timeStamps;
         matobj.samplingInterval = samplingInterval;
-        matobj.time0 = time0;
+        matobj.time0 = 0;
         matobj.timeend = timeend;
     end
 
