@@ -24,6 +24,7 @@ function [signal, computedTimeStamps, samplingInterval, channelNumber] = Nlx_rea
 % Xin added log warning message
 % Xin added check InputInverted in header.
 % Xin simplified algorithm to computeTS.
+% Xin change samplingInterval to matlab duration.
 
 
 if ~exist('computeTS','var') || isempty(computeTS)
@@ -110,7 +111,7 @@ else
 end
 
 timeStamps = timeStamps * 1e-6; % ts now in seconds
-samplingInterval = 1/sampleFrequency; % in milli-seconds.
+samplingInterval = milliseconds(1/sampleFrequency); % in milli-seconds.
 
 if computeTS
     sampleIdx = cumsum([1; numSamples(:)]);
@@ -120,7 +121,7 @@ if computeTS
         startSample = sampleIdx(i);
         endSample = sampleIdx(i+1)-1;
         startTS = timeStamps(i);
-        theseTS = (1:numSamples(i)) * samplingInterval * 1e-3 + startTS;
+        theseTS = (1:numSamples(i)) * seconds(samplingInterval) + startTS;
         computedTimeStamps(startSample: endSample) = theseTS;
     end
 else
