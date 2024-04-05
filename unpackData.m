@@ -16,34 +16,36 @@ if nargin < 4 || isempty(verbose)
 end
 
 if nargin < 5
-    skipExist = 1;
+    skipExist = 0;
 end
 
 % TO DO: probably don't want to hard code timestamp file name.
 timestampFileName = 'lfpTimeStamps';
+
+% compute stampstamp for the first channel in each segment.
+% each segment has a suffix with pattern '001'.
+suffix = regexp(outFileNames, '(?<=_)\d{3}(?=.mat)', 'match', 'once');
+suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
+[~, computeTS] = findFirstOccurrence(suffix_int);
 
 % unpack the remainning files without computing the timestamp:
 parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
+
+    % TO DO: check if file is complete:
     if exist(outFileName, "file") && skipExist
         continue
     end
 
     if verbose
-        fprintf('unpack: %s\n', inFileName);
+        fprintf('unpack: %s\n to %s\n', inFileName, outFileName);
     end
 
-    suffix = regexp(outFileName, '(?<=_)\d{3}.mat', 'match', 'once');
-    timestampFullFile = fullfile(outFilePath, [timestampFileName, suffix]);
-    if ~exist(timestampFullFile, "file")
-        computeTS = true;
-    else
-        computeTS = false;
-    end
+    timestampFullFile = fullfile(outFilePath, [timestampFileName, suffix{i}]);
 
-    [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS, outFilePath);
+    [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
     num_samples = length(signal);
     timeend = (num_samples-1) * (samplingInterval/1000); % in seconds
 
@@ -53,13 +55,12 @@ parfor i = 1:length(inFileNames)
     matobj.time0 = 0;
     matobj.timeend = timeend;
 
-    if computeTS
+    if computeTS(i)
         matobj = matfile(timestampFullFile, Writable=true);
         matobj.timeStamps = timeStamps;
         matobj.samplingInterval = samplingInterval;
         matobj.time0 = 0;
         matobj.timeend = timeend;
     end
-
 end
 
