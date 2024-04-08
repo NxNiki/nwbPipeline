@@ -53,7 +53,7 @@ microPattern = '^G[A-D].*[0-9]';
 tic
 unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
 toc
-disp('macro files unpack finished!')
+disp('micro files unpack finished!')
 
 
 
