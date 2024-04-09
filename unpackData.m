@@ -5,6 +5,10 @@ function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % inFileName: datatable(m, 1). '.ncs' files for one experiment. Should have same
 % timestamps.
 
+% timestamps: Unix time
+% samplingInterval: matlab duration object.
+% samplingRate can be calculate as: seconds(1)/samplingInterval.
+
 % This function uses library developed by Ueli Rutishauser:
 % https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html
 % As this function calls mex files complied in intel/amd machine, it will

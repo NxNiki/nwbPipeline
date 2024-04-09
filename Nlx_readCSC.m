@@ -111,7 +111,7 @@ else
 end
 
 timeStamps = timeStamps * 1e-6; % ts now in seconds
-samplingInterval = milliseconds(1/sampleFrequency); % in milli-seconds.
+samplingInterval = milliseconds(1/sampleFrequency); 
 
 if computeTS
     sampleIdx = cumsum([1; numSamples(:)]);
@@ -127,4 +127,5 @@ if computeTS
 else
     computedTimeStamps = NaN;
 end
+
 
