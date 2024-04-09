@@ -31,6 +31,7 @@ channels = inFileNames(:, 1);
 numFilesEachChannel = size(inFiles, 2);
 suffix = arrayfun(@(y) sprintf('%03d.mat', y), 1:numFilesEachChannel, 'UniformOutput', false);
 outFiles = combineCellArrays(channels, suffix);
+outFiles = cellfun(@(fn) fullfile(channelOutFilePath, fn), outFiles, 'UniformOutput', false);
 
 emptyIdx = cellfun(@isempty, inFiles(:));
 outFiles(emptyIdx) = {''};

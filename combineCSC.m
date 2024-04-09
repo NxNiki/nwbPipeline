@@ -18,33 +18,36 @@ signalCombined = cell(1, numFiles);
 timestampsCombined = cell(1, numFiles);
 samplingInterval = zeros(numFiles, 1);
 
-
 parfor i = 1: numFiles
-    matObj = matfile(signalFiles{i}, 'r');
-    signalCombined{i} = matObj.data;
-    samplingInterval(i) = matObj.samplingInterval
+    matObj = matfile(signalFiles{i});
+    signal = matObj.data;
+    signalCombined{i} = signal(:)';
+    samplingInterval(i) = seconds(matObj.samplingInterval);
 
-    tsFileObj = matfile(timestampsFiles{i}, 'r');
-    timestampsCombined{i} = tsFileObj.timeStamps;
+    tsFileObj = matfile(timestampsFiles{i});
+    ts = tsFileObj.timeStamps;
+    timestampsCombined{i} = ts(:)';
 end
 
-samplingInterval = unqiue(samplingInterval);
+samplingInterval = unique(samplingInterval);
 if length(samplingInterval) > 1
     error('sampling Interval not match across files!');
 end
 
-signalGap = cell(numfiles, 1);
-for i = 2: numFiles
+samplingInterval = seconds(samplingInterval);
+
+signalGap = cell(1, numFiles);
+parfor i = 2: numFiles
     gapInterval = seconds(timestampsCombined{i}(end) - timestampsCombined{i-1}(1));
     if gapInterval / samplingInterval > GAP_THRESHOLD
-        signalGap{i-1} = NaN(round(gapDuration/samplingInterval), 1);
+        signalGap{i-1} = NaN(1, round(gapDuration/samplingInterval));
     end
 end
 
-signalCombined = vercat(signalCombined, signalGap);
+signalCombined = [signalCombined(:)', signalGap(:)'];
 signal = [signalCombined{:}];
 
-timestampsCombined = vercat(timestampsCombined, signalGap);
+timestampsCombined = [timestampsCombined(:)', signalGap(:)'];
 timestamps = [timestampsCombined{:}];
 
 

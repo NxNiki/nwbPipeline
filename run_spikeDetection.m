@@ -14,14 +14,36 @@ expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 
 %%
 
-macroFilePath = fullfile(expFilePath, 'CSC_macro');
+microFilePath = fullfile(expFilePath, 'CSC_micro');
 
-macroFiles = readcell(fullfile(macroFilePath, 'outFileNames.csv'));
-timestampFiles = dir(fullfile(macroFilePath, 'lfpTimeStamps*.mat'));
-timestampFiles = fullfile(macroFilePath, {timestampFiles.name});
+microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
+timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
-for i = 1: size(macroFiles, 1)
-    [signal, timestamps, samplingInterval] = combineCSC(macroFiles(i,:));
+microFiles = microFiles(1:2,:);
+
+for i = 1: size(microFiles, 1)
+    channelMicroFiles = microFiles(i,:);
+    tic
+    fprintf(['combine csc signals: \n', sprintf('%s \n', channelMicroFiles{:})]);
+    [signal, timestamps, samplingInterval] = combineCSC(channelMicroFiles, timestampFiles);
+    toc
+
+    % spike detection:
+    param = set_parameters();
+    param.sr = seconds(1)/samplingInterval;
+    param.ref = floor(1.5 * param.sr/1000); 
+    
+    tic
+    fprintf(['spike detection on csc signals: \n', sprintf('%s \n', channelMicroFiles{:})]);
+    [spikes,detectionParams,index] = amp_detect(signal, param);
+    toc
+
+    
+
+    1
+
+end
 
     
 
