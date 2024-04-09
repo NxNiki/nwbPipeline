@@ -1,4 +1,7 @@
 % unpack the macro neuralynx data.
+% this script should run with Matlab 2023a or earlier on Mac with apple
+% silicon.
+
 
 expId = 5;
 filePath = '/Volumes/DATA/NLData/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
@@ -10,7 +13,7 @@ outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MoviePa
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 0; 
+skipExist = 1; 
 
 expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
 
