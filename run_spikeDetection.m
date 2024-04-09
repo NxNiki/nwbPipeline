@@ -1,7 +1,7 @@
 % run spike detection and spike sorting to the unpacked data:
 
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/555_Screening';
+expId = 2;
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/555_Screening';
 
 expId = 5;
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
@@ -15,6 +15,7 @@ expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 %%
 
 microFilePath = fullfile(expFilePath, 'CSC_micro');
+outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
@@ -22,28 +23,7 @@ timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
 microFiles = microFiles(1:2,:);
 
-for i = 1: size(microFiles, 1)
-    channelMicroFiles = microFiles(i,:);
-    tic
-    fprintf(['combine csc signals: \n', sprintf('%s \n', channelMicroFiles{:})]);
-    [signal, timestamps, samplingInterval] = combineCSC(channelMicroFiles, timestampFiles);
-    toc
-
-    % spike detection:
-    param = set_parameters();
-    param.sr = seconds(1)/samplingInterval;
-    param.ref = floor(1.5 * param.sr/1000); 
-    
-    tic
-    fprintf(['spike detection on csc signals: \n', sprintf('%s \n', channelMicroFiles{:})]);
-    [spikes,detectionParams,index] = amp_detect(signal, param);
-    toc
-
-    
-
-    1
-
-end
+spikeDetection(microFiles, timestampFiles, outputPath, skipExist)
 
     
 

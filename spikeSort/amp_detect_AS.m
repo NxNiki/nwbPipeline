@@ -32,30 +32,13 @@ if exist('inputStruct','var') && ~isempty(inputStruct)
         thr = inputStruct.thr;
     end
 else
-
     %HIGH-PASS FILTER OF THE DATA
-    if exist('ellip','file')                         %Checks for the signal processing toolbox
-        [b_detect,a_detect] = ellip(par.detect_order,0.1,40,[fmin_detect fmax_detect]*2/sr);
+    if exist('ellip','file')                  %Checks for the signal processing toolbox
+        [b_detect, a_detect] = ellip(par.detect_order, 0.1, 40, [fmin_detect fmax_detect]*2/sr);
         [b,a] = ellip(par.sort_order,0.1,40,[fmin_sort fmax_sort]*2/sr);
-        % [z_det,p_det,k_det] = ellip(par.detect_order,0.1,40,[fmin_detect fmax_detect]*2/sr);
-        % [z,p,k] = ellip(par.sort_order,0.1,40,[fmin_sort fmax_sort]*2/sr);
-        %
-        % [SOS,G] = zp2sos(z,p,k);
-        % [SOS_det,G_det] = zp2sos(z_det,p_det,k_det);
-        if 0%exist('FiltFiltM','file')
-            xf_detect = FiltFiltM(b_detect, a_detect, x);
-            if isequal(b_detect, b) && isequal(a_detect, a)
-                xf = xf_detect;
-            else
-                xf = FiltFiltM(b, a, x);
-            end
-        else
-            xf_detect = filtfilt(b_detect, a_detect, x);
-            xf = filtfilt(b, a, x);
-            % xf_detect = filtfilt(SOS_det, G_det, x);
-            % xf = filtfilt(SOS,G, x);
 
-        end
+        xf_detect = filtfilt(b_detect, a_detect, x);
+        xf = filtfilt(b, a, x);
 
     else
         xf = fix_filter(x);                   %Does a bandpass filtering between [300 3000] without the toolbox.
@@ -151,7 +134,8 @@ end
 if isempty(index)
     binEdges1 = 0:3:1000*(duration)+3;
     binEdgesPrecise = 0:2000/sr:1000*(duration)+1;
-    spikeHist = zeros(1, length(binEdges1)-1); spikeHistPrecise = zeros(1, length(binEdgesPrecise));
+    spikeHist = zeros(1, length(binEdges1)-1); 
+    spikeHistPrecise = zeros(1, length(binEdgesPrecise));
     [spikes,thr,index,spikeCodes] = deal([]);
     return
 end
@@ -161,24 +145,24 @@ rawAmplitude = spikes(:, w_pre);
 ampAsMultipleOfSTD = spikes(:, w_pre) / noise_std_detect;
 
 
-tIndex = TimeStamps(index)/1000;
+tIndex = TimeStamps(index)*1000;
 %calculate firing rate
 if nspk==0
     firingRateAroundSpikeTime = zeros(0,1);
 else
-    binEdges1 = 0:500:500*floor(max(tIndex)/500)+500; binEdges2 = 250:500:500*floor((max(tIndex)+250)/500)+500;
+    binEdges1 = 0:500:500*floor(max(tIndex)/500)+500; 
+    binEdges2 = 250:500:500*floor((max(tIndex)+250)/500)+500;
     hist1 = histcounts(tIndex, binEdges1); hist2 = histcounts(tIndex, binEdges2);
     spikeCount1 = hist1(max([ones(1, length(tIndex));floor(tIndex/500)], [], 1));
     spikeCount2 = hist2(max([ones(1, length(tIndex));ceil((tIndex-250)/500)], [], 1));
     firingRateAroundSpikeTime = .5*max([spikeCount1', spikeCount2'], [], 2);
 end
 
-timestamp_ms = tIndex(:);
 timestamp_sec = tIndex(:)/1000;
 
 %% local minima:
 locMin = diff(sign(diff(spikes')))'>0;
-locMin = [repmat(1,size(locMin,1),1) locMin repmat(1,size(locMin,1),1)];
+locMin = [repmat(1,size(locMin,1),1), locMin, repmat(1,size(locMin,1),1)];
 localMinInd_Pre = nan(size(rawAmplitude)); localMinV_Pre = localMinInd_Pre;
 localMinInd_Post = nan(size(rawAmplitude)); localMinV_Post = localMinInd_Post;
 halfWidth = localMinInd_Pre;
@@ -199,11 +183,12 @@ heightToWidthRatio = spikes(:,w_pre)./halfWidth;
 minToMinWidth = localMinInd_Post-localMinInd_Pre;
 %%
 
-spikeCodes = table(timestamp_ms,timestamp_sec,firingRateAroundSpikeTime,...
+spikeCodes = table(timestamp_sec,firingRateAroundSpikeTime,...
     rawAmplitude,ampAsMultipleOfSTD,localMinInd_Pre,localMinV_Pre,localMinInd_Post,localMinV_Post,...
     halfWidth, heightToWidthRatio,minToMinWidth);
 
-binEdges1 = 0:3:1000*(duration)+3; binEdges2 = 1.5:3:1000*(duration)+4.5;
+binEdges1 = 0:3:1000*(duration)+3; 
+binEdges2 = 1.5:3:1000*(duration)+4.5;
 spikeHist1 = logical(histcounts(tIndex, binEdges1));
 spikeHist2 = logical(histcounts(tIndex, binEdges2));
 spikeHist = spikeHist1 | spikeHist2;

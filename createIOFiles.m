@@ -1,4 +1,4 @@
-function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath, pattern, skipExist)
+function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath, pattern)
 %createIOFiles create input/output file names to unpack.
 %   A single recording may have multiple segments with different files. The
 %   issue is the suffix of files for a single channel may not be correctly
@@ -7,13 +7,6 @@ function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath,
 %   same as the .ncs file.
 
 if ~exist(channelOutFilePath, "dir")
-    mkdir(channelOutFilePath);
-elseif ~skipExist
-    % create an empty dir to avoid not able to resume with unprocessed
-    % files in the future if this job fails. e.g. if we have 10 files
-    % processed in t1, t2 stops with 5 files processed, we cannot start
-    % with the 6th file in t3 as we have 10 files saved.
-    rmdir(channelOutFilePath, 's');
     mkdir(channelOutFilePath);
 end
 
