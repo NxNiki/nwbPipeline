@@ -87,6 +87,7 @@ for i = 1: size(cscFiles, 1)
     matobj.spikeCodes = vertcat(spikeCodes{:});
     matobj.spikeHist = [spikeHist{:}];
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+    matobj.param = param;
 
 end
 end
