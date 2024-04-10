@@ -1,4 +1,3 @@
-
 function new_par = update_parameters(new_par, par, type,NaN_fill)
 % This function overwrite or create fields from par in new_par. The fields
 %   used will be only the ones with type 'type' present in 'par'.

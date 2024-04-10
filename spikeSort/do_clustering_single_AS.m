@@ -1,34 +1,30 @@
-function do_clustering_single_AS(filename,min_spikes4SPC, par_file, par_input,fnum)
+function do_clustering_single_AS(inputFile, outputPath, min_spikes4SPC, param)
 
 par = set_parameters;
-par = update_parameters(par,par_file,'clus');
-par = update_parameters(par,par_file,'batch_plot');
-par = update_parameters(par,par_input,'clus');
-par = update_parameters(par,par_input,'batch_plot');
+par = update_parameters(par, param, 'clus');
+par = update_parameters(par, param, 'batch_plot');
 
-par.filename = filename;
+par.filename = inputFile;
 par.reset_results = true;
 
-data_handler = readInData(par);
-par = data_handler.par;
 check_WC_params(par)
 
-%     if isfield(par,'channels') && ~isnan(par.channels)
-%         par.max_inputs = par.max_inputs * par.channels;
-%     end
+% if isfield(par,'channels') && ~isnan(par.channels)
+%   par.max_inputs = par.max_inputs * par.channels;
+% end
 
-par.fname_in = ['tmp_data_wc' num2str(fnum)];                       % temporary filename used as input for SPC
-par.fname = ['data_' data_handler.nick_name];
-par.nick_name = data_handler.nick_name;
-par.fnamespc = ['data_wc' num2str(fnum)];
+[filePath, fileName, ext] = fileparts(inputFile);
+channel = regexp(fileName, ".*(?=_spikes.mat)", "match", "once");
+par.channel = channel;
+par.fname_in = ['tmp_data_wc' channel];                       % temporary filename used as input for SPC
+par.fname = ['data_' channel];
+par.fnamespc = ['data_wc' channel];
 
 % LOAD SPIKES
-if data_handler.with_spikes            			%data have some time of _spikes files
-    [spikes, index, spikeCodes] = data_handler.load_spikes();
-else
-    warning('MyComponent:noValidInput', 'File: %s doesn''t include spikes', filename);
-    return
-end
+spikeFileObj = matfile(inputFile);
+spikes = spikeFileObj.spikes;
+index = spikeFileObj.spikeTimestamps;
+spikeCodes = spikeFileObj.spikeCodes;
 
 % REJECT SPIKES
 % SPK quantity check 1
@@ -36,11 +32,11 @@ nspk = size(spikes,1);
 naux = min(par.max_spk, size(spikes,1));
 
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes in the file');
+    warning('MyComponent:noValidInput', 'Not enough spikes in the file: %s', inputFile);
     return
 end
 
-if exist('spikeCodes','var') && ~isempty(spikeCodes)
+if ~isempty(spikeCodes)
     [inds, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
     rejectedSpikes.spikes = spikes(inds,:);
     rejectedSpikes.index = index(inds);
@@ -60,8 +56,8 @@ if nspk < min_spikes4SPC
 end
 
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
-inspk = wave_features(spikes,par);     %takes wavelet coefficients.
-par.inputs = size(inspk,2);                       % number of inputs to the clustering
+inspk = wave_features(spikes, par);     % takes wavelet coefficients.
+par.inputs = size(inspk, 2);            % number of inputs to the clustering
 
 if par.permut == 'n'
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
@@ -84,9 +80,9 @@ else
     end
 end
 %INTERACTION WITH SPC
-save(par.fname_in,'inspk_aux','-ascii');
+save(par.fname_in, 'inspk_aux', '-ascii');
 try
-    [clu, tree] = run_cluster(par,true);
+    [clu, tree] = run_cluster(par, true);
     if exist([par.fnamespc '.dg_01.lab'],'file')
         movefile([par.fnamespc '.dg_01.lab'], [par.fname '.dg_01.lab'], 'f');
         movefile([par.fnamespc '.dg_01'], [par.fname '.dg_01'], 'f');
@@ -96,7 +92,7 @@ catch
     return
 end
 
-[clust_num temp auto_sort] = find_temp(tree, clu, par);
+[clust_num, temp, auto_sort] = find_temp(tree, clu, par);
 
 if par.permut == 'y'
     clu_aux = zeros(size(clu,1),2 + size(spikes,1)) -1;  %when update classes from clu, not selected elements go to cluster 0
@@ -169,33 +165,33 @@ warning(s);
 current_par = par;
 par = struct;
 par = update_parameters(par, current_par, 'relevant');
-par = update_parameters(par,current_par,'batch_plot');
+par = update_parameters(par, current_par, 'batch_plot');
 
 par.sorting_date = datestr(now);
 cluster_class = zeros(nspk,2);
 cluster_class(:,2)= index';
 cluster_class(:,1)= classes';
 
-
-save(['times_' data_handler.nick_name], 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
+outFileName = ['times_', channel, '.mat'];
+save(fullfile(outputPath, outFileName), 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
 if exist('ipermut','var')
-    save(['times_' data_handler.nick_name], 'ipermut', '-append', '-v7.3');
+    save(fullfile(outputPath, outFileName), 'ipermut', '-append', '-v7.3');
 end
 if exist('rejectedSpikes','var')
-    save(['times_' data_handler.nick_name], 'rejectedSpikes', '-append', '-v7.3');
+    save(fullfile(outputPath, outFileName), 'rejectedSpikes', '-append', '-v7.3');
 end
 
 
 end
 % mahal function incase system doesn't have it
 function d = mahal(Y,X)
-[rx,cx] = size(X);
-[ry,cy] = size(Y);
+[rx, cx] = size(X);
+[ry, cy] = size(Y);
 
 m = mean(X,1);
 M = m(ones(ry,1),:);
 C = X - m(ones(rx,1),:);
-[Q,R] = qr(C,0);
+[Q, R] = qr(C,0);
 
 ri = R'\(Y-M)';
 d = sum(ri.*ri,1)'*(rx-1);
