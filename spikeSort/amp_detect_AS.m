@@ -105,14 +105,14 @@ switch detect
 end
 
 % SPIKE STORING (with or without interpolation)
-ls = w_pre+w_post;
+ls = w_pre + w_post;
 spikes = zeros(nspk,ls+4);
 rejectedSpikes = spikes;
 
 xf(length(xf)+1:length(xf)+w_post)=0;
 
 for i=1:nspk                          %Eliminates artifacts
-    if max(abs( xf(index(i)-w_pre:index(i)+w_post) )) < thrmax
+    if max(abs( xf(index(i)-w_pre:index(i) + w_post) )) < thrmax
         spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
     else
         rejectedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
@@ -128,7 +128,7 @@ switch par.interpolation
         spikes(:,1:2)=[];
     case 'y'
         %Does interpolation
-        spikes = int_spikes(spikes,par);
+        spikes = int_spikes(spikes, par);
 end
 
 if isempty(index)
@@ -183,9 +183,19 @@ heightToWidthRatio = spikes(:,w_pre)./halfWidth;
 minToMinWidth = localMinInd_Post-localMinInd_Pre;
 %%
 
-spikeCodes = table(timestamp_sec,firingRateAroundSpikeTime,...
-    rawAmplitude,ampAsMultipleOfSTD,localMinInd_Pre,localMinV_Pre,localMinInd_Post,localMinV_Post,...
-    halfWidth, heightToWidthRatio,minToMinWidth);
+spikeCodes = table( ...
+    timestamp_sec, ...
+    firingRateAroundSpikeTime,...
+    rawAmplitude, ...
+    ampAsMultipleOfSTD, ...
+    localMinInd_Pre, ...
+    localMinV_Pre, ...
+    localMinInd_Post, ...
+    localMinV_Post,...
+    halfWidth, ...
+    heightToWidthRatio, ...
+    minToMinWidth ...
+    );
 
 binEdges1 = 0:3:1000*(duration)+3; 
 binEdges2 = 1.5:3:1000*(duration)+4.5;
