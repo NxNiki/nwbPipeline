@@ -34,7 +34,8 @@ for i = 1: size(cscFiles, 1)
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
     [~, channelFilename] = fileparts(channelFiles{1});
-    spikeFilename = fullfile(outputPath, ['spikes_', regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '.mat']);
+    % clustering requires the file ends with _spikes.mat:
+    spikeFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_spikes.mat']);
 
     % TO DO: check file completeness:
     if exist(spikeFilename, "file") && skipExist
