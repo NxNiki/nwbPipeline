@@ -58,7 +58,7 @@ parfor i = 1:length(inFileNames)
         fprintf('unpack: %s\n to %s\n', inFileName, outFileName);
     end
 
-    timestampFullFile = fullfile(outFilePath, [timestampFileName, suffix{i}]);
+    timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);
 
     [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
     num_samples = length(signal);
