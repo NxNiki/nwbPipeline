@@ -28,6 +28,11 @@ spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist)
 
 %% spike clustering:
 
+outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
+spikeFiles = dir(fullfile(outputPath, "spikes_*.mat"));
+spikeClustering(spikeFiles);
+
+
 
 
 
