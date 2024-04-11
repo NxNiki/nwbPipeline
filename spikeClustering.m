@@ -13,6 +13,8 @@ min_spikes4SPC = 16;
 
 for fnum = 1:length(spikeFiles)
     filename = spikeFiles{fnum};
+    fprintf('clustering spikes:\n %s\n', filename);
+
     spikeFileObj = matfile(filename, 'Writable', false);
     par = spikeFileObj.param;
     
