@@ -1,4 +1,4 @@
-function [res_x, idx_of_result] = knee_pt(y,x,just_return)
+function [res_x, idx_of_result] = knee_pt(y, x, just_return)
 %function [res_x, idx_of_result] = knee_pt(y,x,just_return)
 %Returns the x-location of a (single) knee of curve y=f(x)
 %  (this is useful for e.g. figuring out where the eigenvalues peter out)
