@@ -1,6 +1,10 @@
 function [position, position_idx] = findFirstOccurrence(array)
-%UNTITLED7 Summary of this function goes here
-%   Detailed explanation goes here
+%findFirstOccurrence find the position of the first occurrence in an array.
+%   This is used to find the index of first suffix in neuralynx segements
+%   to decide whether to compute timestamps. As timestamps are same across
+%   channel, we only do this for the first file (segments).
+%
+%   array: cell (n, 1) or vector.
 
 unique_vals = unique(array);
 position = zeros(length(unique_vals), 1);
