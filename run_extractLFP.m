@@ -15,6 +15,14 @@ skipExist = 1;
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 
-%%
+%% micro electrodes:
 
-cscFiles = 
+microFilePath = fullfile(expFilePath, 'CSC_micro');
+
+microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
+timestampFiles = fullfile(microFilePath, {timestampFiles.name});
+
+outputPath = fullfile(expFilePath, 'LFP_micro');
+
+extractLFP(microFiles, timestampFiles, outputPath)

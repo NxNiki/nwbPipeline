@@ -9,24 +9,12 @@ if nargin < 5
 end
 
 
-inputPath = fileparts(cscFiles{1});
+makeOutputPath(cscFiles, outputPath, skipExist)
 
-if ~exist(outputPath, "dir")
-    mkdir(outputPath);
-elseif ~skipExist && ~strcmp(inputPath, outputPath)
-    % create an empty dir to avoid not able to resume with unprocessed
-    % files in the future if this job fails. e.g. if we have 10 files
-    % processed in t1, t2 stops with 5 files processed, we cannot start
-    % with the 6th file in t3 as we have 10 files saved.
-    rmdir(outputPath, 's');
-    mkdir(outputPath);
-end
-
-
-parfor i = 1: size(cscFiles, 1)
+for i = 1: size(cscFiles, 1)
     
     channelFiles = cscFiles(i,:);
-    fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
+    fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
 
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
@@ -40,7 +28,7 @@ parfor i = 1: size(cscFiles, 1)
     % to reduce edge effects - especially for the sleep data 
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
-    [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles(i, :), timestampFiles);
+    [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
     % TO DO:
     cscSignal = removeSpikes(cscSignal);
