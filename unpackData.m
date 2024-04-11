@@ -15,7 +15,7 @@ function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % not work on mac with Matlab >= 2023b which run natively on apple silicon.
 
 
-if nargin < 4 || isempty(ve`rbose)
+if nargin < 4 || isempty(verbose)
     verbose = 1;
 end
 
