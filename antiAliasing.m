@@ -4,8 +4,8 @@ function [lfpSignal, downSampledTimestamps, timestampStart] = antiAliasing(cscSi
 % this is the one I would recommend using but open to other options
 f_info.Fs = 32000;
 f_info.Fpass = 300;         % Passband Frequency
-f_info.Fstop = 1000;         % Stopband Frequency
-f_info.Apass = 0.0001;       % Passband Ripple (dB)
+f_info.Fstop = 1000;        % Stopband Frequency
+f_info.Apass = 0.0001;      % Passband Ripple (dB)
 f_info.Astop = 65;          % Stopband Attenuation (dB)
 f_info.match = 'passband';  % Band to match exactly
 
@@ -40,8 +40,8 @@ flt_data_conc(nan_idx) = NaN;
 % but we only want to do this if there is a time gap between the recordings
 
 % create a 2kHz time vector that spans the full series
-t_2k = timestamps(1):1/2000:timestamps(end);
+ts_2k = timestamps(1):1/2000:timestamps(end);
 
-lfpSignal = interp1(timestamps, flt_data_conc, t_2k);
+lfpSignal = interp1(timestamps, flt_data_conc, ts_2k);
 downSampledTimestamps = ts_2k - ts_2k(1);
 timestampStart = ts_2k(1);
