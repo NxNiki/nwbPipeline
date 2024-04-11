@@ -15,7 +15,7 @@ function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % not work on mac with Matlab >= 2023b which run natively on apple silicon.
 
 
-if nargin < 4 || isempty(verbose)
+if nargin < 4 || isempty(ve`rbose)
     verbose = 1;
 end
 
@@ -23,16 +23,7 @@ if nargin < 5
     skipExist = 1;
 end
 
-if ~exist(outFilePath, "dir")
-    mkdir(outFilePath);
-elseif ~skipExist
-    % create an empty dir to avoid not able to resume with unprocessed
-    % files in the future if this job fails. e.g. if we have 10 files
-    % processed in t1, t2 stops with 5 files processed, we cannot start
-    % with the 6th file in t3 as we have 10 files saved.
-    rmdir(outFilePath, 's');
-    mkdir(outFilePath);
-end
+makeOutputPath(inFileNames, outputPath, skipExist)
 
 % TO DO: probably don't want to hard code timestamp file name.
 timestampFileName = 'lfpTimeStamps';

@@ -3,6 +3,7 @@ function spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, sk
 %   cscFiles cell(m, n). m: number of channels. n: number of files in each
 %   channel. spikes detected from file in each row will be combined.
 
+
 if nargin < 4 || isempty(experimentName)
     experimentName = repmat({''}, length(timestampFiles), 1);
 end
@@ -12,17 +13,7 @@ if nargin < 5
 end
 
 
-inputPath = fileparts(cscFiles{1});
-if ~exist(outputPath, "dir")
-    mkdir(outputPath);
-elseif ~skipExist  && ~strcmp(inputPath, outputPath)
-    % create an empty dir to avoid not able to resume with unprocessed
-    % files in the future if this job fails. e.g. if we have 10 files
-    % processed in t1, t2 stops with 5 files processed, we cannot start
-    % with the 6th file in t3 as we have 10 files saved.
-    rmdir(outputPath, 's');
-    mkdir(outputPath);
-end
+makeOutputPath(cscFiles, outputPath, skipExist)
 
 nSegments = length(timestampFiles);
 for j = nSegments:-1:1
