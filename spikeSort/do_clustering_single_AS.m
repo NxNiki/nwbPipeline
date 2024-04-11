@@ -14,7 +14,7 @@ check_WC_params(par)
 % end
 
 [filePath, fileName, ext] = fileparts(inputFile);
-channel = regexp(fileName, ".*(?=_spikes.mat)", "match", "once");
+channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 par.fname_in = ['tmp_data_wc' channel];                       % temporary filename used as input for SPC
 par.fname = ['data_' channel];
@@ -31,12 +31,12 @@ spikeCodes = spikeFileObj.spikeCodes;
 nspk = size(spikes,1);
 naux = min(par.max_spk, size(spikes,1));
 
-if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes in the file: %s', inputFile);
-    return
-end
+% if nspk < min_spikes4SPC
+%     warning('MyComponent:noValidInput', 'Not enough spikes in the file: %s', inputFile);
+%     return
+% end
 
-if ~isempty(spikeCodes)
+if ~isempty(spikeCodes) && nspk >= min_spikes4SPC
     [inds, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
     rejectedSpikes.spikes = spikes(inds,:);
     rejectedSpikes.index = index(inds);
@@ -51,7 +51,7 @@ nspk = size(spikes,1);
 naux = min(par.max_spk,size(spikes,1));
 
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes in the file');
+    warning('MyComponent:noValidInput', 'Not enough spikes in the file: %s', inputFile);
     return
 end
 
@@ -175,10 +175,10 @@ cluster_class(:,1)= classes';
 outFileName = ['times_', channel, '.mat'];
 save(fullfile(outputPath, outFileName), 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
 if exist('ipermut','var')
-    save(fullfile(outputPath, outFileName), 'ipermut', '-append', '-v7.3');
+    save(fullfile(outputPath, outFileName), 'ipermut', '-append');
 end
 if exist('rejectedSpikes','var')
-    save(fullfile(outputPath, outFileName), 'rejectedSpikes', '-append', '-v7.3');
+    save(fullfile(outputPath, outFileName), 'rejectedSpikes', '-append');
 end
 
 
