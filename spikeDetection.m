@@ -1,7 +1,7 @@
 function spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
 %spikeDetection Summary of this function goes here
 %   cscFiles cell(m, n). m: number of channels. n: number of files in each
-%   channel.
+%   channel. spikes detected from file in each row will be combined.
 
 if nargin < 4 || isempty(experimentName)
     experimentName = repmat({''}, length(timestampFiles), 1);
@@ -25,8 +25,7 @@ end
 
 nSegments = length(timestampFiles);
 for j = nSegments:-1:1
-    [timestamps{j}, dur] = readTimestamps(timestampFiles{j});
-    duration(j) = seconds(dur);
+    [timestamps{j}, duration(j)] = readTimestamps(timestampFiles{j});
 end
 
 for i = 1: size(cscFiles, 1)
@@ -93,20 +92,4 @@ end
 end
 
 
-function [signal, samplingInterval] = readCSC(filename)
 
-matObj = matfile(filename);
-signal = matObj.data;
-signal = signal(:)';
-samplingInterval = seconds(matObj.samplingInterval);
-
-end
-
-function [timestamps, duration] = readTimestamps(filename)
-
-tsFileObj = matfile(filename);
-ts = tsFileObj.timeStamps;
-timestamps = ts(:)';
-duration = tsFileObj.timeend - tsFileObj.time0;
-
-end

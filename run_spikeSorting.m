@@ -11,7 +11,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening'
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 0; 
+skipExist = 1; 
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 
@@ -28,9 +28,14 @@ spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist)
 
 %% spike clustering:
 
+spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
 outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
-spikeFiles = dir(fullfile(outputPath, "spikes_*.mat"));
-spikeClustering(spikeFiles, skipExist);
+
+spikeFiles = dir(fullfile(spikeFilePath, "*_spikes.mat"));
+spikeFiles = cellfun(@(f, n)fullfile(f, n), {spikeFiles.folder}, {spikeFiles.name}, UniformOutput=false);
+
+spikeClustering(spikeFiles, outputPath, skipExist);
+
 
 
 
