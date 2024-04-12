@@ -2,6 +2,9 @@ function [signal ,timestamps, samplingInterval] = combineCSC(signalFiles, timest
 %combineCSC Combine CSC signals. filling gaps with NaNs if gap between
 %segments larger than threshold.
 
+% signalFiles: cell(n, 1)
+% timestampFiles: cell(n, 1)
+
 
 if nargin < 3
     maxGapDuration = seconds(1000);
@@ -20,6 +23,8 @@ timestampsCombined = cell(1, numFiles);
 samplingInterval = zeros(numFiles, 1);
 
 parfor i = 1: numFiles
+    fprintf('reading csc: %s \n', signalFiles{i});
+
     [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i})
     [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i})
 end

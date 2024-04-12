@@ -88,32 +88,33 @@ end
 ElectrodesDynamicTable.toTable()
 nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
 
-%%  Electrical Series:
-% 
-microFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro', expId));
-microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
-
-voltageSignals = cell(1, length(microFiles));
-for i = 1: length(microFiles)
-    [voltageSignals{i}, ~, samplingInterval] = combineCSC(microFiles(i,:), timestampFiles);
-end
-voltageSignal = vertcat(voltageSignals{:});
-% 
 electrode_table_region = types.hdmf_common.DynamicTableRegion( ...
     'table', types.untyped.ObjectView(ElectrodesDynamicTable), ...
     'description', 'all electrodes', ...
     'data', (0:length(ElectrodesDynamicTable.id.data)-1)');
 
-electrical_series = types.core.ElectricalSeries( ...
-    'starting_time', 0.0, ... % seconds
-    'starting_time_rate', 1/seconds(samplingInterval), ... % Hz
-    'data', voltageSignal, ...
-    'electrodes', electrode_table_region, ...
-    'data_unit', 'volts');
+%%  Electrical Series:
+% we don't save raw signals to save storage space:
 
-nwb.acquisition.set('ElectricalSeries', electrical_series);
+% microFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro', expId));
+% microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+% 
+% voltageSignals = cell(1, length(microFiles));
+% for i = 1: length(microFiles)
+%     [voltageSignals{i}, ~, samplingInterval] = combineCSC(microFiles(i,:), timestampFiles);
+% end
+% voltageSignal = vertcat(voltageSignals{:});
+% 
+% electrical_series = types.core.ElectricalSeries( ...
+%     'starting_time', 0.0, ... % seconds
+%     'starting_time_rate', 1/seconds(samplingInterval), ... % Hz
+%     'data', voltageSignal, ...
+%     'electrodes', electrode_table_region, ...
+%     'data_unit', 'volts');
+% 
+% nwb.acquisition.set('ElectricalSeries', electrical_series);
 
-%%
+%% LFP:
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment%d/LFP_micro', expId));
 lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
@@ -126,7 +127,7 @@ for i = 1: length(lfpFiles)
 end
 lfpSignal = vertcat(lfpSignals{:});
 
-% LFP:
+
 electrical_series = types.core.ElectricalSeries( ...
     'starting_time', 0.0, ... % seconds
     'starting_time_rate', 2000., ... % Hz
@@ -142,6 +143,10 @@ ecephys_module = types.core.ProcessingModule(...
 ecephys_module.nwbdatainterface.set('LFP', lfp);
 
 nwb.processing.set('ecephys', ecephys_module);
+
+%% spikes:
+
+
 
 %% 
 
