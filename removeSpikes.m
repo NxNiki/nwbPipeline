@@ -7,6 +7,7 @@ function signal = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spi
 unitNums = length(unique(spikeClass));
 negativeSpikes = zeros(size(signal));
 for u = 1:length(unitNums)
+    fprintf('remove spike for unit %d...\n', u);
 
     ts = spikeTimestamps(classes==unitNums(u));
     tsInd = interp1(signalTimestamps, 1:length(signalTimestamps), ts, 'nearest');

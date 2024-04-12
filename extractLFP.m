@@ -1,17 +1,17 @@
-function extractLFP(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
+function extractLFP(cscFiles, timestampFiles, spikeFiles, outputPath, experimentName, skipExist)
 
-if nargin < 4 || isempty(experimentName)
+if nargin < 5 || isempty(experimentName)
     experimentName = '';
 end
 
-if nargin < 5
+if nargin < 6
     skipExist = false;
 end
 
 
 makeOutputPath(cscFiles, outputPath, skipExist)
 
-for i = 1: size(cscFiles, 1)
+parfor i = 1: size(cscFiles, 1)
     
     channelFiles = cscFiles(i,:);
     fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
@@ -30,8 +30,14 @@ for i = 1: size(cscFiles, 1)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
-    % TO DO:
-    cscSignal = removeSpikes(cscSignal);
+    if exist(spikeFiles{i}, "file")
+        spikeFileObj = matfile(spikeFiles{i});
+        spikes = spikeFileObj.spikes;
+        spikeClass = spikeFileObj.cluster_class(:, 1);
+        spikeTimestamps = spikeFileObj.cluster_class(:, 2);
+    
+        cscSignal = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps);
+    end
 
     [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignal, timestamps);
 
