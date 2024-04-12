@@ -1,15 +1,21 @@
-function signal = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spikeTimestamps)
+function signal = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spikeTimestamps, inludeClass0)
 % remove spikes in the csc signal:
 
-% samplingInterval = mean(diff(signalTimestamps));
-% sr = 1 / samplingInterval;
+if nargin < 6
+    inludeClass0 = false;
+end
 
-unitNums = length(unique(spikeClass));
+if ~inludeClass0
+    spikes = spikes(spikeClass ~= 0,:);
+    spikeClass = spikeClass(spikeClass ~= 0);
+end
+
+units = unique(spikeClass);
 negativeSpikes = zeros(size(signal));
-for u = 1:length(unitNums)
+for u = 1:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
-    ts = spikeTimestamps(spikeClass==unitNums(u));
+    ts = spikeTimestamps(spikeClass==units(u));
     tsInd = interp1(signalTimestamps, 1:length(signalTimestamps), ts, 'nearest');
 
     if sum(isnan(tsInd))>5
@@ -22,7 +28,7 @@ for u = 1:length(unitNums)
         tsInd(isnan(tsInd)) = [];
     end
 
-    wav = mean(spikes(spikeClass==unitNums(u),:));
+    wav = mean(spikes(spikeClass==units(u),:));
 
     [~,peakInd] = max(wav);
     fprintf('peak index of spike: %d\n', peakInd);
@@ -41,7 +47,7 @@ for u = 1:length(unitNums)
     for t = 1:length(ts)
         theseInds = colonByLength(tsInd(t)-peakInd,1,length(wav));
         theseInds(theseInds<1) = nan;
-        theseInds(theseInds>length(lfpTS)) = nan;
+        theseInds(theseInds>length(signalTimestamps)) = nan;
         [~,spikePeak] = min(signal(theseInds((peakInd-maxTolerance):(peakInd+maxTolerance)))); % find index that spike peaks
         newPeakInd = spikePeak + peakInd - maxTolerance - 1;
         if newPeakInd ~= peakInd
