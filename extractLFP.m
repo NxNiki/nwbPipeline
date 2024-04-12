@@ -30,13 +30,15 @@ parfor i = 1: size(cscFiles, 1)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
-    if exist(spikeFiles{i}, "file")
+    if ~isempty(spikeFiles) && exist(spikeFiles{i}, "file")
         spikeFileObj = matfile(spikeFiles{i});
         spikes = spikeFileObj.spikes;
         spikeClass = spikeFileObj.cluster_class(:, 1);
         spikeTimestamps = spikeFileObj.cluster_class(:, 2);
     
         cscSignal = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps);
+    else
+        fprintf('spike remove spikes, %s not found!\n', spikeFiles{i})
     end
 
     [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignal, timestamps);
