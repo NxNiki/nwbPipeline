@@ -30,7 +30,7 @@ timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 tsObj = matfile(timestampFiles{1});
 sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
-% generateCore('2.1.0');
+generateCore('2.6.0');
 
 nwb = NwbFile( ...
     'session_description', 'sub-550_exp-1_Screening',...
