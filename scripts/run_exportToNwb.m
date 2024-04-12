@@ -2,7 +2,7 @@
 
 % https://neurodatawithoutborders.github.io/matnwb/tutorials/html/intro.html#H_FF8B1A2D
 % https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
-
+clear
 
 expId = 1;
 filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
@@ -89,7 +89,7 @@ ElectrodesDynamicTable.toTable()
 nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
 
 %%  Electrical Series:
-
+% 
 microFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro', expId));
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
 
@@ -98,7 +98,7 @@ for i = 1: length(microFiles)
     [voltageSignals{i}, ~, samplingInterval] = combineCSC(microFiles(i,:), timestampFiles);
 end
 voltageSignal = vertcat(voltageSignals{:});
-
+% 
 electrode_table_region = types.hdmf_common.DynamicTableRegion( ...
     'table', types.untyped.ObjectView(ElectrodesDynamicTable), ...
     'description', 'all electrodes', ...
