@@ -12,7 +12,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening'
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 1; 
+skipExist = 0; 
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 
@@ -21,6 +21,7 @@ expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microFilePath = fullfile(expFilePath, 'CSC_micro');
 
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+
 microFiles = microFiles(end,:);
 
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
