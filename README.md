@@ -37,6 +37,42 @@ check for any references that were not assigned to the root  NwbFile or if any o
 ```
 Solution:
 Add `ElectrodesDynamicTable` to nwb object before adding recordings/processed data.
+
 ```
-nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
+numShanks = 1;
+numChannelsPerShank = 4;
+ 
+ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
+    'colnames', {'location', 'group', 'group_name', 'label'}, ...
+    'description', 'all electrodes');
+ 
+Device = types.core.Device(...
+    'description', 'Neuralynx Pegasus', ...
+    'manufacturer', 'Neuralynx' ...
+);
+
+shankLabel = {'GA'};
+electrodeLabel = {'ROF'};
+
+nwb.general_devices.set('array', Device);
+for iShank = 1:numShanks
+    shankGroupName = sprintf([shankLabel{iShank}, '%d'], iShank);
+    EGroup = types.core.ElectrodeGroup( ...
+        'description', sprintf('electrode group for %s', shankGroupName), ...
+        'location', 'brain area', ...
+        'device', types.untyped.SoftLink(Device) ...
+    );
+    
+    nwb.general_extracellular_ephys.set(shankGroupName, EGroup);
+    for iElectrode = 1:numChannelsPerShank
+        ElectrodesDynamicTable.addRow( ...
+            'location', 'unknown', ...
+            'group', types.untyped.ObjectView(EGroup), ...
+            'group_name', shankGroupName, ...
+            'label', sprintf(['%s-', electrodeLabel{iShank}, '%d'], shankGroupName, iElectrode));
+    end
+end
+
+nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable; % don't forget the last line!!
+
 ```
