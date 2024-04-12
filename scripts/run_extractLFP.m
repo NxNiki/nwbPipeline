@@ -21,13 +21,14 @@ expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microFilePath = fullfile(expFilePath, 'CSC_micro');
 
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+microFiles = microFiles(end,:);
 
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
+spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
 [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
-spikeFiles = cellfun(@(x) fullfile(outputPath, x), spikeFiles, UniformOutput=false);
+spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
 
 outputPath = fullfile(expFilePath, 'LFP_micro');
-
-extractLFP(microFiles, timestampFiles, spikeFiles, outputPath)
+extractLFP(microFiles, timestampFiles, spikeFiles, outputPath, '', skipExist)
