@@ -24,3 +24,19 @@ The scripts to unpack raw data, spike detection, spike clustering, and export da
 
 Code to export data to nwb format. 
 https://github.com/NeurodataWithoutBorders/matnwb
+
+## troubleshooting:
+
+error:
+```
+object(s) could not be created:
+    /processing/ecephys/LFP/ElectricalSeries/electrodes
+
+The listed object(s) above contain an ObjectView, RegionView , or SoftLink object that has failed to resolve itself. Please
+check for any references that were not assigned to the root  NwbFile or if any of the above paths are incorrect.
+```
+Solution:
+Add `ElectrodesDynamicTable` to nwb object before adding recordings/processed data.
+```
+nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
+```
