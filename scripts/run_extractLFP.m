@@ -1,4 +1,5 @@
 % run_extractLFP
+clear
 
 % expId = 2;
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/555_Screening';
@@ -20,9 +21,13 @@ expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microFilePath = fullfile(expFilePath, 'CSC_micro');
 
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
+[~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
+spikeFiles = cellfun(@(x) fullfile(outputPath, x), spikeFiles, UniformOutput=false);
+
 outputPath = fullfile(expFilePath, 'LFP_micro');
 
-extractLFP(microFiles, timestampFiles, outputPath)
+extractLFP(microFiles, timestampFiles, spikeFiles, outputPath)

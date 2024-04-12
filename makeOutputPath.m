@@ -1,8 +1,14 @@
 function makeOutputPath(inputPath, outputPath, skipExist)
 
+if iscell(inputPath)
+    inputPath = unique(cellfun(@fileparts, inputPath, UniformOutput=false));
+else
+    inputPath = fileparts(inputPath);
+end
+
 if ~exist(outputPath, "dir")
     mkdir(outputPath);
-elseif ~skipExist  && ~strcmp(inputPath, outputPath)
+elseif ~skipExist  && all(~strcmp(inputPath, outputPath))
     % create an empty dir to avoid not able to resume with unprocessed
     % files in the future if this job fails. e.g. if we have 10 files
     % processed in t1, t2 stops with 5 files processed, we cannot start
