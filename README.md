@@ -10,6 +10,8 @@ This script contains the global parameters for the pipeline.
 This is the code to read raw neuralynx files. 
 https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html
 
+Note: this part needs a Matlab version earlier than 2023b on Apple silicon.
+
 ## spikeSort
 
 The code for spike sorting, modified from PDM (by Emily) and Multi-Exp Analysis (by Chris Dao)
