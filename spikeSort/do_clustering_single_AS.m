@@ -16,6 +16,13 @@ check_WC_params(par)
 [filePath, fileName, ext] = fileparts(inputFile);
 channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
+
+% TO DO: save temp files in outputPath. need to fix bug here...
+% par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);                       % temporary filename used as input for SPC
+% par.fname = fullfile(outputPath, ['data_' channel]);
+% par.fnamespc = fullfile(outputPath, ['data_wc' channel]);
+
+% for now we save files in current dir:
 par.fname_in = ['tmp_data_wc' channel];                       % temporary filename used as input for SPC
 par.fname = ['data_' channel];
 par.fnamespc = ['data_wc' channel];
@@ -29,13 +36,6 @@ spikeCodes = spikeFileObj.spikeCodes;
 % REJECT SPIKES
 % SPK quantity check 1
 nspk = size(spikes,1);
-naux = min(par.max_spk, size(spikes,1));
-
-% if nspk < min_spikes4SPC
-%     warning('MyComponent:noValidInput', 'Not enough spikes in the file: %s', inputFile);
-%     return
-% end
-
 if ~isempty(spikeCodes) && nspk >= min_spikes4SPC
     [inds, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
     rejectedSpikes.spikes = spikes(inds,:);
