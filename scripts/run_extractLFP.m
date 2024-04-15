@@ -21,7 +21,6 @@ expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microFilePath = fullfile(expFilePath, 'CSC_micro');
 
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
-
 microFiles = microFiles(end,:);
 
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
