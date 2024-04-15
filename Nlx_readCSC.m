@@ -90,6 +90,7 @@ else
     if isempty(InputInverted)
         message = 'Cannot extract header info: InputInverted';
         logMessage(logFile, message);
+        InputInverted = 1;
     elseif strcmpi(InputInverted{1}, 'false')
         InputInverted = 1;
     elseif strcmpi(InputInverted{1}, 'true')
