@@ -34,26 +34,16 @@ fclose(fid);
 system_type = computer;
 switch system_type
     case {'PCWIN'}    
-%         if exist([pwd '\cluster.exe'])==0
-%             directory = which('cluster.exe');
-%             copyfile(directory,pwd);
-%         end
         [status,result] = dos(sprintf('"%s" %s.run',which('cluster.exe'),fname));
-        %[status,result] = dos(sprintf('cluster.exe %s.run',fname));
     case {'PCWIN64'}    
-%         if exist([pwd '\cluster_64.exe'])==0
-%             directory = which('cluster_64.exe');
-%             copyfile(directory,pwd);
-%         end
         [status,result] = dos(sprintf('"%s" %s.run',which('cluster_64.exe'),fname));
-        %[status,result] = dos(sprintf('cluster_64.exe %s.run',fname));
     case {'MAC'}
         if exist([pwd '/cluster_mac.exe'], "file")==0
             directory = which('cluster_mac.exe');
             copyfile(directory,pwd);
         end
         fileattrib([pwd '/cluster_mac.exe'],'+x')
-        run_mac = sprintf('./cluster_mac.exe %s.run',fname);
+        run_mac = sprintf('./cluster_mac.exe %s.run', fname);
 	    [status,result] = unix(run_mac);
    case {'MACI','MACI64'}
         if exist([pwd '/cluster_maci.exe'], "file")==0
@@ -61,11 +51,11 @@ switch system_type
             copyfile(directory, pwd);
         end
         fileattrib([pwd '/cluster_maci.exe'],'+x')
-        run_maci = sprintf('./cluster_maci.exe %s.run',fname);
+        run_maci = sprintf('./cluster_maci.exe %s.run', fname);
 	    [status,result] = unix(run_maci);
     case {'GLNX86'}      
         
-        run_linux = sprintf('''%s'' %s.run',which('cluster_linux.exe'),fname);
+        run_linux = sprintf('''%s'' %s.run', which('cluster_linux.exe'), fname);
         fileattrib(which('cluster_linux.exe'),'+x')
         
         [stat, mess]=fileattrib(which('cluster_linux.exe'));
@@ -75,13 +65,13 @@ switch system_type
                 directory = which('cluster_linux.exe');
                 copyfile(directory,pwd);
             end
-            run_linux = sprintf('./cluster_linux.exe %s.run',fname);
+            run_linux = sprintf('./cluster_linux.exe %s.run', fname);
         end
 	    [status,result] = unix(run_linux);
         
     case {'GLNXA64', 'GLNXI64'}
        
-        run_linux = sprintf('''%s'' %s.run',which('cluster_linux64.exe'),fname);
+        run_linux = sprintf('''%s'' %s.run', which('cluster_linux64.exe'), fname);
         fileattrib(which('cluster_linux64.exe'),'+x')
         
         [stat, mess]=fileattrib(which('cluster_linux64.exe'));
@@ -102,8 +92,6 @@ end
 if status ~= 0
     disp(result)
 end
-
-
 
 if exist('multi_files','var') && multi_files==true
 	log_name = [par.filename 'spc_log.txt'];
