@@ -23,7 +23,7 @@ if nargin < 5
     skipExist = 1;
 end
 
-makeOutputPath(inFileNames, outputPath, skipExist)
+makeOutputPath(inFileNames, outFilePath, skipExist)
 
 % TO DO: probably don't want to hard code timestamp file name.
 timestampFileName = 'lfpTimeStamps';
@@ -35,7 +35,7 @@ suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 [~, computeTS] = findFirstOccurrence(suffix_int);
 
 % unpack the remainning files without computing the timestamp:
-parfor i = 1:length(inFileNames)
+for i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
