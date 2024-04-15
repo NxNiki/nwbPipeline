@@ -15,52 +15,53 @@ negativeSpikes = zeros(size(signal));
 for u = 1:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
-    ts = spikeTimestamps(spikeClass==units(u));
-    tsInd = interp1(signalTimestamps, 1:length(signalTimestamps), ts, 'nearest');
+    unitTs = spikeTimestamps(spikeClass==units(u));
+    unitPeakIdxInSignal = interp1(signalTimestamps, 1:length(signalTimestamps), unitTs, 'nearest');
 
-    if sum(isnan(tsInd))>5
+    if sum(isnan(unitPeakIdxInSignal))>5
         warning('unexpected number of nan timestamps discovered.')
         keyboard
-        ts(isnan(tsInd)) = [];
-        tsInd(isnan(tsInd)) = [];
+        unitTs(isnan(unitPeakIdxInSignal)) = [];
+        unitPeakIdxInSignal(isnan(unitPeakIdxInSignal)) = [];
     else
-        ts(isnan(tsInd)) = [];
-        tsInd(isnan(tsInd)) = [];
+        unitTs(isnan(unitPeakIdxInSignal)) = [];
+        unitPeakIdxInSignal(isnan(unitPeakIdxInSignal)) = [];
     end
 
-    wav = mean(spikes(spikeClass==units(u),:));
+    unitAvgSpike = mean(spikes(spikeClass==units(u),:));
 
-    [~,peakInd] = max(wav);
-    fprintf('peak index of spike: %d\n', peakInd);
+    [~, avgPeakInd] = max(abs(unitAvgSpike));
+    fprintf('peak index of spike: %d\n', avgPeakInd);
 
     % add a gradual taper to the waveform so that there isn't an
     % abrupt cliff at the edges.
-    padWidth = floor(length(wav)/2);
-    prePad = linspace(0, wav(1), padWidth+1); 
+    padWidth = floor(length(unitAvgSpike)/2);
+    prePad = linspace(0, unitAvgSpike(1), padWidth+1); 
     prePad(end) = [];
-    postPad = linspace(wav(end), 0, padWidth+1);
+    postPad = linspace(unitAvgSpike(end), 0, padWidth+1);
     postPad(1) = [];
-    peakInd = peakInd + padWidth;
-    wav = [prePad, wav, postPad];
+    avgPeakInd = avgPeakInd + padWidth;
+    unitAvgSpike = [prePad, unitAvgSpike, postPad];
 
     maxTolerance = 22;
-    for t = 1:length(ts)
-        theseInds = colonByLength(tsInd(t)-peakInd,1,length(wav));
-        theseInds(theseInds<1) = nan;
-        theseInds(theseInds>length(signalTimestamps)) = nan;
-        [~,spikePeak] = min(signal(theseInds((peakInd-maxTolerance):(peakInd+maxTolerance)))); % find index that spike peaks
-        newPeakInd = spikePeak + peakInd - maxTolerance - 1;
-        if newPeakInd ~= peakInd
-            theseInds = colonByLength(tsInd(t)-peakInd+(newPeakInd-peakInd), 1, length(wav));
-            indsToKeep = theseInds>=1 & theseInds<=length(signalTimestamps);
+    for t = 1:length(unitTs)
+        unitIdx = colonByLength(unitPeakIdxInSignal(t)-avgPeakInd, 1, length(unitAvgSpike));
+        unitIdx(unitIdx<1) = nan;
+        unitIdx(unitIdx>length(signalTimestamps)) = nan;
+        unitSignalSpike = signal(unitIdx((avgPeakInd - maxTolerance): (avgPeakInd + maxTolerance)));
+        [~, spikePeak] = min(unitSignalSpike); % find index that spike peaks
+        newPeakInd = spikePeak + avgPeakInd - maxTolerance - 1;
+        if newPeakInd ~= avgPeakInd
+            unitIdx = colonByLength(unitPeakIdxInSignal(t) - avgPeakInd + (newPeakInd-avgPeakInd), 1, length(unitAvgSpike));
+            indsToKeep = unitIdx>=1 & unitIdx<=length(signalTimestamps);
         else
-            indsToKeep = ~isnan(theseInds); %true(size(wav)); need to eliminate those past length(lfpTS)
+            indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
         end
-        negativeSpikes(theseInds(indsToKeep)) = negativeSpikes(theseInds(indsToKeep)) - wav(indsToKeep); % negative spikes is all 0s so this flips the spike
+        negativeSpikes(unitIdx(indsToKeep)) = negativeSpikes(unitIdx(indsToKeep)) - unitAvgSpike(indsToKeep); % negative spikes is all 0s so this flips the spike
     end
 end
 
-signal = signal - negativeSpikes;
+signal = signal + negativeSpikes; % !!! need to confirm the spikes are NOT reverted !!!
 
 end
 

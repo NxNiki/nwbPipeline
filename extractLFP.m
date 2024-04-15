@@ -11,7 +11,7 @@ end
 
 makeOutputPath(cscFiles, outputPath, skipExist)
 
-parfor i = 1: size(cscFiles, 1)
+for i = 1: size(cscFiles, 1)
     
     channelFiles = cscFiles(i,:);
     fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
