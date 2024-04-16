@@ -1,15 +1,21 @@
-function extractLFP(cscFiles, timestampFiles, spikeFiles, outputPath, experimentName, skipExist)
+function outputFiles = extractLFP(cscFiles, timestampFiles, spikeFiles, outputPath, experimentName, skipExist, saveRaw)
 
 if nargin < 5 || isempty(experimentName)
     experimentName = '';
 end
 
-if nargin < 6
-    skipExist = false;
+if nargin < 6 || isempty(skipExist)
+    skipExist = true;
+end
+
+% save Raw signals to check spikes are removed correctly (see run_plotLFP.m).
+if nargin < 7
+    saveRaw = false;
 end
 
 
 makeOutputPath(cscFiles, outputPath, skipExist)
+outputFiles = cell(size(cscFiles, 1), 1);
 
 for i = 1: size(cscFiles, 1)
     
@@ -18,7 +24,8 @@ for i = 1: size(cscFiles, 1)
 
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
-    
+    outputFiles{i} = lfpFilename;
+
     % TO DO: check file completeness:
     if exist(lfpFilename, "file") && skipExist
         continue
@@ -36,18 +43,25 @@ for i = 1: size(cscFiles, 1)
         spikeClass = spikeFileObj.cluster_class(:, 1);
         spikeTimestamps = spikeFileObj.cluster_class(:, 2);
     
-        cscSignal = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps);
+        cscSignalSpikesRemoved = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps);
     else
-        fprintf('spike remove spikes, %s not found!\n', spikeFiles{i})
+        fprintf('spike file: %s not found!\n', spikeFiles{i})
+        cscSignalSpikesRemoved = cscSignal;
     end
 
-    [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignal, timestamps);
+    [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikesRemoved, timestamps);
 
     lfpFileObj = matfile(lfpFilename, "Writable", true);
     lfpFileObj.lfp = lfpSignal;
-    lfpFileObj.timestamps = downSampledTimestamps;
+    lfpFileObj.lfpTimestamps = downSampledTimestamps;
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
+
+    if saveRaw
+        lfpFileObj.cscSignal = cscSignal;
+        lfpFileObj.cscSignalSpikesRemoved = cscSignalSpikesRemoved;
+        lfpFileObj.rawTimestamps = timestamps;
+    end
 
 end
 

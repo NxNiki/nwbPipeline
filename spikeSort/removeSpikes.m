@@ -20,7 +20,6 @@ for u = 1:length(units)
 
     if sum(isnan(unitPeakIdxInSignal))>5
         warning('unexpected number of nan timestamps discovered.')
-        keyboard
         unitTs(isnan(unitPeakIdxInSignal)) = [];
         unitPeakIdxInSignal(isnan(unitPeakIdxInSignal)) = [];
     else
@@ -49,10 +48,10 @@ for u = 1:length(units)
         unitIdx(unitIdx<1) = nan;
         unitIdx(unitIdx>length(signalTimestamps)) = nan;
         unitSignalSpike = signal(unitIdx((avgPeakInd - maxTolerance): (avgPeakInd + maxTolerance)));
-        [~, spikePeak] = min(unitSignalSpike); % find index that spike peaks
+        [~, spikePeak] = max(abs(unitSignalSpike)); % find index that spike peaks
         newPeakInd = spikePeak + avgPeakInd - maxTolerance - 1;
         if newPeakInd ~= avgPeakInd
-            unitIdx = colonByLength(unitPeakIdxInSignal(t) - avgPeakInd + (newPeakInd-avgPeakInd), 1, length(unitAvgSpike));
+            unitIdx = colonByLength(unitPeakIdxInSignal(t) - avgPeakInd + (newPeakInd - avgPeakInd), 1, length(unitAvgSpike));
             indsToKeep = unitIdx>=1 & unitIdx<=length(signalTimestamps);
         else
             indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
