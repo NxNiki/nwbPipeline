@@ -15,3 +15,6 @@ venv/
 
 # Ignore temp .m files:
 *.asv
+
+scripts/*.dg_01*
+scripts/*.exe
