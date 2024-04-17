@@ -12,7 +12,7 @@ end
 
 units = unique(spikeClass);
 negativeSpikes = zeros(size(signal));
-for u = 2:length(units)
+for u = 1:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
     unitTs = spikeTimestamps(spikeClass==units(u));
@@ -53,9 +53,10 @@ for u = 2:length(units)
     for t = 1:length(unitTs)
         unitIdx = colonByLength(unitPeakIdxInSignal(t)-avgPeakInd, 1, length(unitAvgSpike));
         
-        % compare signals with spikes:
+        % ----------------- uncomment and set break point to compare signals with spikes:
         spikeInSignal = signal(unitPeakIdxInSignal(t) - 23: unitPeakIdxInSignal(t) + 50);
         plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal)])
+        % -----------------
 
         unitIdx(unitIdx<1) = nan;
         unitIdx(unitIdx>length(signalTimestamps)) = nan;

@@ -31,6 +31,10 @@ if ~exist('computeTS','var') || isempty(computeTS)
     computeTS = 1;
 end
 
+if ~exist('logPath','var') || isempty(logPath)
+    logPath = '';
+end
+
 % 1. Timestamps   
 % 2. Sc Numbers
 % 3. Cell Numbers
