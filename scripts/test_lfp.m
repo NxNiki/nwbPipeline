@@ -17,6 +17,19 @@ timestampfile = {'/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Scre
 microLFPPath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening/lfp_test';
 
 
+%% check data in .ncs file is same as .mat file:
+
+ncsfile = '/Volumes/DATA/NLData/D569/EXP2_Screening/2024-01-25_16-53-58/GB1-RA3_0001.ncs';
+
+[TimeStamps,~,~,~,raw_data,~] = Nlx2MatCSC_v3(ncsfile,[1,1,1,1,1],1,1);
+[signal, computedTimeStamps] = Nlx_readCSC(ncsfile);
+
+load(cscfile{1})
+plot(data - signal(:)');
+
+
+%% test extract lfp:
+
 skipExist = 0; 
 saveRawSignal = true;
 
