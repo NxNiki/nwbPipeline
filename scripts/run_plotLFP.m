@@ -1,5 +1,6 @@
 % run_extractLFP
 clear
+close all;
 
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
@@ -20,7 +21,7 @@ cscSignal.value = lfpFileObj.cscSignal;
 cscSignal.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
 cscSignal.label = 'cscSignal';
 
-cscSignalSpikesRemoved.value = lfpFileObj.cscSignalSpikesRemoved;
+cscSignalSpikesRemoved.value = lfpFileObj.cscSignalSpikesRemoved * 20;
 cscSignalSpikesRemoved.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
 cscSignalSpikesRemoved.label = 'cscSignalSpikesRemoved';
 
@@ -28,8 +29,11 @@ lfpSignal.value = lfpFileObj.lfp;
 lfpSignal.ts = lfpFileObj.lfpTimestamps;
 lfpSignal.label = 'lfp';
 
+%%
+plotOverlapSignals(cscSignal, [], lfpSignal, [0, 100])
 
-plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, lfpSignal, [10, 100])
+%%
+plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, lfpSignal, [99, 100])
 
 
 

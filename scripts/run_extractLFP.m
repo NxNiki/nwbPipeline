@@ -10,6 +10,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening'
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = 0; 
+saveRawSignal = true;
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
@@ -27,7 +28,7 @@ spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
 [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
 spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
 
-lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, true);
+lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, saveRawSignal);
 writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
 
 
