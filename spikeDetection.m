@@ -20,7 +20,7 @@ for j = nSegments:-1:1
     [timestamps{j}, duration(j)] = readTimestamps(timestampFiles{j});
 end
 
-for i = 1: size(cscFiles, 1)
+parfor i = 1: size(cscFiles, 1)
     channelFiles = cscFiles(i,:);
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
@@ -70,14 +70,16 @@ for i = 1: size(cscFiles, 1)
         spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
     end
 
+    fprintf('write spikes to file:\n %s\n', spikeFilename);
     matobj = matfile(spikeFilename, 'Writable', true);
     matobj.spikes = [spikes{:}];
     matobj.spikeTimestamps = [spikeTimestamps{:}];
     matobj.thr = thr;
+    matobj.param = param;
     matobj.spikeCodes = vertcat(spikeCodes{:});
     matobj.spikeHist = [spikeHist{:}];
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
-    matobj.param = param;
+    
 
 end
 end
