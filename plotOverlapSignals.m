@@ -1,12 +1,13 @@
 function plotOverlapSignals(signal1, signal2, signal3, tsInterval)
 
-transparency = 1;
+transparency = .8;
 
 % Plot the resampled signals
 figure;
 signalVal1 = signal1.value(signal1.ts>=tsInterval(1) & signal1.ts<=tsInterval(2));
 signalTs1 = signal1.ts(signal1.ts>=tsInterval(1) & signal1.ts<=tsInterval(2));
 plot(signalTs1, signalVal1, 'LineWidth', 1.5, 'LineStyle', '-', 'Color', [0.1, 0.7, 0.2, transparency]);
+legendLabels = {signal1.label};
 
 if ~isempty(signal2)
     signalVal2 = signal2.value(signal2.ts>=tsInterval(1) & signal2.ts<=tsInterval(2));
@@ -14,10 +15,8 @@ if ~isempty(signal2)
     % Resample signal2 to match signalTs1
     signalVal2 = interp1(signalTs2, signalVal2, signalTs1);
     hold on;
-    plot(signalTs1, signalVal2, 'LineWidth', 1.5, 'LineStyle', '-', 'Color', [0.7, 0.1, 0.2, transparency]);
-    label2 = signal2.label;
-else
-    label2 = '';
+    plot(signalTs1, signalVal2, 'LineWidth', 1.5, 'LineStyle', '-', 'Color', [0.3, 0.1, 0.2, transparency]);
+    legendLabels = [legendLabels, {signal2.label}];
 end
 
 if ~isempty(signal3)
@@ -27,14 +26,12 @@ if ~isempty(signal3)
     signalVal3 = interp1(signalTs3, signalVal3, signalTs1);
     hold on;
     plot(signalTs1, signalVal3, 'LineWidth', 1.5, 'LineStyle', '-', 'Color', [0.2, 0.1, 0.7, transparency]);
-    label3 = signal3.label;
-else
-    label3 = '';
+    legendLabels = [legendLabels, {signal3.label}];
 end
 
-xlabel('Time');
+xlabel('Time (sec)');
 ylabel('Amplitude');
-legend(signal1.label, label2, label3);
+legend(legendLabels);
 title('');
 
 end
