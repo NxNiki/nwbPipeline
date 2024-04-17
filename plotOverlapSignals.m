@@ -35,7 +35,7 @@ end
 
 xlabel('Time');
 ylabel('Amplitude');
-legend(signal1.label, label2, label3);
+legend(legendLabels);
 title('');
 
 end

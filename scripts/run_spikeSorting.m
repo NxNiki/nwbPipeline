@@ -8,7 +8,7 @@ addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
 expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 
 % 0: will remove all previous unpack files.
