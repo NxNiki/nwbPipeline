@@ -20,14 +20,13 @@ for u = 1:length(units)
 
     if sum(isnan(unitPeakIdxInSignal))>5
         warning('unexpected number of nan timestamps discovered.')
-        unitTs(isnan(unitPeakIdxInSignal)) = [];
         unitPeakIdxInSignal(isnan(unitPeakIdxInSignal)) = [];
     else
-        unitTs(isnan(unitPeakIdxInSignal)) = [];
         unitPeakIdxInSignal(isnan(unitPeakIdxInSignal)) = [];
     end
 
-    unitAvgSpike = mean(spikes(spikeClass==units(u),:));
+    unitSpikes = spikes(spikeClass==units(u),:);
+    unitAvgSpike = mean(unitSpikes);
 
     [~, avgPeakInd] = max(abs(unitAvgSpike));
     fprintf('peak index of spike: %d\n', avgPeakInd);
@@ -39,31 +38,16 @@ for u = 1:length(units)
     prePad(end) = [];
     postPad = linspace(unitAvgSpike(end), 0, padWidth+1);
     postPad(1) = [];
-    avgPeakInd = avgPeakInd + padWidth;
-    unitAvgSpike = [prePad, unitAvgSpike, postPad];
 
-    maxTolerance = 22;
-    for t = 1:length(unitTs)
-        unitIdx = colonByLength(unitPeakIdxInSignal(t)-avgPeakInd, 1, length(unitAvgSpike));
-        unitIdx(unitIdx<1) = nan;
-        unitIdx(unitIdx>length(signalTimestamps)) = nan;
-        unitSignalSpike = signal(unitIdx((avgPeakInd - maxTolerance): (avgPeakInd + maxTolerance)));
-        [~, spikePeak] = max(abs(unitSignalSpike)); % find index that spike peaks
-        newPeakInd = spikePeak + avgPeakInd - maxTolerance - 1;
-        if newPeakInd ~= avgPeakInd
-            unitIdx = colonByLength(unitPeakIdxInSignal(t) - avgPeakInd + (newPeakInd - avgPeakInd), 1, length(unitAvgSpike));
-            indsToKeep = unitIdx>=1 & unitIdx<=length(signalTimestamps);
-        else
-            indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
-        end
-        negativeSpikes(unitIdx(indsToKeep)) = negativeSpikes(unitIdx(indsToKeep)) - unitAvgSpike(indsToKeep); % negative spikes is all 0s so this flips the spike
+    searchRange = max(100, avgPeakInd); % number of sample before and after peak to search for spike index in signal.
+    for t = 1:length(unitPeakIdxInSignal)
+        [spikeStartIndex, spikeEndIndex] = findSpikeIndex(signal, unitSpikes(t,:), [unitPeakIdxInSignal(t) - searchRange, unitPeakIdxInSignal(t) + searchRange]);
+        spikeStartIndex = spikeStartIndex - length(prePad);
+        spikeEndIndex = spikeEndIndex + length(postPad);
+        negativeSpikes(spikeStartIndex: spikeEndIndex) = negativeSpikes(spikeStartIndex: spikeEndIndex) - [prePad, unitAvgSpike, postPad]; % negative spikes is all 0s so this flips the spike
     end
 end
 
 signal = signal + negativeSpikes; % !!! need to confirm the spikes are NOT reverted !!!
 
-end
-
-function v = colonByLength(start,increment,length)
-v = start:increment:((length-1)*increment+start);
 end
