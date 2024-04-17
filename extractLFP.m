@@ -37,11 +37,15 @@ for i = 1: size(cscFiles, 1)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
+    fprintf('length of csc signal: %d', length(cscSignal));
+
     if ~isempty(spikeFiles) && exist(spikeFiles{i}, "file")
         spikeFileObj = matfile(spikeFiles{i});
         spikes = spikeFileObj.spikes;
         spikeClass = spikeFileObj.cluster_class(:, 1);
         spikeTimestamps = spikeFileObj.cluster_class(:, 2);
+
+        fprintf('index of last spike: %d', spikeTimestamps(end) * (seconds(1) / samplingInterval));
     
         cscSignalSpikesRemoved = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps);
     else

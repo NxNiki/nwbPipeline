@@ -12,11 +12,17 @@ end
 
 units = unique(spikeClass);
 negativeSpikes = zeros(size(signal));
-for u = 1:length(units)
+for u = 2:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
     unitTs = spikeTimestamps(spikeClass==units(u));
     unitPeakIdxInSignal = interp1(signalTimestamps, 1:length(signalTimestamps), unitTs, 'nearest');
+
+    if all(isnan(unitPeakIdxInSignal))
+        warning('spike and signal timestamp miss match!')
+        signalTimestamps = (signalTimestamps - signalTimestamps(1)) * 1000;
+        unitPeakIdxInSignal = interp1(signalTimestamps, 1:length(signalTimestamps), unitTs, 'nearest');
+    end
 
     if sum(isnan(unitPeakIdxInSignal))>5
         warning('unexpected number of nan timestamps discovered.')
@@ -27,7 +33,8 @@ for u = 1:length(units)
         unitPeakIdxInSignal(isnan(unitPeakIdxInSignal)) = [];
     end
 
-    unitAvgSpike = mean(spikes(spikeClass==units(u),:));
+    unitSpikes = spikes(spikeClass==units(u),:);
+    unitAvgSpike = mean(unitSpikes);
 
     [~, avgPeakInd] = max(abs(unitAvgSpike));
     fprintf('peak index of spike: %d\n', avgPeakInd);
@@ -45,6 +52,11 @@ for u = 1:length(units)
     maxTolerance = 22;
     for t = 1:length(unitTs)
         unitIdx = colonByLength(unitPeakIdxInSignal(t)-avgPeakInd, 1, length(unitAvgSpike));
+        
+        % compare signals with spikes:
+        spikeInSignal = signal(unitPeakIdxInSignal(t) - 23: unitPeakIdxInSignal(t) + 50);
+        plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal)])
+
         unitIdx(unitIdx<1) = nan;
         unitIdx(unitIdx>length(signalTimestamps)) = nan;
         unitSignalSpike = signal(unitIdx((avgPeakInd - maxTolerance): (avgPeakInd + maxTolerance)));
@@ -60,7 +72,7 @@ for u = 1:length(units)
     end
 end
 
-signal = signal + negativeSpikes; % !!! need to confirm the spikes are NOT reverted !!!
+signal = signal - negativeSpikes; % 
 
 end
 
