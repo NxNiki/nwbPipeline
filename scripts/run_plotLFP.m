@@ -28,8 +28,23 @@ lfpSignal.value = lfpFileObj.lfp;
 lfpSignal.ts = lfpFileObj.lfpTimestamps;
 lfpSignal.label = 'lfp';
 
+removedSpikes.value = (lfpFileObj.cscSignal - lfpFileObj.cscSignalSpikesRemoved) * 20;
+removedSpikes.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
+removedSpikes.label = 'removedSpikes';
 
-plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, lfpSignal, [10, 100])
+%%
+
+plotOverlapSignals(cscSignal, [], lfpSignal, [0, 100])
+
+%%
+
+interval = [30.4, 30.6];
+plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, lfpSignal, interval)
+
+plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, [], interval)
+
+plotOverlapSignals(cscSignal, removedSpikes, [], interval)
+
 
 
 
