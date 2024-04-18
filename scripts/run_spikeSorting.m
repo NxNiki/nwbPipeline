@@ -3,8 +3,8 @@ clear
 
 addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/555_Screening';
+% expId = 1;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
 
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
@@ -25,6 +25,7 @@ microFilePath = fullfile(expFilePath, 'CSC_micro');
 outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+% microFiles = microFiles(2,:);
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
