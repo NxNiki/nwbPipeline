@@ -10,8 +10,10 @@ if ~inludeClass0
     spikeClass = spikeClass(spikeClass ~= 0);
 end
 
+spikeSignalCorrThresh = 0.5;
+
 units = unique(spikeClass);
-negativeSpikes = zeros(size(signal));
+revertedSpikes = zeros(size(signal));
 for u = 1:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
@@ -36,7 +38,7 @@ for u = 1:length(units)
     unitSpikes = spikes(spikeClass==units(u),:);
     unitAvgSpike = mean(unitSpikes);
 
-    [~, avgPeakInd] = max(abs(unitAvgSpike));
+    [~, avgPeakInd] = max(abs(unitAvgSpike - median(unitAvgSpike)));
     fprintf('peak index of spike: %d\n', avgPeakInd);
 
     % add a gradual taper to the waveform so that there isn't an
@@ -47,33 +49,37 @@ for u = 1:length(units)
     postPad = linspace(unitAvgSpike(end), 0, padWidth+1);
     postPad(1) = [];
     avgPeakInd = avgPeakInd + padWidth;
-    unitAvgSpike = [prePad, unitAvgSpike, postPad];
+    unitAvgSpikePad = [prePad, unitAvgSpike, postPad];
 
     maxTolerance = 22;
     for t = 1:length(unitTs)
-        unitIdx = colonByLength(unitPeakIdxInSignal(t)-avgPeakInd, 1, length(unitAvgSpike));
+        unitIdx = colonByLength(unitPeakIdxInSignal(t)-avgPeakInd, 1, length(unitAvgSpikePad));
+        
+        spikeInSignal = signal(unitPeakIdxInSignal(t) - 23: unitPeakIdxInSignal(t) + 50);
+        spikeSignalCorr = corr(unitSpikes(t,:)', spikeInSignal(:));
+        isInverted = (spikeSignalCorr < 0) * 2 - 1;
+        isInverted = isInverted * (abs(spikeSignalCorr) < spikeSignalCorrThresh);
         
         % ----------------- uncomment and set break point to compare signals with spikes:
-        spikeInSignal = signal(unitPeakIdxInSignal(t) - 23: unitPeakIdxInSignal(t) + 50);
-        plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal)])
+        %plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
         % -----------------
 
         unitIdx(unitIdx<1) = nan;
         unitIdx(unitIdx>length(signalTimestamps)) = nan;
         unitSignalSpike = signal(unitIdx((avgPeakInd - maxTolerance): (avgPeakInd + maxTolerance)));
-        [~, spikePeak] = max(abs(unitSignalSpike)); % find index that spike peaks
+        [~, spikePeak] = max(abs(unitSignalSpike - median(unitSignalSpike))); % find index that spike peaks
         newPeakInd = spikePeak + avgPeakInd - maxTolerance - 1;
         if newPeakInd ~= avgPeakInd
-            unitIdx = colonByLength(unitPeakIdxInSignal(t) - avgPeakInd + (newPeakInd - avgPeakInd), 1, length(unitAvgSpike));
+            unitIdx = colonByLength(unitPeakIdxInSignal(t) - avgPeakInd + (newPeakInd - avgPeakInd), 1, length(unitAvgSpikePad));
             indsToKeep = unitIdx>=1 & unitIdx<=length(signalTimestamps);
         else
             indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
         end
-        negativeSpikes(unitIdx(indsToKeep)) = negativeSpikes(unitIdx(indsToKeep)) - unitAvgSpike(indsToKeep); % negative spikes is all 0s so this flips the spike
+        revertedSpikes(unitIdx(indsToKeep)) = revertedSpikes(unitIdx(indsToKeep)) - isInverted * unitAvgSpikePad(indsToKeep);
     end
 end
 
-signal = signal - negativeSpikes; % 
+signal = signal - revertedSpikes; % the spikes are reverted so we add it to the raw signal.
 
 end
 

@@ -1,11 +1,11 @@
 % run_extractLFP
 clear
-
+close all
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
 expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
@@ -13,7 +13,7 @@ microLFPPath = fullfile(expFilePath, 'LFP_micro');
 %% plot LFP with raw signals:
 
 
-lfpFile = fullfile(microLFPPath, 'GA1-ROF2_lfp.mat');
+lfpFile = fullfile(microLFPPath, 'GB1-RA2_lfp.mat');
 lfpFileObj = matfile(lfpFile);
 
 cscSignal.value = lfpFileObj.cscSignal;
@@ -34,11 +34,11 @@ removedSpikes.label = 'removedSpikes';
 
 %%
 
-plotOverlapSignals(cscSignal, [], lfpSignal, [0, 100])
+plotOverlapSignals(cscSignal, [], lfpSignal, [20, 50])
 
 %%
 
-interval = [30.4, 30.6];
+interval = [30.48, 30.58];
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, lfpSignal, interval)
 
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, [], interval)

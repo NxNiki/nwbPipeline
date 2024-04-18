@@ -89,8 +89,8 @@ try
     end
 catch err
     warning('MyComponent:ERROR_SPC', 'Error in SPC');
-    rethrow(err);
-    %return
+    disp(err);
+    return
 end
 
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
