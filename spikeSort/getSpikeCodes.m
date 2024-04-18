@@ -1,4 +1,4 @@
-function [spikeCodes, spikeHist, spikeHistPrecise, binEdges1, binEdgesPrecise] = getSpikeCodes(spikes, spikeTimestamp, duration, par)
+function [spikeCodes, spikeHist, spikeHistPrecise, binEdges1, binEdgesPrecise] = getSpikeCodes(spikes, spikeTimestamp, duration, par, inputStruct)
 
 binEdges1 = 0:3:1000*(duration)+3;
 binEdgesPrecise = 0:2000/par.sr:1000*(duration)+1;
@@ -15,14 +15,14 @@ spikeTimestamp = spikeTimestamp*1000;
 
 % Calculate and store spike features that can be used for rejection
 spikeCodes = table();
-spikeCodes.timestamp_sec = spikeTimestamp(:)';
+spikeCodes.timestamp_sec = spikeTimestamp(:);
 
 %calculate firing rate
 spikeCodes.firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamp);
 
 % local minima:
 spikeCodes.rawAmplitude = spikes(:, w_pre);
-spikeCodes.ampAsMultipleOfSTD = spikes(:, w_pre) / noise_std_detect;
+spikeCodes.ampAsMultipleOfSTD = spikes(:, w_pre) / inputStruct.noise_std_detect;
 locMin = diff(sign(diff(spikes')))'>0;
 locMin = [ones(size(locMin,1),1), locMin, ones(size(locMin,1),1)];
 
@@ -66,6 +66,7 @@ spikeHistPrecise = logical(histc(spikeTimestamp, binEdgesPrecise));
 end
 
 function firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamp)
+    spikeTimestamp = spikeTimestamp - spikeTimestamp(1);
     binEdges1 = 0:500:500*floor(max(spikeTimestamp)/500)+500; 
     hist1 = histcounts(spikeTimestamp, binEdges1);
     spikeCount1 = hist1(max([ones(1, length(spikeTimestamp));floor(spikeTimestamp/500)], [], 1));

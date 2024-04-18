@@ -85,7 +85,7 @@ switch system_type
         end
         [status,result] = unix(run_linux);
     otherwise 
-    	ME = MException('MyComponent:NotSupportedArq', '%s type of computer not supported.', com_type);
+    	ME = MException('MyComponent:NotSupportedArq', '%s type of computer not supported.', system_type);
     	throw(ME)
 end
 

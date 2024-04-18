@@ -1,4 +1,4 @@
-function [spikes,thr,index] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
+function [spikes,thr,index, inputStruct] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
 % Detect spikes with amplitude thresholding. Uses median estimation.
 % Detection is done with filters set by fmin_detect and fmax_detect. Spikes
 % are stored for sorting using fmin_sort and fmax_sort. This trick can
@@ -25,8 +25,6 @@ if exist('inputStruct','var') && ~isempty(inputStruct)
     %passed here.
     xf = inputStruct.xf;
     xf_detect = inputStruct.xf_detect;
-    noise_std_detect = inputStruct.noise_std_detect;
-    noise_std_sorted = inputStruct.noise_std_sorted;
     thrmax = inputStruct.thrmax;
     if ~exist('thr','var') || isempty(thr)
         thr = inputStruct.thr;
@@ -45,12 +43,12 @@ else
         xf_detect = xf;
     end
 
-    noise_std_detect = median(abs(xf_detect))/0.6745;
-    noise_std_sorted = median(abs(xf))/0.6745;
+    inputStruct.noise_std_detect = median(abs(xf_detect))/0.6745;
+    inputStruct.noise_std_sorted = median(abs(xf))/0.6745;
     if ~exist('thr','var') || isempty(thr)
-        thr = stdmin * noise_std_detect;        %thr for detection is based on detect settings.
+        thr = stdmin * inputStruct.noise_std_detect;        %thr for detection is based on detect settings.
     end
-    thrmax = min(maxAmp, stdmax * noise_std_sorted);     %thrmax for artifact removal is based on sorted settings.
+    thrmax = min(maxAmp, stdmax * inputStruct.noise_std_sorted);     %thrmax for artifact removal is based on sorted settings.
 end
 
 index = [];
