@@ -65,9 +65,9 @@ for i = 1: size(cscFiles, 1)
         outputStruct{j}.noise_std_sorted = common_noise_std_sorted;
         outputStruct{j}.thr = thr_all;
 
-        [spikes{j}, thr, index] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct{j});
+        [spikes{j}, thr, index, outputStruct{j}] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct{j});
         spikeTimestamps{j} = timestamps{j}(index);
-        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration(j), param);
+        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration(j), param, outputStruct{j});
         spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
     end
 
