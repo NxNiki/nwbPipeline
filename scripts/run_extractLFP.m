@@ -5,7 +5,7 @@ clear
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
 expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
@@ -18,7 +18,7 @@ microLFPPath = fullfile(expFilePath, 'LFP_micro');
 
 microFilePath = fullfile(expFilePath, 'CSC_micro');
 microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
-microFiles = microFiles(2,:);
+% microFiles = microFiles(2,:);
 
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
