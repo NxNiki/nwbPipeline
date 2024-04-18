@@ -1,4 +1,4 @@
-function [spikes,thr,index,spikeCodes,spikeHist,spikeHistPrecise, binEdges1, binEdgesPrecise] = amp_detect_AS(x, par, maxAmp, TimeStamps, duration, thr, inputStruct)
+function [spikes,thr,index] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
 % Detect spikes with amplitude thresholding. Uses median estimation.
 % Detection is done with filters set by fmin_detect and fmax_detect. Spikes
 % are stored for sorting using fmin_sort and fmax_sort. This trick can
@@ -132,77 +132,8 @@ switch par.interpolation
 end
 
 if isempty(index)
-    binEdges1 = 0:3:1000*(duration)+3;
-    binEdgesPrecise = 0:2000/sr:1000*(duration)+1;
-    spikeHist = zeros(1, length(binEdges1)-1); 
-    spikeHistPrecise = zeros(1, length(binEdgesPrecise));
-    [spikes,thr,index,spikeCodes] = deal([]);
-    return
+    fprintf('no spikes detected!\n')
+    [spikes,thr,index] = deal([]);
 end
 
-%% Calculate and store spike features that can be used for rejection
-rawAmplitude = spikes(:, w_pre);
-ampAsMultipleOfSTD = spikes(:, w_pre) / noise_std_detect;
-
-
-tIndex = TimeStamps(index)*1000;
-%calculate firing rate
-if nspk==0
-    firingRateAroundSpikeTime = zeros(0,1);
-else
-    binEdges1 = 0:500:500*floor(max(tIndex)/500)+500; 
-    binEdges2 = 250:500:500*floor((max(tIndex)+250)/500)+500;
-    hist1 = histcounts(tIndex, binEdges1); hist2 = histcounts(tIndex, binEdges2);
-    spikeCount1 = hist1(max([ones(1, length(tIndex));floor(tIndex/500)], [], 1));
-    spikeCount2 = hist2(max([ones(1, length(tIndex));ceil((tIndex-250)/500)], [], 1));
-    firingRateAroundSpikeTime = .5*max([spikeCount1', spikeCount2'], [], 2);
-end
-
-timestamp_sec = tIndex(:)/1000;
-
-%% local minima:
-locMin = diff(sign(diff(spikes')))'>0;
-locMin = [repmat(1,size(locMin,1),1), locMin, repmat(1,size(locMin,1),1)];
-localMinInd_Pre = nan(size(rawAmplitude)); localMinV_Pre = localMinInd_Pre;
-localMinInd_Post = nan(size(rawAmplitude)); localMinV_Post = localMinInd_Post;
-halfWidth = localMinInd_Pre;
-for i = 1:length(localMinInd_Pre)
-    localMinInd_Pre(i) = find(locMin(i,1:w_pre-1),1,'last');
-    localMinV_Pre(i) = spikes(i,localMinInd_Pre(i));
-    localMinInd_Post(i) = find(locMin(i,w_pre+1:end),1,'first')+w_pre;
-    localMinV_Post(i) = spikes(i,localMinInd_Post(i));
-    halfHeight = (spikes(i,w_pre) - localMinV_Pre(i))/2;
-    [~,halfHeightPreInd] = min(abs(spikes(i,localMinInd_Pre(i):w_pre)-halfHeight));
-    halfHeightPreInd = halfHeightPreInd+localMinInd_Pre(i);
-    [~,halfHeightPostInd] = min(abs(spikes(i,w_pre:localMinInd_Post(i))-halfHeight));
-    halfHeightPostInd = halfHeightPostInd+w_pre-1;
-    halfWidth(i) = halfHeightPostInd-halfHeightPreInd;
-end
-
-heightToWidthRatio = spikes(:,w_pre)./halfWidth;
-minToMinWidth = localMinInd_Post-localMinInd_Pre;
-%%
-
-spikeCodes = table( ...
-    timestamp_sec, ...
-    firingRateAroundSpikeTime,...
-    rawAmplitude, ...
-    ampAsMultipleOfSTD, ...
-    localMinInd_Pre, ...
-    localMinV_Pre, ...
-    localMinInd_Post, ...
-    localMinV_Post,...
-    halfWidth, ...
-    heightToWidthRatio, ...
-    minToMinWidth ...
-    );
-
-binEdges1 = 0:3:1000*(duration)+3; 
-binEdges2 = 1.5:3:1000*(duration)+4.5;
-spikeHist1 = logical(histcounts(tIndex, binEdges1));
-spikeHist2 = logical(histcounts(tIndex, binEdges2));
-spikeHist = spikeHist1 | spikeHist2;
-
-binEdgesPrecise = 0:2000/sr:1000*(duration)+1;
-spikeHistPrecise = logical(histc(tIndex, binEdgesPrecise));
 
