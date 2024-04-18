@@ -18,3 +18,5 @@ venv/
 
 scripts/*.dg_01*
 scripts/*.exe
+scripts/data_*.run
+scripts/tmp_data*
