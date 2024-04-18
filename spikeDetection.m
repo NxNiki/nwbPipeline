@@ -20,7 +20,7 @@ for j = nSegments:-1:1
     [timestamps{j}, duration(j)] = readTimestamps(timestampFiles{j});
 end
 
-parfor i = 1: size(cscFiles, 1)
+for i = 1: size(cscFiles, 1)
     channelFiles = cscFiles(i,:);
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
@@ -65,12 +65,19 @@ parfor i = 1: size(cscFiles, 1)
         outputStruct{j}.noise_std_sorted = common_noise_std_sorted;
         outputStruct{j}.thr = thr_all;
 
-        [spikes{j}, thr, index, spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}, ~, ~] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, duration(j), thr_all, outputStruct{j});
+        [spikes{j}, thr, index] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct{j});
         spikeTimestamps{j} = timestamps{j}(index);
+        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration(j), param);
         spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
     end
 
     fprintf('write spikes to file:\n %s\n', spikeFilename);
+    % remove file if it exist as repetitive writing to save variable in
+    % matfile obj consumes increasing memory:
+    if exist(spikeFilename, "file")
+        delete(spikeFilename);
+    end
+
     matobj = matfile(spikeFilename, 'Writable', true);
     matobj.spikes = [spikes{:}];
     matobj.spikeTimestamps = [spikeTimestamps{:}];
@@ -79,7 +86,6 @@ parfor i = 1: size(cscFiles, 1)
     matobj.spikeCodes = vertcat(spikeCodes{:});
     matobj.spikeHist = [spikeHist{:}];
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
-    
 
 end
 end
