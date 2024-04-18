@@ -87,9 +87,10 @@ try
         movefile([par.fnamespc '.dg_01.lab'], [par.fname '.dg_01.lab'], 'f');
         movefile([par.fnamespc '.dg_01'], [par.fname '.dg_01'], 'f');
     end
-catch
+catch err
     warning('MyComponent:ERROR_SPC', 'Error in SPC');
-    return
+    rethrow(err);
+    %return
 end
 
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
