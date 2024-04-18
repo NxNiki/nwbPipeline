@@ -5,7 +5,7 @@
 clear
 
 expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
@@ -64,7 +64,7 @@ Device = types.core.Device(...
     'manufacturer', 'Neuralynx' ...
 );
 
-shankLabel = {'GA'};
+shankLabel = {'GB'};
 electrodeLabel = {'ROF'};
 
 nwb.general_devices.set('array', Device);
@@ -146,6 +146,26 @@ nwb.processing.set('ecephys', ecephys_module);
 
 %% spikes:
 
+
+
+num_cells = 10;
+firing_rate = 20;
+spikes = cell(1, num_cells);
+for iShank = 1:num_cells
+    spikes{iShank} = rand(1, randi([16, 28]));
+end
+
+[spike_times_vector, spike_times_index] = util.create_indexed_column(spikes);
+ 
+nwb.units = types.core.Units( ...
+    'colnames', {'spike_times'}, ...
+    'description', 'units table', ...
+    'id', types.hdmf_common.ElementIdentifiers( ...
+        'data', int64(0:length(spikes) - 1) ...
+    ), ...
+    'spike_times', spike_times_vector, ...
+    'spike_times_index', spike_times_index ...
+);
 
 
 %% 
