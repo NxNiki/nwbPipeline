@@ -23,7 +23,7 @@ timestampsCombined = cell(1, numFiles);
 samplingInterval = zeros(numFiles, 1);
 
 parfor i = 1: numFiles
-    fprintf('reading csc: %s \n', signalFiles{i});
+    fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
 
     [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i})
     [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i})
