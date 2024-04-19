@@ -1,4 +1,4 @@
-function [signalSpikeRemoved, signalInterpolate] = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spikeTimestamps, inludeClass0)
+function [signalSpikeRemoved, signalInterpolate, spikeIntervalPercentage] = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spikeTimestamps, inludeClass0)
 % remove spikes in the csc signal:
 
 if nargin < 6
@@ -15,6 +15,8 @@ spikeSignalCorrThresh = 0.5;
 units = unique(spikeClass);
 revertedSpikes = zeros(size(signal));
 signalInterpolate = signal;
+spikeIntervalPercentage = 0;
+
 for u = 1:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
@@ -77,12 +79,14 @@ for u = 1:length(units)
             indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
         end
         revertedSpikes(unitIdx(indsToKeep)) = revertedSpikes(unitIdx(indsToKeep)) - isInverted * unitAvgSpikePad(indsToKeep);
-        signalInterpolate(unitIdx(indsToKeep)) = NaN;
+        signalInterpolate(unitPeakIdxInSignal(t) - 23: unitPeakIdxInSignal(t) + 50) = NaN;
+        spikeIntervalPercentage = spikeIntervalPercentage + 74;
     end
 end
 
 signalSpikeRemoved = signal - revertedSpikes; % the spikes are reverted so we add it to the raw signal.
 signalInterpolate = fillmissing(signalInterpolate, "linear");
+spikeIntervalPercentage = spikeIntervalPercentage/length(signal);
 
 end
 

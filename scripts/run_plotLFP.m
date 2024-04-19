@@ -1,19 +1,21 @@
-% run_extractLFP
+% plot LFP with raw signals:
+
 clear
 close all
+
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
 expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
+expName = '569_Screening';
+fileName = 'GB1-RA2_lfp.mat';
+filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
 
-%% plot LFP with raw signals:
-
-
-lfpFile = fullfile(microLFPPath, 'GB1-RA2_lfp.mat');
+% load data:
+lfpFile = fullfile(microLFPPath, fileName);
 lfpFileObj = matfile(lfpFile);
 
 cscSignal.value = lfpFileObj.cscSignal;
@@ -24,6 +26,10 @@ cscSignalSpikesRemoved.value = lfpFileObj.cscSignalSpikesRemoved;
 cscSignalSpikesRemoved.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
 cscSignalSpikesRemoved.label = 'cscSignalSpikesRemoved';
 
+cscSignalSpikeInterpolated.value = lfpFileObj.cscSignalSpikeInterpolated;
+cscSignalSpikeInterpolated.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
+cscSignalSpikeInterpolated.label = 'cscSignalSpikeInterpolated';
+
 lfpSignal.value = lfpFileObj.lfp;
 lfpSignal.ts = lfpFileObj.lfpTimestamps;
 lfpSignal.label = 'lfp';
@@ -32,18 +38,27 @@ removedSpikes.value = (lfpFileObj.cscSignal - lfpFileObj.cscSignalSpikesRemoved)
 removedSpikes.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
 removedSpikes.label = 'removedSpikes';
 
-%%
+spikeIntervalPercentage = lfpFileObj.spikeIntervalPercentage;
 
-plotOverlapSignals(cscSignal, [], lfpSignal, [20, 50])
+% plot signal over a large range:
+yLimit = [-500, 500];
+xTimeRangeSecs = [0, inf];
 
-%%
+plotLabel = sprintf([expName, ': ', fileName, ', removed signal: %.3f%%'], spikeIntervalPercentage * 100);
+plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
+plotOverlapSignals(cscSignal, [], cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
 
-interval = [30.48, 30.58];
-plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, lfpSignal, interval)
+plotSignalSpectrum(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, plotLabel)
 
-plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, [], interval)
+%% select x range:
 
-plotOverlapSignals(cscSignal, removedSpikes, [], interval)
+% close all;
+
+xTimeRangeSecs = [441.4, 441.5];
+plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel)
+
+% plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, [], interval)
+plotOverlapSignals(cscSignal, removedSpikes, [], xTimeRangeSecs, [], plotLabel)
 
 
 

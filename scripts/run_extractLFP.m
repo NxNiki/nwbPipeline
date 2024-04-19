@@ -1,11 +1,11 @@
 % run_extractLFP
 clear
 
-% expId = 5;
-% filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+expId = 5;
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
-expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
+% expId = 1;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
