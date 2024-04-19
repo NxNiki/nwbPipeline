@@ -1,4 +1,4 @@
-function signal = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spikeTimestamps, inludeClass0)
+function [signalSpikeRemoved, signalInterpolate] = removeSpikes(signal, signalTimestamps, spikes, spikeClass, spikeTimestamps, inludeClass0)
 % remove spikes in the csc signal:
 
 if nargin < 6
@@ -14,6 +14,7 @@ spikeSignalCorrThresh = 0.5;
 
 units = unique(spikeClass);
 revertedSpikes = zeros(size(signal));
+signalInterpolate = signal;
 for u = 1:length(units)
     fprintf('remove spike for unit %d...\n', u);
 
@@ -58,10 +59,10 @@ for u = 1:length(units)
         spikeInSignal = signal(unitPeakIdxInSignal(t) - 23: unitPeakIdxInSignal(t) + 50);
         spikeSignalCorr = corr(unitSpikes(t,:)', spikeInSignal(:));
         isInverted = (spikeSignalCorr < 0) * 2 - 1;
-        isInverted = isInverted * (abs(spikeSignalCorr) < spikeSignalCorrThresh);
-        
+        isInverted = isInverted * (abs(spikeSignalCorr) > spikeSignalCorrThresh);
+
         % ----------------- uncomment and set break point to compare signals with spikes:
-        %plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
+        % plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
         % -----------------
 
         unitIdx(unitIdx<1) = nan;
@@ -76,10 +77,12 @@ for u = 1:length(units)
             indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
         end
         revertedSpikes(unitIdx(indsToKeep)) = revertedSpikes(unitIdx(indsToKeep)) - isInverted * unitAvgSpikePad(indsToKeep);
+        signalInterpolate(unitIdx(indsToKeep)) = NaN;
     end
 end
 
-signal = signal - revertedSpikes; % the spikes are reverted so we add it to the raw signal.
+signalSpikeRemoved = signal - revertedSpikes; % the spikes are reverted so we add it to the raw signal.
+signalInterpolate = fillmissing(signalInterpolate, "linear");
 
 end
 

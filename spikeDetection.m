@@ -36,7 +36,7 @@ for i = 1: size(cscFiles, 1)
     maxAmp = 500;
 
     signals = cell(nSegments, 1);
-    outputStruct = cell(nSegments, 1);
+    %outputStruct = cell(nSegments, 1);
     spikes = cell(nSegments, 1);
     spikeCodes = cell(nSegments, 1);
     spikeHist = cell(nSegments, 1);
@@ -44,31 +44,33 @@ for i = 1: size(cscFiles, 1)
     spikeTimestamps = cell(nSegments, 1);
     thr = zeros(nSegments, 1);
 
-    for j = 1: nSegments
+    for j = nSegments:-1:1
         [signals{j}, samplingInterval] = readCSC(channelFiles{j});
 
         param.sr = 1/samplingInterval;
         param.ref = floor(1.5 * param.sr/1000);
-        [thr(j), outputStruct{j}] = getDetectionThresh(signals{j}, param, maxAmp);
+        [thr(j), outputStruct(j)] = getDetectionThresh(signals{j}, param, maxAmp);
     end
 
     thr_all = min(thr);
     % it shouldn't go less than 18. If it does, it probably found a file with a long stretch of flat, and will then find millions of spikes in the non-flat section.
     thr_all = max(thr_all, 18);
-    maxThr = max([outputStruct{:}.thrmax]);
-    common_noise_std_detect = min([outputStruct{:}.noise_std_detect]);
-    common_noise_std_sorted = min([outputStruct{:}.noise_std_sorted]);
+    maxThr = max([outputStruct.thrmax]);
+    common_noise_std_detect = min([outputStruct.noise_std_detect]);
+    common_noise_std_sorted = min([outputStruct.noise_std_sorted]);
 
     for j = 1: nSegments
-        outputStruct{j}.thrmax = maxThr;
-        outputStruct{j}.noise_std_detect = common_noise_std_detect;
-        outputStruct{j}.noise_std_sorted = common_noise_std_sorted;
-        outputStruct{j}.thr = thr_all;
+        outputStruct(j).thrmax = maxThr;
+        outputStruct(j).noise_std_detect = common_noise_std_detect;
+        outputStruct(j).noise_std_sorted = common_noise_std_sorted;
+        outputStruct(j).thr = thr_all;
 
-        [spikes{j}, thr, index, outputStruct{j}] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct{j});
+        [spikes{j}, thr, index, outputStruct(j)] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct(j));
         spikeTimestamps{j} = timestamps{j}(index);
-        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration(j), param, outputStruct{j});
-        spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
+        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration(j), param, outputStruct(j));
+        if ~isempty(spikeCodes{j})
+            spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
+        end
     end
 
     fprintf('write spikes to file:\n %s\n', spikeFilename);
@@ -79,7 +81,7 @@ for i = 1: size(cscFiles, 1)
     end
 
     matobj = matfile(spikeFilename, 'Writable', true);
-    matobj.spikes = [spikes{:}];
+    matobj.spikes = vertcat(spikes{:});
     matobj.spikeTimestamps = [spikeTimestamps{:}];
     matobj.thr = thr;
     matobj.param = param;
