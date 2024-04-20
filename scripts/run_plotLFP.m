@@ -3,14 +3,17 @@
 clear
 close all
 
-% expId = 5;
-% filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+expId = 5;
+expName = '570_MovieParadigm';
+fileName = 'GA1-REC2_lfp.mat';
+filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/', expName];
 
-expId = 1;
-expName = '569_Screening';
-fileName = 'GB1-RA2_lfp.mat';
-filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+% expId = 1;
+% expName = '569_Screening';
+% fileName = 'GB1-RA2_lfp.mat';
+% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
+%% load data:
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
 
@@ -40,13 +43,14 @@ removedSpikes.label = 'removedSpikes';
 
 spikeIntervalPercentage = lfpFileObj.spikeIntervalPercentage;
 
-% plot signal over a large range:
-yLimit = [-500, 500];
-xTimeRangeSecs = [0, inf];
+%% plot signal over a large range:
+
+yLimit = [-1000, 1000];
+xTimeRangeSecs = [0, 100] + 600;
 
 plotLabel = sprintf([expName, ': ', fileName, ', removed signal: %.3f%%'], spikeIntervalPercentage * 100);
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
-plotOverlapSignals(cscSignal, [], cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
+%plotOverlapSignals(cscSignal, [], cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
 
 plotSignalSpectrum(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, plotLabel)
 
@@ -54,10 +58,9 @@ plotSignalSpectrum(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated
 
 % close all;
 
-xTimeRangeSecs = [441.4, 441.5];
+xTimeRangeSecs = [52.31, 52.55];
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel)
 
-% plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, [], interval)
 plotOverlapSignals(cscSignal, removedSpikes, [], xTimeRangeSecs, [], plotLabel)
 
 

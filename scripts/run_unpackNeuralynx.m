@@ -28,6 +28,10 @@ expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
 %% list csc and event files. 
 % csc files are grouped for each channel.
 
+
+addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
+
+
 if ~exist(expOutFilePath, "dir")
     mkdir(expOutFilePath);
 end

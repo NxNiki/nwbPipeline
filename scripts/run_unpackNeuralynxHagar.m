@@ -2,6 +2,8 @@
 % this script should run with Matlab 2023a or earlier if on Mac with apple
 % silicon.
 
+addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
+
 
 expId = 1;
 filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/P384/EXP1_Hagar_Movie';
