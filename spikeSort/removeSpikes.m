@@ -78,12 +78,12 @@ for u = 1:length(units)
         spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxStart + length(unitSpikes(t,:)) - 1);
         
         spikeSignalCorr = corr(unitSpikes(t,:)', spikeInSignal(:));
-        isInverted = (spikeSignalCorr < 0) * 2 - 1;
+        isInverted = ((spikeSignalCorr < 0) - .5) * 2;
         isInverted = isInverted * (abs(spikeSignalCorr) > spikeSignalCorrThresh);
 
         % ----------------- uncomment and set break point to compare signals with spikes:
-        plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
-        legend({'unitSpike', 'spikeInSignal', 'unitAvgSpike'})
+        % plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
+        % legend({'unitSpike', 'spikeInSignal', 'unitAvgSpike'})
         % -----------------
 
         revertedSpikes(unitIdx(indsToKeep)) = revertedSpikes(unitIdx(indsToKeep)) - isInverted * unitAvgSpikePad(indsToKeep);
@@ -93,7 +93,7 @@ for u = 1:length(units)
 end
 
 signalSpikeRemoved = signal - revertedSpikes; % the spikes are reverted so we add it to the raw signal.
-signalInterpolate = fillmissing(signalInterpolate, "spline");
+signalInterpolate = fillmissing(signalInterpolate, "linear");
 spikeIntervalPercentage = spikeIntervalPercentage/length(signal);
 
 end
