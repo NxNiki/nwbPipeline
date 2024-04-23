@@ -2,6 +2,8 @@
 
 % https://neurodatawithoutborders.github.io/matnwb/tutorials/html/intro.html#H_FF8B1A2D
 % https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
+% https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertTrials.m
+
 clear
 
 expId = 1;
@@ -56,7 +58,7 @@ numShanks = 1;
 numChannelsPerShank = 4;
  
 ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
-    'colnames', {'location', 'group', 'group_name', 'label'}, ...
+    'colnames', {'x', 'y', 'z', 'location', 'group', 'group_name', 'label'}, ...
     'description', 'all electrodes');
  
 Device = types.core.Device(...
@@ -79,12 +81,16 @@ for iShank = 1:numShanks
     nwb.general_extracellular_ephys.set(shankGroupName, EGroup);
     for iElectrode = 1:numChannelsPerShank
         ElectrodesDynamicTable.addRow( ...
+            'x', NaN, ...
+            'y', NaN, ...
+            'z', NaN, ...
             'location', 'unknown', ...
             'group', types.untyped.ObjectView(EGroup), ...
             'group_name', shankGroupName, ...
             'label', sprintf(['%s-', electrodeLabel{iShank}, '%d'], shankGroupName, iElectrode));
     end
 end
+
 ElectrodesDynamicTable.toTable()
 nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
 
@@ -146,6 +152,51 @@ nwb.processing.set('ecephys', ecephys_module);
 
 %% spikes:
 
+spikeFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro_spikes', expId));
+spikeFileNames = dir(fullfile(spikeFilePath, 'times*.mat'));
+spikeFileNames = fullfile(spikeFilePath, {spikeFileNames.name});
+
+nwb.units = types.core.Units('colnames',...
+    {'spike_times', 'trials', 'waveforms'},...
+    'description', 'Analysed Spike Events');
+esHash = data.eventSeriesHash;
+ids = regexp(esHash.keyNames, '^unit(\d+)$', 'once', 'tokens');
+ids = str2double([ids{:}]);
+nwb.units.spike_times = types.hdmf_common.VectorData(...
+    'description', 'timestamps of spikes');
+
+for i=1:length(ids)
+    esData = esHash.value{i};
+    % add trials ID reference
+
+    good_trials_mask = ismember(esData.eventTrials, nwb.intervals_trials.id.data);
+    eventTrials = [];
+    eventTimes = esData.eventTimes(good_trials_mask);
+    waveforms = esData.waveforms(good_trials_mask,:);
+    channel = esData.channel(good_trials_mask);
+
+    % add waveform data to "unitx" and associate with "waveform" column as ObjectView.
+    ses = types.core.SpikeEventSeries(...
+        'control', ids(i),...
+        'control_description', 'Units Table ID',...
+        'data', waveforms .', ...
+        'description', '', ...
+        'timestamps', eventTimes, ...
+        'timestamps_unit', 'seconds',...
+        'electrodes', types.hdmf_common.DynamicTableRegion(...
+            'description', 'Electrodes involved with these spike events',...
+            'table', types.untyped.ObjectView('/general/extracellular_ephys/electrodes'),...
+            'data', channel - 1));
+    ses_name = esHash.keyNames{i};
+    ses_ref = types.untyped.ObjectView(['/analysis/', ses_name]);
+    if ~isempty(esData.cellType)
+        ses.comments = ['cellType: ' esData.cellType{1}];
+    end
+    nwb.analysis.set(ses_name, ses);
+    nwb.units.addRow(...
+        'id', ids(i), 'trials', eventTrials, 'spike_times', eventTimes, 'waveforms', ses_ref,...
+        'tablepath', '/units');
+end
 
 
 num_cells = 10;
