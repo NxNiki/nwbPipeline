@@ -3,15 +3,15 @@
 clear
 close all
 
-expId = 5;
-expName = '570_MovieParadigm';
-fileName = 'GA1-REC2_lfp.mat';
-filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/', expName];
+% expId = 5;
+% expName = '570_MovieParadigm';
+% fileName = 'GA1-REC2_lfp.mat';
+% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/', expName];
 
-% expId = 1;
-% expName = '569_Screening';
-% fileName = 'GB1-RA2_lfp.mat';
-% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+expId = 2;
+expName = '572_Screening';
+fileName = 'GB1-RA2_lfp.mat';
+filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
 %% load data:
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];

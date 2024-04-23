@@ -3,11 +3,11 @@ clear
 
 addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 
-% expId = 1;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
+expId = 2;
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
 
-expId = 5;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
+% expId = 5;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
 
 % 0: will remove all previous unpack files.
@@ -27,6 +27,7 @@ timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
 spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist)
+disp('Spike Detection Finished!')
 
 %% spike clustering:
 
@@ -37,6 +38,7 @@ spikeFiles = dir(fullfile(spikeFilePath, "*_spikes.mat"));
 spikeFiles = cellfun(@(f, n)fullfile(f, n), {spikeFiles.folder}, {spikeFiles.name}, UniformOutput=false);
 
 spikeClustering(spikeFiles, outputPath, skipExist);
+disp('Spike Clustering finished!')
 
 
 
