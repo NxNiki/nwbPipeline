@@ -3,6 +3,7 @@
 % https://neurodatawithoutborders.github.io/matnwb/tutorials/html/intro.html#H_FF8B1A2D
 % https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
 % https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertTrials.m
+% https://github.com/rutishauserlab/recogmem-release-NWB/blob/master/RutishauserLabtoNWB/events/newolddelay/matlab/export/NWBexport_demo.m
 
 clear
 
