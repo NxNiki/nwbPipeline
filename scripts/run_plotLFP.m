@@ -1,7 +1,6 @@
 % plot LFP with raw signals:
 
 clear
-close all
 
 % expId = 5;
 % expName = '570_MovieParadigm';
@@ -10,7 +9,7 @@ close all
 
 expId = 2;
 expName = '572_Screening';
-fileName = 'GB1-RA2_lfp.mat';
+fileName = 'GA4-RFOpAI1_lfp.mat';
 filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
 %% load data:
@@ -39,31 +38,38 @@ lfpSignal.label = 'lfp';
 
 removedSpikes.value = (lfpFileObj.cscSignal - lfpFileObj.cscSignalSpikesRemoved) * 20;
 removedSpikes.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
-removedSpikes.label = 'removedSpikes';
+removedSpikes.label = 'removedSpikes x 20';
+
+removedInterpolateSpikes.value = (lfpFileObj.cscSignal - cscSignalSpikeInterpolated.value) * 20;
+removedInterpolateSpikes.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
+removedInterpolateSpikes.label = '-cscSignalSpikeInterpolated x 20';
 
 spikeIntervalPercentage = lfpFileObj.spikeIntervalPercentage;
 
 %% plot signal over a large range:
 
-yLimit = [-1000, 1000];
-xTimeRangeSecs = [0, 100] + 600;
+close all
+
+yLimit = [-500, 500] * 2;
+xTimeRangeSecs = [0, 100] + 100;
 
 plotLabel = sprintf([expName, ': ', fileName, ', removed signal: %.3f%%'], spikeIntervalPercentage * 100);
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
 %plotOverlapSignals(cscSignal, [], cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
 
+xTimeRangeSecs = [0, inf];
 plotSignalSpectrum(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, plotLabel)
 
 %% select x range:
 
 % close all;
 
-xTimeRangeSecs = [52.31, 52.55];
+xTimeRangeSecs = [52.38, 52.4];
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel)
 
 plotOverlapSignals(cscSignal, removedSpikes, [], xTimeRangeSecs, [], plotLabel)
 
-
+plotOverlapSignals(cscSignal, [], removedInterpolateSpikes, xTimeRangeSecs, [], plotLabel)
 
 
 
