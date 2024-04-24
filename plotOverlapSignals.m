@@ -22,7 +22,7 @@ if ~isempty(signal2)
     % Resample signal2 to match signalTs1
     signalVal2 = interp1(signalTs2, signalVal2, signalTs1);
     hold on;
-    plot(signalTs1(1:downsampleRate:end), signalVal2(1:downsampleRate:end), 'LineWidth', .5, 'LineStyle', '-', 'Color', [0.7, 0.1, 0.2, transparency]);
+    plot(signalTs1(1:downsampleRate:end), signalVal2(1:downsampleRate:end), 'LineWidth', .6, 'LineStyle', '-', 'Color', [0.7, 0.1, 0.2, transparency]);
     legendLabels = [legendLabels, {signal2.label}];
 end
 
@@ -32,7 +32,7 @@ if ~isempty(signal3)
     % Resample signal2 to match signalTs1
     signalVal3 = interp1(signalTs3, signalVal3, signalTs1);
     hold on;
-    plot(signalTs1(1:downsampleRate:end), signalVal3(1:downsampleRate:end), 'LineWidth', .3, 'LineStyle', '-', 'Color', [0.2, 0.1, 0.7, transparency]);
+    plot(signalTs1(1:downsampleRate:end), signalVal3(1:downsampleRate:end), 'LineWidth', .6, 'LineStyle', '-', 'Color', [0.2, 0.1, 0.7, transparency]);
     legendLabels = [legendLabels, {signal3.label}];
 end
 

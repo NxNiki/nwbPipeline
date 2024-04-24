@@ -13,6 +13,7 @@ if nargin < 7
     saveRaw = false;
 end
 
+removeRejectedSpikes = true;
 
 makeOutputPath(cscFiles, outputPath, skipExist)
 outputFiles = cell(size(cscFiles, 1), 1);
@@ -47,7 +48,15 @@ for i = 1: size(cscFiles, 1)
 
         fprintf('index of last spike: %d\n', (spikeTimestamps(end) - timestamps(1)) * (seconds(1) / samplingInterval));
     
-        [cscSignalSpikesRemoved, cscSignalSpikeInterpolated, spikeIntervalPercentage] = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps);
+        cscSignalSpikesRemoved  = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps, true);
+        [cscSignalSpikeInterpolated, spikeIntervalPercentage] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
+        
+        if removeRejectedSpikes
+            rejectedSpikes = spikeFileObj.rejectedSpikes;
+            rejectedSpikeTimestamps = rejectedSpikes.index(:);
+            [cscSignalSpikeInterpolated, rejectedSpikeIntervalPercentage] = interpolateSpikes(cscSignalSpikeInterpolated, timestamps, rejectedSpikes.spikes, rejectedSpikeTimestamps);
+            spikeIntervalPercentage = spikeIntervalPercentage + rejectedSpikeIntervalPercentage;
+        end
     else
         fprintf('spike file: %s not found!\n', spikeFiles{i})
         cscSignalSpikesRemoved = cscSignal;
