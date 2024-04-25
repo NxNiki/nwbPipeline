@@ -37,6 +37,6 @@ for i = 1:length(spikeIndexInSignal)
 
 end
 
-signalInterpolate = fillmissing(signalInterpolate, "movmean", 1 + interpolateRangePre + interpolateRangePost);
+signalInterpolate = fillmissing(signalInterpolate, "movmean", round((1 + interpolateRangePre + interpolateRangePost) * 1.2));
 signalInterpolate = fillmissing(signalInterpolate, "nearest");
 spikeIntervalPercentage = spikeIntervalPercentage/length(signal);
