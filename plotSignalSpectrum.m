@@ -46,8 +46,8 @@ noverlap = [];          % amount of overlap of sections for psd ([] = default = 
 [pxx,fxx] = pwelch(signal(:)', win, noverlap, nfft, samplingRate);
 pxx = 10*log10(pxx);
 
-pxx = pxx(6:floor(length(pxx)/16));
-fxx = fxx(6:floor(length(fxx)/16)); % up to 1000 Hz.
+pxx = pxx(3:floor(length(pxx)/32));
+fxx = fxx(3:floor(length(fxx)/32)); % up to 500 Hz.
 
 end
 
