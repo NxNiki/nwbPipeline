@@ -4,12 +4,13 @@ clear
 expId = 4;
 filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
+% expId = 1;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = 0; 
+saveRaw = 1;
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
@@ -27,7 +28,7 @@ spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
 [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
 spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
 
-lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, true);
+lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, saveRaw);
 writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
 
 

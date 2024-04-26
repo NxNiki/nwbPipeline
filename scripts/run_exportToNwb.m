@@ -200,6 +200,10 @@ for i=1:length(ids)
 end
 
 
+% load spikes for all channels:
+
+
+
 num_cells = 10;
 firing_rate = 20;
 spikes = cell(1, num_cells);
