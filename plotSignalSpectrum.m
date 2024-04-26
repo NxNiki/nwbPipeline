@@ -29,11 +29,15 @@ if ~isempty(signal3)
     legendLabels = [legendLabels, {signal3.label}];
 end
 
-xlabel('Frequency');
-ylabel('Spectrum Power');
+xlabel('Frequency', 'FontSize', 15);
+ylabel('Spectrum Power', 'FontSize', 15);
 
-legend(legendLabels);
+legend(legendLabels, 'FontSize', 12, 'location','best');
 title(strrep(titleName, '_', ' '), 'FontSize', 16);
+set(gca, 'Xscale', 'log')
+
+ax = gca;
+ax.XAxis.FontSize = 15;
 
 end
 
@@ -46,8 +50,8 @@ noverlap = [];          % amount of overlap of sections for psd ([] = default = 
 [pxx,fxx] = pwelch(signal(:)', win, noverlap, nfft, samplingRate);
 pxx = 10*log10(pxx);
 
-pxx = pxx(3:floor(length(pxx)/32));
-fxx = fxx(3:floor(length(fxx)/32)); % up to 500 Hz.
+pxx = pxx(3:floor(length(pxx)/16));
+fxx = fxx(3:floor(length(fxx)/16)); % up to 1000 Hz.
 
 end
 

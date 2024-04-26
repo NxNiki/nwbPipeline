@@ -39,7 +39,6 @@ for i = 1: size(cscFiles, 1)
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
-
     if ~isempty(spikeFiles) && exist(spikeFiles{i}, "file")
         spikeFileObj = matfile(spikeFiles{i});
         spikes = spikeFileObj.spikes;
@@ -49,19 +48,23 @@ for i = 1: size(cscFiles, 1)
         fprintf('index of last spike: %d\n', (spikeTimestamps(end) - timestamps(1)) * (seconds(1) / samplingInterval));
     
         cscSignalSpikesRemoved  = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps, true);
-        [cscSignalSpikeInterpolated, spikeIntervalPercentage] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
+        [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
         
         if removeRejectedSpikes
             rejectedSpikes = spikeFileObj.rejectedSpikes;
             rejectedSpikeTimestamps = rejectedSpikes.index(:);
-            [cscSignalSpikeInterpolated, rejectedSpikeIntervalPercentage] = interpolateSpikes(cscSignalSpikeInterpolated, timestamps, rejectedSpikes.spikes, rejectedSpikeTimestamps);
+            [cscSignalSpikeInterpolated, rejectedSpikeIntervalPercentage, interpolateIndexRejected, spikeIndexRejected] = interpolateSpikes(cscSignalSpikeInterpolated, timestamps, rejectedSpikes.spikes, rejectedSpikeTimestamps);
             spikeIntervalPercentage = spikeIntervalPercentage + rejectedSpikeIntervalPercentage;
+            interpolateIndex = interpolateIndex | interpolateIndexRejected;
+            spikeIndex = spikeIndex | spikeIndexRejected;
         end
     else
         fprintf('spike file: %s not found!\n', spikeFiles{i})
         cscSignalSpikesRemoved = cscSignal;
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
+        interpolateIndex = false(1, length(cscSignal));
+        spikeIndex = false(1, length(cscSignal));
     end
 
     [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikesRemoved, timestamps);
@@ -78,6 +81,8 @@ for i = 1: size(cscFiles, 1)
         lfpFileObj.cscSignalSpikesRemoved = cscSignalSpikesRemoved;
         lfpFileObj.cscSignalSpikeInterpolated = cscSignalSpikeInterpolated;
         lfpFileObj.rawTimestamps = timestamps;
+        lfpFileObj.interpolateIndex = interpolateIndex;
+        lfpFileObj.spikeIndex = spikeIndex;
     end
 
 end
