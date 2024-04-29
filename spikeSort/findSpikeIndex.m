@@ -1,4 +1,6 @@
 function [spikeStartIndex, spikeEndIndex] = findSpikeIndex(signal, spike, searchRange)
+% this is not used.
+% Xin
 
 if nargin < 3
     searchRange = [1, length(signal)];
