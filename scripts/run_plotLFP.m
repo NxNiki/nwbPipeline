@@ -2,15 +2,15 @@
 
 clear
 
-% expId = 1;
-% expName = '550_Screening';
-% fileName = 'GA1-ROF2_lfp.mat';
-% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+expId = 1;
+expName = '550_Screening';
+fileName = 'GA1-ROF2_lfp.mat';
+filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
-expId = 5;
-expName = '570_MovieParadigm';
-fileName = 'GA1-REC2_lfp.mat';
-filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/', expName];
+% expId = 5;
+% expName = '570_MovieParadigm';
+% fileName = 'GA1-REC2_lfp.mat';
+% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/', expName];
 
 % expId = 4;
 % expName = '570_MovieParadigm';
@@ -65,8 +65,8 @@ removedInterpolateSpikes.label = '-cscSignalSpikeInterpolated x 5';
 
 spikeIntervalPercentage = lfpFileObj.spikeIntervalPercentage;
 
-% spikeIndex = lfpFileObj.spikeIndex;
-spikeIndex = [];
+spikeIndex = lfpFileObj.spikeIndex;
+% spikeIndex = [];
 
 plotLabel = sprintf([expName, ' Exp %d: ', fileName, ', removed signal: %.3f%%'], expId, spikeIntervalPercentage * 100);
 
@@ -88,7 +88,7 @@ plotSignalSpectrum(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated
 
 % close all;
 
-xTimeRangeSecs = [118.62, 118.64];
+xTimeRangeSecs = [332.72, 332.74];
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel, spikeIndex)
 
 plotOverlapSignals(cscSignal, interpolateIndex, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel)
