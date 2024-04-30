@@ -28,6 +28,9 @@ https://github.com/NeurodataWithoutBorders/matnwb
 ## troubleshooting:
 
 Matlab toolbox cannot be installed due to permission issue:
+
+See this [solution](https://www.mathworks.com/matlabcentral/answers/334889-can-t-install-any-toolboxes-because-can-t-write-to-usr-local-matlab-r2017)
+
 Run this in Mac terminal:
 
 ```
