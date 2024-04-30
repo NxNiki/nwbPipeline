@@ -35,7 +35,7 @@ suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 [~, computeTS] = findFirstOccurrence(suffix_int);
 
 % unpack the remainning files without computing the timestamp:
-for i = 1:length(inFileNames)
+parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
