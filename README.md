@@ -27,6 +27,20 @@ https://github.com/NeurodataWithoutBorders/matnwb
 
 ## troubleshooting:
 
+Matlab toolbox cannot be installed due to permission issue:
+Run this in Mac terminal:
+
+```
+sudo chown -R $LOGNAME: '/Applications/MATLAB_R2023a.app'
+```
+
+Or maybe run matlab in terminal:
+
+```
+sudo matlab
+```
+
+
 error:
 ```
 object(s) could not be created:
