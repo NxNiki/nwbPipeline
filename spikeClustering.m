@@ -9,7 +9,7 @@ makeOutputPath(spikeFiles, outputPath, skipExist)
 
 min_spikes4SPC = 16;
 
-for fnum = 1:length(spikeFiles)
+parfor fnum = 1:length(spikeFiles)
 
     filename = spikeFiles{fnum};
     fprintf('clustering spikes:\n %s\n', filename);
