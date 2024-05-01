@@ -50,7 +50,9 @@ end
 
 if ~isempty(spikeIndex)
     spikeIndex = spikeIndex(signal1.ts>=tsInterval(1) & signal1.ts<=tsInterval(2));
-    xline(signalTs(spikeIndex(1:downsampleRate:end)))
+    if any(spikeIndex)
+        xline(signalTs(spikeIndex(1:downsampleRate:end)))
+    end
 end
 
 xlabel('Time (sec)', 'FontSize', 15);

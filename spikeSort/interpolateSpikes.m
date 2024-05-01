@@ -26,12 +26,6 @@ for i = 1:length(spikeIndexInSignal)
     if signalPeakIdx ~= unitPeakIdx && peakMissMatchWarnning
         warning('miss match of peak index in unit: %d and signals: %d, index: %d', unitPeakIdx, signalPeakIdx, i)
     end
-
-    % ----------------- uncomment and set break point to compare signals with spikes:
-    % spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxStart + length(unitSpikes(t,:)) - 1);
-    % plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
-    % legend({'unitSpike', 'spikeInSignal', 'unitAvgSpike'})
-    % -----------------
     
     % on noisy data, the raw signal can be monotonic, then the peak index
     % will be at the edge of the spike interval.

@@ -1,4 +1,4 @@
-function [spikes,thr,index, inputStruct] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
+function [spikes,thr,index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
 % Detect spikes with amplitude thresholding. Uses median estimation.
 % Detection is done with filters set by fmin_detect and fmax_detect. Spikes
 % are stored for sorting using fmin_sort and fmax_sort. This trick can
