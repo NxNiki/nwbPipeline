@@ -29,7 +29,7 @@ for i = 1:numFiles
     
     % [~, spikeFileName] = fileparts(spikeFiles{i});
     % unitsLabeli(:) = {regexp(spikeFileName, 'G[A-D]\d-.*', 'match', 'once')};
-    unitsLabeli(:) = {i};
+    unitsLabeli(:) = {i - 1};
 
     for u = 1:length(units)
         fprintf('load spike: %s, unit %d...\n', spikeFiles{i}, units(u));

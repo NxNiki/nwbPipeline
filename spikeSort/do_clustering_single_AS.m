@@ -182,6 +182,15 @@ if exist('rejectedSpikes','var')
     save(fullfile(outputPath, outFileName), 'rejectedSpikes', '-append');
 end
 
+% remove temp files:
+if exist([par.fname '.dg_01.lab'], "file")
+    delete(par.fname)
+end
+
+if exist([par.fname '.dg_01'], "file")
+    delete(par.fname)
+end
+
 
 end
 % mahal function incase system doesn't have it
