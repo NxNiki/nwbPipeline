@@ -30,7 +30,7 @@ parfor i=start + 1: endIdx
     fprintf(['processing file: %d, ' fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), '\n'], i);
     %if ~exist(['CSC' num2str(i) '.mat'], 'file')
 
-    [data,~,samplingInterval,chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), computeTS);
+    [data, ~, samplingInterval, chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), computeTS);
     data = data';
     save_aux(i, data, time0, timeend, samplingInterval, trialFolder);
  %   end
@@ -50,10 +50,11 @@ updateChannelMetaData(patient, exp)
 %%
 
 rasters_by_unit(patient, exp, imageDirectory, 1, 0)
-rasters_by_unit(patient, exp, imageDirectory, 0, 0)
+
 rasters_by_image(patient, exp, imageDirectory, 0);
 
 %%
+rasters_by_unit(patient, exp, imageDirectory, 0, 0)
 % rasters_by_unit(patient, exp, imageDirectory, 1, 1)
 % rasters_by_unit(patient, exp, imageDirectory, 0, 1)
 
