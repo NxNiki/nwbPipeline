@@ -43,6 +43,7 @@ for i = 1: size(cscFiles, 1)
     spikeHistPrecise = cell(nSegments, 1);
     spikeTimestamps = cell(nSegments, 1);
     thr = zeros(nSegments, 1);
+    xfDetect = cell(nSegments, 1);
 
     for j = nSegments:-1:1
         [signals{j}, samplingInterval] = readCSC(channelFiles{j});
@@ -65,7 +66,7 @@ for i = 1: size(cscFiles, 1)
         outputStruct(j).noise_std_sorted = common_noise_std_sorted;
         outputStruct(j).thr = thr_all;
 
-        [spikes{j}, thr, index, outputStruct(j)] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct(j));
+        [spikes{j}, thr, index, outputStruct(j), xfDetect{j}] = amp_detect_AS(signals{j}, param, maxAmp, timestamps{j}, thr_all, outputStruct(j));
         spikeTimestamps{j} = timestamps{j}(index);
         [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration(j), param, outputStruct(j));
         if ~isempty(spikeCodes{j})
@@ -88,6 +89,7 @@ for i = 1: size(cscFiles, 1)
     matobj.spikeCodes = vertcat(spikeCodes{:});
     matobj.spikeHist = [spikeHist{:}];
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+    matobj.xfDetect = [xfDetect{:}];
 
 end
 end
