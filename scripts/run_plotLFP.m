@@ -2,10 +2,10 @@
 
 clear
 
-expId = 1;
-expName = '550_Screening';
-fileName = 'GA1-ROF2_lfp.mat';
-filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+% expId = 1;
+% expName = '550_Screening';
+% channel = 'GA1-ROF2';
+% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
 % expId = 5;
 % expName = '570_MovieParadigm';
@@ -22,18 +22,30 @@ filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 % fileName = 'GA4-RFOpAI1_lfp.mat';
 % filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
-% expId = 1;
-% expName = '569_Screening';
-% fileName = 'GB1-RA2_lfp.mat';
-% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+expId = 1;
+expName = '569_Screening';
+channel = 'GB1-RA1';
+filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+
 
 %% load data:
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
+spikesPath = fullfile(expFilePath, 'CSC_micro_spikes');
+
+lfpFileName = [channel, '_lfp.mat'];
+spikeFileName = [channel, '_spikes.mat'];
 
 % load data:
-lfpFile = fullfile(microLFPPath, fileName);
+lfpFile = fullfile(microLFPPath, lfpFileName);
 lfpFileObj = matfile(lfpFile);
+
+spikeFile = fullfile(spikesPath, spikeFileName);
+spikeFileObj = matfile(spikeFile);
+
+xfDetect.value = spikeFileObj.xfDetect;
+xfDetect.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
+xfDetect.label = 'xf_detect';
 
 cscSignal.value = lfpFileObj.cscSignal;
 cscSignal.ts = lfpFileObj.rawTimestamps - lfpFileObj.rawTimestamps(1, 1);
@@ -68,7 +80,7 @@ spikeIntervalPercentage = lfpFileObj.spikeIntervalPercentage;
 spikeIndex = lfpFileObj.spikeIndex;
 % spikeIndex = [];
 
-plotLabel = sprintf([expName, ' Exp %d: ', fileName, ', removed signal: %.3f%%'], expId, spikeIntervalPercentage * 100);
+plotLabel = sprintf([expName, ' Exp %d: ', lfpFileName, ', removed signal: %.3f%%'], expId, spikeIntervalPercentage * 100);
 
 %% plot signal over a large range:
 
@@ -76,7 +88,6 @@ close all
 
 yLimit = [-500, 500] * 1;
 xTimeRangeSecs = [0, 100] + 300;
-
 
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
 %plotOverlapSignals(cscSignal, [], cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
@@ -88,12 +99,15 @@ plotSignalSpectrum(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated
 
 % close all;
 
-xTimeRangeSecs = [332.72, 332.74];
+xTimeRangeSecs = [3.65, 3.69];
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel, spikeIndex)
+
+% check why some spikes are opposite:
+plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, xfDetect, xTimeRangeSecs, [], plotLabel, spikeIndex)
 
 plotOverlapSignals(cscSignal, interpolateIndex, cscSignalSpikeInterpolated, xTimeRangeSecs, [], plotLabel)
 
-plotOverlapSignals(cscSignal, removedSpikes, [], xTimeRangeSecs, [], plotLabel)
+plotOverlapSignals(cscSignal, removedSpikes, xfDetect, xTimeRangeSecs, [], plotLabel)
 
 plotOverlapSignals(cscSignal, interpolateIndex, removedInterpolateSpikes, xTimeRangeSecs, [], plotLabel)
 

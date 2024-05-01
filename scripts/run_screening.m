@@ -21,13 +21,13 @@ start = 97;
 endIdx = 112;
 
 computeTS = 1;
-[data,timeStamps,samplingInterval,chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(start) '.ncs']), computeTS);
+[data, timeStamps, samplingInterval, chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(start) '.ncs']), computeTS);
 time0 = timeStamps(1); 
 timeend = timeStamps(end);
 computeTS = 0;
 
 parfor i=start + 1: endIdx
-    fprintf(['processing file: %d, ' fullfile(dataFolder, ['PDes' num2str(i) '.ncs'])], i);
+    fprintf(['processing file: %d, ' fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), '\n'], i);
     %if ~exist(['CSC' num2str(i) '.mat'], 'file')
 
     [data,~,samplingInterval,chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), computeTS);

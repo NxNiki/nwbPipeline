@@ -16,6 +16,7 @@ revertedSpikes = zeros(size(signal));
 
 
 for u = 1:length(units)
+    
     fprintf('remove spike for unit %d...\n', units(u));
 
     unitTs = spikeTimestamps(spikeClass==units(u));
@@ -66,6 +67,13 @@ for u = 1:length(units)
         else
             indsToKeep = ~isnan(unitIdx); %true(size(wav)); need to eliminate those past length(lfpTS)
         end
+
+        % ----------------- uncomment and set break point to compare signals with spikes:
+        spikeInSignalIdxStart = spikeIndexInSignal(t) - 23 + 1;
+        spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxStart + length(spikes(t,:)) - 1);
+        plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
+        legend({'unitSpike', 'spikeInSignal', 'unitAvgSpike'})
+        % -----------------
 
         spikeSignalCorr = corr(signal(unitIdx(indsToKeep))', unitAvgSpikePad(indsToKeep)');
         isInverted = ((spikeSignalCorr < 0) - .5) * 2; % if correlation < 0 isInverted is 1 else -1.
