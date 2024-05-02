@@ -24,7 +24,7 @@ clear
 
 expId = 1;
 expName = '569_Screening';
-channel = 'GB1-RA1';
+channel = 'GB1-RA3';
 filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
 
@@ -87,7 +87,7 @@ plotLabel = sprintf([expName, ' Exp %d: ', lfpFileName, ', removed signal: %.3f%
 close all
 
 yLimit = [-500, 500] * 1;
-xTimeRangeSecs = [0, 100] + 300;
+xTimeRangeSecs = [0, 100] + 100;
 
 plotOverlapSignals(cscSignal, cscSignalSpikesRemoved, cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)
 %plotOverlapSignals(cscSignal, [], cscSignalSpikeInterpolated, xTimeRangeSecs, yLimit, plotLabel)

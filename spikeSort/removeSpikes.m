@@ -69,10 +69,10 @@ for u = 1:length(units)
         end
 
         % ----------------- uncomment and set break point to compare signals with spikes:
-        spikeInSignalIdxStart = spikeIndexInSignal(t) - 23 + 1;
-        spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxStart + length(spikes(t,:)) - 1);
-        plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
-        legend({'unitSpike', 'spikeInSignal', 'unitAvgSpike'})
+        % spikeInSignalIdxStart = spikeIndexInSignal(t) - 23 + 1;
+        % spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxStart + length(spikes(t,:)) - 1);
+        % plot([unitSpikes(t,:)', spikeInSignal(:) - mean(spikeInSignal), unitAvgSpike(:)])
+        % legend({'unitSpike', 'spikeInSignal', 'unitAvgSpike'})
         % -----------------
 
         spikeSignalCorr = corr(signal(unitIdx(indsToKeep))', unitAvgSpikePad(indsToKeep)');
