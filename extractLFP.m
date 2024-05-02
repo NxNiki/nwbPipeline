@@ -18,7 +18,7 @@ removeRejectedSpikes = true;
 makeOutputPath(cscFiles, outputPath, skipExist)
 outputFiles = cell(size(cscFiles, 1), 1);
 
-for i = 1: size(cscFiles, 1)
+parfor i = 1: size(cscFiles, 1)
     channelFiles = cscFiles(i,:);
     fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
 
@@ -74,6 +74,21 @@ for i = 1: size(cscFiles, 1)
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
     lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
+    lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
+    lfpFileObj.spikeGapLength = findGapLength(interpolateIndex);
+
+    % ---- check the distribution of spike gap length:
+    figure('Position', [100, 100, 1000, 500])
+    h = histogram(lfpFileObj.spikeGapLength);
+    set(gca, 'YScale', 'log');
+    ylim([0.8 max(h.Values)*1.1]);
+    [filePath, fileName] = fileparts(channelFiles{1});
+    xlabel('gap length of interpolation', 'FontSize', 15);
+    ylabel(['Frequency (', fileName, ')'], 'FontSize', 15);
+    title(filePath, 'FontSize', 13);
+    saveas(h, fullfile(outputPath, [fileName, '.png']), 'png');
+    close
+    % ----
 
     if saveRaw
         lfpFileObj.cscSignal = cscSignal;
@@ -85,4 +100,21 @@ for i = 1: size(cscFiles, 1)
     end
 
 end
+end
+
+function gapLength = findGapLength(index)
+    % find the length of gaps in the spike index (1: spike interval on raw
+    % signal, 0: non-spike intervals.
+
+    index = logical(index);
+    
+    indexStart = [0, index(1:end-1)];
+    diff = index - indexStart;
+    
+    startIdx = find(diff == 1);
+    endIdx = find(diff == -1);
+    
+    gapLength = endIdx - startIdx;
+end
+
 

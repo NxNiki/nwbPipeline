@@ -11,14 +11,18 @@
 % filePath = '/Volumes/DATA/NLData/D555/EXP2_Screening/2022-07-31_12-46-04';
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/555_Screening';
 
+expId = 2;
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D569/EXP2_Screening/2024-01-25_16-53-58';
+outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
+
 % expId = 2;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D572/EXP2_Screening/2024-03-20_14-46-19';
 % outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
 
 
-expId = 4;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57';
-outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
+% expId = 4;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57';
+% outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
