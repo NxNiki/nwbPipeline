@@ -20,7 +20,7 @@ for j = nSegments:-1:1
     [timestamps{j}, duration(j)] = readTimestamps(timestampFiles{j});
 end
 
-for i = 1: size(cscFiles, 1)
+parfor i = 1: size(cscFiles, 1)
     channelFiles = cscFiles(i,:);
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
@@ -44,14 +44,17 @@ for i = 1: size(cscFiles, 1)
     spikeTimestamps = cell(nSegments, 1);
     thr = zeros(nSegments, 1);
     xfDetect = cell(nSegments, 1);
+    outputStruct = cell(nSegments, 1);
 
     for j = nSegments:-1:1
         [signals{j}, samplingInterval] = readCSC(channelFiles{j});
 
         param.sr = 1/samplingInterval;
         param.ref = floor(1.5 * param.sr/1000);
-        [thr(j), outputStruct(j)] = getDetectionThresh(signals{j}, param, maxAmp);
+        [thr(j), outputStruct{j}] = getDetectionThresh(signals{j}, param, maxAmp);
     end
+
+    outputStruct = cell2mat(outputStruct);
 
     thr_all = min(thr);
     % it shouldn't go less than 18. If it does, it probably found a file with a long stretch of flat, and will then find millions of spikes in the non-flat section.

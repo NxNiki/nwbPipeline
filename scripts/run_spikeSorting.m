@@ -3,8 +3,8 @@ clear
 
 addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 
-expId = 1;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/550_Screening';
+expId = 2;
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
