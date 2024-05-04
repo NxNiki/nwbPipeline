@@ -1,17 +1,17 @@
 clear
 
-patient = 1720;
-exp = 2;
+patient = 573;
+exp = 1;
 
 trialFolder = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/CSC_data', patient, exp);
-imageDirectory = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/Screening_2/trial1', patient, exp);
 
 addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/DataPipeline_Screening'));
 rmpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/DataPipeline_Screening/Utilities/chronux'));
 
-%% unpack data:
+%% unpack data (only for Iowa data):
 
-dataFolder='/Volumes/DATA/NLData/i720R/720-098_UCLA_Screening1/2024-04-29_14-41-45';
+% dataFolder='/Volumes/DATA/NLData/i720R/720-098_UCLA_Screening1/2024-04-29_14-41-45';
+dataFolder='/Volumes/DATA/NLData/D573/EXP1_Screening';
 
 if ~exist(trialFolder, "dir")
     mkdir(trialFolder)
@@ -25,7 +25,6 @@ timeend = timeStamps(end);
 save_aux(1, data, time0, timeend, samplingInterval, trialFolder);
 save(fullfile(trialFolder, 'lfpTimeStamps.mat'), 'time0', 'timeend', 'timeStamps', 'samplingInterval'); 
 
-%%
 start = 97;
 endIdx = 112;
 computeTS = 0;
@@ -50,10 +49,11 @@ automaticScreeningAnalyze5(trialFolder);
 % use PDM to add patient and session before proceeding with the following
 % steps:
 
+imageDirectory = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/trial1', patient, exp);
 
 updateChannelMetaData(patient, exp)
 [clusterCharacteristics] = calculateClusterCharacteristics(patient, exp, 1, trialFolder);
-[clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, 1, imageDirectory);
+% [clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, 1, imageDirectory);
 
 %%
 
