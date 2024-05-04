@@ -17,15 +17,16 @@ clear
 % fileName = 'GB1-LA8_lfp.mat';
 % filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/', expName];
 
-% expId = 2;
-% expName = '572_Screening';
+expId = 2;
+expName = '572_Screening';
 % fileName = 'GA4-RFOpAI1_lfp.mat';
-% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
-
-expId = 1;
-expName = '569_Screening';
-channel = 'GB1-RA3';
+channel = 'GA3-LAH1';
 filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
+
+% expId = 1;
+% expName = '569_Screening';
+% channel = 'GB1-RA3';
+% filePath = ['/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/', expName];
 
 
 %% load data:
