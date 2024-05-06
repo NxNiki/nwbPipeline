@@ -13,7 +13,7 @@ if nargin < 7
     saveRaw = false;
 end
 
-removeRejectedSpikes = true;
+removeRejectedSpikes = false;
 
 makeOutputPath(cscFiles, outputPath, skipExist)
 outputFiles = cell(size(cscFiles, 1), 1);

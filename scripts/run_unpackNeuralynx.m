@@ -2,83 +2,73 @@
 % this script should run with Matlab 2023a or earlier if on Mac with apple
 % silicon.
 
+expIds = (3: 11);
+filePath = {...
+    '/Volumes/DATA/NLData/D573/EXP3_PreSleep_Movie24_Control_1_Home_Improvement/2024-05-03_20-54-34',...
+    '/Volumes/DATA/NLData/D573/EXP4_PreSleep_Movie24_Control_2_Top_Gun/2024-05-03_21-30-59', ...
+    '/Volumes/DATA/NLData/D573/EXP5_PreSleep_Movie24_Control_3_Lion_King/2024-05-03_21-56-23', ...
+    '/Volumes/DATA/NLData/D573/EXP6_PreSleep_Movie24_Control_4_Quentin_Johnson/2024-05-03_22-14-34', ...
+    '/Volumes/DATA/NLData/D573/EXP7_PreSleep_Movie24_Viewing/2024-05-03_22-28-34', ...
+    '/Volumes/DATA/NLData/D573/EXP8_PreSleep_Movie24_Memory/2024-05-03_23-16-37', ...
+    '/Volumes/DATA/NLData/D573/EXP9_Movie24_Sleep/2024-05-03_23-50-25', ...
+    '/Volumes/DATA/NLData/D573/EXP10_PostSleep_Movie24_Memory/2024-05-04_08-48-41', ...
+    '/Volumes/DATA/NLData/D573/EXP11_PostSleep_Movie24_Control_Free_Recall/2024-05-04_09-42-25', ...
+    };
 
-% expId = 5;
-% filePath = '/Volumes/DATA/NLData/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
-% outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
 
-% expId = 2;
-% filePath = '/Volumes/DATA/NLData/D555/EXP2_Screening/2022-07-31_12-46-04';
-% outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/555_Screening';
-
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D569/EXP2_Screening/2024-01-25_16-53-58';
-% outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
-
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D572/EXP2_Screening/2024-03-20_14-46-19';
-% outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
-
-expId = 4;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57';
-outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
-
-% expId = 5;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
-% outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 1; 
+skipExist = 1;
 
-expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
-
-%% list csc and event files. 
+%% list csc and event files.
 % csc files are grouped for each channel.
-
-
 addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
+for i = 1:length(expIds)
 
+    expId = expIds(i);
+    expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
 
-if ~exist(expOutFilePath, "dir")
-    mkdir(expOutFilePath);
+    if ~exist(expOutFilePath, "dir")
+        mkdir(expOutFilePath);
+    end
+
+    groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
+    suffixRegPattern = '(?<=\_)\d*';
+    orderByCreateTime = true;
+
+    ignoreFilesWithSizeBelow = 16384;
+
+    tic
+    [groups, fileNames, channelFileNames, eventFileNames] = groupFiles(filePath{i}, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
+    toc
+
+    writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
+
+    %% unpack macro files:
+
+    macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
+    macroPattern = '^[RL].*[0-9]';
+    [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern);
+
+    tic
+    unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
+    toc
+    disp('macro files unpack finished!')
+
+    %% unpack micro files:
+
+    microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
+    microPattern = '^G[A-D].*[0-9]';
+    [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern);
+
+    tic
+    unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
+    toc
+    disp('micro files unpack finished!')
+
 end
-
-groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
-suffixRegPattern = '(?<=\_)\d*';
-orderByCreateTime = true;
-
-ignoreFilesWithSizeBelow = 16384;
-
-tic
-[groups, fileNames, channelFileNames, eventFileNames] = groupFiles(filePath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
-toc
-
-writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
-
-%% unpack macro files:
-
-macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
-macroPattern = '^[RL].*[0-9]';
-[inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern);
-
-tic
-unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
-toc
-disp('macro files unpack finished!')
-
-%% unpack micro files:
-
-microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
-microPattern = '^G[A-D].*[0-9]';
-[inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern);
-
-tic
-unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
-toc
-disp('micro files unpack finished!')
-
-
 
 
 
