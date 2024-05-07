@@ -7,7 +7,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/573_MovieP
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = 0;
-saveRaw = 1;
+saveRaw = false;
 
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
