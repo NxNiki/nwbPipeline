@@ -9,7 +9,7 @@ if nargin < 4 || isempty(experimentName)
 end
 
 if nargin < 5
-    skipExist = false;
+    skipExist = true;
 end
 
 saveXfDetect = false;
