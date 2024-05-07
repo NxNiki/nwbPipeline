@@ -12,6 +12,8 @@ if nargin < 5
     skipExist = false;
 end
 
+saveXfDetect = false;
+
 makeOutputPath(cscFiles, outputPath, skipExist)
 nSegments = length(timestampFiles);
 
@@ -27,7 +29,6 @@ parfor i = 1: size(cscFiles, 1)
         continue
     end
 
-    %outputStruct = cell(nSegments, 1);
     spikes = cell(nSegments, 1);
     spikeCodes = cell(nSegments, 1);
     spikeHist = cell(nSegments, 1);
@@ -45,7 +46,12 @@ parfor i = 1: size(cscFiles, 1)
         signal = readCSC(channelFiles{j});
         [timestamps, duration] = readTimestamps(timestampFiles{j});
 
-        [spikes{j}, thr, index, outputStruct(j), xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
+        if saveXfDetect
+            [spikes{j}, thr, index, outputStruct(j), xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
+        else
+            [spikes{j}, thr, index, outputStruct(j), ~] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
+        end
+
         spikeTimestamps{j} = timestamps(index);
         [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration, param, outputStruct(j));
         if ~isempty(spikeCodes{j})
@@ -68,7 +74,10 @@ parfor i = 1: size(cscFiles, 1)
     matobj.spikeCodes = vertcat(spikeCodes{:});
     matobj.spikeHist = [spikeHist{:}];
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
-    matobj.xfDetect = [xfDetect{:}];
+
+    if saveXfDetect
+        matobj.xfDetect = [xfDetect{:}];
+    end
 
 end
 end
