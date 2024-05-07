@@ -9,7 +9,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParad
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 0;
+skipExist = 1;
 
 microFiles = [];
 timestampFiles = [];
@@ -19,18 +19,19 @@ for i = 1:length(expIds)
     microFiles = [microFiles, readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",")];
     timestampFile = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
     timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFile.name})];
+    expNames{i} = sprintf('Exp%d', expIds(i));
 end
 
 
 %% spike detection:
 delete(gcp('nocreate'))
-parpool(5);
+parpool(2);
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 
 outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
-spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist)
+spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist)
 disp('Spike Detection Finished!')
 
 %% spike clustering:
