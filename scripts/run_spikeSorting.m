@@ -24,7 +24,7 @@ end
 
 %% spike detection:
 delete(gcp('nocreate'))
-parpool(1);
+parpool(2);
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 

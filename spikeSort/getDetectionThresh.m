@@ -1,4 +1,4 @@
-function [thr_all, outputStruct] = getDetectionThresh(channleFiles)
+function [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFiles)
 % Does the first few steps of spike detection to find the threshold. This
 % allows for using the same threshold across multiple sessions. Returns
 % thr, as well as a struct with other variables created so that these steps
@@ -6,10 +6,10 @@ function [thr_all, outputStruct] = getDetectionThresh(channleFiles)
 
     param = set_parameters();
     maxAmp = 500;
-    thr = zeros(nSegments, 1);
+    thr = zeros(length(channelFiles), 1);
 
-    for i = 1:length(channleFiles)
-        [signal, samplingInterval] = readCSC(channelFiles{j});
+    for i = 1:length(channelFiles)
+        [x, samplingInterval] = readCSC(channelFiles{i});
         param.sr = 1/samplingInterval;
         param.ref = floor(1.5 * param.sr/1000);
 
