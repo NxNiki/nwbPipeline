@@ -9,7 +9,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParad
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 1;
+skipExist = 0;
 
 microFiles = [];
 timestampFiles = [];
@@ -24,7 +24,7 @@ end
 
 %% spike detection:
 delete(gcp('nocreate'))
-parpool(2);
+parpool(5);
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 
