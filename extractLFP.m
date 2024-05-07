@@ -13,7 +13,7 @@ if nargin < 7
     saveRaw = false;
 end
 
-removeRejectedSpikes = false;
+removeRejectedSpikes = true;
 
 makeOutputPath(cscFiles, outputPath, skipExist)
 outputFiles = cell(size(cscFiles, 1), 1);
@@ -46,7 +46,7 @@ parfor i = 1: size(cscFiles, 1)
 
         fprintf('index of last spike: %d\n', (spikeTimestamps(end) - timestamps(1)) * (seconds(1) / samplingInterval));
     
-        cscSignalSpikesRemoved  = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps, true);
+        % cscSignalSpikesRemoved  = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps, true);
         [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
         
         if removeRejectedSpikes
@@ -79,7 +79,7 @@ parfor i = 1: size(cscFiles, 1)
 
     if saveRaw
         lfpFileObj.cscSignal = cscSignal;
-        lfpFileObj.cscSignalSpikesRemoved = cscSignalSpikesRemoved;
+        % lfpFileObj.cscSignalSpikesRemoved = cscSignalSpikesRemoved;
         lfpFileObj.cscSignalSpikeInterpolated = cscSignalSpikeInterpolated;
         lfpFileObj.rawTimestamps = timestamps;
         lfpFileObj.interpolateIndex = interpolateIndex;
