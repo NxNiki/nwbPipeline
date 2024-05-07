@@ -28,7 +28,7 @@ end
 
 %% spike detection:
 delete(gcp('nocreate'))
-parpool(3);
+parpool(2); % each channel will take nearly 30GB memory for multi-exp analysis.
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 
