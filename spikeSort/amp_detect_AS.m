@@ -105,15 +105,15 @@ end
 % SPIKE STORING (with or without interpolation)
 ls = w_pre + w_post;
 spikes = zeros(nspk,ls+4);
-rejectedSpikes = spikes;
+%rejectedSpikes = spikes;
 
 xf(length(xf)+1:length(xf)+w_post)=0;
 
 for i=1:nspk                          %Eliminates artifacts
     if max(abs( xf(index(i)-w_pre:index(i) + w_post) )) < thrmax
         spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
-    else
-        rejectedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
+    %else
+        %rejectedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
     end
 end
 aux = find(spikes(:,w_pre)==0);       %erases indexes that were artifacts
