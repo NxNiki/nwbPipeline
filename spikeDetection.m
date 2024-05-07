@@ -62,7 +62,7 @@ parfor i = 1: size(cscFiles, 1)
 
     fprintf('write spikes to file:\n %s\n', spikeFilename);
     % remove file if it exist as repetitive writing to save variable in
-    % matfile obj consumes increasing memory:
+    % matfile obj consumes increasing storage:
     if exist(spikeFilename, "file")
         delete(spikeFilename);
     end
