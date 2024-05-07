@@ -1,7 +1,7 @@
 clear
 
 patient = 573;
-exp = 1;
+exp = 13;
 
 trialFolder = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/CSC_data', patient, exp);
 
@@ -10,8 +10,7 @@ rmpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/DataPipeline_Screening/Utili
 
 %% unpack data (only for Iowa data):
 
-% dataFolder='/Volumes/DATA/NLData/i720R/720-098_UCLA_Screening1/2024-04-29_14-41-45';
-dataFolder='/Volumes/DATA/NLData/D573/EXP1_Screening';
+dataFolder='/Volumes/DATA/NLData/i720R/720-098_UCLA_Screening1/2024-04-29_14-41-45';
 
 if ~exist(trialFolder, "dir")
     mkdir(trialFolder)
@@ -52,8 +51,8 @@ automaticScreeningAnalyze5(trialFolder);
 imageDirectory = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/trial1', patient, exp);
 
 updateChannelMetaData(patient, exp)
-[clusterCharacteristics] = calculateClusterCharacteristics(patient, exp, 1, trialFolder);
-% [clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, 1, imageDirectory);
+% [clusterCharacteristics] = calculateClusterCharacteristics(patient, exp, 1, trialFolder);
+[clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, 1, imageDirectory);
 
 %%
 
@@ -73,11 +72,10 @@ rasters_by_image(patient, exp, imageDirectory, 0);
 
 %%
 
-rasters_by_unit_video(patient, exp, imageDirectory, 1, 0)
+% rasters_by_unit_video(patient, exp, imageDirectory, 1, 0)
 rasters_by_unit_video(patient, exp, imageDirectory, 0, 0)
+rasters_by_image(patient, exp, imageDirectory, 0);
 
-% rasters_by_unit(patient, exp, imageDirectory, 1, 1)
-% rasters_by_unit(patient, exp, imageDirectory, 0, 1)
 
 
 function save_aux(i, data, time0, timeend, samplingInterval, outputDir)
