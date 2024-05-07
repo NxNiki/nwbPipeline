@@ -37,9 +37,10 @@ parfor i = 1: size(cscFiles, 1)
     xfDetect = cell(nSegments, 1);
 
     [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFiles);
+    thr = NaN;
 
     for j = 1: nSegments
-        if isempty(channelFiles{j}, "file")
+        if ~exist(channelFiles{j}, "file")
             continue
         end
 
