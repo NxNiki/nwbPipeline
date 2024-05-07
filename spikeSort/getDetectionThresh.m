@@ -55,7 +55,9 @@ function [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFile
     common_noise_std_detect = min([outputStruct.noise_std_detect]);
     common_noise_std_sorted = min([outputStruct.noise_std_sorted]);
 
-    outputStruct(:).thrmax = maxThr;
-    outputStruct(:).noise_std_detect = common_noise_std_detect;
-    outputStruct(:).noise_std_sorted = common_noise_std_sorted;
-    outputStruct(:).thr = thr_all;
+    for i = 1:length(channelFiles)
+        outputStruct(i).thrmax = maxThr;
+        outputStruct(i).noise_std_detect = common_noise_std_detect;
+        outputStruct(i).noise_std_sorted = common_noise_std_sorted;
+        outputStruct(i).thr = thr_all;
+    end
