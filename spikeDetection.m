@@ -18,16 +18,16 @@ makeOutputPath(cscFiles, outputPath, skipExist)
 nSegments = length(timestampFiles);
 
 parfor i = 1: size(cscFiles, 1)
-    channelFiles = cscFiles(i,:);
-    fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
+    channelFiles = cscFiles(i,:);
     spikeFilename = createSpikeFileName(channelFiles{1});
     spikeFilename = fullfile(outputPath, spikeFilename);
-
+    
     % TO DO: check file completeness:
     if exist(spikeFilename, "file") && skipExist
         continue
     end
+    fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
     spikes = cell(nSegments, 1);
     spikeCodes = cell(nSegments, 1);
@@ -69,9 +69,9 @@ parfor i = 1: size(cscFiles, 1)
 
     matobj = matfile(spikeFilename, 'Writable', true);
     matobj.spikes = vertcat(spikes{:});
-    clear spikes;
+    % clear spikes;
     matobj.spikeTimestamps = [spikeTimestamps{:}];
-    clear spikeTimestamps;
+    % clear spikeTimestamps;
     matobj.thr = thr;
     matobj.param = param;
     matobj.spikeCodes = vertcat(spikeCodes{:});
