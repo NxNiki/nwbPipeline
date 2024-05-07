@@ -67,19 +67,25 @@ parfor i = 1: size(cscFiles, 1)
         delete(spikeFilename);
     end
 
-    matobj = matfile(spikeFilename, 'Writable', true);
-    matobj.spikes = vertcat(spikes{:});
-    % clear spikes;
-    matobj.spikeTimestamps = [spikeTimestamps{:}];
-    % clear spikeTimestamps;
-    matobj.thr = thr;
-    matobj.param = param;
-    matobj.spikeCodes = vertcat(spikeCodes{:});
-    matobj.spikeHist = [spikeHist{:}];
-    matobj.spikeHistPrecise = [spikeHistPrecise{:}];
-
-    if saveXfDetect
-        matobj.xfDetect = [xfDetect{:}];
+    try
+        matobj = matfile(spikeFilename, 'Writable', true);
+        matobj.spikes = vertcat(spikes{:});
+        % clear spikes;
+        matobj.spikeTimestamps = [spikeTimestamps{:}];
+        % clear spikeTimestamps;
+        matobj.thr = thr;
+        matobj.param = param;
+        matobj.spikeCodes = vertcat(spikeCodes{:});
+        matobj.spikeHist = [spikeHist{:}];
+        matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+    
+        if saveXfDetect
+            matobj.xfDetect = [xfDetect{:}];
+        end
+    catch err
+        fprintf('delete file with writing error: %s', spikeFilename)
+        delete(spikeFilename);
+        rethrow(err)
     end
 
 end
