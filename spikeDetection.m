@@ -80,7 +80,7 @@ parfor i = 1: size(cscFiles, 1)
         if saveXfDetect
             matobj.xfDetect = [xfDetect{:}];
         end
-        fprintf('file writing finished!')
+        fprintf('writing finished: %s\n', spikeFilename);
     catch err
         fprintf('delete file with writing error: %s', spikeFilename)
         delete(spikeFilename);
