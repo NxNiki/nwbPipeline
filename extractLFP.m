@@ -18,7 +18,7 @@ removeRejectedSpikes = true;
 makeOutputPath(cscFiles, outputPath, skipExist)
 outputFiles = cell(size(cscFiles, 1), 1);
 
-parfor i = 1: size(cscFiles, 1)
+for i = 1: size(cscFiles, 1)
     channelFiles = cscFiles(i,:);
     fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
 

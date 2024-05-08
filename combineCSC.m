@@ -1,4 +1,4 @@
-function [signal ,timestamps, samplingInterval] = combineCSC(signalFiles, timestampsFiles, maxGapDuration)
+function [signal ,timestamps, samplingIntervalSeconds] = combineCSC(signalFiles, timestampsFiles, maxGapDuration)
 %combineCSC Combine CSC signals. filling gaps with NaNs if gap between
 %segments larger than threshold.
 
@@ -22,11 +22,19 @@ signalCombined = cell(1, numFiles);
 timestampsCombined = cell(1, numFiles);
 samplingInterval = zeros(numFiles, 1);
 
-parfor i = 1: numFiles
+for i = 1: numFiles
     fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
 
-    [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i})
-    [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i})
+    [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i});
+    [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i});
+end
+
+% check if timestamps and signals have same length:
+timestampLength = cellfun("length", timestampsCombined);
+signalLength = cellfun("length", signalCombined);
+
+if any(timestampLength ~= signalLength)
+    error(["missmatched length of signal and timestamps: \n", sprintf('%s \n', signalFiles{timestampLength ~= signalLength})])
 end
 
 samplingInterval = unique(samplingInterval);
@@ -34,15 +42,16 @@ if length(samplingInterval) > 1
     error('sampling Interval not match across files!');
 end
 
-samplingInterval = seconds(samplingInterval);
+samplingIntervalSeconds = seconds(samplingInterval);
 timestampsCombinedNext = timestampsCombined(2:end);
 signalGap = cell(1, numFiles);
 timestampsGap = cell(1, numFiles);
 
-parfor i = 2: numFiles
+% fill gaps between experiments/segments with NaNs:
+for i = 2: numFiles
     gapInterval = min(seconds(timestampsCombinedNext{i-1}(1) - timestampsCombined{i-1}(end)), maxGapDuration);
-    if gapInterval / samplingInterval > GAP_THRESHOLD
-        gapLength = floor(gapInterval/samplingInterval);
+    if gapInterval / samplingIntervalSeconds > GAP_THRESHOLD
+        gapLength = floor(gapInterval/samplingIntervalSeconds);
         signalGap{i-1} = NaN(1, gapLength);
         timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + 0: 1/samplingInterval: 1/samplingInterval * (gapLength - 1);
     end
