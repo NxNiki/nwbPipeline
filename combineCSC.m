@@ -7,7 +7,7 @@ function [signal ,timestamps, samplingIntervalSeconds] = combineCSC(signalFiles,
 
 
 if nargin < 3
-    maxGapDuration = seconds(1000);
+    maxGapDuration = seconds(1);
 end
 
 GAP_THRESHOLD = 2;
@@ -53,14 +53,14 @@ for i = 2: numFiles
     if gapInterval / samplingIntervalSeconds > GAP_THRESHOLD
         gapLength = floor(gapInterval/samplingIntervalSeconds);
         signalGap{i-1} = NaN(1, gapLength);
-        timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + 0: 1/samplingInterval: 1/samplingInterval * (gapLength - 1);
+        timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + (0: 1/samplingInterval: 1/samplingInterval * (gapLength - 1));
     end
 end
 
-signalCombined = [signalCombined(:)', signalGap(:)'];
+signalCombined = [signalCombined(:), signalGap(:)]';
 signal = [signalCombined{:}];
 
-timestampsCombined = [timestampsCombined(:)', timestampsGap(:)'];
+timestampsCombined = [timestampsCombined(:), timestampsGap(:)]';
 timestamps = [timestampsCombined{:}];
 
 
