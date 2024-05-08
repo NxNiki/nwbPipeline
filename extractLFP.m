@@ -99,7 +99,7 @@ for i = 1: size(cscFiles, 1)
     title(filePath , 'FontSize', 13);
     saveas(h, fullfile(outputPath, [fileName, '.png']), 'png');
     close
-    % ----
+    % ---- 
 
 end
 end
