@@ -59,14 +59,14 @@ for i = 1: size(cscFiles, 1)
         end
     else
         fprintf('spike file: %s not found!\n', spikeFiles{i})
-        cscSignalSpikesRemoved = cscSignal;
+        % cscSignalSpikesRemoved = cscSignal;
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
         interpolateIndex = false(1, length(cscSignal));
         spikeIndex = false(1, length(cscSignal));
     end
 
-    [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikesRemoved, timestamps);
+    [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
 
     lfpFileObj = matfile(lfpFilename, "Writable", true);
     lfpFileObj.lfp = lfpSignal;
