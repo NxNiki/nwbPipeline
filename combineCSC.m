@@ -53,7 +53,7 @@ for i = 2: numFiles
     if gapInterval / samplingIntervalSeconds > GAP_THRESHOLD
         gapLength = floor(gapInterval/samplingIntervalSeconds);
         signalGap{i-1} = NaN(1, gapLength);
-        timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + (0: 1/samplingInterval: 1/samplingInterval * (gapLength - 1));
+        timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + (0: samplingInterval: samplingInterval * (gapLength - 1));
     end
 end
 
