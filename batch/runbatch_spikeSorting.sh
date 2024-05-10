@@ -10,9 +10,9 @@
 ## and the number of cores as needed:
 #$ -pe shared 1
 # Email address to notify
-#$ -M michelniki1988@gmail.com
+#$ -M $USER@mail
 # Notify when
-#$ -m bea
+# #$ -m bea
 #$ -t 1:10:1  # 1-indexed here
 
 
@@ -24,13 +24,13 @@ echo " "
 # load the job environment:
 . /u/local/Modules/default/init/modules.sh
 # To see which versions of matlab are available use: module av matlab
-module load matlab/R2020b
+module load matlab/R2023b
 echo "loaded matlab"
 
 total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 
 echo "Start Matlab"
-matlab  -nosplash -nodisplay -singleCompThread -r "disp('getting started'), cd('/u/home/x/xinniu/nwbPipeline/'), runbatch_spikeSorting($SGE_TASK_ID, $total_tasks), disp('end'), exit"
+matlab  -nosplash -nodisplay -singleCompThread -r "disp('getting started'), cd('/u/home/x/xinniu/nwbPipeline/batch/'), runbatch_spikeSorting($SGE_TASK_ID, $total_tasks), disp('end'), exit"
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
