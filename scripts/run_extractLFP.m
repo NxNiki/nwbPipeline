@@ -8,7 +8,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParad
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 0;
+skipExist = 1;
 saveRaw = false;
 
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
@@ -27,7 +27,7 @@ for i = 1: length(expIds)
     timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFilesExp.name})];
 end
 
-% delete(gcp('nocreate'))
+% delete(gcp('nocreate')) 
 % parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
 
 spikeFilePath = fullfile(spikeFilePath, 'CSC_micro_spikes');
