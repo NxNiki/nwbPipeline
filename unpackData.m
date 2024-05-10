@@ -34,7 +34,7 @@ suffix = regexp(outFileNames, '(?<=_)\d{3}(?=.mat)', 'match', 'once');
 suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 [~, computeTS] = findFirstOccurrence(suffix_int);
 
-% unpack the remainning files without computing the timestamp:
+% unpack ncs files:
 parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
@@ -46,7 +46,7 @@ parfor i = 1:length(inFileNames)
     end
 
     if verbose
-        fprintf('unpack: %s\n to %s\n', inFileName, outFileName);
+        fprintf('unpack: %s\nto %s\n', inFileName, outFileName);
     end
 
     timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);

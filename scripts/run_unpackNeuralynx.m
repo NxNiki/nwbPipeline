@@ -5,6 +5,7 @@
 % define filePath, experiment id and outFilePath here or comment it will trigger a UI to
 % select paths and experiment id:
 clear
+addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 
 % expIds = (3: 11);
 % filePath = {...
@@ -20,7 +21,6 @@ clear
 %     };
 % 
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
-
 
 % expIds = (4:5);
 % filePath = {...
@@ -41,7 +41,7 @@ end
 %% list csc and event files.
 
 % csc files are grouped for each channel.
-addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
+
 for i = 1:length(expIds)
 
     expId = expIds(i);
