@@ -19,6 +19,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     % expIds = (3: 11);
     % filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
     
+    % run on test data:
     expIds = (4: 5);
     filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
@@ -47,7 +48,9 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         return
     end
 
-    microFiles = microFiles(jobIds);
+    disp(['jobIds: ', sprintf('%d ', jobIds)]);
+    microFiles = microFiles(jobIds, :);
+    fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
     %% spike detection:
     delete(gcp('nocreate'))
