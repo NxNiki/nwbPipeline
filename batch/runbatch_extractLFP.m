@@ -23,7 +23,7 @@ function runbatch_extractLFP(workerId, totalWorkers)
     microLFPPath = fullfile(spikeFilePath, 'LFP_micro');
 
     %% micro electrodes:
-    [microFiles, timestampFiles] = readFilePath(filePath);
+    [microFiles, timestampFiles] = readFilePath(expIds, filePath);
 
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
     if isempty(jobIds)
@@ -34,9 +34,6 @@ function runbatch_extractLFP(workerId, totalWorkers)
     disp(['jobIds: ', sprintf('%d ', jobIds)]);
     microFiles = microFiles(jobIds, :);
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
-
-    % delete(gcp('nocreate'))
-    % parpool(3); % each channel will take around 50GB memory for multi-exp analysis.
 
     spikeFilePath = fullfile(spikeFilePath, 'CSC_micro_spikes');
     [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
