@@ -87,7 +87,7 @@ for i = 1: size(cscFiles, 1)
     end
 
     % ---- check the distribution of spike gap length:
-    figure('Position', [100, 100, 1000, 500])
+    figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
     h = histogram(lfpFileObj.spikeGapLength);
     set(gca, 'YScale', 'log');
     if max(h.Values)*1.1 > min(h.Values(h.Values>0))*.8
