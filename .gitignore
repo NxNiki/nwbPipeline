@@ -21,9 +21,12 @@ scripts/*.exe
 scripts/data_*.run
 scripts/tmp_data*
 scripts/Rasters*.pdf
+<<<<<<< HEAD
 
 batch/*data_*.run
 batch/tmp_data*
 
+=======
+>>>>>>> ee315f513060ad8625a55dd8834411b845286fad
 scripts/Patient-*.json
 .idea/*
