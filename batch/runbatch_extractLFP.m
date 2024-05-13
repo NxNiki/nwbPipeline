@@ -26,14 +26,18 @@ function runbatch_extractLFP(workerId, totalWorkers)
         expId = expIds(i);
         cscFilePath = [filePath, sprintf('/Experiment%d', expId)];
         microFilePath = fullfile(cscFilePath, 'CSC_micro');
-        microFiles = [microFiles, readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",")];
+
+        % save filenames for micro files to csv as there may be multiple segments in a single experiment.
+        % files for a single channel will be in the same row.
+        microFilesExp = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
+        microFilesExp = cellfun(@(x)replacePath(x, microFilePath), microFilesExp, UniformOutput=false);
+        microFiles = [microFiles, microFilesExp];
 
         timestampFilesExp = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
         timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFilesExp.name})];
     end
 
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
-
     if isempty(jobIds)
         disp("No job assigned to batch! This is due to more workers than number of micro files.")
         return
@@ -53,6 +57,11 @@ function runbatch_extractLFP(workerId, totalWorkers)
     lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, saveRaw);
     writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
 
+end
+
+function fullPath = replacePath(fullPath, replacePath)
+    [~, fileName, ext] = fileparts(fullPath);
+    fullPath = [replacePath, filesep, fileName, ext];
 end
 
 
