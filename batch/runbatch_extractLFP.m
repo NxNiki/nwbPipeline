@@ -48,7 +48,7 @@ function runbatch_extractLFP(workerId, totalWorkers)
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
     % delete(gcp('nocreate'))
-    % parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
+    % parpool(3); % each channel will take around 50GB memory for multi-exp analysis.
 
     spikeFilePath = fullfile(spikeFilePath, 'CSC_micro_spikes');
     [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
