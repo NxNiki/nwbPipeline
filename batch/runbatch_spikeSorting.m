@@ -2,7 +2,6 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     
     % run spike detection and spike sorting to the unpacked data:
 
-
     if nargin < 1
         % run script without queue:
         workerId = 1;
@@ -27,20 +26,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     % 1: skip existing files.
     skipExist = 1;
 
-    microFiles = [];
-    timestampFiles = [];
-    expNamesId = 1;
-
-    for i = 1:length(expIds)
-        expFilePath = [filePath, '/Experiment', sprintf('%d/', expIds(i))];
-        microFilePath = fullfile(expFilePath, 'CSC_micro');
-        microFiles = [microFiles, readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",")];
-        timestampFile = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
-        timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFile.name})];
-        expNames(expNamesId: length(timestampFiles)) = {sprintf('Exp%d', expIds(i))};
-        expNamesId = length(timestampFiles) + 1;
-    end
-
+    [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
 
     if isempty(jobIds)
@@ -53,9 +39,6 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
     %% spike detection:
-    delete(gcp('nocreate'))
-    parpool(2); % each channel will take nearly 30GB memory for multi-exp analysis.
-
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
@@ -64,7 +47,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
 
     %% spike clustering:
     spikeClustering(spikeFiles, outputPath, skipExist);
-    disp('Spike Clustering finished!')
+    disp('Spike Clustering Finished!')
 
 end
 

@@ -15,17 +15,7 @@ spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 microLFPPath = fullfile(spikeFilePath, 'LFP_micro');
 
 %% micro electrodes:
-microFiles = [];
-timestampFiles = [];
-for i = 1: length(expIds)
-    expId = expIds(i);
-    cscFilePath = [filePath, sprintf('/Experiment%d', expId)];
-    microFilePath = fullfile(cscFilePath, 'CSC_micro');
-    microFiles = [microFiles, readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",")];
-
-    timestampFilesExp = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
-    timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFilesExp.name})];
-end
+[microFiles, timestampFiles] = readFilePath(expIds, filePath);
 
 % delete(gcp('nocreate')) 
 % parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
