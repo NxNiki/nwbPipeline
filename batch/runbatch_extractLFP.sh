@@ -30,6 +30,7 @@ echo "loaded matlab"
 total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 
 echo "Start Matlab"
+echo "run extractLFP, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 matlab  -nosplash -nodisplay -singleCompThread -r "disp('getting started'), cd('/u/home/x/xinniu/nwbPipeline/batch/'), runbatch_extractLFP($SGE_TASK_ID, $total_tasks), disp('end'), exit"
 
 # echo job info on joblog:
