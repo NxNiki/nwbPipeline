@@ -5,7 +5,7 @@
 #$ -o ../../cluster-output-spikeSort/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=5:00:00,h_data=500G
+#$ -l h_rt=5:00:00,h_data=200G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 1
@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 # #$ -m bea
-#$ -t 1:40:1  # 1-indexed here
+#$ -t 1:10:1  # 1-indexed here
 
 
 # echo job info on joblog:
@@ -31,7 +31,7 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 
 echo "Start Matlab"
 echo "run extractLFP, task id: $SGE_TASK_ID, total tasks: $total_tasks"
-matlab  -nosplash -nodisplay -singleCompThread -r "disp('getting started'), cd('/u/home/x/xinniu/nwbPipeline/batch/'), runbatch_extractLFP($SGE_TASK_ID, $total_tasks), disp('end'), exit"
+matlab  -nosplash -nodisplay -singleCompThread -r "cd('/u/home/x/xinniu/nwbPipeline/batch/'), runbatch_extractLFP($SGE_TASK_ID, $total_tasks), exit"
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
