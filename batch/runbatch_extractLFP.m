@@ -23,22 +23,7 @@ function runbatch_extractLFP(workerId, totalWorkers)
     microLFPPath = fullfile(spikeFilePath, 'LFP_micro');
 
     %% micro electrodes:
-    microFiles = [];
-    timestampFiles = [];
-    for i = 1: length(expIds)
-        expId = expIds(i);
-        cscFilePath = [filePath, sprintf('/Experiment%d', expId)];
-        microFilePath = fullfile(cscFilePath, 'CSC_micro');
-
-        % save filenames for micro files to csv as there may be multiple segments in a single experiment.
-        % files for a single channel will be in the same row.
-        microFilesExp = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
-        microFilesExp = cellfun(@(x)replacePath(x, microFilePath), microFilesExp, UniformOutput=false);
-        microFiles = [microFiles, microFilesExp];
-
-        timestampFilesExp = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
-        timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFilesExp.name})];
-    end
+    [microFiles, timestampFiles] = readFilePath(filePath);
 
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
     if isempty(jobIds)
@@ -62,10 +47,6 @@ function runbatch_extractLFP(workerId, totalWorkers)
 
 end
 
-function fullPath = replacePath(fullPath, replacePath)
-    [~, fileName, ext] = fileparts(fullPath);
-    fullPath = [replacePath, filesep, fileName, ext];
-end
 
 
 
