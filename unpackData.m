@@ -39,9 +39,8 @@ parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
-    outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp', '.mat']);
+    outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
 
-    % TO DO: check if file is complete:
     if exist(outFileName, "file") && skipExist
         continue
     end
