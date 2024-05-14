@@ -46,7 +46,7 @@ parfor i = 1:length(inFileNames)
     end
 
     if verbose
-        fprintf('unpack: %s\nto %s\n', inFileName, outFileName);
+        fprintf('unpack: %s\nto: %s\n', inFileName, outFileName);
     end
 
     timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);
@@ -57,16 +57,20 @@ parfor i = 1:length(inFileNames)
 
     matobj = matfile(outFileName, 'Writable', true);
     matobj.samplingInterval = samplingInterval;
+    matobj.samplingIntervalSeconds = seconds(samplingInterval);
     matobj.data = signal;
     matobj.time0 = 0;
     matobj.timeend = timeend;
+    matobj.timeendSeconds = seconds(timeend);
 
     if computeTS(i)
         matobj = matfile(timestampFullFile, Writable=true);
         matobj.timeStamps = timeStamps;
         matobj.samplingInterval = samplingInterval;
+        matobj.samplingIntervalSeconds = seconds(samplingInterval);
         matobj.time0 = 0;
         matobj.timeend = timeend;
+        matobj.timeendSeconds = seconds(timeend);
     end
 end
 
