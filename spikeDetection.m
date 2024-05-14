@@ -72,9 +72,7 @@ parfor i = 1: size(cscFiles, 1)
 
     matobj = matfile(tempSpikeFilename, 'Writable', true);
     matobj.spikes = vertcat(spikes{:});
-    % clear spikes;
     matobj.spikeTimestamps = [spikeTimestamps{:}];
-    % clear spikeTimestamps;
     matobj.thr = thr;
     matobj.param = param;
     matobj.spikeCodes = vertcat(spikeCodes{:});

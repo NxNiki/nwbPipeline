@@ -17,7 +17,7 @@ check_WC_params(par)
 channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 
-% TO DO: save temp files in outputPath. need to fix bug here...
+% TO DO (Xin): save temp files in outputPath. need to fix bug here...
 % par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);                       % temporary filename used as input for SPC
 % par.fname = fullfile(outputPath, ['data_' channel]);
 % par.fnamespc = fullfile(outputPath, ['data_wc' channel]);
@@ -173,14 +173,17 @@ cluster_class = zeros(nspk,2);
 cluster_class(:,2)= index';
 cluster_class(:,1)= classes';
 
-outFileName = ['times_', channel, '.mat'];
-save(fullfile(outputPath, outFileName), 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
+outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
+outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
+save(outFileNameTemp, 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
 if exist('ipermut','var')
-    save(fullfile(outputPath, outFileName), 'ipermut', '-append');
+    save(outFileNameTemp, 'ipermut', '-append');
 end
 if exist('rejectedSpikes','var')
-    save(fullfile(outputPath, outFileName), 'rejectedSpikes', '-append');
+    save(outFileNameTemp, 'rejectedSpikes', '-append');
 end
+
+movefile(outFileNameTemp, outFileName);
 
 % remove temp files:
 if exist([current_par.fname '.dg_01.lab'], "file")
