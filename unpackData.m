@@ -38,15 +38,19 @@ suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
+    outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
 
-    % TO DO: check if file is complete:
     if exist(outFileName, "file") && skipExist
         continue
     end
 
+    if exist(outFileNameTemp, "file")
+        delete(outFileNameTemp);
+    end
+
     if verbose
-        fprintf('unpack: %s\nto %s\n', inFileName, outFileName);
+        fprintf('unpack: %s\nto: %s\n', inFileName, outFileName);
     end
 
     timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);
@@ -55,18 +59,24 @@ parfor i = 1:length(inFileNames)
     num_samples = length(signal);
     timeend = (num_samples-1) * samplingInterval;
 
-    matobj = matfile(outFileName, 'Writable', true);
+    matobj = matfile(outFileNameTemp, 'Writable', true);
     matobj.samplingInterval = samplingInterval;
+    matobj.samplingIntervalSeconds = seconds(samplingInterval);
     matobj.data = signal;
     matobj.time0 = 0;
     matobj.timeend = timeend;
+    matobj.timeendSeconds = seconds(timeend);
 
     if computeTS(i)
         matobj = matfile(timestampFullFile, Writable=true);
         matobj.timeStamps = timeStamps;
         matobj.samplingInterval = samplingInterval;
+        matobj.samplingIntervalSeconds = seconds(samplingInterval);
         matobj.time0 = 0;
         matobj.timeend = timeend;
+        matobj.timeendSeconds = seconds(timeend);
     end
+
+    movefile(outFileNameTemp, outFileName);
 end
 

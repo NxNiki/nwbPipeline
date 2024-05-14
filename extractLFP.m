@@ -16,19 +16,24 @@ end
 removeRejectedSpikes = true;
 
 makeOutputPath(cscFiles, outputPath, skipExist)
-outputFiles = cell(size(cscFiles, 1), 1);
+numFiles = size(cscFiles, 1);
+outputFiles = cell(numFiles, 1);
 
-for i = 1: size(cscFiles, 1)
+for i = 1: numFiles
     channelFiles = cscFiles(i,:);
-    fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
-
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
+    lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
     outputFiles{i} = lfpFilename;
 
-    % TO DO: check file completeness:
-    if exist(lfpFilename, "file") && skipExist
+    if exist(lfpFilename, "file") && skipExist    
         continue
+    end
+
+    fprintf([sprintf('extract LFP (%d of %d): \n', i, numFiles), sprintf('%s \n', channelFiles{:})])
+
+    if exist(lfpFilenameTemp, "file")
+        delete(lfpFilenameTemp);
     end
 
     % it is better if we can combine the data at 32kHz then filter,
@@ -68,7 +73,7 @@ for i = 1: size(cscFiles, 1)
 
     [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
 
-    lfpFileObj = matfile(lfpFilename, "Writable", true);
+    lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
     lfpFileObj.lfp = lfpSignal;
     lfpFileObj.lfpTimestamps = downSampledTimestamps;
     lfpFileObj.experimentName = experimentName;
@@ -85,6 +90,8 @@ for i = 1: size(cscFiles, 1)
         lfpFileObj.interpolateIndex = interpolateIndex;
         lfpFileObj.spikeIndex = spikeIndex;
     end
+
+    movefile(lfpFilenameTemp, lfpFilename);
 
     % ---- check the distribution of spike gap length:
     figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
