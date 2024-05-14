@@ -92,11 +92,11 @@ if orderByCreateTime && length(fileSuffix)>1
     % we assume the temporal order of files in each channel is
     % consistent, so just check the order of the first channel and apply
     % it to the remaining channels.
-    fprintf("groupFiles: order files by create time for group: %s.\n", fileGroup{1});
+    fprintf("groupFiles: order files by create time for group: %s. \n", fileGroup{1});
     order = orderFilesByTime(groupFileNames(1,:), REVERSE_TEMPORAL_ORDER);
     groupFileNames = groupFileNames(:, order);
 elseif length(fileSuffix)>1
-    warning("groupFiles: order files by file name. Make sure the order is correct by checking header of raw data!")
+    warning("groupFiles: order files by file name. Make sure the order is correct by checking header of raw data! \n")
 end
 
 groupFileNames = cell2table([fileGroup(:), groupFileNames]);
@@ -126,7 +126,7 @@ existIdx = cellfun(@(f)exist(f, 'file'), files);
 
 if any(~existIdx)
     for i = find(~existIdx)
-        warning('groupFiles: file missing: %s.', files{i});
+        warning('groupFiles: file missing: %s \n', files{i});
     end
 end
 
