@@ -1,14 +1,17 @@
-function jobIds = splitJobs(numTasks, numWorkers, workerId)
+function taskIds = splitJobs(numTasks, numWorkers, workerId)
     % assign n tasks to m workers and return the id of tasks for a specific worker.
     % workerId starts from 1.
 
     if numWorkers >= numTasks
-        jobIds = workerId;
+        if workerId <= numTasks
+            jobIds = workerId;
+        else
+            jobIds = [];
         return
     end
 
-    taskPerWorker = floor(numTasks / numWorkers);
+    taskPerWorker = ceil(numTasks / numWorkers);
     startJobId = taskPerWorker * (workerId - 1) + 1;
-    jobIds = startJobId: min(startJobId + taskPerWorker, numTasks);
+    jobIds = startJobId: min(startJobId + taskPerWorker - 1, numTasks);
 
 end
