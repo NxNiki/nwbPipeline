@@ -12,6 +12,6 @@ function taskIds = splitJobs(numTasks, numWorkers, workerId)
 
     taskPerWorker = ceil(numTasks / numWorkers);
     startJobId = taskPerWorker * (workerId - 1) + 1;
-    jobIds = startJobId: min(startJobId + taskPerWorker - 1, numTasks);
+    taskIds = startJobId: min(startJobId + taskPerWorker - 1, numTasks);
 
 end
