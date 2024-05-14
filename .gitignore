@@ -22,4 +22,6 @@ scripts/data_*.run
 scripts/tmp_data*
 scripts/Rasters*.pdf
 scripts/Patient-*.json
+scripts/*.csv
+
 .idea/*
