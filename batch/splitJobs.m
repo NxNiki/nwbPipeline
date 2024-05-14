@@ -7,6 +7,7 @@ function taskIds = splitJobs(numTasks, numWorkers, workerId)
             taskIds = workerId;
         else
             taskIds = [];
+        end
         return
     end
 
