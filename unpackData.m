@@ -38,8 +38,8 @@ suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};
     [~, outFileName, ~] = fileparts(outFileNames{i});
-    outFileName = fullfile(outFilePath, [outFileName, '.mat']);
     outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
+    outFileName = fullfile(outFilePath, [outFileName, '.mat']);
 
     if exist(outFileName, "file") && skipExist
         continue
