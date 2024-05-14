@@ -13,15 +13,16 @@ end
 channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
 channelFileNames = channelFileNames(2:end,:);
 
-% select macro files and rename output file names so that alphabetic order 
+% select macro/micro files and rename output file names so that alphabetic order 
 % is consistent with temporal order. The macro files always start with 'R' 
-% or 'L' in the file name
+% or 'L' in the file name. The micro files always start with 'G[A-D]'.
 idx = cellfun(@(x)~isempty(regexp(x, pattern, 'match', 'once')), channelFileNames(:, 1));
 inFileNames = channelFileNames(idx, :);
 
 inFiles = inFileNames(:, 2:end);
 channels = inFileNames(:, 1);
 numFilesEachChannel = size(inFiles, 2);
+
 suffix = arrayfun(@(y) sprintf('%03d.mat', y), 1:numFilesEachChannel, 'UniformOutput', false);
 outFiles = combineCellArrays(channels, suffix);
 outFiles = cellfun(@(fn) fullfile(channelOutFilePath, fn), outFiles, 'UniformOutput', false);
