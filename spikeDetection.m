@@ -1,4 +1,4 @@
-function spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
+function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
 %spikeDetection Summary of this function goes here
 %   cscFiles cell(m, n). m: number of channels. n: number of files in each
 %   channel. spikes detected from file in each row will be combined.
@@ -16,6 +16,7 @@ saveXfDetect = false;
 
 makeOutputPath(cscFiles, outputPath, skipExist)
 nSegments = length(timestampFiles);
+outputFiles = cell(1, size(cscFiles, 1));
 
 parfor i = 1: size(cscFiles, 1)
 
@@ -25,6 +26,8 @@ parfor i = 1: size(cscFiles, 1)
 
     spikeFilename = fullfile(outputPath, spikeFilename);
     tempSpikeFilename = fullfile(outputPath, tempSpikeFilename);
+
+    outputfiles{i} = spikeFilename;
     
     if exist(spikeFilename, "file") && skipExist
         continue

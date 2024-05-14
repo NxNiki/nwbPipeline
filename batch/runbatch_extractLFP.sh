@@ -2,7 +2,7 @@
 #!/bin/bash
 #$ -cwd
 # error = Merged with joblog
-#$ -o ../../cluster-output-spikeSort/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
+#$ -o ../../cluster-output-extractLFP/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
 ## Edit the line below as needed:
 #$ -l h_rt=5:00:00,h_data=200G
