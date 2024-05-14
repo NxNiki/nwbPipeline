@@ -30,7 +30,7 @@ par.fnamespc = ['data_wc' channel];
 % LOAD SPIKES
 spikeFileObj = matfile(inputFile);
 spikes = spikeFileObj.spikes;
-index = spikeFileObj.spikeTimestamps;
+spikeTimestamps = spikeFileObj.spikeTimestamps;
 spikeCodes = spikeFileObj.spikeCodes;
 
 % REJECT SPIKES
@@ -39,11 +39,11 @@ nspk = size(spikes,1);
 if ~isempty(spikeCodes) && nspk >= min_spikes4SPC
     [inds, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
     rejectedSpikes.spikes = spikes(inds,:);
-    rejectedSpikes.index = index(inds);
+    rejectedSpikes.index = spikeTimestamps(inds);
     rejectedSpikes.spikeCodes = spikeCodes(inds,:);
     rejectedSpikes.originalIndsOfRejected = inds;
     spikes(inds,:) = [];
-    index(inds) = [];
+    spikeTimestamps(inds) = [];
     spikeCodes(inds,:) = [];
 end
 
@@ -170,7 +170,7 @@ par = update_parameters(par, current_par, 'batch_plot');
 
 par.sorting_date = datestr(now);
 cluster_class = zeros(nspk,2);
-cluster_class(:,2)= index';
+cluster_class(:,2)= spikeTimestamps';
 cluster_class(:,1)= classes';
 
 outFileName = fullfile(outputPath, ['times_', channel, '.mat']);

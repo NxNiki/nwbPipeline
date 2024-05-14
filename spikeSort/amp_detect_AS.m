@@ -1,8 +1,10 @@
-function [spikes,thr,index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
+function [spikes, thr, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
 % Detect spikes with amplitude thresholding. Uses median estimation.
 % Detection is done with filters set by fmin_detect and fmax_detect. Spikes
 % are stored for sorting using fmin_sort and fmax_sort. This trick can
 % eliminate noise in the detection but keeps the spikes shapes for sorting.
+
+useSinglePrecision = true;
 
 if length(x(:)) ~= length(TimeStamps(:))
     error('voltage signal (%d) and time stamp (%d) do not have same length.', length(x(:)), length(TimeStamps(:)))
@@ -105,15 +107,15 @@ end
 % SPIKE STORING (with or without interpolation)
 ls = w_pre + w_post;
 spikes = zeros(nspk,ls+4);
-rejectedSpikes = spikes;
+%rejectedSpikes = spikes;
 
 xf(length(xf)+1:length(xf)+w_post)=0;
 
 for i=1:nspk                          %Eliminates artifacts
     if max(abs( xf(index(i)-w_pre:index(i) + w_post) )) < thrmax
         spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
-    else
-        rejectedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
+    %else
+        %rejectedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
     end
 end
 aux = find(spikes(:,w_pre)==0);       %erases indexes that were artifacts
@@ -133,5 +135,12 @@ if isempty(index)
     fprintf('no spikes detected!\n')
     [spikes,thr,index] = deal([]);
 end
+
+if useSinglePrecision
+    % change data type to single to save memory:
+    spikes = single(spikes);
+    xf_detect = single(xf_detect);
+end
+
 
 
