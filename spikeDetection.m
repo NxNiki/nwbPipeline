@@ -27,7 +27,7 @@ parfor i = 1: size(cscFiles, 1)
     spikeFilename = fullfile(outputPath, spikeFilename);
     tempSpikeFilename = fullfile(outputPath, tempSpikeFilename);
 
-    outputfiles{i} = spikeFilename;
+    outputFiles{i} = spikeFilename;
     
     if exist(spikeFilename, "file") && skipExist
         continue
