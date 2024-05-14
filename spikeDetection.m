@@ -21,12 +21,20 @@ parfor i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);
     spikeFilename = createSpikeFileName(channelFiles{1});
+    tempSpikeFilename = ['temp_', spikeFilename];
+
     spikeFilename = fullfile(outputPath, spikeFilename);
+    tempSpikeFilename = fullfile(outputPath, tempSpikeFilename);
     
     % TO DO: check file completeness:
     if exist(spikeFilename, "file") && skipExist
         continue
     end
+
+    if exist(tempSpikeFilename, "file")
+        delete(tempSpikeFilename);
+    end
+
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
     spikes = cell(nSegments, 1);
@@ -61,32 +69,24 @@ parfor i = 1: size(cscFiles, 1)
     end
 
     fprintf('write spikes to file:\n %s\n', spikeFilename);
-    % remove file if it exist as repetitive writing to save variable in
-    % matfile obj consumes increasing storage:
-    if exist(spikeFilename, "file")
-        delete(spikeFilename);
+
+
+    matobj = matfile(tempSpikeFilename, 'Writable', true);
+    matobj.spikes = vertcat(spikes{:});
+    % clear spikes;
+    matobj.spikeTimestamps = [spikeTimestamps{:}];
+    % clear spikeTimestamps;
+    matobj.thr = thr;
+    matobj.param = param;
+    matobj.spikeCodes = vertcat(spikeCodes{:});
+    matobj.spikeHist = [spikeHist{:}];
+    matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+
+    if saveXfDetect
+        matobj.xfDetect = [xfDetect{:}];
     end
 
-    try
-        matobj = matfile(spikeFilename, 'Writable', true);
-        matobj.spikes = vertcat(spikes{:});
-        % clear spikes;
-        matobj.spikeTimestamps = [spikeTimestamps{:}];
-        % clear spikeTimestamps;
-        matobj.thr = thr;
-        matobj.param = param;
-        matobj.spikeCodes = vertcat(spikeCodes{:});
-        matobj.spikeHist = [spikeHist{:}];
-        matobj.spikeHistPrecise = [spikeHistPrecise{:}];
-    
-        if saveXfDetect
-            matobj.xfDetect = [xfDetect{:}];
-        end
-    catch err
-        fprintf('delete file with writing error: %s', spikeFilename)
-        delete(spikeFilename);
-        rethrow(err)
-    end
+    movefile(tempSpikeFilename, spikeFilename);
 
 end
 end
