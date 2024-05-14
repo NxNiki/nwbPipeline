@@ -26,7 +26,6 @@ parfor i = 1: size(cscFiles, 1)
     spikeFilename = fullfile(outputPath, spikeFilename);
     tempSpikeFilename = fullfile(outputPath, tempSpikeFilename);
     
-    % TO DO: check file completeness:
     if exist(spikeFilename, "file") && skipExist
         continue
     end
