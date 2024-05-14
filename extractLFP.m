@@ -16,12 +16,11 @@ end
 removeRejectedSpikes = true;
 
 makeOutputPath(cscFiles, outputPath, skipExist)
-outputFiles = cell(size(cscFiles, 1), 1);
+numFiles = size(cscFiles, 1);
+outputFiles = cell(numFiles, 1);
 
-for i = 1: size(cscFiles, 1)
+for i = 1: numFiles
     channelFiles = cscFiles(i,:);
-    fprintf(['extract LFP: \n', sprintf('%s \n', channelFiles{:})])
-
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
     lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
@@ -30,6 +29,8 @@ for i = 1: size(cscFiles, 1)
     if exist(lfpFilename, "file") && skipExist    
         continue
     end
+
+    fprintf([sprintf('extract LFP (%d of %d): \n', i, numFiles), sprintf('%s \n', channelFiles{:})])
 
     if exist(lfpFilenameTemp, "file")
         delete(lfpFilenameTemp);

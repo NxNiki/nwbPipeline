@@ -1,12 +1,29 @@
 % check completeness of unpacked .mat files
+% hidden .mat file and incomplete files will be deleted.
+
 
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/568_MovieParadigm/Experiment*/CSC_micro';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/567_MovieParadigm/Experiment*/CSC_micro';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/566_MovieParadigm/Experiment*/CSC_micro';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/565_MovieParadigm/Experiment*/CSC_micro';
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/563_MovieParadigm/Experiment*/CSC_micro';
+% filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/563_MovieParadigm/Experiment*/CSC_micro';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/562_MovieParadigm/Experiment*/CSC_micro';
+% filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm/Experiment*/CSC_micro';
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm/Experiment*/CSC_micro';
 
+logFileName = 'deletedFiles573.csv';
+
+%%
+hiddenFiles = dir([filePath, '/.*.mat']);
+
+% Loop through the hidden mat files and delete each one
+for k = 1:length(hiddenFiles)
+    % Construct the full path to the file
+    file_path = fullfile(hiddenFiles(k).folder, hiddenFiles(k).name);
+    fprintf('remove hidden file:\n %s\n', file_path);
+    % Delete the file
+    delete(file_path);
+end
 
 fileNames = dir([filePath, '/*.mat']);
 fileNames = fullfile({fileNames.folder}, {fileNames.name});
@@ -32,4 +49,6 @@ for i = 1:length(fileNames)
 
 end
 
-writecell(deletedFiles', 'deletedFiles563.csv');
+if ~isempty(deletedFiles)
+    writecell(deletedFiles', logFileName);
+end
