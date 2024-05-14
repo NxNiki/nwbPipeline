@@ -86,7 +86,7 @@ fileSuffix(idx) = sort(cellfun(@(x) ['_', x], fileSuffix(idx), 'UniformOutput', 
 groupFileNames = arrayfun(@(x, y) fullfile(inputPath, [y{:}, x{:}, '.ncs']), rowMat, colMat, 'UniformOutput', false);
 
 % remove file if it does not exists:
-groupFileNames = removeNonExistFile(groupFileNames, true);
+groupFileNames = removeNonExistFile(groupFileNames);
 
 if orderByCreateTime && length(fileSuffix)>1
     % we assume the temporal order of files in each channel is
@@ -117,19 +117,12 @@ fileNames = table2cell(groupFileNames(:, 2:end));
 end
 
 
-function files = removeNonExistFile(files, parallel)
+function files = removeNonExistFile(files)
 fprintf('groupFiles: check file existence...\n');
 [r, c] = size(files);
 files = files(:);
 
-if parallel
-    existIdx = zeros(length(files), 1);
-    parfor i = 1: length(files)
-        existIdx(i) = exist(files{i}, 'file');
-    end
-else
-    existIdx = cellfun(@(f)exist(f, 'file'), files);
-end
+existIdx = cellfun(@(f)exist(f, 'file'), files);
 
 if any(~existIdx)
     for i = find(~existIdx)
@@ -148,7 +141,7 @@ if nargin < 2
 end
 
 createTimes = NaT(length(files), 1);
-parfor i = 1:length(files)
+for i = 1:length(files)
     [~, ~, createTime, ~] = Nlx_getStartAndEndTimes(files{i});
     createTimes(i) = createTime;
 end
