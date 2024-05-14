@@ -1,4 +1,6 @@
 function filenames = getNeuralynxFiles(directory, fileExt, ignoreFilesWithSizeBelow)
+% list the .ncs files in neuralynx data. Files will be ignore if the name
+% matches pattern defined in IGNORE_FILES in config.m.
 
 if nargin < 3 || isempty(ignoreFilesWithSizeBelow)
     ignoreFilesWithSizeBelow = 16384;
