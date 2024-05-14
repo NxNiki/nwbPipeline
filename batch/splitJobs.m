@@ -4,9 +4,9 @@ function taskIds = splitJobs(numTasks, numWorkers, workerId)
 
     if numWorkers >= numTasks
         if workerId <= numTasks
-            jobIds = workerId;
+            taskIds = workerId;
         else
-            jobIds = [];
+            taskIds = [];
         return
     end
 
