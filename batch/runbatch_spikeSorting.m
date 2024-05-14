@@ -20,7 +20,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     
     % run on test data:
     expIds = (4: 5);
-    filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+    % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+    filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
     % 0: will remove all previous unpack files.
     % 1: skip existing files.
