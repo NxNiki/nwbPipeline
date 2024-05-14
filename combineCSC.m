@@ -7,7 +7,7 @@ function [signal ,timestamps, samplingIntervalSeconds] = combineCSC(signalFiles,
 
 
 if nargin < 3
-    maxGapDuration = seconds(1);
+    maxGapDuration = milliseconds(2);
 end
 
 GAP_THRESHOLD = 2;

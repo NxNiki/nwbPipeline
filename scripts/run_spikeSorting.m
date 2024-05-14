@@ -11,20 +11,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParad
 % 1: skip existing files.
 skipExist = 1;
 
-microFiles = [];
-timestampFiles = [];
-expNamesId = 1;
-
-for i = 1:length(expIds)
-    expFilePath = [filePath, '/Experiment', sprintf('%d/', expIds(i))];
-    microFilePath = fullfile(expFilePath, 'CSC_micro');
-    microFiles = [microFiles, readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",")];
-    timestampFile = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
-    timestampFiles = [timestampFiles, fullfile(microFilePath, {timestampFile.name})];
-    expNames(expNamesId: length(timestampFiles)) = {sprintf('Exp%d', expIds(i))};
-    expNamesId = length(timestampFiles) + 1;
-end
-
+[microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
 
 %% spike detection:
 delete(gcp('nocreate'))

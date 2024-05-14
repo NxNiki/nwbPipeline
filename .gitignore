@@ -21,6 +21,10 @@ scripts/*.exe
 scripts/data_*.run
 scripts/tmp_data*
 scripts/Rasters*.pdf
+
+batch/*data_*.run
+batch/tmp_data*
+
 scripts/Patient-*.json
 scripts/*.csv
 

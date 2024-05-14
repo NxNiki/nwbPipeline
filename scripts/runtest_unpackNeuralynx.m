@@ -27,6 +27,13 @@ outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_Mov
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
 % outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
+% unpack data to test directory on hoffman:
+% expId = 4;
+% TO DO: figure out how to access to LTS (where raw data is stored)
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57';
+% outFilePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+
+
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = 1; 
