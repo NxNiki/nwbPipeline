@@ -1,32 +1,53 @@
-function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
-    %spikeDetection Summary of this function goes here
-    %   cscFiles cell(m, n). m: number of channels. n: number of files in each
-    %   channel. spikes detected from file in each row will be combined.
+function spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
+%spikeDetection Summary of this function goes here
+%   cscFiles cell(m, n). m: number of channels. n: number of files in each
+%   channel. spikes detected from file in each row will be combined.
+
+
+if nargin < 4 || isempty(experimentName)
+    experimentName = repmat({''}, length(timestampFiles), 1);
+end
+
+if nargin < 5
+    skipExist = true;
+end
+
+saveXfDetect = false;
+
+makeOutputPath(cscFiles, outputPath, skipExist)
+nSegments = length(timestampFiles);
+
+parfor i = 1: size(cscFiles, 1)
+
+    channelFiles = cscFiles(i,:);
+    spikeFilename = createSpikeFileName(channelFiles{1});
+    tempSpikeFilename = ['temp_', spikeFilename];
+
+    spikeFilename = fullfile(outputPath, spikeFilename);
+    tempSpikeFilename = fullfile(outputPath, tempSpikeFilename);
     
-    
-    if nargin < 4 || isempty(experimentName)
-        experimentName = repmat({''}, length(timestampFiles), 1);
+    if exist(spikeFilename, "file") && skipExist
+        continue
     end
-    
-    if nargin < 5
-        skipExist = true;
+
+    if exist(tempSpikeFilename, "file")
+        delete(tempSpikeFilename);
     end
-    
-    saveXfDetect = false;
-    
-    makeOutputPath(cscFiles, outputPath, skipExist)
-    nSegments = length(timestampFiles);
-    outputFiles = cell(1, size(cscFiles, 1));
-    
-    parfor i = 1: size(cscFiles, 1)
-    
-        channelFiles = cscFiles(i,:);
-        spikeFilename = createSpikeFileName(channelFiles{1});
-        spikeFilename = fullfile(outputPath, spikeFilename);
-        outputFiles{i} = spikeFilename;
-        
-        % TO DO: check file completeness:
-        if exist(spikeFilename, "file") && skipExist
+
+    fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
+
+    spikes = cell(nSegments, 1);
+    spikeCodes = cell(nSegments, 1);
+    spikeHist = cell(nSegments, 1);
+    spikeHistPrecise = cell(nSegments, 1);
+    spikeTimestamps = cell(nSegments, 1);
+    xfDetect = cell(nSegments, 1);
+
+    [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFiles);
+    thr = NaN;
+
+    for j = 1: nSegments
+        if ~exist(channelFiles{j}, "file")
             continue
         end
         fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
@@ -68,30 +89,28 @@ function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, expe
         if exist(spikeFilename, "file")
             delete(spikeFilename);
         end
-    
-        try
-            matobj = matfile(spikeFilename, 'Writable', true);
-            matobj.spikes = vertcat(spikes{:});
-            matobj.spikeTimestamps = [spikeTimestamps{:}];
-            matobj.thr = thr;
-            matobj.param = param;
-            matobj.spikeCodes = vertcat(spikeCodes{:});
-            matobj.spikeHist = [spikeHist{:}];
-            matobj.spikeHistPrecise = [spikeHistPrecise{:}];
-        
-            if saveXfDetect
-                matobj.xfDetect = [xfDetect{:}];
-            end
-            fprintf('writing finished: %s\n', spikeFilename);
-        catch err
-            fprintf('delete file with writing error: %s', spikeFilename)
-            delete(spikeFilename);
-            rethrow(err)
-        end
-    
     end
+
+    fprintf('write spikes to file:\n %s\n', spikeFilename);
+
+
+    matobj = matfile(tempSpikeFilename, 'Writable', true);
+    matobj.spikes = vertcat(spikes{:});
+    matobj.spikeTimestamps = [spikeTimestamps{:}];
+    matobj.thr = thr;
+    matobj.param = param;
+    matobj.spikeCodes = vertcat(spikeCodes{:});
+    matobj.spikeHist = [spikeHist{:}];
+    matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+
+    if saveXfDetect
+        matobj.xfDetect = [xfDetect{:}];
     end
-    
-    
-    
-    
+
+    movefile(tempSpikeFilename, spikeFilename);
+
+end
+end
+
+
+

@@ -26,4 +26,6 @@ batch/*data_*.run
 batch/tmp_data*
 
 scripts/Patient-*.json
+scripts/*.csv
+
 .idea/*
