@@ -10,6 +10,7 @@ IGNORE_FILES = {
     '^C4.*\.ncs';
     '^EMG.*\.ncs';
     '^EOG.*\.ncs';
+    '^Analogue1.*\.ncs';
     '^Analogue2.*\.ncs';
     '^Ez.*\.ncs';
     '^HR_Ref.*\.ncs';
