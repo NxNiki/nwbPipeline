@@ -91,8 +91,6 @@ for i = 1: numFiles
         lfpFileObj.spikeIndex = spikeIndex;
     end
 
-    movefile(lfpFilenameTemp, lfpFilename);
-
     % ---- check the distribution of spike gap length:
     figure('Position', [100, 100, 1000, 500])
     h = histogram(lfpFileObj.spikeGapLength);
@@ -107,6 +105,8 @@ for i = 1: numFiles
     saveas(h, fullfile(outputPath, [fileName, '.png']), 'png');
     close
     % ---- 
+
+    movefile(lfpFilenameTemp, lfpFilename);
 
 end
 end
