@@ -19,7 +19,7 @@ makeOutputPath(cscFiles, outputPath, skipExist)
 numFiles = size(cscFiles, 1);
 outputFiles = cell(numFiles, 1);
 
-for i = 1: numFiles
+for i = 2: numFiles
     channelFiles = cscFiles(i,:);
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
@@ -49,6 +49,9 @@ for i = 1: numFiles
         spikeClass = spikeFileObj.cluster_class(:, 1);
         spikeTimestamps = spikeFileObj.cluster_class(:, 2);
 
+        % the index of last spike should be close to the end of csc signal.
+        % except for multi-exp analysis in which case there is large gaps
+        % between experiments.
         fprintf('index of last spike: %d\n', (spikeTimestamps(end) - timestamps(1)) * (seconds(1) / samplingInterval));
     
         % cscSignalSpikesRemoved  = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps, true);
