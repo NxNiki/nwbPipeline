@@ -51,9 +51,9 @@ parfor i = 1: size(cscFiles, 1)
 
     for j = 1: nSegments
         if ~exist(channelFiles{j}, "file")
+            fprintf(['missing file in spike detection: \n', sprintf('%s \n', channelFiles{j})])
             continue
         end
-        fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
     
         spikes = cell(nSegments, 1);
         spikeCodes = cell(nSegments, 1);
