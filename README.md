@@ -1,10 +1,10 @@
 # nwbPipeline
 Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
-- unpack raw data: read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
-- spike sort: detect spikes and cluster spikes into units.
-- extract LFP: remove spikes in the raw csc signals and downsample to 2k Hz.
-- convert to NWB: export data to NWB (neural data without borders) format for data sharing.
+- **unpack raw data:** read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
+- **spike sort:** detect spikes and cluster spikes into units.
+- **extract LFP:** remove spikes in the raw csc signals and downsample to 2k Hz.
+- **convert to NWB:** export data to NWB (neural data without borders) format for data sharing.
 
 ## How to use:
 
