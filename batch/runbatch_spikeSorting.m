@@ -16,7 +16,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
 
     expIds = (8:14);
-    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
+    % filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
+    filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
     
     % run on test data:
     % expIds = (4: 5);
@@ -26,6 +27,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     % 0: will remove all previous unpack files.
     % 1: skip existing files.
     skipExist = 1;
+
+    %% load file names micro data:
 
     [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
@@ -43,6 +46,9 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
+    delete(gcp('nocreate')); 
+    pool = parpool(1);
+
     spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist);
     disp('Spike Detection Finished!')
 
@@ -50,6 +56,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     spikeClustering(spikeFiles, outputPath, skipExist);
     disp('Spike Clustering Finished!')
 
+    delete(pool);
 end
 
 
