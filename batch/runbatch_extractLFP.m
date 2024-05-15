@@ -43,6 +43,8 @@ function runbatch_extractLFP(workerId, totalWorkers)
     lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, saveRaw);
     writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
 
+    disp('lfp extraction finished!');
+
 end
 
 
