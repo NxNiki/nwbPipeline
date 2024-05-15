@@ -19,28 +19,28 @@ Run in matlab:
 scripts/run_unpackNeuralynx
 ```
 
-You can either define the I/O path in the script or use the UI to select file path:
+You can either define the I/O path in the script or use the UI to select the file path:
 
-![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/a9a26e55-4ef8-4602-94fa-4586380e53b7)
+![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/d84a562c-816c-4a61-ba5e-4da2062eaabe)
 
 
 ### spike sorting:
 
 Run in matlab:
 ```
-scripts/run_spikeSorting
+scripts/run_spikeSorting()
 ```
 
 Run on SGE:
 ```
-qsub batch/runbatch_spikeSorting
+qsub batch/runbatch_spikeSorting()
 ```
 
 ### extract LFP:
 
 Run in matlab:
 ```
-scripts/run_extractLFP
+scripts/run_extractLFP()
 ```
 Run on SGE:
 ```
