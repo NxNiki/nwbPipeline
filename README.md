@@ -77,7 +77,11 @@ https://github.com/NeurodataWithoutBorders/matnwb
 
 ## troubleshooting:
 
-Parallel toolbox not working:
+### Eqw on SGE:
+
+This could be due to memory exceeding the limit. Try to increase `h_data` in the shell script.
+
+### Parallel toolbox not working:
 This could be due to pathdef issue, which is caused by multiple versions of Matlab reading/writing to pathdef in ~/Documents/MATLAB. 
 
 See [this post](https://www.mathworks.com/matlabcentral/answers/2113676-matlab-r2023a-parallel-computing-toolbox-is-not-working?s_tid=srchtitle)
@@ -105,7 +109,7 @@ savepath
 Note that the above commands will reset any custom paths you have set.
 
 
-Matlab toolbox cannot be installed due to permission issue:
+## Matlab toolbox cannot be installed due to permission issue:
 
 See this [solution](https://www.mathworks.com/matlabcentral/answers/334889-can-t-install-any-toolboxes-because-can-t-write-to-usr-local-matlab-r2017)
 
@@ -121,8 +125,7 @@ Or maybe run matlab in terminal:
 sudo matlab
 ```
 
-
-error:
+## error in matnwb:
 ```
 object(s) could not be created:
     /processing/ecephys/LFP/ElectricalSeries/electrodes
