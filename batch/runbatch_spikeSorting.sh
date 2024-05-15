@@ -6,7 +6,7 @@
 #$ -j y
 ## Edit the line below as needed. The data limit applies for each job individually,
 ## so no need to change it if you submit more array jobs.
-#$ -l h_rt=24:00:00,h_data=50G
+#$ -l h_rt=24:00:00,h_data=500G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 1
