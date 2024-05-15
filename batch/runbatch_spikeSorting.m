@@ -46,8 +46,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
-    delete(gcp('nocreate')); 
-    pool = parpool(1);
+    % delete(gcp('nocreate')); 
+    % pool = parpool(1);
 
     spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist);
     disp('Spike Detection Finished!')
@@ -56,7 +56,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     spikeClustering(spikeFiles, outputPath, skipExist);
     disp('Spike Clustering Finished!')
 
-    delete(pool);
+    % delete(pool);
 end
 
 
