@@ -4,7 +4,8 @@ organize iEEG (neuralynx and blackrock) recordings and convert raw data to nwb f
 ## How to use:
 
 `scripts`: Pipelines to run on the local machine.
-`batch': Pipelines to run on SGE.
+
+`batch`: Pipelines to run on SGE.
 
 ### unpack data:
 
