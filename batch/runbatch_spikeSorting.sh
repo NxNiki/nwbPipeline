@@ -1,4 +1,4 @@
-### matlab_test_job.sh START ###
+###  submit matlab batch jobs to SGE ###
 #!/bin/bash
 #$ -cwd
 # error = Merged with joblog
