@@ -2,10 +2,11 @@
 #!/bin/bash
 #$ -cwd
 # error = Merged with joblog
-#$ -o ../../cluster-output-spikeSort/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
+#$ -o ../../cluster-log-spikeSort/job572-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
-## Edit the line below as needed:
-#$ -l h_rt=24:00:00,h_data=500G
+## Edit the line below as needed. The data limit applies for each job individually,
+## so no need to change it if you submit more array jobs.
+#$ -l h_rt=24:00:00,h_data=50G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 1
