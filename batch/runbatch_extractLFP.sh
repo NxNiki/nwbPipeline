@@ -5,7 +5,7 @@
 #$ -o ../../cluster-output-extractLFP/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=5:00:00,h_data=100G
+#$ -l h_rt=5:00:00,h_data=500G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 1
