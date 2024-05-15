@@ -19,7 +19,7 @@ makeOutputPath(cscFiles, outputPath, skipExist)
 numFiles = size(cscFiles, 1);
 outputFiles = cell(numFiles, 1);
 
-for i = 2: numFiles
+for i = 1: numFiles
     channelFiles = cscFiles(i,:);
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
