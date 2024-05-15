@@ -1,9 +1,44 @@
 # nwbPipeline
 organize iEEG (neuralynx and blackrock) recordings and convert raw data to nwb format.
 
+## How to use:
+
+`scripts`: Pipelines to run on the local machine.
+`batch': Pipelines to run on SGE.
+
+### unpack data:
+
+Run in matlab:
+```
+scripts/run_unpackNeuralynx
+```
+
+### spike sorting:
+
+Run in matlab:
+```
+scripts/run_spikeSorting
+```
+
+Run on SGE:
+```
+qsub batch/runbatch_spikeSorting
+```
+
+### extract LFP:
+
+Run in matlab:
+```
+scripts/run_extractLFP
+```
+Run on SGE:
+```
+qsub batch/runbatch_extractLFP.sh
+```
+
 ## config.m
 
-This script contains the global parameters for the pipeline.
+This script contains the global parameters for the pipeline. Including name patterns for micro and macro files, files that are ignored when unpacking, etc.
 
 ## Nlx2Mat
 
@@ -19,6 +54,10 @@ The code for spike sorting, modified from PDM (by Emily) and Multi-Exp Analysis 
 ## scripts
 
 The scripts to unpack raw data, spike detection, spike clustering, and export data to nwb format.
+
+## batch
+
+The scripts to run the pipeline on Hoffman (SGE).
 
 ## matnwb:
 
