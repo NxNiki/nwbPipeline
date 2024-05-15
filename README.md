@@ -1,5 +1,10 @@
 # nwbPipeline
-organize iEEG (neuralynx and blackrock) recordings and convert raw data to nwb format.
+Data processing pipeline for iEEG (neuralynx and blackrock) recordings.
+
+- unpack raw data: read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
+- spike sort: detect spikes and cluster spikes into units.
+- extract LFP: remove spikes in the raw csc signals and downsample to 2k Hz.
+- convert to NWB: export data to NWB (neural data without borders) format for data sharing.
 
 ## How to use:
 
@@ -13,6 +18,11 @@ Run in matlab:
 ```
 scripts/run_unpackNeuralynx
 ```
+
+You can either define the I/O path in the script or use the UI to select file path:
+
+![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/a9a26e55-4ef8-4602-94fa-4586380e53b7)
+
 
 ### spike sorting:
 
