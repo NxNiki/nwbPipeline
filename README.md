@@ -1,10 +1,11 @@
 # nwbPipeline
 Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
-- **unpack raw data:** read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
-- **spike sort:** detect spikes and cluster spikes into units.
-- **extract LFP:** remove spikes in the raw csc signals and downsample to 2k Hz.
-- **convert to NWB:** export data to NWB (neural data without borders) format for data sharing.
+- **set montage:** Set the montage information which maps the device channel to the brain region.
+- **unpack raw data:** Read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
+- **spike sort:** Detect spikes and cluster spikes into units.
+- **extract LFP:** Remove spikes in the raw csc signals and downsample to 2k Hz.
+- **convert to NWB:** Export data to NWB (neural data without borders) format for data sharing.
 
 ## How to use:
 
@@ -12,9 +13,13 @@ Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
 `batch`: Pipelines to run on SGE.
 
+### set montage:
+
+<WIP>
+
 ### unpack data:
 
-Run in matlab:
+Run in Matlab:
 ```
 scripts/run_unpackNeuralynx
 ```
@@ -26,7 +31,7 @@ You can either define the I/O path in the script or use the UI to select the fil
 
 ### spike sorting:
 
-Run in matlab:
+Run in Matlab:
 ```
 scripts/run_spikeSorting
 ```
