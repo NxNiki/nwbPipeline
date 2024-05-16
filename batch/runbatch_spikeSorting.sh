@@ -2,7 +2,7 @@
 #!/bin/bash
 #$ -cwd
 # error = Merged with joblog
-#$ -o ../../cluster-log-spikeSort/job572-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
+#$ -o /u/home/x/xinniu/cluster-log-spikeSort/job572-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
 ## Edit the line below as needed. The data limit applies for each job individually,
 ## so no need to change it if you submit more array jobs.
