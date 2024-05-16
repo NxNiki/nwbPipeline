@@ -99,7 +99,7 @@ https://github.com/NeurodataWithoutBorders/matnwb
 
 This could be due to memory exceeding the limit. Try to increase `h_data` in the shell script.
 
-Use qstat -j <job_id> to get detailed information about the job and why it failed.
+Use `qstat -j <job_id>` to get detailed information about the job and why it failed.
 
 ### Parallel toolbox not working:
 This could be due to pathdef issue, which is caused by multiple versions of Matlab reading/writing to pathdef in ~/Documents/MATLAB. 
