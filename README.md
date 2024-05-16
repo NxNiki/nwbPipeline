@@ -61,6 +61,10 @@ Or define `expIds` and `filePath` in `batch/runbatch_extractLFP.m` and run on SG
 qsub batch/runbatch_extractLFP.sh
 ```
 
+### export to NWB:
+
+<WIP>
+
 ## config.m
 
 This script contains the global parameters for the pipeline. Including name patterns for micro and macro files, files that are ignored when unpacking, etc.
