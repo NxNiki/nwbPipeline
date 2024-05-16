@@ -31,23 +31,32 @@ You can either define the I/O path in the script or use the UI to select the fil
 
 ### spike sorting:
 
-Run in Matlab:
+Define experiment ID and file path in `scripts/run_spikeSorting.m` to run spike sorting:
+
+```
+expIds = (4:7);
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+```
+
+and run in Matlab:
 ```
 scripts/run_spikeSorting
 ```
 
-Run on SGE:
+This will run spike detection using a common threshold across all selected experiments and combine spikes in a single .mat file for each channel.
+
+Or define experiment ID and file path in `batch/runbatch_spikeSorting.m` and run on SGE:
 ```
-qsub batch/runbatch_spikeSorting
+qsub batch/runbatch_spikeSorting.sh
 ```
 
 ### extract LFP:
 
-Run in matlab:
+Similar to spike sorting, define `expIds` and `filePath` in `scripts/run_extractLFP.m` and run in matlab:
 ```
 scripts/run_extractLFP
 ```
-Run on SGE:
+Or define `expIds` and `filePath` in `batch/runbatch_extractLFP.m` and run on SGE:
 ```
 qsub batch/runbatch_extractLFP.sh
 ```
