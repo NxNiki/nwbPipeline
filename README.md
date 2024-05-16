@@ -102,6 +102,7 @@ This could be due to memory exceeding the limit. Try to increase `h_data` in the
 Use `qstat -j <job_id>` to get detailed information about the job and why it failed.
 
 Once the underlying issue is resolved, you can clear the error state using `qmod -c <job_id>` and then resubmit or restart the job with `qmod -rj <job_id>`.
+> You typically do not need to run `qmod -rj` to reschedule a job that has returned to the qw (queued and waiting) status after clearing the Eqw state. 
 
 ### Parallel toolbox not working:
 This could be due to pathdef issue, which is caused by multiple versions of Matlab reading/writing to pathdef in ~/Documents/MATLAB. 
