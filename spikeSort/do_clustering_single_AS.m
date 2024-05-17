@@ -36,15 +36,11 @@ spikeCodes = spikeFileObj.spikeCodes;
 % REJECT SPIKES
 % SPK quantity check 1
 nspk = size(spikes,1);
+spikeIdxRejected = [];
 if ~isempty(spikeCodes) && nspk >= min_spikes4SPC
-    [inds, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
-    rejectedSpikes.spikes = spikes(inds,:);
-    rejectedSpikes.index = spikeTimestamps(inds);
-    rejectedSpikes.spikeCodes = spikeCodes(inds,:);
-    rejectedSpikes.originalIndsOfRejected = inds;
-    spikes(inds,:) = [];
-    spikeTimestamps(inds) = [];
-    spikeCodes(inds,:) = [];
+    [spikeIdxRejected, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
+    spikes(spikeIdxRejected,:) = [];
+    spikeTimestamps(spikeIdxRejected) = [];
 end
 
 nspk = size(spikes,1);
@@ -175,12 +171,11 @@ cluster_class(:,1)= classes';
 
 outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
 outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
-save(outFileNameTemp, 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
+
+save(outFileNameTemp, 'cluster_class', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', '-v7.3');
+
 if exist('ipermut','var')
     save(outFileNameTemp, 'ipermut', '-append');
-end
-if exist('rejectedSpikes','var')
-    save(outFileNameTemp, 'rejectedSpikes', '-append');
 end
 
 movefile(outFileNameTemp, outFileName);
