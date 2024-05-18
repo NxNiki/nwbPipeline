@@ -26,6 +26,15 @@ function moveFile(source, dest)
         mkdir(destDir);
     end
 
+    % also copy IO record so that we can rerun analysis directly from LTS:
+    if ~exist(fullfile(destDir, 'outFileNames.csv'), "file")
+        [sourceDir, ~, ~] = fileparts(source);
+        IOLog = fullfile(sourceDir, 'outFileNames.csv');
+        if exist(IOLog, "file")
+            copyfile(IOLog, destDir);
+        end
+    end
+
     % Move the file
     if exist(source, "file")
         fprintf('move file: %s \nto: %s\n', source, dest);
