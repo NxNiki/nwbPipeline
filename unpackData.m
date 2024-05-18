@@ -34,6 +34,10 @@ suffix = regexp(outFileNames, '(?<=_)\d{3}(?=.mat)', 'match', 'once');
 suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 [~, computeTS] = findFirstOccurrence(suffix_int);
 
+fileInfo = dir(inFileNames{1});
+fileSize = fileInfo.bytes / 1024^3;
+startParPool(fileSize * 10)
+
 % unpack ncs files:
 parfor i = 1:length(inFileNames)
     inFileName = inFileNames{i};

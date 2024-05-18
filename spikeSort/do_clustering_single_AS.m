@@ -175,6 +175,7 @@ cluster_class(:,1)= classes';
 
 outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
 outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
+
 save(outFileNameTemp, 'cluster_class', 'spikes', 'par', 'inspk', 'forced', 'Temp', 'gui_status', '-v7.3');
 if exist('ipermut','var')
     save(outFileNameTemp, 'ipermut', '-append');
