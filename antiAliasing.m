@@ -22,8 +22,14 @@ f_info.type = 'cheby2';
 nan_idx = isnan(cscSignal);
 
 % fill in any NaN so we can filter (this is slow)
-if ~sum(nan_idx)
+if ~sum(nan_idx) 
     cscSignal = fillmissing(cscSignal, 'linear', 1, 'EndValues', 'nearest');
+end
+
+if length(unique(diff(timestamps))) > 1
+    % resample csc signal with linearized timestamps as suggested by Emily:
+    linearTs = timestamps(1):(1/f_info.Fs):timestamps(end);
+    cscSignal = interp1(timestamps, cscSignal, linearTs);
 end
 
 % filter the data
@@ -42,6 +48,8 @@ flt_data_conc(nan_idx) = NaN;
 % create a 2kHz time vector that spans the full series
 ts_2k = timestamps(1):1/2000:timestamps(end);
 
+% Or use decimate or decimateBy (Emily) to downsample the signal?
 lfpSignal = interp1(timestamps, flt_data_conc, ts_2k);
+
 downSampledTimestamps = ts_2k - ts_2k(1);
 timestampStart = ts_2k(1);
