@@ -1,65 +1,71 @@
-function setMontageUI()
+function createCustomUI()
+
+    numMontageAdded = 0;
     % Create the main UI figure
-    fig = uifigure('Name', 'Custom Montage Info Tool', 'Position', [100, 100, 800, 600]);
+    fig = uifigure('Name', 'Custom Montage Info Tool', 'Position', [100, 100, 900, 700]);  % Increased size
 
     % Directory and Pattern Input
-    lblDir = uilabel(fig, 'Text', 'Directory:', 'Position', [20, 560, 60, 22]);
-    editDir = uieditfield(fig, 'text', 'Position', [90, 560, 200, 22], 'Value', '/Volumes/DATA/NLData');
+    lblDir = uilabel(fig, 'Text', 'Directory:', 'Position', [20, 650, 60, 22]);
+    editDir = uieditfield(fig, 'text', 'Position', [90, 650, 200, 22], 'Value', '/Volumes/DATA/NLData');
     
-    btnSelectFolder = uibutton(fig, 'push', 'Text', 'Select Folder', 'Position', [300, 560, 100, 22], ...
+    btnSelectFolder = uibutton(fig, 'push', 'Text', 'Select Folder', 'Position', [300, 650, 100, 22], ...
                                 'ButtonPushedFcn', @(btn,event) selectFolderButtonPushed());
 
-    lblPattern = uilabel(fig, 'Text', 'Regex Pattern:', 'Position', [410, 560, 90, 22]);
-    editPattern = uieditfield(fig, 'text', 'Position', [510, 560, 100, 22]);
-    btnAddFiles = uibutton(fig, 'push', 'Text', 'Add Files', 'Position', [620, 560, 100, 22], ...
+    lblPattern = uilabel(fig, 'Text', 'Regex Pattern:', 'Position', [410, 650, 90, 22]);
+    editPattern = uieditfield(fig, 'text', 'Position', [510, 650, 150, 22], 'Value', '*.ncs');  % Widened text field
+    btnAddFiles = uibutton(fig, 'push', 'Text', 'Add Files', 'Position', [670, 650, 100, 22], ...
                             'ButtonPushedFcn', @(btn,event) addFilesButtonPushed());
 
-    % Montage Info Panel
-    panelMontageInfo = uipanel(fig, 'Title', 'Montage Info', 'Position', [20, 320, 760, 230]);
-    lstFileList = uilistbox(panelMontageInfo, 'Position', [10, 10, 350, 200], 'Items', {});
+    % Montage Info Panel - Enlarged and adjusted
+    panelMontageInfo = uipanel(fig, 'Title', 'Montage Info', 'Position', [20, 250, 860, 390]);  % Enlarged
+    lstFileList = uilistbox(panelMontageInfo, 'Position', [10, 10, 500, 360], 'Items', {});  % Enlarged
 
     % Dropdown for Brain Areas
-    lblArea = uilabel(panelMontageInfo, 'Text', 'Brain Area:', 'Position', [370, 180, 100, 22]);
+    lblArea = uilabel(panelMontageInfo, 'Text', 'Brain Area:', 'Position', [520, 330, 100, 22]);
     ddBrainArea = uidropdown(panelMontageInfo, 'Items', ...
         {'RA', 'LA', 'RAI', 'LAI', 'ROF', 'LOF', 'LAC', 'RAC', 'LPHG', 'RPHG', 'LAH', 'RAH', 'Skip Channels'}, ...
-        'Position', [370, 150, 150, 22]);
-    lblNumber = uilabel(panelMontageInfo, 'Text', 'Number:', 'Position', [370, 120, 100, 22]);
-    editNumber = uieditfield(panelMontageInfo, 'numeric', 'Position', [370, 90, 150, 22]);
-    btnAddMontage = uibutton(panelMontageInfo, 'push', 'Text', 'Add Montage', 'Position', [370, 50, 150, 30], ...
+        'Position', [520, 300, 150, 22]);
+    lblNumber = uilabel(panelMontageInfo, 'Text', 'Number:', 'Position', [520, 270, 100, 22]);
+    editNumber = uieditfield(panelMontageInfo, 'numeric', 'Position', [520, 240, 150, 22]);
+    btnAddMontage = uibutton(panelMontageInfo, 'push', 'Text', 'Add Montage', 'Position', [520, 200, 150, 30], ...
                               'ButtonPushedFcn', @(btn,event) addMontageButtonPushed());
 
-    % Output File Panel
-    panelOutput = uipanel(fig, 'Title', 'Output File', 'Position', [20, 20, 760, 290]);
-    editOutputJSON = uieditfield(panelOutput, 'text', 'Value', 'montageInfo_patient-xx_exp-xx.json', 'Position', [10, 220, 300, 22]);
-    editOutputCSV = uieditfield(panelOutput, 'text', 'Value', 'montageInfo_patient-xx_exp-xx.csv', 'Position', [10, 190, 300, 22]);
-    btnLoad = uibutton(panelOutput, 'push', 'Text', 'Load', 'Position', [320, 220, 100, 22]);
-    btnConfirm = uibutton(panelOutput, 'push', 'Text', 'Confirm', 'Position', [320, 190, 100, 22]);
+    % Output File Panel - Adjusted
+    panelOutput = uipanel(fig, 'Title', 'Output File', 'Position', [20, 20, 860, 220]);  % Adjusted
+    editOutputJSON = uieditfield(panelOutput, 'text', 'Value', 'montageInfo_patient-xx_exp-xx.json', 'Position', [10, 180, 300, 22]);
+    editOutputCSV = uieditfield(panelOutput, 'text', 'Value', 'montageInfo_patient-xx_exp-xx.csv', 'Position', [10, 150, 300, 22]);
+    btnLoad = uibutton(panelOutput, 'push', 'Text', 'Load', 'Position', [320, 180, 100, 22]);
+    btnConfirm = uibutton(panelOutput, 'push', 'Text', 'Confirm', 'Position', [320, 150, 100, 22]);
 
     % Define button callbacks
     function addFilesButtonPushed()
+        updateFileList();
+    end
+
+    function updateFileList()
         folderPath = editDir.Value;
-        regexPatterns = strsplit(editPattern.Value, ',');
-        fileList = [];
-        for i = 1:length(regexPatterns)
-            tempFiles = dir(fullfile(folderPath, strtrim(regexPatterns{i}))); % Trim whitespace
-            fileList = [fileList; tempFiles]; % Accumulate files from all patterns
+        regexPattern = editPattern.Value;
+        if isempty(folderPath) || isempty(regexPattern)
+            uialert(fig, 'Directory or Regex Pattern cannot be empty.', 'Input Error');
+            return;
         end
+        fileList = dir(fullfile(folderPath, regexPattern));
         if isempty(fileList)
             lstFileList.Items = {};
             uialert(fig, 'No files found with the given patterns.', 'File Search');
         else
-            lstFileList.Items = {fileList.name};
+            lstFileList.Items = [{fileList.name}', repmat({''}, length(fileList), 1)];
         end
     end
 
     function addMontageButtonPushed()
         selectedArea = ddBrainArea.Value;
         montageNumber = editNumber.Value;
-        newItem = sprintf('%s - %d', selectedArea, montageNumber);
-        if isempty(lstFileList.Items)
-            lstFileList.Items = {newItem};
-        else
-            lstFileList.Items = [lstFileList.Items; {newItem}];
+        newItem = cellfun(@(x)sprintf('%s - %d', selectedArea,x),  mat2cell(1: montageNumber));
+        startIdx = numMontageAdded + 1;
+        endIdx = startIdx + length(newItem) - 1;
+        if ~isempty(lstFileList.Items)
+            lstFileList.Items(startIdx: endIdx, 2) = newItem;
         end
     end
 
@@ -67,6 +73,7 @@ function setMontageUI()
         folderPath = uigetdir('/Volumes/DATA/NLData', 'Select Folder');
         if folderPath ~= 0
             editDir.Value = folderPath;
+            updateFileList(); % Automatically update the file list after selecting a folder
         end
     end
 end

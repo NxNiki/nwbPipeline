@@ -11,7 +11,6 @@ if isempty(spikeTimestamp)
 end
 
 w_pre = par.w_pre;
-spikeTimestamp = spikeTimestamp*1000;
 
 % Calculate and store spike features that can be used for rejection
 spikeCodes = table();
