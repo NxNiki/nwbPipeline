@@ -15,9 +15,9 @@ function runbatch_spikeSorting(workerId, totalWorkers)
 
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
 
-    expIds = (8:14);
-    % filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
-    filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
+    expIds = (4:7);
+    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+    % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
     
     % run on test data:
     % expIds = (4: 5);
@@ -45,6 +45,10 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     %% spike detection:
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
+
+    if isempty(gcp('nocreate'))
+        parpool('local', 1);  % Adjust the number of workers as needed
+    end
 
     spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist);
     disp('Spike Detection Finished!')

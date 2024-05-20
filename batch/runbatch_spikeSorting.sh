@@ -14,7 +14,7 @@
 #$ -M $USER@mail
 # Notify when
 # #$ -m bea
-#$ -t 1:40:1  # 1-indexed here
+#$ -t 1:10:1  # 1-indexed here
 
 
 # echo job info on joblog:
