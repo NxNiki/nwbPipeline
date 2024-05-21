@@ -35,6 +35,9 @@ echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 cd /u/home/x/xinniu/nwbPipeline/batch/
 matlab  -nosplash -nodisplay -singleCompThread -r "runbatch_spikeSorting($SGE_TASK_ID, $total_tasks), exit"
 
+rm /u/home/x/xinniu/nwbPipeline/batch/data_wc*.run
+rm /u/home/x/xinniu/nwbPipeline/batch/tmp_data_wc*
+
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
