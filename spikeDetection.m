@@ -14,7 +14,7 @@ end
 
 saveXfDetect = false;
 
-makeOutputPath(cscFiles, outputPath, skipExist)
+makeOutputPath(cscFiles, outputPath, skipExist);
 nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
@@ -50,7 +50,7 @@ parfor i = 1: size(cscFiles, 1)
 
     for j = 1: nSegments
         if ~exist(channelFiles{j}, "file")
-            fprintf(['missing file in spike detection: \n', sprintf('%s \n', channelFiles{j})])
+            fprintf(['missing file in spike detection: \n', sprintf('%s \n', channelFiles{j})]);
             continue
         end
 

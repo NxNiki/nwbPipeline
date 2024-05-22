@@ -1,4 +1,4 @@
-function createCustomUI()
+function setMontageUI()
 
     numMontageAdded = 0;
     % Create the main UI figure
