@@ -58,13 +58,19 @@ parfor i = 1: size(cscFiles, 1)
         signal = readCSC(channelFiles{j});
         [timestamps, duration] = readTimestamps(timestampFiles{j});
 
+        if j == 1
+            timestampsStart = timestamps(1);
+        end
+
+        timestamps = timestamps - timestampsStart;
+
         if saveXfDetect
             [spikes{j}, thr, index, outputStruct(j), xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
         else
             [spikes{j}, thr, index, outputStruct(j), ~] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
         end
 
-        spikeTimestamps{j} = timestamps(index);
+        spikeTimestamps{j} = single(timestamps(index));
         [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration, param, outputStruct(j));
         if ~isempty(spikeCodes{j})
             spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
@@ -86,6 +92,8 @@ parfor i = 1: size(cscFiles, 1)
     matobj.spikeCodes = vertcat(spikeCodes{:});
     matobj.spikeHist = [spikeHist{:}];
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+    matobj.timestampsStart = timestampsStart;
+
 
     if saveXfDetect
         matobj.xfDetect = [xfDetect{:}];
