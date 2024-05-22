@@ -30,5 +30,5 @@ scripts/*.csv
 
 .idea/*
 
-*.json
-*.cfg
+config_*.cfg
+montage_*.json
