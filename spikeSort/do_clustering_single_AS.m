@@ -23,9 +23,9 @@ par.channel = channel;
 % par.fnamespc = fullfile(outputPath, ['data_wc' channel]);
 
 % for now we save files in current dir:
-par.fname_in = ['tmp_data_wc' channel];                       % temporary filename used as input for SPC
+par.fname_in = ['tmp_data_wc_' channel];                       % temporary filename used as input for SPC
 par.fname = ['data_' channel];
-par.fnamespc = ['data_wc' channel];
+par.fnamespc = ['data_wc_' channel];
 
 % LOAD SPIKES
 spikeFileObj = matfile(inputFile);
