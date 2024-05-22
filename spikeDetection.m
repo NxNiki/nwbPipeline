@@ -43,7 +43,6 @@ parfor i = 1: size(cscFiles, 1)
     spikeCodes = cell(nSegments, 1);
     spikeHist = cell(nSegments, 1);
     spikeHistPrecise = cell(nSegments, 1);
-    spikeTimestamps = cell(nSegments, 1);
     xfDetect = cell(nSegments, 1);
 
     [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFiles);
@@ -70,8 +69,7 @@ parfor i = 1: size(cscFiles, 1)
             [spikes{j}, thr, index, outputStruct(j), ~] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
         end
 
-        spikeTimestamps{j} = single(timestamps(index));
-        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, spikeTimestamps{j}, duration, param, outputStruct(j));
+        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, timestamps(index), duration, param, outputStruct(j));
         if ~isempty(spikeCodes{j})
             spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
         end
