@@ -29,3 +29,6 @@ scripts/Patient-*.json
 scripts/*.csv
 
 .idea/*
+
+*.json
+*.cfg
