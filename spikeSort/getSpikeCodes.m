@@ -15,7 +15,7 @@ w_pre = par.w_pre;
 spikeCodes = table();
 
 ts = single(spikeTimestamp(:));
-if length(unqiue(ts)) ~= length(spikeTimestamp)
+if length(unique(ts)) ~= length(spikeTimestamp)
     spikeCodes.timestamp_sec = spikeTimestamp(:);
 else
     spikeCodes.timestamp_sec = ts;
