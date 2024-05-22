@@ -70,6 +70,11 @@ switch system_type
 	    [status,result] = unix(run_linux);
         
     case {'GLNXA64', 'GLNXI64'}
+        cluster_file = which('cluster_linux64.exe');
+        if isempty(cluster_file)
+    	    ME = MException('MyComponent:NotSupportedArq', 'cluster_linxu64.exe not found!');
+    	    throw(ME)
+        end
        
         run_linux = sprintf('''%s'' %s.run', which('cluster_linux64.exe'), fname);
         fileattrib(which('cluster_linux64.exe'),'+x')
