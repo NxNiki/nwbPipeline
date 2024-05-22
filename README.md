@@ -15,7 +15,7 @@ Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
 ### set montage:
 
-Run MontageConfigUI.m to open the UI to set the montage:
+Run `MontageConfigUI.m` to open the UI to set the montage:
 
 ![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/750943aa-0c6b-433d-9979-fd3dc7b1bd6d)
 
