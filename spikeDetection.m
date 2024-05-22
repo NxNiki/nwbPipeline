@@ -86,7 +86,7 @@ parfor i = 1: size(cscFiles, 1)
 
     fprintf('write spikes to file:\n %s\n', spikeFilename);
     matobj = matfile(tempSpikeFilename, 'Writable', true);
-    matobj.spikes = vertcat(spikes{:});
+    matobj.spikes = single(vertcat(spikes{:}));
     matobj.thr = thr;
     matobj.param = param;
     matobj.spikeCodes = vertcat(spikeCodes{:});
