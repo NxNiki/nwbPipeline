@@ -45,7 +45,7 @@ nspk = size(spikes,1);
 naux = min(par.max_spk,size(spikes,1));
 
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes in the file: %s', inputFile);
+    warning('MyComponent:noValidInput', 'Not enough spikes in the file: \n%s', inputFile);
     return
 end
 
