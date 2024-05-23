@@ -34,16 +34,16 @@ spikeCodes = spikeFileObj.spikeCodes;
 
 % REJECT SPIKES
 % SPK quantity check 1
-nspk = size(spikes,1);
+nspkBeforeReject = size(spikes,1);
 spikeIdxRejected = [];
-if ~isempty(spikeCodes) && nspk >= min_spikes4SPC
+if ~isempty(spikeCodes) && nspkBeforeReject >= min_spikes4SPC
     [spikeIdxRejected, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
     spikes(spikeIdxRejected,:) = [];
 end
 
 nspk = size(spikes,1);
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes (%d) in the file: \n%s', nspk, inputFile);
+    warning('MyComponent:noValidInput', 'Not enough spikes (%d/%d) in the file: \n%s', nspk, nspkBeforeReject, inputFile);
     return
 end
 
