@@ -8,8 +8,8 @@ function runbatch_extractLFP(workerId, totalWorkers)
 
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
 
-    expIds = (3:11);
-    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
+    expIds = (4:7);
+    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
     % expIds = (4: 5);
     % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
