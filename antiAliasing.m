@@ -30,6 +30,7 @@ if length(unique(diff(timestamps))) > 1
     % resample csc signal with linearized timestamps as suggested by Emily:
     linearTs = timestamps(1):(1/f_info.Fs):timestamps(end);
     cscSignal = interp1(timestamps, cscSignal, linearTs);
+    timestamps = linearTs;
 end
 
 % filter the data
