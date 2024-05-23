@@ -92,7 +92,6 @@ parfor i = 1: size(cscFiles, 1)
     matobj.spikeHistPrecise = [spikeHistPrecise{:}];
     matobj.timestampsStart = timestampsStart;
 
-
     if saveXfDetect
         matobj.xfDetect = [xfDetect{:}];
     end
