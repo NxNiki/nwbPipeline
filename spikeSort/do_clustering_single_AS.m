@@ -42,16 +42,15 @@ if ~isempty(spikeCodes) && nspk >= min_spikes4SPC
 end
 
 nspk = size(spikes,1);
-naux = min(par.max_spk,size(spikes,1));
-
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes in the file: \n%s', inputFile);
+    warning('MyComponent:noValidInput', 'Not enough spikes (%d) in the file: \n%s', nspk, inputFile);
     return
 end
 
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
 inspk = wave_features(spikes, par);     % takes wavelet coefficients.
 par.inputs = size(inspk, 2);            % number of inputs to the clustering
+naux = min(par.max_spk,size(spikes,1));
 
 if par.permut == 'n'
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
