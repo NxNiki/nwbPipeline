@@ -1,4 +1,4 @@
-function outputFiles = extractLFP(cscFiles, timestampFiles, spikeFiles, outputPath, experimentName, skipExist, saveRaw)
+function outputFiles = extractLFP(cscFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, outputPath, experimentName, skipExist, saveRaw)
 
 if nargin < 5 || isempty(experimentName)
     experimentName = '';
@@ -41,32 +41,28 @@ for i = 1: numFiles
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
+    timestamps = timestamps - timestamps(1);
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
-    if ~isempty(spikeFiles) && exist(spikeFiles{i}, "file")
-        spikeFileObj = matfile(spikeFiles{i});
+    if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
+        spikeFileObj = matfile(spikeDetectFiles{i});
         spikes = spikeFileObj.spikes;
-        spikeClass = spikeFileObj.cluster_class(:, 1);
-        spikeTimestamps = spikeFileObj.cluster_class(:, 2);
+        spikeTimestamps = table2array(spikeFileObj.spikeCode.timestamp_sec);
 
         % the index of last spike should be close to the end of csc signal.
         % except for multi-exp analysis in which case there is large gaps
         % between experiments.
-        fprintf('index of last spike: %d\n', (spikeTimestamps(end) - timestamps(1)) * (seconds(1) / samplingInterval));
-    
-        % cscSignalSpikesRemoved  = removeSpikes(cscSignal, timestamps, spikes, spikeClass, spikeTimestamps, true);
-        [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
-        
-        if removeRejectedSpikes
-            rejectedSpikes = spikeFileObj.rejectedSpikes;
-            rejectedSpikeTimestamps = rejectedSpikes.index(:);
-            [cscSignalSpikeInterpolated, rejectedSpikeIntervalPercentage, interpolateIndexRejected, spikeIndexRejected] = interpolateSpikes(cscSignalSpikeInterpolated, timestamps, rejectedSpikes.spikes, rejectedSpikeTimestamps);
-            spikeIntervalPercentage = spikeIntervalPercentage + rejectedSpikeIntervalPercentage;
-            interpolateIndex = interpolateIndex | interpolateIndexRejected;
-            spikeIndex = spikeIndex | spikeIndexRejected;
+        fprintf('index of last spike: %d\n', spikeTimestamps(end) * (seconds(1) / samplingInterval));
+
+        if ~removeRejectedSpikes && ~isempty(spikeClusterFiles) && exist(spikeClusterFiles{i}, "file")
+            spikeClusterFileObj = matfile(spikeClusterFiles{i});
+            rejectedSpikes = spikeClusterFileObj.rejectedSpikes;
+            spikes(rejectedSpikes,:) = [];
+            spikeTimestamps(rejectedSpikes) = [];
         end
+        [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
     else
-        fprintf('spike file: %s not found!\n', spikeFiles{i})
+        fprintf('spike file: %s not found!\n', spikeDetectFiles{i})
         % cscSignalSpikesRemoved = cscSignal;
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
@@ -86,8 +82,8 @@ for i = 1: numFiles
     lfpFileObj.spikeGapLength = findGapLength(interpolateIndex);
 
     if saveRaw
+        % save Raw data to check interpolation:
         lfpFileObj.cscSignal = cscSignal;
-        % lfpFileObj.cscSignalSpikesRemoved = cscSignalSpikesRemoved;
         lfpFileObj.cscSignalSpikeInterpolated = cscSignalSpikeInterpolated;
         lfpFileObj.rawTimestamps = timestamps;
         lfpFileObj.interpolateIndex = interpolateIndex;
