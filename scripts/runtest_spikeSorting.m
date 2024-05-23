@@ -29,16 +29,10 @@ microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=","
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
-spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist)
+spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist);
 disp('Spike Detection Finished!')
 
 %% spike clustering:
-
-spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
-
-spikeFiles = dir(fullfile(spikeFilePath, "*_spikes.mat"));
-spikeFiles = cellfun(@(f, n)fullfile(f, n), {spikeFiles.folder}, {spikeFiles.name}, UniformOutput=false);
 
 spikeClustering(spikeFiles, outputPath, skipExist);
 disp('Spike Clustering finished!')
