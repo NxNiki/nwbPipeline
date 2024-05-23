@@ -47,7 +47,8 @@ for i = 1: numFiles
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
         spikeFileObj = matfile(spikeDetectFiles{i});
         spikes = spikeFileObj.spikes;
-        spikeTimestamps = table2array(spikeFileObj.spikeCode.timestamp_sec);
+        spikeCodes = spikeFileObj.spikeCodes;
+        spikeTimestamps = spikeCodes.timestamp_sec;
 
         % the index of last spike should be close to the end of csc signal.
         % except for multi-exp analysis in which case there is large gaps
