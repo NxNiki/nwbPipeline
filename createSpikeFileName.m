@@ -7,21 +7,22 @@ function [spikeDetectionFileName, spikeClusteringFileName ] = createSpikeFileNam
 
 
 if iscell(cscFileName)
-    spikeDetectionFileName = cellfun(@spikeDetection, cscFileName, UniformOutput=false);
-    spikeClusteringFileName = cellfun(@spikeClustering, cscFileName, UniformOutput=false);
+    spikeDetectionFileName = cellfun(@makeSpikeDetectionFileName, cscFileName, UniformOutput=false);
+    spikeClusteringFileName = cellfun(@makeSpikeClusteringFileName, cscFileName, UniformOutput=false);
 else
-    spikeDetectionFileName = spikeDetection(cscFileName);
-    spikeClusteringFileName = spikeClustering(cscFileName);
+    spikeDetectionFileName = makeSpikeDetectionFileName(cscFileName);
+    spikeClusteringFileName = makeSpikeClusteringFileName(cscFileName);
 end
 end
 
-function fname1 = spikeDetection(fname)
+function fname1 = makeSpikeDetectionFileName(fname)
 
 [~, fname] = fileparts(fname);
 fname1 = [regexp(fname, '.*(?=_\d+)', 'match', 'once'), '_spikes.mat'];
+
 end
 
-function fname1 = spikeClustering(fname)
+function fname1 = makeSpikeClusteringFileName(fname)
 
 [~, fname] = fileparts(fname);
 fname1 = ['times_', regexp(fname, '.*(?=_\d+)', 'match', 'once'), '.mat'];
