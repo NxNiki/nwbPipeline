@@ -37,10 +37,11 @@ function runbatch_extractLFP(workerId, totalWorkers)
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
     spikeFilePath = fullfile(spikeFilePath, 'CSC_micro_spikes');
-    [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
-    spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
+    [spikeDetectFiles, spikeClusterFiles] = createSpikeFileName(microFiles(:, 1));
+    spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
+    spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
 
-    lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, saveRaw);
+    lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectionFiles, spikeClusterFiles, microLFPPath, '', skipExist, saveRaw);
     writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
 
     disp('lfp extraction finished!');
