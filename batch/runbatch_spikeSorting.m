@@ -16,16 +16,14 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
 
     expIds = (4:7);
-    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    % filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/572_MovieParadigm';
+    % filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+    filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
     
     % run on test data:
     % expIds = (4: 5);
     % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
     % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
-    % 0: will remove all previous unpack files.
-    % 1: skip existing files.
     skipExist = 1;
 
     %% load file names micro data:
