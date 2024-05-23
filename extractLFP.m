@@ -1,15 +1,15 @@
 function outputFiles = extractLFP(cscFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, outputPath, experimentName, skipExist, saveRaw)
 
-if nargin < 5 || isempty(experimentName)
+if nargin < 6 || isempty(experimentName)
     experimentName = '';
 end
 
-if nargin < 6 || isempty(skipExist)
+if nargin < 7 || isempty(skipExist)
     skipExist = true;
 end
 
 % save Raw signals to check spikes are removed correctly (see run_plotLFP.m).
-if nargin < 7
+if nargin < 8
     saveRaw = false;
 end
 
