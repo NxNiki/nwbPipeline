@@ -21,7 +21,6 @@ function [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFile
         fmin_sort = param.sort_fmin;
         fmax_sort = param.sort_fmax;
 
-
         %HIGH-PASS FILTER OF THE DATA
         if exist('ellip','file')                  % Checks for the signal processing toolbox
             [b_detect,a_detect] = ellip(param.detect_order,0.1,40,[fmin_detect fmax_detect]*2/sr);
@@ -61,3 +60,4 @@ function [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFile
         outputStruct(i).noise_std_sorted = common_noise_std_sorted;
         outputStruct(i).thr = thr_all;
     end
+end
