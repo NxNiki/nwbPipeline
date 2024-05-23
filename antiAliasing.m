@@ -49,7 +49,7 @@ flt_data_conc(nan_idx) = NaN;
 ts_2k = timestamps(1):1/2000:timestamps(end);
 
 % Or use decimate or decimateBy (Emily) to downsample the signal?
-lfpSignal = interp1(timestamps, flt_data_conc, ts_2k);
+lfpSignal = interp1(linearTs, flt_data_conc, ts_2k);
 
 downSampledTimestamps = ts_2k - ts_2k(1);
 timestampStart = ts_2k(1);
