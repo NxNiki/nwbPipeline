@@ -25,10 +25,11 @@ timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
 spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-[~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
-spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
+[spikeDetectFiles, spikeClusterFiles] = createSpikeFileName(microFiles(:, 1));
+spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
+spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
 
-lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, microLFPPath, '', skipExist, saveRaw);
+lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist, saveRaw);
 writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
 
 

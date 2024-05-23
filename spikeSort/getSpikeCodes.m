@@ -11,10 +11,15 @@ if isempty(spikeTimestamp)
 end
 
 w_pre = par.w_pre;
-
 % Calculate and store spike features that can be used for rejection
 spikeCodes = table();
-spikeCodes.timestamp_sec = spikeTimestamp(:);
+
+ts = single(spikeTimestamp(:));
+if length(unique(ts)) ~= length(spikeTimestamp)
+    spikeCodes.timestamp_sec = spikeTimestamp(:);
+else
+    spikeCodes.timestamp_sec = ts;
+end
 
 %calculate firing rate
 spikeCodes.firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamp);
