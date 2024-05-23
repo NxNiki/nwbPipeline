@@ -13,7 +13,7 @@ check_WC_params(par)
 %   par.max_inputs = par.max_inputs * par.channels;
 % end
 
-[filePath, fileName, ext] = fileparts(inputFile);
+[~, fileName, ~] = fileparts(inputFile);
 channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 
