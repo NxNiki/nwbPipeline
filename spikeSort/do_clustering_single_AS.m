@@ -1,7 +1,12 @@
 function do_clustering_single_AS(spikeFile, spikeCodeFile, outputPath, min_spikes4SPC)
 
+% load spikes and spike codes:
 spikeFileObj = matfile(spikeFile);
+spikes = spikeFileObj.spikes;
 param = spikeFileObj.param;
+
+spikeCodeFileObj = matfile(spikeCodeFile);
+spikeCodes = spikeCodeFileObj.spikeCodes;
 
 par = set_parameters;
 par = update_parameters(par, param, 'clus');
@@ -29,13 +34,6 @@ par.channel = channel;
 par.fname_in = ['tmp_data_wc_' channel];                       % temporary filename used as input for SPC
 par.fname = ['data_' channel];
 par.fnamespc = ['data_wc_' channel];
-
-% LOAD SPIKES
-
-spikes = spikeFileObj.spikes;
-
-spikeCodeFileObj = matfile(spikeCodeFile);
-spikeCodes = spikeCodeFileObj.spikeCodes;
 
 % REJECT SPIKES
 % SPK quantity check 1
