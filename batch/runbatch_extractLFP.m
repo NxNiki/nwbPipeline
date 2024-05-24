@@ -6,14 +6,11 @@ function runbatch_extractLFP(workerId, totalWorkers)
         totalWorkers = 1;
     end
 
-    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    [codeDir, workingDir] = getDirectory();
+    addpath(genpath(codeDir));
 
     expIds = (4:7);
-    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-
-    % expIds = (4: 5);
-    % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
     % 0: will remove all previous unpack files.
     % 1: skip existing files.
