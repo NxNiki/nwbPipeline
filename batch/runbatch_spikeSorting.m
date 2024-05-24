@@ -18,8 +18,6 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     expIds = (4:7);
     filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
-    skipExist = 0;
-
     %% load file names micro data:
     
     [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
@@ -49,7 +47,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
 
     %% spike clustering:
 
-    skipExist = 0;
+    skipExist = 1;
     spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist);
 
     spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist);
