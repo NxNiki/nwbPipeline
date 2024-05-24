@@ -18,7 +18,6 @@ makeOutputPath(cscFiles, outputPath, skipExist);
 nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
-
 for i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);
@@ -79,7 +78,6 @@ for i = 1: size(cscFiles, 1)
 
     end
 
-    fprintf('write spikes to file:\n %s\n', spikeFilename);
     % remove file if it exist as repetitive writing to save variable in
     % matfile obj consumes increasing storage:
     if exist(spikeFilename, "file")
