@@ -5,6 +5,7 @@ scales = par.scales;
 feature = par.features;
 nspk = size(spikes,1);
 ls = size(spikes,2);
+
 if strcmp(par.max_inputs,'all')
     par.max_inputs = ls;
 elseif par.max_inputs < 1
@@ -14,10 +15,10 @@ end
 % CALCULATES FEATURES
 switch feature
     case 'wav'
-        cc=zeros(nspk,ls);
+        cc=zeros(nspk, ls);
         try
             spikes_l = reshape(spikes', numel(spikes), 1);
-            if exist('wavedec')
+            if exist('wavedec', 'file') == 2
                 [c_l,l_wc] = wavedec(spikes_l, scales, 'haar');
             else
                 [c_l,l_wc] = fix_wavedec(spikes_l, scales);
@@ -27,17 +28,17 @@ switch feature
             wccum = cumsum(wv_c);
             nccum = cumsum(nc);
             for cf = 2:length(nc)
-                cc(:,nccum(cf-1)+1:nccum(cf)) = reshape(c_l(wccum(cf-1)+1:wccum(cf)), nc(cf), nspk)';
+                cc(:, nccum(cf-1)+1:nccum(cf)) = reshape(c_l(wccum(cf-1)+1:wccum(cf)), nc(cf), nspk)';
             end
         catch
-            if exist('wavedec')                             % Looks for Wavelets Toolbox
+            if exist('wavedec', 'file') == 2                % Looks for Wavelets Toolbox
                 for i=1:nspk                                % Wavelet decomposition
-                    [c,l] = wavedec(spikes(i,:), scales, 'haar');
+                    [c, ~] = wavedec(spikes(i,:), scales, 'haar');
                     cc(i,1:ls) = c(1:ls);
                 end
             else
                 for i=1:nspk                                % Replaces Wavelets Toolbox, if not available
-                    [c,l] = fix_wavedec(spikes(i,:), scales);
+                    [c, ~] = fix_wavedec(spikes(i,:), scales);
                     cc(i,1:ls) = c(1:ls);
                 end
             end
@@ -79,7 +80,7 @@ switch feature
     	end
 
         if  isfield(par,'plot_feature_stats') && par.plot_feature_stats
-            [path, name, ext] = fileparts(par.filename);
+            [path, name, ~] = fileparts(par.filename);
             if isempty(path)
                 path='.';
             end
@@ -117,7 +118,7 @@ switch feature
 end
 
 %CREATES INPUT MATRIX FOR SPC
-inspk=zeros(nspk,inputs);
+inspk=zeros(nspk, inputs);
 for i=1:nspk
     for j=1:inputs
         inspk(i,j)=cc(i,coeff(j));
