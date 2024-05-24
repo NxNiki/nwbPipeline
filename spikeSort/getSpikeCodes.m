@@ -13,14 +13,11 @@ for fnum = 1:length(spikeFiles)
     [~, filename, ext] = fileparts(spikeFile);
     outFile = [strrep(filename, '_spikes', '_spikeCodesTemp'), ext];
 
-
     tmpOutFile = ['temp_', outFile];
     outputFiles{fnum} = outFile;
 
     outFile = fullfile(outputPath, outFile);
     tmpOutFile = fullfile(outputPath, tmpOutFile);
-    spikeCodeFile = strrep(outFile, '_spikeCodesTemp', '_spikeCodes');
-    
 
     fprintf('get spike codes:\n %s\n', outFile);
     spikeFileObj = matfile(spikeFile, 'Writable', false);
@@ -36,10 +33,6 @@ for fnum = 1:length(spikeFiles)
     hasSpikesPrecise{fnum} = spikeHistPrecise(:);
 
     fprintf('write spike codes to file:\n %s\n', outFile);
-    if exist(tmpOutFile, "file")
-        delete(tmpOutFile);
-    end
-
     if exist(tmpOutFile, "file")
         delete(tmpOutFile);
     end
