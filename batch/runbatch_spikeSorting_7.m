@@ -1,7 +1,5 @@
 function runbatch_spikeSorting(workerId, totalWorkers)
     % run spike detection and spike sorting to the unpacked data:
-    % run can modify this script and run on different patients/exp when
-    % at least one previous job is running (a temporary job script is created).
 
     if nargin < 1
         % run script without queue:
