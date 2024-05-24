@@ -5,7 +5,7 @@
 #$ -o /u/home/x/xinniu/cluster-output-extractLFP/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=5:00:00,h_data=500G
+#$ -l h_rt=10:00:00,h_data=100G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 1
@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 # #$ -m bea
-#$ -t 1:10:1  # 1-indexed here
+#$ -t 1:20:1  # 1-indexed here
 
 
 # echo job info on joblog:
