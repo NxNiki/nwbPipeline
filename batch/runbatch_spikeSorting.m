@@ -1,5 +1,4 @@
 function runbatch_spikeSorting(workerId, totalWorkers)
-    
     % run spike detection and spike sorting to the unpacked data:
 
     if nargin < 1
@@ -13,18 +12,11 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         return
     end
 
-    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    [codeDir, workingDir] = getDirectory();
+    addpath(genpath(codeDir));
 
     expIds = (4:7);
-    % filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    
-    % run on test data:
-    % expIds = (4: 5);
-    % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-
-    skipExist = 1;
+    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
     %% load file names micro data:
 
@@ -41,6 +33,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
     %% spike detection:
+
+    skipExist = 1;
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
@@ -52,6 +46,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     disp('Spike Detection Finished!')
 
     %% spike clustering:
+
+    skipExist = 0;
     spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist);
 
     spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist);
