@@ -3,14 +3,14 @@ clear
 
 addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
+expId = 2;
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
 
 % expId = 5;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
-expId = 4;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
+% expId = 4;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
 
 % 0: will remove all previous unpack files.
@@ -34,7 +34,9 @@ disp('Spike Detection Finished!')
 
 %% spike clustering:
 
-spikeClustering(spikeFiles, outputPath, skipExist);
+spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist);
+
+spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist);
 disp('Spike Clustering finished!')
 
 

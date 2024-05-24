@@ -19,7 +19,7 @@ nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
 
-parfor i = 1: size(cscFiles, 1)
+for i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);
     spikeFilename = createSpikeFileName(channelFiles{1});
@@ -46,8 +46,7 @@ parfor i = 1: size(cscFiles, 1)
     spikeTimestamps = cell(nSegments, 1);
     duration = 0;
 
-    [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFiles);
-    thr = NaN;
+    [outputStruct, param, maxAmp] = getDetectionThresh(channelFiles);
 
     for j = 1: nSegments
         if ~exist(channelFiles{j}, "file")
@@ -65,9 +64,9 @@ parfor i = 1: size(cscFiles, 1)
 
         timestamps = timestamps - timestampsStart;
         if saveXfDetect
-            [spikes{j}, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct);
+            [spikes{j}, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, outputStruct);
         else
-            [spikes{j}, index, ~] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct);
+            [spikes{j}, index, ~] = amp_detect_AS(signal, param, maxAmp, timestamps, outputStruct);
         end
 
         tsSingle = single(timestamps);
