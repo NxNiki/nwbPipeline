@@ -1,4 +1,4 @@
-function [spikes, thr, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, TimeStamps, thr, inputStruct)
+function [spikes, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, TimeStamps, inputStruct)
 % Detect spikes with amplitude thresholding. Uses median estimation.
 % Detection is done with filters set by fmin_detect and fmax_detect. Spikes
 % are stored for sorting using fmin_sort and fmax_sort. This trick can
@@ -22,35 +22,31 @@ fmax_detect = par.detect_fmax;
 fmin_sort = par.sort_fmin;
 fmax_sort = par.sort_fmax;
 
+%HIGH-PASS FILTER OF THE DATA
+if exist('ellip','file')                  %Checks for the signal processing toolbox
+    [b_detect, a_detect] = ellip(par.detect_order, 0.1, 40, [fmin_detect fmax_detect]*2/sr);
+    [b,a] = ellip(par.sort_order,0.1,40,[fmin_sort fmax_sort]*2/sr);
+
+    xf_detect = filtfilt(b_detect, a_detect, x);
+    xf = filtfilt(b, a, x);
+
+else
+    xf = fix_filter(x);                   %Does a bandpass filtering between [300 3000] without the toolbox.
+    xf_detect = xf;
+end
+
 if exist('inputStruct','var') && ~isempty(inputStruct)
     %the data has already been loaded and filtered in a previous step and
     %passed here.
-    xf = inputStruct.xf;
-    xf_detect = inputStruct.xf_detect;
     thrmax = inputStruct.thrmax;
-    if ~exist('thr','var') || isempty(thr)
-        thr = inputStruct.thr;
-    end
+    thr = inputStruct.thr;
 else
-    %HIGH-PASS FILTER OF THE DATA
-    if exist('ellip','file')                  %Checks for the signal processing toolbox
-        [b_detect, a_detect] = ellip(par.detect_order, 0.1, 40, [fmin_detect fmax_detect]*2/sr);
-        [b,a] = ellip(par.sort_order,0.1,40,[fmin_sort fmax_sort]*2/sr);
-
-        xf_detect = filtfilt(b_detect, a_detect, x);
-        xf = filtfilt(b, a, x);
-
-    else
-        xf = fix_filter(x);                   %Does a bandpass filtering between [300 3000] without the toolbox.
-        xf_detect = xf;
-    end
-
     inputStruct.noise_std_detect = median(abs(xf_detect))/0.6745;
     inputStruct.noise_std_sorted = median(abs(xf))/0.6745;
-    if ~exist('thr','var') || isempty(thr)
-        thr = stdmin * inputStruct.noise_std_detect;        %thr for detection is based on detect settings.
-    end
+    thr = stdmin * inputStruct.noise_std_detect;        %thr for detection is based on detect settings.
     thrmax = min(maxAmp, stdmax * inputStruct.noise_std_sorted);     %thrmax for artifact removal is based on sorted settings.
+    inputStruct.thr = thr;
+    inputStruct.thrmax = thrmax;
 end
 
 index = [];
@@ -107,15 +103,12 @@ end
 % SPIKE STORING (with or without interpolation)
 ls = w_pre + w_post;
 spikes = zeros(nspk,ls+4);
-%rejectedSpikes = spikes;
 
 xf(length(xf)+1:length(xf)+w_post)=0;
 
 for i=1:nspk                          %Eliminates artifacts
     if max(abs( xf(index(i)-w_pre:index(i) + w_post) )) < thrmax
         spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
-    %else
-        %rejectedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
     end
 end
 aux = find(spikes(:,w_pre)==0);       %erases indexes that were artifacts
@@ -133,7 +126,7 @@ end
 
 if isempty(index)
     fprintf('no spikes detected!\n')
-    [spikes,thr,index] = deal([]);
+    [spikes,index] = deal([]);
 end
 
 if useSinglePrecision
