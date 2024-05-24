@@ -1,10 +1,10 @@
-function do_clustering_single_AS(inputFile, outputPath, min_spikes4SPC, param)
+function do_clustering_single_AS(spikeFiles, spikeCodeFile, outputPath, min_spikes4SPC)
 
 par = set_parameters;
 par = update_parameters(par, param, 'clus');
 par = update_parameters(par, param, 'batch_plot');
 
-par.filename = inputFile;
+par.filename = spikeFiles;
 par.reset_results = true;
 
 check_WC_params(par)
@@ -13,7 +13,7 @@ check_WC_params(par)
 %   par.max_inputs = par.max_inputs * par.channels;
 % end
 
-[~, fileName, ~] = fileparts(inputFile);
+[~, fileName, ~] = fileparts(spikeFiles);
 channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 
@@ -28,9 +28,11 @@ par.fname = ['data_' channel];
 par.fnamespc = ['data_wc_' channel];
 
 % LOAD SPIKES
-spikeFileObj = matfile(inputFile);
+spikeFileObj = matfile(spikeFiles);
 spikes = spikeFileObj.spikes;
-spikeCodes = spikeFileObj.spikeCodes;
+
+spikeCodeFileObj = matfile(spikeCodeFile);
+spikeCodes = spikeCodeFileObj.spikeCodes;
 
 % REJECT SPIKES
 % SPK quantity check 1
@@ -43,7 +45,7 @@ end
 
 nspk = size(spikes,1);
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes (%d/%d) in the file: \n%s', nspk, nspkBeforeReject, inputFile);
+    warning('MyComponent:noValidInput', 'Not enough spikes (%d/%d) in the file: \n%s', nspk, nspkBeforeReject, spikeFiles);
     return
 end
 

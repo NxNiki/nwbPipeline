@@ -18,6 +18,7 @@ makeOutputPath(cscFiles, outputPath, skipExist);
 nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
+
 parfor i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);
@@ -40,10 +41,10 @@ parfor i = 1: size(cscFiles, 1)
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
     spikes = cell(nSegments, 1);
-    spikeCodes = cell(nSegments, 1);
-    spikeHist = cell(nSegments, 1);
-    spikeHistPrecise = cell(nSegments, 1);
     xfDetect = cell(nSegments, 1);
+    ExpName = cell(nSegments, 1);
+    spikeTimestamps = cell(nSegments, 1);
+    duration = 0;
 
     [thr_all, outputStruct, param, maxAmp] = getDetectionThresh(channelFiles);
     thr = NaN;
@@ -55,24 +56,28 @@ parfor i = 1: size(cscFiles, 1)
         end
 
         signal = readCSC(channelFiles{j});
-        [timestamps, duration] = readTimestamps(timestampFiles{j});
+        [timestamps, dur] = readTimestamps(timestampFiles{j});
+        duration = duration + dur;
 
         if j == 1
             timestampsStart = timestamps(1);
         end
 
         timestamps = timestamps - timestampsStart;
-
         if saveXfDetect
-            [spikes{j}, thr, index, outputStruct(j), xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
+            [spikes{j}, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct);
         else
-            [spikes{j}, thr, index, outputStruct(j), ~] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct(j));
+            [spikes{j}, index, ~] = amp_detect_AS(signal, param, maxAmp, timestamps, thr_all, outputStruct);
         end
 
-        [spikeCodes{j}, spikeHist{j}, spikeHistPrecise{j}] = getSpikeCodes(spikes{j}, timestamps(index), duration, param, outputStruct(j));
-        if ~isempty(spikeCodes{j})
-            spikeCodes{j}.ExpName = repmat(experimentName(j), height(spikeCodes{j}), 1);
+        tsSingle = single(timestamps);
+        if length(unique(tsSingle)) == length(timestamps)
+            timestamps = tsSingle;
         end
+
+        ExpName{j} = repmat(experimentName(j), size(spikes, 1), 1);
+        spikeTimestamps{j} = timestamps(index);
+
     end
 
     fprintf('write spikes to file:\n %s\n', spikeFilename);
@@ -85,12 +90,12 @@ parfor i = 1: size(cscFiles, 1)
     fprintf('write spikes to file:\n %s\n', spikeFilename);
     matobj = matfile(tempSpikeFilename, 'Writable', true);
     matobj.spikes = single(vertcat(spikes{:}));
-    matobj.thr = thr;
     matobj.param = param;
-    matobj.spikeCodes = vertcat(spikeCodes{:});
-    matobj.spikeHist = [spikeHist{:}];
-    matobj.spikeHistPrecise = [spikeHistPrecise{:}];
+    matobj.ExpName = [ExpName{:}];
     matobj.timestampsStart = timestampsStart;
+    matobj.outputStruct = outputStruct;
+    matobj.spikeTimestamps = [spikeTimestamps{:}];
+    matobj.duration = duration;
 
     if saveXfDetect
         matobj.xfDetect = [xfDetect{:}];
@@ -98,6 +103,7 @@ parfor i = 1: size(cscFiles, 1)
 
     movefile(tempSpikeFilename, spikeFilename);
 end
+
 end
 
 
