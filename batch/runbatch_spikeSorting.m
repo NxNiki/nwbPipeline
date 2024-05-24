@@ -18,8 +18,10 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     expIds = (4:7);
     filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
-    %% load file names micro data:
+    skipExist = 0;
 
+    %% load file names micro data:
+    
     [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
 
