@@ -6,10 +6,6 @@ function [spikes, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp,
 
 useSinglePrecision = true;
 
-if length(x(:)) ~= length(timeStamps(:))
-    error('voltage signal (%d) and time stamp (%d) do not have same length.', length(x(:)), length(timeStamps(:)))
-end
-
 sr = par.sr;
 w_pre = par.w_pre;
 w_post = par.w_post;
