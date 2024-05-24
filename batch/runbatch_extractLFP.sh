@@ -35,14 +35,14 @@ cd /u/home/x/xinniu/nwbPipeline/batch
 
 # make a copy of batch script so that we can submit jobs for other patients
 # when previous jobs are still running:
-cp runbatch_extractLFP.m runbatch_extractLFP_$SGE_TASK_ID.m
+cp runbatch_extractLFP.m runbatch_extractLFP_$JOB_ID.m
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    runbatch_extractLFP_$SGE_TASK_ID($SGE_TASK_ID, $total_tasks);
+    runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks);
     exit
 EOF
 
-rm runbatch_extractLFP_$SGE_TASK_ID.m 
+rm runbatch_extractLFP_$JOB_ID.m 
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
