@@ -6,15 +6,13 @@ function runbatch_extractLFP(workerId, totalWorkers)
         totalWorkers = 1;
     end
 
-    addpath(genpath(fileparts(pwd)));
+    addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
     workingDir = getDirectory();
 
     expIds = (4:7);
     filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
-    % 0: will remove all previous unpack files.
-    % 1: skip existing files.
-    skipExist = 1;
+    skipExist = 0;
     saveRaw = false;
 
     spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
