@@ -1,4 +1,4 @@
-function [spikes, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, TimeStamps, inputStruct)
+function [spikes, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp, inputStruct)
 % Detect spikes with amplitude thresholding. Uses median estimation.
 % Detection is done with filters set by fmin_detect and fmax_detect. Spikes
 % are stored for sorting using fmin_sort and fmax_sort. This trick can
@@ -6,8 +6,8 @@ function [spikes, index, inputStruct, xf_detect] = amp_detect_AS(x, par, maxAmp,
 
 useSinglePrecision = true;
 
-if length(x(:)) ~= length(TimeStamps(:))
-    error('voltage signal (%d) and time stamp (%d) do not have same length.', length(x(:)), length(TimeStamps(:)))
+if length(x(:)) ~= length(timeStamps(:))
+    error('voltage signal (%d) and time stamp (%d) do not have same length.', length(x(:)), length(timeStamps(:)))
 end
 
 sr = par.sr;
