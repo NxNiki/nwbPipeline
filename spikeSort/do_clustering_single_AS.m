@@ -54,11 +54,11 @@ end
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
 inspk = wave_features(spikes, par);     % takes wavelet coefficients.
 par.inputs = size(inspk, 2);            % number of inputs to the clustering
-naux = min(par.max_spk,size(spikes,1));
+naux = min(par.max_spk, size(spikes,1));
 
 if par.permut == 'n'
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
-    if size(spikes,1)> par.max_spk
+    if size(spikes,1) > par.max_spk
         % take first 'par.max_spk' spikes as an input for SPC
         inspk_aux = inspk(1:naux,:);
     else
@@ -66,7 +66,7 @@ if par.permut == 'n'
     end
 else
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
-    if size(spikes,1)> par.max_spk
+    if size(spikes,1) > par.max_spk
         % random selection of spikes for SPC
         ipermut = randperm(length(inspk));
         ipermut(naux+1:end) = [];
@@ -87,8 +87,7 @@ try
 catch err
     warning('MyComponent:ERROR_SPC', 'Error in SPC');
     disp(err);
-    % return
-    rethrow(err);
+    return
 end
 
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
@@ -101,14 +100,14 @@ if par.permut == 'y'
     clear clu_aux
 end
 
-classes = zeros(1,size(clu,2)-2);
+classes = zeros(1, size(clu,2)-2);
 for c =1: length(clust_num)
-    aux = clu(temp(c),3:end) +1 == clust_num(c);
+    aux = clu(temp(c), 3:end) + 1 == clust_num(c);
     classes(aux) = c;
 end
 
 if par.permut == 'n'
-    classes = [classes zeros(1,max(size(spikes,1)-par.max_spk,0))];
+    classes = [classes zeros(1, max(size(spikes,1) - par.max_spk, 0))];
 end
 
 Temp = [];
@@ -150,11 +149,11 @@ s = warning; warning('off')
 for i=1:max(classes)
     inCluster = classes == i;
     nSpikes = sum(inCluster);
-    nFeatures = size(inspk,2);
+    nFeatures = size(inspk, 2);
     if nSpikes > nFeatures
-        M = mahal(inspk,inspk(inCluster,:));
+        M = mahal(inspk, inspk(inCluster, :));
         Lspk = 1-gammainc(M/2, nFeatures/2);
-        %    Lspk = 1-chi2cdf(M,nFeatures);
+        % Lspk = 1-chi2cdf(M,nFeatures);
         removeFromClust = inCluster & Lspk' < 5e-3;
         classes(removeFromClust) = 0;
     end
