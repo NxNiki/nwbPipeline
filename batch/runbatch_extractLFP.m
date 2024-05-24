@@ -6,8 +6,8 @@ function runbatch_extractLFP(workerId, totalWorkers)
         totalWorkers = 1;
     end
 
-    [codeDir, workingDir] = getDirectory();
-    addpath(genpath(codeDir));
+    addpath(genpath(fileparts(pwd)));
+    workingDir = getDirectory();
 
     expIds = (4:7);
     filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
