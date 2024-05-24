@@ -9,18 +9,19 @@ makeOutputPath(spikeFiles, outputPath, skipExist)
 
 min_spikes4SPC = 16;
 
-parfor fnum = 1:length(spikeFiles)
+for fnum = 1:length(spikeFiles)
 
-    filename = spikeFiles{fnum};
-    outfile = sprintf('times_%s',strrep(filename,'_spikes',''));
+    filePath = spikeFiles{fnum};
+    [~, filename, ext] = fileparts(filePath);
+    outfile = sprintf('times_%s%s',strrep(filename, '_spikes', ''), ext);
     if skipExist && exist(fullfile(outputPath, outfile), 'file')
         continue
     end
-    fprintf('clustering spikes:\n %s\n', filename);
+    fprintf('clustering spikes:\n %s\n', filePath);
 
-    spikeFileObj = matfile(filename, 'Writable', false);
+    spikeFileObj = matfile(filePath, 'Writable', false);
     par = spikeFileObj.param;
 
-    do_clustering_single_AS(filename, outputPath, min_spikes4SPC, par);
+    do_clustering_single_AS(filePath, outputPath, min_spikes4SPC, par);
 
 end
