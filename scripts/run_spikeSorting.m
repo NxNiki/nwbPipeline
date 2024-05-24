@@ -27,7 +27,10 @@ disp('Spike Detection Finished!')
 
 %% spike clustering:
 
-spikeClustering(spikeFiles, outputPath, skipExist);
+spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist);
+
+spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist);
+
 disp('Spike Clustering finished!')
 
 

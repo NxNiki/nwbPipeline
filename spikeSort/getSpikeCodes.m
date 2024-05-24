@@ -41,11 +41,9 @@ parfor fnum = 1:length(spikeFiles)
     matobj = matfile(tmpOutFile, 'Writable', true);
     matobj.spikeHist = spikeHist;
     matobj.spikeHistPrecise = spikeHistPrecise;
-    matobj.timestampsStart = timestampsStart;
     matobj.spikeCodes = spikeCodes;
 
     movefile(tmpOutFile, outFile);
-
 end
 
 hasSpikes = [hasSpikes{:}];
@@ -61,8 +59,8 @@ parfor fnum = 1:length(outputFiles)
     tempOutFile = fullfile(outputPath, strrep(outFile, 'temp_', ''));
     
     outFile = fullfile(outputPath, outFile);
-    fprintf('get across channel spike codes:\n %s\n', outFile);
-    spikeCodeFileObj = matfile(spikeCodeFile, 'Writable', false);
+    fprintf('get cross channel spike codes:\n %s\n', outFile);
+    spikeCodeFileObj = matfile(fullfile(outputPath, spikeCodeFile), 'Writable', false);
     spikeCodes = spikeCodeFileObj.spikeCodes;
 
     spikeFileObj = matfile(spikeFiles{fnum}, 'Writable', false);
