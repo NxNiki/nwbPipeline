@@ -63,9 +63,9 @@ for i = 1: size(cscFiles, 1)
 
         timestamps = timestamps - timestampsStart;
         if saveXfDetect
-            [spikes{j}, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, timestamps, outputStruct);
+            [spikes{j}, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, maxAmp, outputStruct);
         else
-            [spikes{j}, index, ~] = amp_detect_AS(signal, param, maxAmp, timestamps, outputStruct);
+            [spikes{j}, index, ~] = amp_detect_AS(signal, param, maxAmp, outputStruct);
         end
 
         tsSingle = single(timestamps);
