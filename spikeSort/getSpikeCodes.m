@@ -12,14 +12,18 @@ for fnum = 1:length(spikeFiles)
     spikeFile = spikeFiles{fnum};
     [~, filename, ext] = fileparts(spikeFile);
     outFile = [strrep(filename, '_spikes', '_spikeCodesTemp'), ext];
+
     tmpOutFile = ['temp_', outFile];
     outputFiles{fnum} = outFile;
 
     outFile = fullfile(outputPath, outFile);
     tmpOutFile = fullfile(outputPath, tmpOutFile);
+    
+    if exist(outFile, 'file') && skipExist
+        continue
+    end
 
     fprintf('get spike codes:\n %s\n', outFile);
-
     spikeFileObj = matfile(spikeFile, 'Writable', false);
     param = spikeFileObj.param;
     outputStruct = spikeFileObj.outputStruct;
@@ -29,15 +33,14 @@ for fnum = 1:length(spikeFiles)
     
     % get spike codes to run clustering:
     [spikeCodes, spikeHist, spikeHistPrecise] = computeSpikeCodes(spikes, spikeTimestamps, duration, param, outputStruct);
-
-    if exist(tmpOutFile, "file")
-        delete(tmpOutFile);
-    end
-
     hasSpikes{fnum} = spikeHist(:);
     hasSpikesPrecise{fnum} = spikeHistPrecise(:);
 
     fprintf('write spike codes to file:\n %s\n', outFile);
+    if exist(tmpOutFile, "file")
+        delete(tmpOutFile);
+    end
+
     matobj = matfile(tmpOutFile, 'Writable', true);
     matobj.spikeHist = spikeHist;
     matobj.spikeHistPrecise = spikeHistPrecise;
@@ -59,6 +62,11 @@ for fnum = 1:length(outputFiles)
     tempOutFile = fullfile(outputPath, ['temp_', outFile]);
     
     outFile = fullfile(outputPath, outFile);
+    
+    if exist(outFile, 'file') && skipExist
+        continue
+    end
+
     fprintf('get cross channel spike codes:\n %s\n', outFile);
     spikeCodeFileObj = matfile(fullfile(outputPath, spikeCodeFile), 'Writable', false);
     spikeCodes = spikeCodeFileObj.spikeCodes;
@@ -80,6 +88,10 @@ for fnum = 1:length(outputFiles)
     spikeCodes = [spikeCodes, table(fractionConcurrentPrecise(:), 'VariableNames', {'fractionConcurrentPrecise'})];
 
     fprintf('write spike codes to file:\n %s\n', outFile);
+    if exist(tempOutFile)
+        delete(tempOutFile);
+    end
+
     matobj = matfile(tempOutFile, 'Writable', true);
     matobj.spikeCodes = spikeCodes;
     matobj.spikeHist = spikeCodeFileObj.spikeHist;
