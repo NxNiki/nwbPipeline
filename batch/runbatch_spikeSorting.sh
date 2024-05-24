@@ -34,11 +34,16 @@ echo "Start Matlab"
 echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 cd /u/home/x/xinniu/nwbPipeline/batch
 
+# make a copy of batch script so that we can submit jobs for other patients
+# when previous jobs are still running:
+cp runbatch_spikeSorting.m runbatch_spikeSorting_$SGE_TASK_ID.m
+
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    runbatch_spikeSorting($SGE_TASK_ID, $total_tasks);
+    runbatch_spikeSorting_$SGE_TASK_ID($SGE_TASK_ID, $total_tasks);
     exit
 EOF
 
+rm runbatch_spikeSorting_$SGE_TASK_ID.m 
 rm /u/home/x/xinniu/nwbPipeline/batch/data_wc*.run
 rm /u/home/x/xinniu/nwbPipeline/batch/tmp_data_wc*
 
