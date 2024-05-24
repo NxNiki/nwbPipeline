@@ -1,7 +1,7 @@
 function [spikeCodes, spikeHist, spikeHistPrecise] = computeSpikeCodes(spikes, spikeTimestamps, duration, par, inputStruct)
 % spikeTimestamp should be in seconds.
 
-[spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration);
+[spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, par.sr);
 
 if isempty(spikeTimestamps)
     [spikeCodes] = deal([]);
@@ -35,16 +35,16 @@ localMinV_Post = localMinInd_Post;
 halfWidth = localMinInd_Pre;
 
 for i = 1:length(localMinInd_Pre)
-    localMinInd_Pre(i) = find(locMin(i,1:w_pre-1),1,'last');
-    localMinV_Pre(i) = spikes(i,localMinInd_Pre(i));
-    localMinInd_Post(i) = find(locMin(i,w_pre+1:end),1,'first')+w_pre;
-    localMinV_Post(i) = spikes(i,localMinInd_Post(i));
+    localMinInd_Pre(i) = find(locMin(i,1:w_pre-1), 1, 'last');
+    localMinV_Pre(i) = spikes(i, localMinInd_Pre(i));
+    localMinInd_Post(i) = find(locMin(i, w_pre+1:end), 1, 'first') + w_pre;
+    localMinV_Post(i) = spikes(i, localMinInd_Post(i));
     halfHeight = (spikes(i,w_pre) - localMinV_Pre(i))/2;
-    [~,halfHeightPreInd] = min(abs(spikes(i,localMinInd_Pre(i):w_pre)-halfHeight));
-    halfHeightPreInd = halfHeightPreInd+localMinInd_Pre(i);
-    [~,halfHeightPostInd] = min(abs(spikes(i,w_pre:localMinInd_Post(i))-halfHeight));
-    halfHeightPostInd = halfHeightPostInd+w_pre-1;
-    halfWidth(i) = halfHeightPostInd-halfHeightPreInd;
+    [~,halfHeightPreInd] = min(abs(spikes(i, localMinInd_Pre(i):w_pre) - halfHeight));
+    halfHeightPreInd = halfHeightPreInd + localMinInd_Pre(i);
+    [~,halfHeightPostInd] = min(abs(spikes(i,w_pre:localMinInd_Post(i)) - halfHeight));
+    halfHeightPostInd = halfHeightPostInd + w_pre-1;
+    halfWidth(i) = halfHeightPostInd - halfHeightPreInd;
 end
 
 spikeCodes.heightToWidthRatio = spikes(:,w_pre)./halfWidth;
@@ -72,9 +72,9 @@ function firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamps)
     firingRateAroundSpikeTime = .5*max([spikeCount1', spikeCount2'], [], 2);
 end
 
-function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration)
+function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, samplingRate)
     binEdges1 = 0:3:1000*(duration)+3;
-    binEdgesPrecise = 0:2000/par.sr:1000*(duration)+1;
+    binEdgesPrecise = 0:2000/samplingRate:1000*(duration)+1;
     binEdges2 = 1.5:3:1000*(duration)+4.5;
     
     if isempty(spikeTimestamps)
