@@ -26,7 +26,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
 
     % 0: will remove all previous unpack files.
     % 1: skip existing files.
-    skipExist = 1;
+    skipExist = 0;
 
     %% load file names micro data:
 
