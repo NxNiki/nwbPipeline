@@ -7,7 +7,7 @@ hasSpikesPrecise = cell(length(spikeFiles), 1);
 outputFiles = cell(length(spikeFiles), 1);
 
 % calculate spikeCodes:
-parfor fnum = 1:length(spikeFiles)
+for fnum = 1:length(spikeFiles)
 
     spikeFile = spikeFiles{fnum};
     [~, filename, ext] = fileparts(spikeFile);
@@ -34,8 +34,8 @@ parfor fnum = 1:length(spikeFiles)
         delete(tmpOutFile);
     end
 
-    hasSpikes{fnum} = spikeHist;
-    hasSpikesPrecise{fnum} = spikeHistPrecise;
+    hasSpikes{fnum} = spikeHist(:);
+    hasSpikesPrecise{fnum} = spikeHistPrecise(:);
 
     fprintf('write spike codes to file:\n %s\n', outFile);
     matobj = matfile(tmpOutFile, 'Writable', true);
@@ -48,15 +48,15 @@ end
 
 hasSpikes = [hasSpikes{:}];
 hasSpikesPrecise = [hasSpikesPrecise{:}];
-percentConcurrentSpikes = sum(hasSpikes)/length(spikeFiles);
-percentConcurrentSpikesPrecise = sum(hasSpikesPrecise);
+percentConcurrentSpikes = sum(hasSpikes, 2)/length(spikeFiles);
+percentConcurrentSpikesPrecise = sum(hasSpikesPrecise, 2);
 
 % get across channel spike codes:
-parfor fnum = 1:length(outputFiles)
+for fnum = 1:length(outputFiles)
     
     spikeCodeFile = outputFiles{fnum};
     outFile = strrep(spikeCodeFile, '_spikeCodesTemp', '_spikeCodes');
-    tempOutFile = fullfile(outputPath, strrep(outFile, 'temp_', ''));
+    tempOutFile = fullfile(outputPath, ['temp_', outFile]);
     
     outFile = fullfile(outputPath, outFile);
     fprintf('get cross channel spike codes:\n %s\n', outFile);
@@ -66,10 +66,10 @@ parfor fnum = 1:length(outputFiles)
     spikeFileObj = matfile(spikeFiles{fnum}, 'Writable', false);
     duration = spikeFileObj.duration;
     spikeTimestamps = spikeFileObj.spikeTimestamps;
+    param = spikeFileObj.param;
 
     binEdges = 0:3:1000*(duration)+3;
-    binEdgesPrecise = 0:2000/sr:1000*duration+1;
-    
+    binEdgesPrecise = 0:2000/param.sr:1000*duration+1;
 
     bin = discretize(spikeTimestamps, binEdges);
     fractionConcurrent = percentConcurrentSpikes(bin);
@@ -82,9 +82,8 @@ parfor fnum = 1:length(outputFiles)
     fprintf('write spike codes to file:\n %s\n', outFile);
     matobj = matfile(tempOutFile, 'Writable', true);
     matobj.spikeCodes = spikeCodes;
-    matobj.spikeHist = spikeFileObj.spikeHist;
-    matobj.spikeHistPrecise = spikeFileObj.spikeHistPrecise;
-    matobj.timestampsStart = spikeFileObj.timestampsStart;
+    matobj.spikeHist = spikeCodeFileObj.spikeHist;
+    matobj.spikeHistPrecise = spikeCodeFileObj.spikeHistPrecise;
 
     movefile(tempOutFile, outFile);
     delete(fullfile(outputPath, spikeCodeFile));
