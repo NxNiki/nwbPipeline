@@ -12,8 +12,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         return
     end
 
-    [codeDir, workingDir] = getDirectory();
-    addpath(genpath(codeDir));
+    addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
+    workingDir = getDirectory();
 
     expIds = (4:7);
     filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
