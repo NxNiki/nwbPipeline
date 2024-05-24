@@ -17,6 +17,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
 
     expIds = (4:7);
     filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
+    skipExist = [1, 1, 1];
 
     %% load file names micro data:
     
@@ -34,7 +35,6 @@ function runbatch_spikeSorting(workerId, totalWorkers)
 
     %% spike detection:
 
-    skipExist = 1;
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
@@ -42,15 +42,14 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         parpool('local', 1);  % Adjust the number of workers as needed
     end
 
-    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist);
+    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1));
     disp('Spike Detection Finished!')
 
     %% spike clustering:
 
-    skipExist = 1;
-    spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist);
+    spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
 
-    spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist);
+    spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
     disp('Spike Clustering Finished!')
 
 end
