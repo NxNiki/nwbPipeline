@@ -26,12 +26,13 @@ channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 
 % TO DO (Xin): save temp files in outputPath. need to fix bug here...
-% par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);                       % temporary filename used as input for SPC
+% par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);
 % par.fname = fullfile(outputPath, ['data_' channel]);
 % par.fnamespc = fullfile(outputPath, ['data_wc' channel]);
 
-% for now we save files in current dir:
-par.fname_in = ['tmp_data_wc_' channel];                       % temporary filename used as input for SPC
+% temporary filename used as input for SPC
+% for now we save files in current dir
+par.fname_in = ['tmp_data_wc_' channel];  
 par.fname = ['data_' channel];
 par.fnamespc = ['data_wc_' channel];
 
