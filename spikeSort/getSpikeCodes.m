@@ -25,7 +25,7 @@ for fnum = 1:length(spikeFiles)
     param = spikeFileObj.param;
     outputStruct = spikeFileObj.outputStruct;
     spikeTimestamps = spikeFileObj.spikeTimestamps;
-    duration = spikeFileObj.duration;
+    duration = spikeFileObj.duration; % expect duration in seconds.
     spikes = spikeFileObj.spikes;
     
     % get spike codes to run clustering:
@@ -70,7 +70,7 @@ for fnum = 1:length(outputFiles)
     spikeCodes = spikeCodeFileObj.spikeCodes;
 
     spikeFileObj = matfile(spikeFiles{fnum}, 'Writable', false);
-    duration = spikeFileObj.duration;
+    duration = spikeFileObj.duration; % expect duration in seconds.
     spikeTimestamps = spikeFileObj.spikeTimestamps;
     param = spikeFileObj.param;
 
