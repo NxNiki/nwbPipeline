@@ -18,10 +18,7 @@ for fnum = 1:length(spikeFiles)
 
     outFile = fullfile(outputPath, outFile);
     tmpOutFile = fullfile(outputPath, tmpOutFile);
-    
-    if exist(outFile, 'file') && skipExist
-        continue
-    end
+    spikeCodeFile = strrep(outFile, '_spikeCodesTemp', '_spikeCodes');
 
     fprintf('get spike codes:\n %s\n', outFile);
     spikeFileObj = matfile(spikeFile, 'Writable', false);
@@ -42,8 +39,8 @@ for fnum = 1:length(spikeFiles)
     end
 
     matobj = matfile(tmpOutFile, 'Writable', true);
-    matobj.spikeHist = spikeHist;
-    matobj.spikeHistPrecise = spikeHistPrecise;
+    matobj.spikeHist = spikeHist(:);
+    matobj.spikeHistPrecise = spikeHistPrecise(:);
     matobj.spikeCodes = spikeCodes;
 
     movefile(tmpOutFile, outFile);
@@ -64,6 +61,7 @@ for fnum = 1:length(outputFiles)
     outFile = fullfile(outputPath, outFile);
     
     if exist(outFile, 'file') && skipExist
+        delete(fullfile(outputPath, spikeCodeFile));
         continue
     end
 
