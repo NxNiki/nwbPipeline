@@ -41,7 +41,7 @@ if [ ! -f "runbatch_extractLFP_$JOB_ID.m" ]; then
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks);
+    temp_runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks);
     exit
 EOF
 
