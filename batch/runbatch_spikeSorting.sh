@@ -43,7 +43,7 @@ if [ ! -f "runbatch_spikeSorting_$JOB_ID.m" ]; then
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    runbatch_spikeSorting_$JOB_ID($SGE_TASK_ID, $total_tasks);
+    temp_runbatch_spikeSorting_$JOB_ID($SGE_TASK_ID, $total_tasks);
     exit
 EOF
 
