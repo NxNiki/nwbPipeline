@@ -63,11 +63,11 @@ function firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamps)
 
     binEdges1 = 0:500:500*floor(max(spikeTimestamps)/500)+500; 
     hist1 = histcounts(spikeTimestamps, binEdges1);
-    spikeCount1 = hist1(max([ones(1, length(spikeTimestamps));floor(spikeTimestamps/500)], [], 1));
+    spikeCount1 = hist1(max([ones(1, length(spikeTimestamps)); floor(spikeTimestamps/500)], [], 1));
 
     binEdges2 = 250:500:500*floor((max(spikeTimestamps)+250)/500)+500;
     hist2 = histcounts(spikeTimestamps, binEdges2);
-    spikeCount2 = hist2(max([ones(1, length(spikeTimestamps));ceil((spikeTimestamps-250)/500)], [], 1));
+    spikeCount2 = hist2(max([ones(1, length(spikeTimestamps)); ceil((spikeTimestamps-250)/500)], [], 1));
 
     firingRateAroundSpikeTime = .5*max([spikeCount1', spikeCount2'], [], 2);
 end
