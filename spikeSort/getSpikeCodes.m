@@ -8,8 +8,7 @@ makeOutputPath(spikeFiles, outputPath, skipExist)
 
 hasSpikes = cell(length(spikeFiles), 1);
 hasSpikesPrecise = cell(length(spikeFiles), 1);
-outputFiles = cell(length(spikeFiles), 1);
-tempOutputFiles = cell(length(spikeFiles), 1);
+tempOutFileNames = cell(length(spikeFiles), 1);
 
 % calculate spikeCodes:
 for fnum = 1:length(spikeFiles)
@@ -19,7 +18,7 @@ for fnum = 1:length(spikeFiles)
     outFile = [strrep(filename, '_spikes', '_spikeCodesTemp'), ext];
 
     tmpOutFile = ['temp_', outFile];
-    tempOutputFiles{fnum} = outFile;
+    tempOutFileNames{fnum} = outFile;
 
     outFile = fullfile(outputPath, outFile);
     tmpOutFile = fullfile(outputPath, tmpOutFile);
@@ -50,19 +49,21 @@ for fnum = 1:length(spikeFiles)
     movefile(tmpOutFile, outFile);
 end
 
+outputFiles = cell(length(spikeFiles), 1);
 hasSpikes = [hasSpikes{:}];
 hasSpikesPrecise = [hasSpikesPrecise{:}];
 percentConcurrentSpikes = sum(hasSpikes, 2)/length(spikeFiles);
 percentConcurrentSpikesPrecise = sum(hasSpikesPrecise, 2);
 
 % get across channel spike codes:
-for fnum = 1:length(outputFiles)
+for fnum = 1:length(tempOutFileNames)
     
-    spikeCodeFile = outputFiles{fnum};
+    spikeCodeFile = tempOutFileNames{fnum};
     outFile = strrep(spikeCodeFile, '_spikeCodesTemp', '_spikeCodes');
+
     tempOutFile = fullfile(outputPath, ['temp_', outFile]);
-    
     outFile = fullfile(outputPath, outFile);
+    outputFiles{fnum} = outFile;
     
     if exist(outFile, 'file') && skipExist
         delete(fullfile(outputPath, spikeCodeFile));
@@ -89,7 +90,7 @@ for fnum = 1:length(outputFiles)
     fractionConcurrentPrecise = percentConcurrentSpikesPrecise(binPrecise);
     spikeCodes = [spikeCodes, table(fractionConcurrentPrecise(:), 'VariableNames', {'fractionConcurrentPrecise'})];
 
-    if exist(tempOutFile)
+    if exist(tempOutFile, 'file')
         delete(tempOutFile);
     end
 
@@ -101,7 +102,6 @@ for fnum = 1:length(outputFiles)
 
     movefile(tempOutFile, outFile);
     delete(fullfile(outputPath, spikeCodeFile));
-    outputFiles{fnum} = outFile;
 
 end
 
