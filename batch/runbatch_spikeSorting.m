@@ -17,8 +17,8 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
     workingDir = getDirectory();
 
-    expIds = (4:7);
-    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
+    expIds = (8:14);
+    filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
     skipExist = [1, 1, 1];
 
     %% load file names micro data:

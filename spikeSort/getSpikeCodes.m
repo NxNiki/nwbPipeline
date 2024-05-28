@@ -1,10 +1,15 @@
 function outputFiles = getSpikeCodes(spikeFiles, outputPath, skipExist)
+    % SpikeCodes are features used to do clustering analysis. 
+    % Most of the spike codes can be calculated for each channel separately.
+    % `franctionConcurrent` and `frantionConcurrentPrecise` need information
+    % across all channels.
 
 makeOutputPath(spikeFiles, outputPath, skipExist)
 
 hasSpikes = cell(length(spikeFiles), 1);
 hasSpikesPrecise = cell(length(spikeFiles), 1);
 outputFiles = cell(length(spikeFiles), 1);
+tempOutputFiles = cell(length(spikeFiles), 1);
 
 % calculate spikeCodes:
 for fnum = 1:length(spikeFiles)
@@ -14,7 +19,7 @@ for fnum = 1:length(spikeFiles)
     outFile = [strrep(filename, '_spikes', '_spikeCodesTemp'), ext];
 
     tmpOutFile = ['temp_', outFile];
-    outputFiles{fnum} = outFile;
+    tempOutputFiles{fnum} = outFile;
 
     outFile = fullfile(outputPath, outFile);
     tmpOutFile = fullfile(outputPath, tmpOutFile);
@@ -84,11 +89,11 @@ for fnum = 1:length(outputFiles)
     fractionConcurrentPrecise = percentConcurrentSpikesPrecise(binPrecise);
     spikeCodes = [spikeCodes, table(fractionConcurrentPrecise(:), 'VariableNames', {'fractionConcurrentPrecise'})];
 
-    fprintf('write spike codes to file:\n %s\n', outFile);
     if exist(tempOutFile)
         delete(tempOutFile);
     end
 
+    fprintf('write spike codes to file:\n %s\n', outFile);
     matobj = matfile(tempOutFile, 'Writable', true);
     matobj.spikeCodes = spikeCodes;
     matobj.spikeHist = spikeCodeFileObj.spikeHist;

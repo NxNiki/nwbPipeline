@@ -47,7 +47,6 @@ matlab  -nosplash -nodisplay -singleCompThread <<EOF
     exit
 EOF
 
-rm runbatch_spikeSorting_$JOB_ID.m 
 rm /u/home/x/xinniu/nwbPipeline/batch/data_wc*.run
 rm /u/home/x/xinniu/nwbPipeline/batch/tmp_data_wc*
 
