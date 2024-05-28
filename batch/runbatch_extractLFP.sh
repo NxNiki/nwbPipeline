@@ -45,8 +45,6 @@ matlab  -nosplash -nodisplay -singleCompThread <<EOF
     exit
 EOF
 
-rm runbatch_extractLFP_$JOB_ID.m 
-
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
