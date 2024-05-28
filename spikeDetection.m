@@ -78,27 +78,37 @@ for i = 1: size(cscFiles, 1)
 
     end
 
-    % remove file if it exist as repetitive writing to save variable in
-    % matfile obj consumes increasing storage:
+    % skip file if it exist (this may be due to other jobs writing to the
+    % same file) as repetitive writing to save variable in matfile obj
+    % consumes increasing storage:
     if exist(spikeFilename, "file")
-        delete(spikeFilename);
+        continue
     end
 
-    fprintf('write spikes to file:\n %s\n', spikeFilename);
-    matobj = matfile(tempSpikeFilename, 'Writable', true);
-    matobj.spikes = single(vertcat(spikes{:}));
-    matobj.param = param;
-    matobj.ExpName = [ExpName{:}];
-    matobj.timestampsStart = timestampsStart;
-    matobj.outputStruct = outputStruct;
-    matobj.spikeTimestamps = [spikeTimestamps{:}];
-    matobj.duration = duration;
+    fprintf('write spikes to file:\n %s\n', tempSpikeFilename);
 
-    if saveXfDetect
-        matobj.xfDetect = [xfDetect{:}];
+    try
+        matobj = matfile(tempSpikeFilename, 'Writable', true);
+        matobj.spikes = single(vertcat(spikes{:}));
+        matobj.param = param;
+        matobj.ExpName = [ExpName{:}];
+        matobj.timestampsStart = timestampsStart;
+        matobj.outputStruct = outputStruct;
+        matobj.spikeTimestamps = [spikeTimestamps{:}];
+        matobj.duration = duration;
+    
+        if saveXfDetect
+            matobj.xfDetect = [xfDetect{:}];
+        end
+        fprintf('save success, rename spike file name to:\n %s\n', spikeFilename);
+        movefile(tempSpikeFilename, spikeFilename);
+    catch ME
+        if exist(spikeFilename, "file")
+            delete(spikeFilename);
+        end
+        warning('error writing file %s\n:', spikeFilename)
+        fprintf('Error message: %s\n', ME.message);
     end
-
-    movefile(tempSpikeFilename, spikeFilename);
 end
 
 end
