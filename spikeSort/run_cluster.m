@@ -81,15 +81,10 @@ end
 clu = load([fname '.dg_01.lab']);
 tree = load([fname '.dg_01']); 
 
-try
-    delete(sprintf('%s.run', fname));    
-    delete([fname '*.mag']);
-    delete([fname '*.edges']);
-    delete([fname '*.param']);
-end
 
-if exist([fname '.knn'], 'file')
-    delete([fname '.knn']);
-end
-
+delete(sprintf('%s.run', fname));    
+delete([fname '*.mag']);
+delete([fname '*.edges']);
+delete([fname '*.param']);
+delete([fname '.knn']);
 delete(fname_in); 
