@@ -79,13 +79,6 @@ for i = 1: size(cscFiles, 1)
 
     end
 
-    % skip file if it exist (this may be due to other jobs writing to the
-    % same file) as repetitive writing to save variable in matfile obj
-    % consumes increasing storage:
-    if exist(spikeFilename, "file")
-        continue
-    end
-
     fprintf('write spikes to file:\n %s\n', tempSpikeFilename);
 
     try
