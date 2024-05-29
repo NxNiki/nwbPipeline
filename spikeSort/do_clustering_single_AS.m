@@ -166,17 +166,19 @@ par = update_parameters(par, current_par, 'relevant');
 par = update_parameters(par, current_par, 'batch_plot');
 
 par.sorting_date = datestr(now);
-cluster_class(:,1)= classes;
-
-outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
-outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
 
 % save spike timestamps and exp start timestamp:
 spikeTimestamps = spikeFileObj.spikeTimestamps;
 spikeTimestamps(spikeIdxRejected) = [];
 timestampsStart = spikeFileObj.timestampsStart;
 
-save(outFileNameTemp, 'cluster_class', 'spikeTimestamps', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', '-v7.3');
+cluster_class(:, 1) = classes;
+cluster_class(:, 2) = spikeTimestamps;
+
+outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
+outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
+
+save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', '-v7.3');
 
 if exist('ipermut','var')
     save(outFileNameTemp, 'ipermut', '-append');

@@ -103,6 +103,9 @@ for i = 1: size(cscFiles, 1)
         fprintf('save success, rename spike file name to:\n %s\n', spikeFilename);
         movefile(tempSpikeFilename, spikeFilename);
     catch ME
+        if exist(tempSpikeFilename, "file")
+            delete(tempSpikeFilename);
+        end
         if exist(spikeFilename, "file")
             delete(spikeFilename);
         end
