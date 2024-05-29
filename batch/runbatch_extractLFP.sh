@@ -35,7 +35,7 @@ cd /u/home/x/xinniu/nwbPipeline/batch
 
 # make a copy of batch script so that we can submit jobs for other patients
 # when previous jobs are still running:
-if [ ! -f "runbatch_extractLFP_$JOB_ID.m" ]; then
+if [ ! -f "temp_runbatch_extractLFP_$JOB_ID.m" ]; then
     echo "create job script: temp_runbatch_extractLFP_$JOB_ID.m"
     cp runbatch_extractLFP.m temp_runbatch_extractLFP_$JOB_ID.m
 fi
