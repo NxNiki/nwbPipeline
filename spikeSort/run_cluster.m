@@ -6,7 +6,11 @@ dim = par.inputs;
 fname = par.fnamespc;
 fname_in = par.fname_in;
 
-[~, fileName] = fileparts(fname);
+currentDir = pwd;
+[workingDir, fileName] = fileparts(fname);
+% cluster*.exe needs to work in the directory of the input file.
+cd(workingDir);
+
 [~, fileNameIn] = fileparts(fname_in);
 
 % DELETE PREVIOUS FILES
@@ -38,6 +42,8 @@ end
 fclose(fid);
 
 system_type = computer;
+
+
 switch system_type
     % window not tested.
     case {'PCWIN'}    
@@ -78,13 +84,15 @@ else
 	fclose(f);
 end
 
-clu = load([fname '.dg_01.lab']);
-tree = load([fname '.dg_01']); 
+clu = load([fname '.dg_01.lab'], '-ascii');
+tree = load([fname '.dg_01'], '-ascii'); 
 
 
 delete(sprintf('%s.run', fname));    
 delete([fname '*.mag']);
 delete([fname '*.edges']);
 delete([fname '*.param']);
-delete([fname '.knn']);
+% delete([fname '.knn']);
 delete(fname_in); 
+
+cd(currentDir);
