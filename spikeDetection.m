@@ -70,6 +70,7 @@ for i = 1: size(cscFiles, 1)
 
         tsSingle = single(timestamps);
         if length(unique(tsSingle)) == length(timestamps)
+            disp('convert timestamps to single precision.')
             timestamps = tsSingle;
         end
 
