@@ -47,9 +47,6 @@ matlab  -nosplash -nodisplay -singleCompThread <<EOF
     exit
 EOF
 
-rm /u/home/x/xinniu/nwbPipeline/batch/data_wc*.run
-rm /u/home/x/xinniu/nwbPipeline/batch/tmp_data_wc*
-
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
