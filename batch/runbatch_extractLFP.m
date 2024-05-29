@@ -1,4 +1,7 @@
 function runbatch_extractLFP(workerId, totalWorkers)
+    % extract LFP after spike detection and clustering (spike sorting).
+    % run can modify this script and run on different patients/exp when
+    % at least one previous job is running (a temporary job script is created).
 
     if nargin < 1
         % run script without queue:
@@ -6,18 +9,13 @@ function runbatch_extractLFP(workerId, totalWorkers)
         totalWorkers = 1;
     end
 
-    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
+    workingDir = getDirectory();
 
     expIds = (4:7);
-    filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
-    % expIds = (4: 5);
-    % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-
-    % 0: will remove all previous unpack files.
-    % 1: skip existing files.
-    skipExist = 1;
+    skipExist = 0;
     saveRaw = false;
 
     spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];

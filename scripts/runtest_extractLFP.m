@@ -1,8 +1,11 @@
 % run_extractLFP
 clear
 
-expId = 4;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
+% expId = 4;
+% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
+
+expId = 2;
+filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
 
 % expId = 2;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';

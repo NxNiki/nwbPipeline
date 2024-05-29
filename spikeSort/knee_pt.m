@@ -103,7 +103,6 @@ if (ndims(x)~= ndims(y) || ~all(size(x) == size(y)))
     if (issue_errors_p)
         error('knee_pt: y and x must have the same dimensions');
     end
-    
     return;
 end
 %and more checking
