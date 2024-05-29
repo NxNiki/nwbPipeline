@@ -25,16 +25,9 @@ check_WC_params(par)
 channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 
-% TO DO (Xin): save temp files in outputPath. need to fix bug here...
-% par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);
-% par.fname = fullfile(outputPath, ['data_' channel]);
-% par.fnamespc = fullfile(outputPath, ['data_wc' channel]);
-
-% temporary filename used as input for SPC
-% for now we save files in current dir
-par.fname_in = ['tmp_data_wc_' channel];  
-par.fname = ['data_' channel];
-par.fnamespc = ['data_wc_' channel];
+par.fname_in = fullfile(outputPath, ['tmp_data_wc_' channel]);
+par.fname = fullfile(outputPath, ['data_' channel]);
+par.fnamespc = fullfile(outputPath, ['data_wc_' channel]);
 
 % REJECT SPIKES
 % SPK quantity check 1
@@ -197,27 +190,17 @@ end
 
 end
 % mahal function incase system doesn't have it
-function d = mahal(Y,X)
+function d = mahal(Y, X)
 [rx, cx] = size(X);
 [ry, cy] = size(Y);
 
-m = mean(X,1);
-M = m(ones(ry,1),:);
-C = X - m(ones(rx,1),:);
-[Q, R] = qr(C,0);
+m = mean(X, 1);
+M = m(ones(ry,1), :);
+C = X - m(ones(rx,1), :);
+[Q, R] = qr(C, 0);
 
 ri = R'\(Y-M)';
-d = sum(ri.*ri,1)'*(rx-1);
+d = sum(ri.*ri, 1)'*(rx-1);
 
 end
 
-% function counter = count_new_times(initial_date, filenames)
-% counter = 0;
-% for i = 1:length(filenames)
-%     fname = filenames{i};
-%     FileInfo = dir(['times_' fname(1:end-11) '.mat']);
-%     if length(FileInfo)==1 && (FileInfo.datenum > initial_date)
-%         counter = counter + 1;
-%     end
-% end
-% end

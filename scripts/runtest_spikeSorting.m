@@ -12,10 +12,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening'
 % expId = 4;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
-
-% 0: will remove all previous unpack files.
-% 1: skip existing files.
-skipExist = 0; 
+skipExist = [1, 0, 0];
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 
@@ -29,14 +26,14 @@ microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=","
 timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
 timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 
-spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist);
+spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist(1));
 disp('Spike Detection Finished!')
 
 %% spike clustering:
 
-spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist);
+spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
 
-spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist);
+spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
 disp('Spike Clustering finished!')
 
 
