@@ -5,7 +5,7 @@
 #$ -o /u/home/x/xinniu/cluster-output-extractLFP/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=5:00:00,h_data=500G
+#$ -l h_rt=10:00:00,h_data=100G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 1
@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 # #$ -m bea
-#$ -t 1:10:1  # 1-indexed here
+#$ -t 1:20:1  # 1-indexed here
 
 
 # echo job info on joblog:
@@ -31,8 +31,19 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 
 echo "Start Matlab"
 echo "run extractLFP, task id: $SGE_TASK_ID, total tasks: $total_tasks"
-cd /u/home/x/xinniu/nwbPipeline/batch/
-matlab  -nosplash -nodisplay -singleCompThread -r "runbatch_extractLFP($SGE_TASK_ID, $total_tasks), exit"
+cd /u/home/x/xinniu/nwbPipeline/batch
+
+# make a copy of batch script so that we can submit jobs for other patients
+# when previous jobs are still running:
+if [ ! -f "runbatch_extractLFP_$JOB_ID.m" ]; then
+    echo "create job script: temp_runbatch_extractLFP_$JOB_ID.m"
+    cp runbatch_extractLFP.m temp_runbatch_extractLFP_$JOB_ID.m
+fi
+
+matlab  -nosplash -nodisplay -singleCompThread <<EOF
+    temp_runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks);
+    exit
+EOF
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`

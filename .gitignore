@@ -24,6 +24,7 @@ scripts/Rasters*.pdf
 
 batch/*data_*.run
 batch/tmp_data*
+batch/temp_runbatch*.m
 
 scripts/Patient-*.json
 scripts/*.csv

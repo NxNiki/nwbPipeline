@@ -1,10 +1,18 @@
-function do_clustering_single_AS(inputFile, outputPath, min_spikes4SPC, param)
+function do_clustering_single_AS(spikeFile, spikeCodeFile, outputPath, min_spikes4SPC)
+
+% load spikes and spike codes:
+spikeFileObj = matfile(spikeFile);
+spikes = spikeFileObj.spikes;
+param = spikeFileObj.param;
+
+spikeCodeFileObj = matfile(spikeCodeFile);
+spikeCodes = spikeCodeFileObj.spikeCodes;
 
 par = set_parameters;
 par = update_parameters(par, param, 'clus');
 par = update_parameters(par, param, 'batch_plot');
 
-par.filename = inputFile;
+par.filename = spikeFile;
 par.reset_results = true;
 
 check_WC_params(par)
@@ -13,24 +21,20 @@ check_WC_params(par)
 %   par.max_inputs = par.max_inputs * par.channels;
 % end
 
-[~, fileName, ~] = fileparts(inputFile);
+[~, fileName, ~] = fileparts(spikeFile);
 channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
 par.channel = channel;
 
 % TO DO (Xin): save temp files in outputPath. need to fix bug here...
-% par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);                       % temporary filename used as input for SPC
+% par.fname_in = fullfile(outputPath, ['tmp_data_wc' channel]);
 % par.fname = fullfile(outputPath, ['data_' channel]);
 % par.fnamespc = fullfile(outputPath, ['data_wc' channel]);
 
-% for now we save files in current dir:
-par.fname_in = ['tmp_data_wc_' channel];                       % temporary filename used as input for SPC
+% temporary filename used as input for SPC
+% for now we save files in current dir
+par.fname_in = ['tmp_data_wc_' channel];  
 par.fname = ['data_' channel];
 par.fnamespc = ['data_wc_' channel];
-
-% LOAD SPIKES
-spikeFileObj = matfile(inputFile);
-spikes = spikeFileObj.spikes;
-spikeCodes = spikeFileObj.spikeCodes;
 
 % REJECT SPIKES
 % SPK quantity check 1
@@ -43,18 +47,18 @@ end
 
 nspk = size(spikes,1);
 if nspk < min_spikes4SPC
-    warning('MyComponent:noValidInput', 'Not enough spikes (%d/%d) in the file: \n%s', nspk, nspkBeforeReject, inputFile);
+    warning('MyComponent:noValidInput', 'Not enough spikes (%d/%d) in the file: \n%s', nspk, nspkBeforeReject, spikeFile);
     return
 end
 
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
 inspk = wave_features(spikes, par);     % takes wavelet coefficients.
 par.inputs = size(inspk, 2);            % number of inputs to the clustering
-naux = min(par.max_spk,size(spikes,1));
+naux = min(par.max_spk, size(spikes,1));
 
 if par.permut == 'n'
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
-    if size(spikes,1)> par.max_spk
+    if size(spikes,1) > par.max_spk
         % take first 'par.max_spk' spikes as an input for SPC
         inspk_aux = inspk(1:naux,:);
     else
@@ -62,7 +66,7 @@ if par.permut == 'n'
     end
 else
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
-    if size(spikes,1)> par.max_spk
+    if size(spikes,1) > par.max_spk
         % random selection of spikes for SPC
         ipermut = randperm(length(inspk));
         ipermut(naux+1:end) = [];
@@ -83,8 +87,7 @@ try
 catch err
     warning('MyComponent:ERROR_SPC', 'Error in SPC');
     disp(err);
-    % return
-    rethrow(err);
+    return
 end
 
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
@@ -97,14 +100,14 @@ if par.permut == 'y'
     clear clu_aux
 end
 
-classes = zeros(1,size(clu,2)-2);
+classes = zeros(1, size(clu,2)-2);
 for c =1: length(clust_num)
-    aux = clu(temp(c),3:end) +1 == clust_num(c);
+    aux = clu(temp(c), 3:end) + 1 == clust_num(c);
     classes(aux) = c;
 end
 
 if par.permut == 'n'
-    classes = [classes zeros(1,max(size(spikes,1)-par.max_spk,0))];
+    classes = [classes zeros(1, max(size(spikes,1) - par.max_spk, 0))];
 end
 
 Temp = [];
@@ -146,11 +149,11 @@ s = warning; warning('off')
 for i=1:max(classes)
     inCluster = classes == i;
     nSpikes = sum(inCluster);
-    nFeatures = size(inspk,2);
+    nFeatures = size(inspk, 2);
     if nSpikes > nFeatures
-        M = mahal(inspk,inspk(inCluster,:));
+        M = mahal(inspk, inspk(inCluster, :));
         Lspk = 1-gammainc(M/2, nFeatures/2);
-        %    Lspk = 1-chi2cdf(M,nFeatures);
+        % Lspk = 1-chi2cdf(M,nFeatures);
         removeFromClust = inCluster & Lspk' < 5e-3;
         classes(removeFromClust) = 0;
     end
@@ -168,7 +171,12 @@ cluster_class(:,1)= classes;
 outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
 outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
 
-save(outFileNameTemp, 'cluster_class', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', '-v7.3');
+% save spike timestamps and exp start timestamp:
+spikeTimestamps = spikeFileObj.spikeTimestamps;
+spikeTimestamps(spikeIdxRejected) = [];
+timestampsStart = spikeFileObj.timestampsStart;
+
+save(outFileNameTemp, 'cluster_class', 'spikeTimestamps', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', '-v7.3');
 
 if exist('ipermut','var')
     save(outFileNameTemp, 'ipermut', '-append');
@@ -184,7 +192,6 @@ end
 if exist([current_par.fname '.dg_01'], "file")
     delete([current_par.fname '.dg_01'])
 end
-
 
 end
 % mahal function incase system doesn't have it
