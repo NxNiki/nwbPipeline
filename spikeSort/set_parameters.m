@@ -30,7 +30,8 @@ par.temp_plot = 'log';               % temperature plot in log scale
  
 par.c_ov = 0.7;                      % Overlapping coefficient to use for the inclusion criterion. 
 par.elbow_min  = 0.4;                %Thr_border parameter for regime border detection. 
- 
+
+
 % DETECTION PARAMETERS 
 par.tmax = 'all';                    % maximum time to load 
 %par.tmax= 180;                      % maximum time to load (in sec) 
@@ -47,9 +48,8 @@ par.sort_fmin = 300;                 % high pass filter for sorting
 par.sort_fmax = 3000;                % low pass filter for sorting (default 3000) 
 par.sort_order = 4;                  % filter order for sorting 
 par.ref_ms = 1.5;                    % detector dead time, minimum refractory period (in ms) 
-%par.detection = 'pos';               % type of threshold ('pos','neg','both') 
-% par.detection = 'neg'; 
-par.detection = 'both'; 
+par.detection = 'both';              % type of threshold ('pos','neg','both') 
+ 
  
 % INTERPOLATION PARAMETERS 
 par.int_factor = 5;                  % interpolation factor 
@@ -58,11 +58,10 @@ par.interpolation = 'y';             % interpolation with cubic splines (default
  
  
 % FEATURES PARAMETERS 
-par.min_inputs = 10;         % number of inputs to the clustering 
-par.max_inputs = 0.75;       % number of inputs to the clustering. if < 1 it will the that proportion of the maximum. 
-par.scales = 4;                        % number of scales for the wavelet decomposition 
+par.min_inputs = 10;                 % number of inputs to the clustering 
+par.max_inputs = 0.75;               % number of inputs to the clustering. if < 1 it will the that proportion of the maximum. 
+par.scales = 4;                      % number of scales for the wavelet decomposition 
 par.features = 'wav';                % type of feature ('wav' or 'pca') 
-%par.features = 'pca' 
  
  
 % FORCE MEMBERSHIP PARAMETERS 
@@ -73,7 +72,7 @@ par.template_k_min = 10;            % min # of nn for vote
 par.template_type = 'center';       % nn, center, ml, mahal 
 par.force_feature = 'spk';          % feature use for forcing (whole spike shape) 
 %par.force_feature = 'wav';         % feature use for forcing (wavelet coefficients). 
-par.force_auto = true;              %automatically force membership (only for batch scripts). 
+par.force_auto = true;              % automatically force membership (only for batch scripts). 
  
 % TEMPLATE MATCHING 
 par.match = 'y';                    % for template matching 

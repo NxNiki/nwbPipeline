@@ -1,6 +1,7 @@
 function runbatch_spikeSorting(workerId, totalWorkers)
-    
     % run spike detection and spike sorting to the unpacked data:
+    % run can modify this script and run on different patients/exp when
+    % at least one previous job is running (a temporary job script is created).
 
     if nargin < 1
         % run script without queue:
@@ -13,21 +14,15 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         return
     end
 
-    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
+    workingDir = getDirectory();
 
-    expIds = (4:7);
-    % filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    
-    % run on test data:
-    % expIds = (4: 5);
-    % filePath = '/u/project/ifried/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-    % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-
-    skipExist = 1;
+    expIds = (8:14);
+    filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
+    skipExist = [1, 1, 1];
 
     %% load file names micro data:
-
+    
     [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
 
@@ -41,6 +36,7 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
     %% spike detection:
+
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
@@ -48,11 +44,14 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         parpool('local', 1);  % Adjust the number of workers as needed
     end
 
-    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist);
+    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1));
     disp('Spike Detection Finished!')
 
     %% spike clustering:
-    spikeClustering(spikeFiles, outputPath, skipExist);
+
+    spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
+
+    spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
     disp('Spike Clustering Finished!')
 
 end
