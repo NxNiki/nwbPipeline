@@ -32,9 +32,8 @@ for fnum = 1:length(spikeFiles)
     spikes = spikeFileObj.spikes;
     
     % get spike codes to run clustering:
-    [spikeCodes, spikeHist, spikeHistPrecise] = computeSpikeCodes(spikes, spikeTimestamps, duration, param, outputStruct);
-    hasSpikes{fnum} = spikeHist(:);
-    hasSpikesPrecise{fnum} = spikeHistPrecise(:);
+    spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, param, outputStruct);
+    [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, par.sr);
 
     fprintf('write spike codes to file:\n %s\n', outFile);
     if exist(tmpOutFile, "file")
@@ -45,8 +44,10 @@ for fnum = 1:length(spikeFiles)
     matobj.spikeHist = spikeHist(:);
     matobj.spikeHistPrecise = spikeHistPrecise(:);
     matobj.spikeCodes = spikeCodes;
-
     movefile(tmpOutFile, outFile);
+
+    hasSpikes{fnum} = spikeHist(:);
+    hasSpikesPrecise{fnum} = spikeHistPrecise(:);
 end
 
 outputFiles = cell(length(spikeFiles), 1);
