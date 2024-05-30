@@ -16,15 +16,10 @@ venv/
 # Ignore temp .m files:
 *.asv
 
-scripts/*.dg_01*
-scripts/*.exe
-scripts/data_*.run
-scripts/tmp_data*
 scripts/Rasters*.pdf
 
-batch/*data_*.run
-batch/tmp_data*
-batch/temp_runbatch*.m
+batch/runbatch_spikeSorting_*.sh
+batch/runbatch_extractLFP_*.sh
 
 scripts/Patient-*.json
 scripts/*.csv

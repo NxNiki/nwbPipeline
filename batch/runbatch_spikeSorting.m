@@ -1,4 +1,4 @@
-function runbatch_spikeSorting(workerId, totalWorkers)
+function runbatch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist)
     % run spike detection and spike sorting to the unpacked data:
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
@@ -14,12 +14,14 @@ function runbatch_spikeSorting(workerId, totalWorkers)
         return
     end
 
-    addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
-    workingDir = getDirectory();
+    if nargin < 3
+        addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
+        workingDir = getDirectory();
 
-    expIds = (8:14);
-    filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
-    skipExist = [1, 1, 1];
+        expIds = (4: 7);
+        filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
+        skipExist = [1, 1, 0];
+    end
 
     %% load file names micro data:
     
@@ -40,9 +42,11 @@ function runbatch_spikeSorting(workerId, totalWorkers)
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
-    if isempty(gcp('nocreate'))
-        parpool('local', 1);  % Adjust the number of workers as needed
-    end
+    % TO-DO: parallel jobs may not be correctly closed when running on hoffman.
+    % create Unique Job Storage Locations to resolve this.
+    % if isempty(gcp('nocreate'))
+    %     parpool('local', 1);  % Adjust the number of workers as needed
+    % end
 
     spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1));
     disp('Spike Detection Finished!')
