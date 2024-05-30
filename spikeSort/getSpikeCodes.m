@@ -33,7 +33,7 @@ for fnum = 1:length(spikeFiles)
     
     % get spike codes to run clustering:
     spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, param, outputStruct);
-    [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, par.sr);
+    [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, param.sr);
 
     fprintf('write spike codes to file:\n %s\n', outFile);
     if exist(tmpOutFile, "file")
