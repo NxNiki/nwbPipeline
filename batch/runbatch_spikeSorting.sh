@@ -32,18 +32,21 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 
 echo "Start Matlab"
 echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
+
+# make a copy of batch script:
 cd /u/home/x/xinniu/nwbPipeline/batch
-
-# make a copy of batch script so that we can submit jobs for other patients
-# when previous jobs are still running:
-
-if [ ! -f "temp_runbatch_spikeSorting_$JOB_ID.m" ]; then
-    echo "create job script: temp_runbatch_spikeSorting_$JOB_ID.m"
-    cp runbatch_spikeSorting.m temp_runbatch_spikeSorting_$JOB_ID.m
+if [ ! -f "runbatch_spikeSorting_$JOB_ID.sh" ]; then
+    echo "backup job script: runbatch_spikeSorting_$JOB_ID.sh"
+    cp runbatch_spikeSorting.sh runbatch_spikeSorting_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    temp_runbatch_spikeSorting_$JOB_ID($SGE_TASK_ID, $total_tasks);
+    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    workingDir = getDirectory();
+    expIds = (4: 7);
+    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
+    skipExist = [1, 1, 0];
+    runbatch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
     exit
 EOF
 
