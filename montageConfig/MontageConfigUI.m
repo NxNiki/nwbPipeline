@@ -34,7 +34,7 @@ function MontageConfigUI()
     % Create headstages and ports
     numHeadstages = 4;
     numPortsPerHeadstage = 4;
-    headstageHandles = cell(numHeadstages, numPortsPerHeadstage, 4); % Handles for micros, brain labels, custom label edit, and headstage label
+    headstageHandles = cell(numHeadstages, numPortsPerHeadstage + 1, 3); % Handles for micros, brain labels, custom label edit, and headstage label
     defaultNumChannelsMicro = '8';
 
     for headstageIdx = 1:numHeadstages
@@ -53,8 +53,8 @@ function MontageConfigUI()
                                  'Units', 'normalized', 'Position', [0.55, 0.85, 0.4, 0.1], 'String', 'Enable', 'FontSize', 12, ...
                                  'Callback', @(src, event)toggleHeadstageFields(headstageIdx, src));
 
-        headstageHandles{headstageIdx, numPortsPerHeadstage + 1, 3} = headstageLabelEdit; % Store headstage label handle
-        headstageHandles{headstageIdx, numPortsPerHeadstage + 1, 4} = headstageCheckbox;
+        headstageHandles{headstageIdx, numPortsPerHeadstage + 1, 1} = headstageLabelEdit; % Store headstage label handle
+        headstageHandles{headstageIdx, numPortsPerHeadstage + 1, 2} = headstageCheckbox;
 
         for portIdx = 1:numPortsPerHeadstage
             % Port label
@@ -215,8 +215,8 @@ function MontageConfigUI()
             portFields = fieldnames(ports);
 
             if isempty(portFields)
-                set(headstageHandles{i, numPortsPerHeadstage + 1, 4}, 'Value', 0);
-                toggleHeadstageFields(i, headstageHandles{i, numPortsPerHeadstage + 1, 4})
+                set(headstageHandles{i, numPortsPerHeadstage + 1, 1}, 'Value', 0);
+                toggleHeadstageFields(i, headstageHandles{i, numPortsPerHeadstage + 1, 2})
                 continue
             end
 
@@ -260,7 +260,7 @@ function MontageConfigUI()
 
         microChannels = {};
         for headstageIdx = 1:numHeadstages
-            headstageLabel = get(headstageHandles{headstageIdx, numPortsPerHeadstage + 1, 3}, 'String');
+            headstageLabel = get(headstageHandles{headstageIdx, numPortsPerHeadstage + 1, 1}, 'String');
             sanitizedHeadstageLabel = matlab.lang.makeValidName(headstageLabel);  % Sanitize headstage label to make it a valid field name
             config.Headstages.(sanitizedHeadstageLabel) = struct();
 
@@ -340,38 +340,80 @@ function MontageConfigUI()
     function addRow(~, ~)
         % Add a new row to the table
         data = get(channelTable, 'Data');
-        data(end + 1, :) = {false, '', ''};
+        rowToAdd = find(cell2mat(data(:, 1)), 1, 'last' );
+        if isempty(rowToAdd) || rowToAdd == size(data, 1)
+            data(end + 1, :) = {false, '', ''};
+        else
+            data = [data(1:rowToAdd,:);
+                    {false, '', ''};
+                    data(rowToAdd+1:end,:)];
+        end
         set(channelTable, 'Data', data);
     end
 
     function removeRow(~, ~)
         % Remove the selected rows from the table
         data = get(channelTable, 'Data');
-        rowsToDelete = find(cell2mat(data(:, 1)));
-        data(rowsToDelete, :) = [];
-        set(channelTable, 'Data', data);
+        rowsToDelete = cell2mat(data(:, 1));
+        if all(rowsToDelete)
+            choice = questdlg(sprintf(['This will remove All macro channels.\n' ...
+                'Do you want to proceed?']), ...
+                'Confirmation', ...
+                'Yes', 'No', 'No');
+            
+            % Handle response
+            switch choice
+                case 'Yes'
+                    data(rowsToDelete, :) = [];
+                    set(channelTable, 'Data', data);
+                case 'No'
+                    return
+            end
+        end  
     end
 
     function moveUp(~, ~)
         % Move the selected row up
         data = get(channelTable, 'Data');
-        selectedRow = find(cell2mat(data(:, 1)));
-        if ~isempty(selectedRow) && selectedRow > 1
-            for i = selectedRow
-                temp = data(i, :);
-                data(i, :) = data(i - 1, :);
-                data(i - 1, :) = temp;
-            end
-            set(channelTable, 'Data', data);
+        selectedRows = cell2mat(data(:, 1));
+
+        if all(selectedRows) || all(~selectedRows)
+            return
         end
+        
+        selectedRows = [selectedRows(:)', false];
+        startIdx = 1;
+        while startIdx <= length(selectedRows)
+            if selectedRows(startIdx) == 1
+                blockStart = startIdx;
+                endIdx = startIdx + 1;
+                while endIdx <= length(selectedRows)
+                    if selectedRows(endIdx) == 0
+                        blockEnd = endIdx - 1;
+                        break
+                    else
+                        endIdx = endIdx + 1;
+                    end
+                end
+                if blockStart > 1
+                    temp = data(blockStart - 1, :);
+                    data((blockStart:blockEnd) - 1, :) = data(blockStart:blockEnd, :);
+                    data(blockEnd) = temp;
+                end
+            else
+                startIdx = startIdx + 1;
+            end
+        end
+
+        set(channelTable, 'Data', data);
     end
 
     function moveDown(~, ~)
         % Move the selected row down
         data = get(channelTable, 'Data');
-        selectedRow = find(cell2mat(data(:, 1)));
-        if ~isempty(selectedRow) && selectedRow < size(data, 1)
-            for i = flip(selectedRow)
+        selectedRows = find(cell2mat(data(:, 1)));
+        if ~isempty(selectedRows)
+            for i = flip(selectedRows)
                 temp = data(i, :);
                 data(i, :) = data(i + 1, :);
                 data(i + 1, :) = temp;
