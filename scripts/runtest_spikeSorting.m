@@ -12,7 +12,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening'
 % expId = 4;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
-skipExist = [0, 0, 0];
+skipExist = [1, 0, 0];
 
 expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
 

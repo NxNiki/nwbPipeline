@@ -4,14 +4,12 @@ clear
 % addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
 
-expIds = (4:7);
-% filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-filePath = '/u/project/ifried/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
-
+expIds = (4:8);
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/568_MovieParadigm';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 1;
+skipExist = 0;
 
 [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
 
