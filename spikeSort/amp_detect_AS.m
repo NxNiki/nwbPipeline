@@ -27,6 +27,7 @@ if exist('ellip','file')                  %Checks for the signal processing tool
     xf = filtfilt(b, a, x);
 
 else
+    warning('ellip:notFound', 'ellip not found, use fix_filter to filter signal.');
     xf = fix_filter(x);                   %Does a bandpass filtering between [300 3000] without the toolbox.
     xf_detect = xf;
 end

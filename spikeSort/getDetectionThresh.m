@@ -36,7 +36,7 @@ function [outputStruct, param, maxAmp] = getDetectionThresh(channelFiles)
         end
 
         noise_std_detect(i) = median(abs(xf_detect))/0.6745;
-        noise_std_sorted(i) = median(abs(xf));
+        noise_std_sorted(i) = median(abs(xf))/0.6745;
         thr(i) = stdmin * noise_std_detect(i);        %thr for detection is based on detect settings.
         thrmax(i) = min(maxAmp, stdmax * noise_std_sorted(i));     %thrmax for artifact removal is based on sorted settings.
 
