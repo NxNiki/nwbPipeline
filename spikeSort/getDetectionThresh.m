@@ -15,7 +15,7 @@ function [outputStruct, param] = getDetectionThresh(channelFiles)
         % assume same sampling interval across channels.
         param.sr = 1/samplingInterval;
 
-        [~, ~, noise_std_detect(i), noise_std_sorted(i), thr(i), thrmax(i)] = highPassSignal(x, param);
+        [~, ~, noise_std_detect(i), noise_std_sorted(i), thr(i), thrmax(i)] = highPassFilter(x, param);
     end
 
     outputStruct.thrmax = max(thrmax);
