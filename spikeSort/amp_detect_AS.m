@@ -7,7 +7,7 @@ function [spikes, index, inputStruct, xf_detect] = amp_detect_AS(x, param, input
 useSinglePrecision = true;
 
 %HIGH-PASS FILTER OF THE DATA
-[xf_detect, xf, noise_std_detect, noise_std_sorted, thr, thrmax] = highPassSignal(x, param);
+[xf_detect, xf, noise_std_detect, noise_std_sorted, thr, thrmax] = highPassFilter(x, param);
 
 if exist('inputStruct','var') && ~isempty(inputStruct)
     %the data has already been loaded and filtered in a previous step and
