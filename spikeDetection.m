@@ -74,7 +74,7 @@ for i = 1: size(cscFiles, 1)
             timestamps = tsSingle;
         end
 
-        ExpName{j} = repmat(experimentName(j), size(spikes, 1), 1);
+        ExpName{j} = repmat(experimentName(j), 1, length(index));
         spikeTimestamps{j} = timestamps(index);
 
     end
