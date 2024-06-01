@@ -1,8 +1,9 @@
 function MontageConfigUI()
     % Create a figure for the UI
-    f = figure('Position', [100, 100, 1000, 900], 'Name', 'Experiment Setup');
+    f = figure('Position', [100, 100, 1000, 900], 'Name', 'Montage Setup');
 
-    % Experiment Info Panel
+    % ------------------- Experiment Info Panel ------------------- %
+
     expInfoPanel = uipanel('Parent', f, 'Title', 'Experiment Info', ...
                            'Position', [0.05, 0.9, 0.9, 0.065], 'FontSize', 12);
 
@@ -20,7 +21,8 @@ function MontageConfigUI()
                                  'Units', 'normalized', 'Position', [0.36, 0.2, 0.1, 0.6], 'FontSize', 12, ...
                                  'Callback', @updateFileNames);
 
-    % Montage Panel
+    % ------------------- Montage Panel ------------------- %
+
     montagePanel = uipanel('Parent', f, 'Title', 'Micro Channels', ...
                            'Position', [0.05, 0.125, 0.55, 0.77], 'FontSize', 12);
 
@@ -31,7 +33,6 @@ function MontageConfigUI()
     % Default headstage labels
     defaultHeadstageLabels = {'GA', 'GB', 'GC', 'GD'};
 
-    % Create headstages and ports
     numHeadstages = 4;
     numPortsPerHeadstage = 4;
     headstageHandles = cell(numHeadstages, numPortsPerHeadstage + 1, 3); % Handles for micros, brain labels, custom label edit, and headstage label
@@ -82,7 +83,8 @@ function MontageConfigUI()
         end
     end
 
-    % misc Macro Channels Panel
+    % ------------------- Macro Channels Panel ------------------- %
+
     channelPanel = uipanel('Parent', f, 'Title', 'Macro Channels', ...
                            'Position', [0.61, 0.125, 0.34, 0.77], 'FontSize', 12);
 
@@ -95,6 +97,15 @@ function MontageConfigUI()
             'ColumnName', {'', 'Label', '# of Electrodes'}, 'ColumnEditable', [true, true, true], 'Data', createDefaultTableData(), ...
             'CellEditCallback', @updateChannelData);
 
+    % Add listeners for mouse clicks and key presses
+    set(channelTable, 'CellSelectionCallback', @cellSelectionCallback);
+    set(channelTable, 'KeyPressFcn', @keyPressCallback);
+    set(channelTable, 'KeyReleaseFcn', @keyReleaseCallback);
+    
+    % Initialize last selected row and Shift key state
+    setappdata(channelTable, 'lastSelectedRow', []);
+    setappdata(channelTable, 'isShiftPressed', false);
+
     % Add/Remove rows buttons
     uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Add Row', ...
               'Units', 'normalized', 'Position', [0.05, 0.01, 0.4, 0.04], 'Callback', @addRow, 'FontSize', 12);
@@ -105,7 +116,8 @@ function MontageConfigUI()
     uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
               'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @moveDown, 'FontSize', 12);
 
-    % Save Config Panel
+    % ------------------- Save Config Panel ------------------- %
+
     saveConfigPanel = uipanel('Parent', f, 'Title', 'Save Config', ...
                               'Position', [0.05, 0.04, 0.9, 0.08], 'FontSize', 12);
 
@@ -118,11 +130,14 @@ function MontageConfigUI()
                                'String', 'config_Patient-_exp-.cfg', ...
                                'Units', 'normalized', 'Position', [0.4, 0.12, 0.4, 0.6], 'FontSize', 12);
 
-    % Load and Confirm buttons
+    % ------------------- Load and Confirm buttons ------------------- %
+
     uicontrol('Parent', saveConfigPanel, 'Style', 'pushbutton', 'String', 'Load', ...
               'Units', 'normalized', 'Position', [0.82, 0.1, 0.08, 0.8], 'Callback', @loadConfigFile, 'FontSize', 12);
     uicontrol('Parent', saveConfigPanel, 'Style', 'pushbutton', 'String', 'Confirm', ...
               'Units', 'normalized', 'Position', [0.91, 0.1, 0.08, 0.8], 'Callback', @saveConfig, 'FontSize', 12);
+
+    % ------------------- callback functions ------------------- %
 
     function data = createDefaultTableData()
         % Create default table data with brain labels and misc macros
@@ -369,56 +384,43 @@ function MontageConfigUI()
                 case 'No'
                     return
             end
-        end  
+        else
+            data(rowsToDelete, :) = [];
+            set(channelTable, 'Data', data);
+        end
     end
 
     function moveUp(~, ~)
         % Move the selected row up
         data = get(channelTable, 'Data');
-        selectedRows = cell2mat(data(:, 1));
-
-        if all(selectedRows) || all(~selectedRows)
-            return
-        end
-        
-        selectedRows = [selectedRows(:)', false];
-        startIdx = 1;
-        while startIdx <= length(selectedRows)
-            if selectedRows(startIdx) == 1
-                blockStart = startIdx;
-                endIdx = startIdx + 1;
-                while endIdx <= length(selectedRows)
-                    if selectedRows(endIdx) == 0
-                        blockEnd = endIdx - 1;
-                        break
-                    else
-                        endIdx = endIdx + 1;
-                    end
-                end
-                if blockStart > 1
-                    temp = data(blockStart - 1, :);
-                    data((blockStart:blockEnd) - 1, :) = data(blockStart:blockEnd, :);
-                    data(blockEnd) = temp;
-                end
-            else
-                startIdx = startIdx + 1;
-            end
-        end
-
+        data = moveUpRows(data);
         set(channelTable, 'Data', data);
     end
 
     function moveDown(~, ~)
         % Move the selected row down
         data = get(channelTable, 'Data');
-        selectedRows = find(cell2mat(data(:, 1)));
-        if ~isempty(selectedRows)
-            for i = flip(selectedRows)
-                temp = data(i, :);
-                data(i, :) = data(i + 1, :);
-                data(i + 1, :) = temp;
+        data = moveUpRows(data(end:-1:1, :));
+        set(channelTable, 'Data', data(end:-1:1,:));
+    end
+
+    function data = moveUpRows(data)
+        selectedRows = cell2mat(data(:, 1));
+        
+        if all(selectedRows) || all(~selectedRows)
+            return
+        end
+        
+        selectedRowsDiff = diff([0, selectedRows(:)', 0]);
+        startIdx = find(selectedRowsDiff == 1);
+        endIdx = find(selectedRowsDiff == -1) - 1;
+        for i = 1:length(startIdx)
+            if startIdx(i) == 1
+                continue
             end
-            set(channelTable, 'Data', data);
+            temp = data(startIdx(i) - 1, :);
+            data((startIdx(i): endIdx(i)) - 1, :) = data(startIdx(i): endIdx(i), :);
+            data(endIdx(i), :) = temp;
         end
     end
 
@@ -433,6 +435,50 @@ function MontageConfigUI()
         set(channelTable, 'Data', data);
     end
 
+    function keyPressCallback(~, event)
+        % Check if Shift key is pressed
+        if strcmp(event.Key, 'shift')
+            setappdata(f, 'isShiftPressed', true);
+        end
+    end
+
+    function keyReleaseCallback(~, event)
+        % Check if Shift key is released
+        if strcmp(event.Key, 'shift')
+            setappdata(f, 'isShiftPressed', false);
+        end
+    end
+
+    function cellSelectionCallback(~, event)
+        % Handle cell selection with Shift key functionality
+        isShiftPressed = getappdata(f, 'isShiftPressed');
+        lastSelectedRow = getappdata(f, 'lastSelectedRow');
+        selectedRows = event.Indices(:, 1);
+        data = get(channelTable, 'Data');
+        
+        if isShiftPressed && ~isempty(lastSelectedRow)
+            % Determine the range of rows to select
+            minRow = min([lastSelectedRow; selectedRows]);
+            maxRow = max([lastSelectedRow; selectedRows]);
+            
+            % Update the selection state for the range of rows
+            for i = minRow:maxRow
+                data{i, 1} = true;
+            end
+        else
+            % Update the selection state for the newly selected row
+            for i = 1:size(data, 1)
+                if ismember(i, selectedRows)
+                    data{i, 1} = true;
+                end
+            end
+        end
+        
+        % Update the data and last selected row
+        set(channelTable, 'Data', data);
+        setappdata(f, 'lastSelectedRow', selectedRows(end));
+    end
+
     function updateChannelData(hObject, eventdata)
         % Update the UserData property to track the selected row
         row = eventdata.Indices(1);
@@ -441,5 +487,4 @@ function MontageConfigUI()
         data{row, col} = eventdata.NewData;
         set(channelTable, 'Data', data);
     end
-
 end
