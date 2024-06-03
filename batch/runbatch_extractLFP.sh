@@ -33,15 +33,19 @@ echo "Start Matlab"
 echo "run extractLFP, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 cd /u/home/x/xinniu/nwbPipeline/batch
 
-# make a copy of batch script so that we can submit jobs for other patients
-# when previous jobs are still running:
-if [ ! -f "temp_runbatch_extractLFP_$JOB_ID.m" ]; then
-    echo "create job script: temp_runbatch_extractLFP_$JOB_ID.m"
-    cp runbatch_extractLFP.m temp_runbatch_extractLFP_$JOB_ID.m
+# make a copy of batch script:
+if [ ! -f "runbatch_extractLFP_$JOB_ID.m" ]; then
+    echo "backup job script: runbatch_extractLFP_$JOB_ID.m"
+    cp runbatch_extractLFP.m runbatch_extractLFP_$JOB_ID.m
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    temp_runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks);
+    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    workingDir = getDirectory();
+    expIds = (8: 14);
+    filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
+    skipExist = 0;
+    temp_runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
     exit
 EOF
 
