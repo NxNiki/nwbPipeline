@@ -1,4 +1,4 @@
-function generatePegasusConfigFile(patientNum,macroList,macrosWithNon7,...
+function generatePegasusConfigFile(patientNum,macroList,macroNumChannels,...
     microList,microsToDuplicateList,miscMacros,savePath)
 
 % SYNTAX: generatePegasusConfigFile(patientNum,macroList,macrosWithNon7,...
@@ -31,22 +31,15 @@ for i=1:length(microList)
     addMicrosToConfig(fid,i,microList{i},allPossibleMicros{i},ismember(microList{i},microsToDuplicateList));
 end
 
-macrosWithNon7 = reshape(macrosWithNon7,2,[])';
-assert(all(cellfun(@(x)isnumeric(x),macrosWithNon7(:,2))),...
-    'Macros with Non 7 should be of the form {MacroName,NumberOfChannels,MacroName2,NumberOfChannels,...}');
-
-nChannels = 7*ones(size(macroList));
-non7 = ismember(macroList,macrosWithNon7(:,1));
-nChannels(non7) = [macrosWithNon7{:,2}];
 % startsAt = [0 cumsum(nChannels(1:end-1))]+96; % removed the +96 because
 % we are moving macros to sources 1-4:
-startsAt = [0 cumsum(nChannels(1:end-1))];
+startsAt = [0 cumsum(macroNumChannels(1:end-1))];
 for i=1:length(macroList)
-    addMacrosToConfig(fid,startsAt(i),macroList{i},nChannels(i));
-    addMacrosToConfig(fid2,startsAt(i),macroList{i},nChannels(i));
+    addMacrosToConfig(fid,startsAt(i),macroList{i},macroNumChannels(i));
+    addMacrosToConfig(fid2,startsAt(i),macroList{i},macroNumChannels(i));
 end
 
-miscStart = startsAt(end)+nChannels(end);
+miscStart = startsAt(end)+macroNumChannels(end);
 for i=1:length(miscMacros)
     addMiscToConfig(fid,miscStart+i-1,miscMacros{i});
 end
@@ -76,11 +69,11 @@ for i=1:length(microList)
 end
 
 % Macro Window
-setUpTimeWindow(fid,'Macro Window')
-setUpTimeWindow(fid2, 'Macro Window')
+setUpTimeWindow(fid, 'Macro Window')
+setUpTimeWindow(fid2,'Macro Window')
 for i=1:length(macroList)
-    addCSCtoPlotWindow(fid,macroList{i},nChannels(i));
-        addCSCtoPlotWindow(fid2,macroList{i},nChannels(i));
+    addCSCtoPlotWindow(fid,macroList{i},macroNumChannels(i));
+    addCSCtoPlotWindow(fid2,macroList{i},macroNumChannels(i));
 end
 
 % Sleep Montage
