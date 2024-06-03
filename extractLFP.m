@@ -41,7 +41,6 @@ for i = 1: numFiles
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
-    timestamps = timestamps - timestamps(1);
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
