@@ -45,7 +45,7 @@ matlab  -nosplash -nodisplay -singleCompThread <<EOF
     expIds = (8: 14);
     filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
     skipExist = 0;
-    temp_runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
+    runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
     exit
 EOF
 
