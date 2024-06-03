@@ -1,8 +1,9 @@
 function MontageConfigUI()
+
     % Create a figure for the UI
     f = figure('Position', [100, 100, 1000, 900], 'Name', 'Montage Setup');
 
-    % ------------------- Experiment Info Panel ------------------- %
+    % ----------------------- Experiment Info Panel --------------------- %
 
     expInfoPanel = uipanel('Parent', f, 'Title', 'Experiment Info', ...
                            'Position', [0.05, 0.9, 0.9, 0.065], 'FontSize', 12);
@@ -21,7 +22,7 @@ function MontageConfigUI()
                                  'Units', 'normalized', 'Position', [0.36, 0.2, 0.1, 0.6], 'FontSize', 12, ...
                                  'Callback', @updateFileNames);
 
-    % ------------------- Montage Panel ------------------- %
+    % ----------------------- Montage Panel ----------------------------- %
 
     montagePanel = uipanel('Parent', f, 'Title', 'Micro Channels', ...
                            'Position', [0.05, 0.125, 0.55, 0.77], 'FontSize', 12);
@@ -83,7 +84,7 @@ function MontageConfigUI()
         end
     end
 
-    % ------------------- Macro Channels Panel ------------------- %
+    % ------------------------ Macro Channels Panel --------------------- %
 
     channelPanel = uipanel('Parent', f, 'Title', 'Macro Channels', ...
                            'Position', [0.61, 0.125, 0.34, 0.77], 'FontSize', 12);
@@ -92,13 +93,13 @@ function MontageConfigUI()
     selectAllCheckbox = uicontrol('Parent', channelPanel, 'Style', 'checkbox', 'String', 'Select All', ...
                                   'Units', 'normalized', 'Position', [0.05, 0.95, 0.4, 0.04], 'Callback', @selectAllRows, 'FontSize', 12);
 
-    % Create the table for additional channels
+    % Create the table for macro channels
     channelTable = uitable('Parent', channelPanel, 'Units', 'normalized', 'Position', [0.05, 0.12, 0.9, 0.83], ...
-            'ColumnName', {'', 'Label', '# of Electrodes'}, 'ColumnEditable', [true, true, true], 'Data', createDefaultTableData(), ...
-            'CellEditCallback', @updateChannelData);
+            'ColumnName', {'', 'Label', '# of Electrodes'}, 'ColumnEditable', [true, true, true], ...
+            'ColumnFormat', {'logical', 'char', 'numeric'}, 'Data', createDefaultTableData(), ...
+            'CellSelectionCallback', @cellSelectionCallback);
 
     % Add listeners for mouse clicks and key presses
-    set(channelTable, 'CellSelectionCallback', @cellSelectionCallback);
     set(channelTable, 'KeyPressFcn', @keyPressCallback);
     set(channelTable, 'KeyReleaseFcn', @keyReleaseCallback);
     
@@ -116,7 +117,7 @@ function MontageConfigUI()
     uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
               'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @moveDown, 'FontSize', 12);
 
-    % ------------------- Save Config Panel ------------------- %
+    % ------------------------- Save Config Panel ----------------------- %
 
     saveConfigPanel = uipanel('Parent', f, 'Title', 'Save Config', ...
                               'Position', [0.05, 0.04, 0.9, 0.08], 'FontSize', 12);
@@ -130,14 +131,14 @@ function MontageConfigUI()
                                'String', 'config_Patient-_exp-.cfg', ...
                                'Units', 'normalized', 'Position', [0.4, 0.12, 0.4, 0.6], 'FontSize', 12);
 
-    % ------------------- Load and Confirm buttons ------------------- %
+    % --------------------- Load and Confirm buttons -------------------- %
 
     uicontrol('Parent', saveConfigPanel, 'Style', 'pushbutton', 'String', 'Load', ...
               'Units', 'normalized', 'Position', [0.82, 0.1, 0.08, 0.8], 'Callback', @loadConfigFile, 'FontSize', 12);
     uicontrol('Parent', saveConfigPanel, 'Style', 'pushbutton', 'String', 'Confirm', ...
               'Units', 'normalized', 'Position', [0.91, 0.1, 0.08, 0.8], 'Callback', @saveConfig, 'FontSize', 12);
 
-    % ------------------- callback functions ------------------- %
+    % ---------------------- callback functions ------------------------- %
 
     function data = createDefaultTableData()
         % Create default table data with brain labels and misc macros
@@ -251,11 +252,11 @@ function MontageConfigUI()
         end
 
         % Load additional channels
-        channelData = cell(length(config.AdditionalChannels), 3);
-        for i = 1:length(config.AdditionalChannels)
+        channelData = cell(length(config.macroChannels), 3);
+        for i = 1:length(config.macroChannels)
             channelData{i, 1} = false;
-            channelData{i, 2} = config.AdditionalChannels{i}.Label;
-            channelData{i, 3} = config.AdditionalChannels{i}.NumberOfElectrodes;
+            channelData{i, 2} = config.macroChannels{i}.Label;
+            channelData{i, 3} = config.macroChannels{i}.NumberOfElectrodes;
         end
         set(channelTable, 'Data', channelData);
     end
@@ -297,11 +298,19 @@ function MontageConfigUI()
             end
         end
 
-        config.AdditionalChannels = {};
+        config.macroChannels = {};
+        config.miscMacros = {};
+        config.macroNumChannels = [];
         channelData = get(channelTable, 'Data');
         for i = 1:size(channelData, 1)
             if ~isempty(channelData{i, 2}) && ~isempty(channelData{i, 3})
-                config.AdditionalChannels{end+1} = struct('Label', channelData{i, 2}, 'NumberOfElectrodes', str2double(channelData{i, 3}));
+                numChannels = channelData{i, 3};
+                if numChannels > 1
+                    config.macroChannels{end+1} = channelData{i, 2};
+                    config.macroNumChannels(end+1) = numChannels;
+                else
+                    config.miscMacros{end+1} = channelData{i, 2};
+                end
             end
         end
 
@@ -320,11 +329,11 @@ function MontageConfigUI()
         configFileNameStr = get(configFileName, 'String');
         microsToDuplicateList = [];
         generatePegasusConfigFile(str2double(patientID), ...
-            {}, ...
-            {}, ...
+            config.macroChannels, ...
+            config.macroNumChannels, ...
             microChannels, ...
             microsToDuplicateList, ...
-            channelData(:, 2), ...
+            config.miscMacros, ...
             configFileNameStr)
 
          showMessageBox(['Configuration saved to: ', newline, ...
@@ -435,56 +444,61 @@ function MontageConfigUI()
         set(channelTable, 'Data', data);
     end
 
-    function keyPressCallback(~, event)
+    function keyPressCallback(hObject, eventdata)
         % Check if Shift key is pressed
-        if strcmp(event.Key, 'shift')
-            setappdata(f, 'isShiftPressed', true);
+        if strcmp(eventdata.Key, 'shift')
+            setappdata(hObject, 'isShiftPressed', true);
         end
     end
 
-    function keyReleaseCallback(~, event)
+    function keyReleaseCallback(hObject, eventdata)
         % Check if Shift key is released
-        if strcmp(event.Key, 'shift')
-            setappdata(f, 'isShiftPressed', false);
+        if strcmp(eventdata.Key, 'shift')
+            setappdata(hObject, 'isShiftPressed', false);
         end
     end
 
-    function cellSelectionCallback(~, event)
+    function cellSelectionCallback(hObject, eventdata)
+        if isempty(eventdata.Indices)
+            return;
+        end
+
+        if size(eventdata.Indices) > 1
+            selectedRows = eventdata.Indices(:, 1);
+            selectedCols = eventdata.Indices(:, 2);
+        else
+            selectedRows = eventdata.Indices(1);
+            selectedCols = eventdata.Indices(2);
+        end
+
+        if isempty(selectedRows) || any(selectedCols ~= 1)
+            return;
+        end
         % Handle cell selection with Shift key functionality
-        isShiftPressed = getappdata(f, 'isShiftPressed');
-        lastSelectedRow = getappdata(f, 'lastSelectedRow');
-        selectedRows = event.Indices(:, 1);
-        data = get(channelTable, 'Data');
+        isShiftPressed = getappdata(hObject, 'isShiftPressed');
+        lastSelectedRow = getappdata(hObject, 'lastSelectedRow');
         
-        if isShiftPressed && ~isempty(lastSelectedRow)
+        data = get(hObject, 'Data');
+        newValue = ~data{selectedRows(end), 1};
+        
+        if isShiftPressed
             % Determine the range of rows to select
-            minRow = min([lastSelectedRow; selectedRows]);
-            maxRow = max([lastSelectedRow; selectedRows]);
+            if isempty(lastSelectedRow)
+                minRow = 1;
+            else
+                minRow = min([selectedRows(:)', lastSelectedRow]);
+            end
+            maxRow = max([selectedRows(:)', lastSelectedRow]);
             
             % Update the selection state for the range of rows
-            for i = minRow:maxRow
-                data{i, 1} = true;
-            end
+            data(minRow:maxRow, 1) = {newValue};
         else
             % Update the selection state for the newly selected row
-            for i = 1:size(data, 1)
-                if ismember(i, selectedRows)
-                    data{i, 1} = true;
-                end
-            end
+            data(selectedRows, 1) = {newValue};
         end
         
         % Update the data and last selected row
-        set(channelTable, 'Data', data);
-        setappdata(f, 'lastSelectedRow', selectedRows(end));
-    end
-
-    function updateChannelData(hObject, eventdata)
-        % Update the UserData property to track the selected row
-        row = eventdata.Indices(1);
-        col = eventdata.Indices(2);
-        data = get(channelTable, 'Data');
-        data{row, col} = eventdata.NewData;
-        set(channelTable, 'Data', data);
+        set(hObject, 'Data', data);
+        setappdata(hObject, 'lastSelectedRow', selectedRows(end));
     end
 end
