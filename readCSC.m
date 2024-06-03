@@ -1,7 +1,7 @@
 function [signal, samplingInterval] = readCSC(filename)
 % samplingInterval will be converted to double type in seconds.
 
-matObj = matfile(filename);
+matObj = matfile(filename, 'Writable', false);
 signal = matObj.data;
 signal = signal(:)';
 
