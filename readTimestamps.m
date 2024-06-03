@@ -1,6 +1,6 @@
 function [timestamps, duration] = readTimestamps(filename)
 
-tsFileObj = matfile(filename);
+tsFileObj = matfile(filename, 'Writable', false);
 ts = tsFileObj.timeStamps;
 timestamps = ts(:)';
 

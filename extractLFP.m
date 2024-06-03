@@ -44,7 +44,7 @@ for i = 1: numFiles
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
-        spikeFileObj = matfile(spikeDetectFiles{i});
+        spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
         spikes = spikeFileObj.spikes;
         spikeTimestamps = spikeFileObj.spikeTimestamps;
 
