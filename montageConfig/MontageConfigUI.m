@@ -30,7 +30,52 @@ function MontageConfigUI()
                            'Position', [0.05, 0.125, 0.55, 0.77], 'FontSize', 12);
 
     % Brain labels
-    brainLabels = {'RA', 'LA', 'RAI', 'LAI', 'ROF', 'LOF', 'RAC', 'LAC', 'RPHG', 'LPHG', 'RAH', 'LAH', 'RLSA', 'RLSS', 'RLSP'};
+    brainLabels = {
+        'LA';           % amygdala/anterior STG
+        'LAC';          % anterior cingulate/anterior middle FG
+        'LACd';
+        'LACv';
+        'LAF';
+        'LAH';
+        'LAIS';
+        'LEC';
+        'LMC';
+        'LMH';          % middle hippocampus/middle MTG
+        'LOF';          % orbitofrontal/anterior inferior FG
+        'LPC';
+        'LPCa';
+        'LPH';          % posterior hippocampus/posterior MTG
+        'LPHG';
+        'LPT';
+        'LPar';
+        'LpSMA';
+        'LSMA';
+        'LST';
+        'LSTG';         % middle STG/middle STG
+        'LTO';
+        'RA';
+        'RAC';
+        'RACd';
+        'RACv';
+        'RAF';
+        'RAH';
+        'RAIS';
+        'REC';
+        'RMC';
+        'RMH';
+        'ROF';
+        'RPC';
+        'RPCa';
+        'RPH';
+        'RPHG';
+        'RPT';
+        'RPar';
+        'RpSMA';
+        'RSMA';
+        'RST';
+        'RSTG';
+        'RTO'};
+
     customBrainLabel = 'Custom';
 
     % Default headstage labels
@@ -71,7 +116,7 @@ function MontageConfigUI()
                                    'Units', 'normalized', 'Position', [0.78, 0.73 - 0.2 * (portIdx - 1), 0.1, 0.07], 'FontSize', 12, ...
                                    'Callback', @validateNumChannels);
             % Brain label
-            brainLabelPopup = uicontrol('Parent', headstagePanel, 'Style', 'popupmenu', 'String', [brainLabels, {customBrainLabel}], ...
+            brainLabelPopup = uicontrol('Parent', headstagePanel, 'Style', 'popupmenu', 'String', [brainLabels(:); {customBrainLabel}], ...
                                         'Units', 'normalized', 'Position', [0.22, 0.70 - 0.2 * (portIdx - 1), 0.35, 0.1], 'FontSize', 12, ...
                                         'Callback', @(src, event)customBrainLabelCallback(src, headstageIdx, portIdx));
 
@@ -293,9 +338,11 @@ function MontageConfigUI()
             for portIdx = 1:numPortsPerHeadstage
                 if strcmp(get(headstageHandles{headstageIdx, portIdx, 1}, 'Enable'), 'on')
                     micros = get(headstageHandles{headstageIdx, portIdx, 1}, 'String');
-                    brainLabel = brainLabels{get(headstageHandles{headstageIdx, portIdx, 2}, 'Value')};
-                    if get(headstageHandles{headstageIdx, portIdx, 2}, 'Value') == length(brainLabels) + 1
+                    brainLabelIdx = get(headstageHandles{headstageIdx, portIdx, 2}, 'Value');
+                    if brainLabelIdx == length(brainLabels) + 1
                         brainLabel = get(headstageHandles{headstageIdx, portIdx, 3}, 'String');
+                    else
+                        brainLabel = brainLabels{brainLabelIdx};
                     end
                     config.Headstages.(sanitizedHeadstageLabel).(['Port' num2str(portIdx)]) = struct( ...
                         'Micros', str2double(micros), ...
