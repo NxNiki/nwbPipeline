@@ -297,8 +297,10 @@ end
 if ismember(miscName,{'MICROPHONE','GlobalMicroRef'})    
     fprintf(fid,'-SetInputRange "%s" 5000\n',miscName);
     fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
+elseif ismember(miscName,{'Analogue1','Analogue2'})  
+    fprintf(fid,'-SetInputRange "%s" 1500\n',miscName);
+    fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
 else
-    
     fprintf(fid,'-SetInputRange "%s" 3000\n',miscName);
     fprintf(fid,'-SetSubSamplingInterleave "%s" 16\n',miscName);
 end
@@ -306,7 +308,7 @@ fprintf(fid,'-SetDspLowCutFilterEnabled "%s" True\n',miscName);
 fprintf(fid,'-SetDspLowCutFrequency "%s" 0.1\n',miscName);
 fprintf(fid,'-SetDspLowCutNumberTaps "%s" 0\n',miscName);
 fprintf(fid,'-SetDspHighCutFilterEnabled "%s" True\n',miscName);
-if ismember(miscName,{'MICROPHONE','GlobalMicroRef'})
+if ismember(miscName,{'MICROPHONE','GlobalMicroRef','Analogue1','Analogue2'})
     fprintf(fid,'-SetDspHighCutFrequency "%s" 8000\n',miscName);
 else
     fprintf(fid,'-SetDspHighCutFrequency "%s" 500\n',miscName);
