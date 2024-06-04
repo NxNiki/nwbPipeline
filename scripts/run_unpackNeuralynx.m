@@ -5,7 +5,8 @@
 % define filePath, experiment id and outFilePath here or comment it will trigger a UI to
 % select paths and experiment id:
 clear
-addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
+scriptDir = fileparts(mfilename('fullpath'));
+addpath(genpath(fileparts(scriptDir)));
 
 % expIds = (3: 11);
 % filePath = {...
@@ -22,6 +23,7 @@ addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 % 
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
 
+% for testing:
 % expIds = (4:5);
 % filePath = {...
 %     '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57', ...
@@ -30,8 +32,6 @@ addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 % 
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
-% 0: will remove all previous unpack files.
-% 1: skip existing files.
 skipExist = 1;
 
 if ~exist("filePath", "var") || isempty(filePath)
