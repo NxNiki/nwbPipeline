@@ -231,7 +231,7 @@ function MontageConfigUI()
             portFields = fieldnames(ports);
 
             if isempty(portFields)
-                set(headstageHandles{i, numPortsPerHeadstage + 1, 1}, 'Value', 0);
+                set(headstageHandles{i, numPortsPerHeadstage + 1, 2}, 'Value', 0);
                 toggleHeadstageFields(i, headstageHandles{i, numPortsPerHeadstage + 1, 2})
                 continue
             end
@@ -254,11 +254,19 @@ function MontageConfigUI()
         % Load additional channels
         channelData = cell(length(config.macroChannels), 3);
         for i = 1:length(config.macroChannels)
-            channelData{i, 1} = false;
-            channelData{i, 2} = config.macroChannels{i}.Label;
-            channelData{i, 3} = config.macroChannels{i}.NumberOfElectrodes;
+            channelData{i, 1} = true;
+            channelData{i, 2} = config.macroChannels{i};
+            channelData{i, 3} = config.macroNumChannels(i);
         end
-        set(channelTable, 'Data', channelData);
+
+        miscMacroData = cell(length(config.miscMacros), 3);
+        for i = 1:length(config.miscMacros)
+            miscMacroData{i, 1} = true;
+            miscMacroData{i, 2} = config.miscMacros{i};
+            miscMacroData{i, 3} = 1;
+        end
+
+        set(channelTable, 'Data', [channelData; miscMacroData]);
     end
 
     function saveConfig(~, ~)
