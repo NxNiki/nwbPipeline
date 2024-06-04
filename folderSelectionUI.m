@@ -1,5 +1,8 @@
 function [selectedFolders, experimentIds, outputFilePath] = folderSelectionUI()
-% Initialize variables for folders, IDs, and paths
+% set variables (folders, IDs, and paths) to unpack raw .ncs file to .mat.
+% see run_unpackNeuralynx.m
+
+
 selectedFolders = {};
 experimentIds = [];
 outputFilePath = '';
