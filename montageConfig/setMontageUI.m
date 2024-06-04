@@ -1,4 +1,5 @@
 function setMontageUI()
+% rename the .ncs files according to 
 
     numMontageAdded = 0;
     % Create the main UI figure
