@@ -76,7 +76,6 @@ for i = 1: size(cscFiles, 1)
 
         ExpName{j} = repmat(experimentName(j), 1, length(index));
         spikeTimestamps{j} = timestamps(index);
-
     end
 
     fprintf('write spikes to file:\n %s\n', tempSpikeFilename);
