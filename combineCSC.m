@@ -1,4 +1,4 @@
-function [signal ,timestamps, samplingIntervalSeconds] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
+function [signal ,timestamps, samplingIntervalSeconds, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
 %combineCSC Combine CSC signals. filling gaps with NaNs if gap between
 %segments larger than threshold.
 
@@ -67,9 +67,15 @@ signal = [signalCombined{:}];
 timestampsCombined = [timestampsCombined(:), timestampsGap(:)]';
 timestamps = [timestampsCombined{:}];
 
+timestampsStart = timestamps(1);
+timestamps = timestamps - timestamps(1);
+
 if useSinglePrecision
     % large number lose precision so we save relative timestamps if use
     % single precision.
-    timestamps = single(timestamps - timestamps(1));
+    timestampsSingle = single(timestamps - timestamps(1));
+    if ~any(diff(timestampsSingle)==0)
+        timestamps = timestampsSingle;
+    end
     signal = single(signal);
 end
