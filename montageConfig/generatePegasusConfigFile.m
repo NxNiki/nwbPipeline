@@ -21,7 +21,6 @@ end
 
 allPossibleMicros = {'GA1','GA2','GA3','GA4','GB1','GB2','GB3','GB4','GC1','GC2','GC3','GC4'};
 
-
 fid = fopen(savePath,'w');
 fid2 = fopen(strrep(savePath,'.cfg','_MacrosOnly.cfg'),'w');
 makeBaseOfConfigFile(fid,patientNum);
