@@ -255,11 +255,7 @@ function MontageConfigUI()
         else
             filename = fullfile(path, file);
             disp(['User selected ', filename]);
-            fid = fopen(filename);
-            raw = fread(fid, inf);
-            str = char(raw');
-            fclose(fid);
-            config = jsondecode(str);
+            config = readJson(filename);
             populateUI(config);
         end
     end
@@ -298,7 +294,7 @@ function MontageConfigUI()
             end
         end
 
-        % Load additional channels
+        % Load macro channels
         channelData = cell(length(config.macroChannels), 3);
         for i = 1:length(config.macroChannels)
             channelData{i, 1} = true;
@@ -372,16 +368,8 @@ function MontageConfigUI()
         end
 
         % Save the montage information to a JSON file
-        jsonText = jsonencode(config, 'PrettyPrint', true);
-        fid = fopen(montageFileNameStr, 'w');
-        if fid == -1
-            errordlg('Error saving the file', 'File Error');
-        else
-            fwrite(fid, jsonText, 'char');
-            fclose(fid);
-            disp(['Configuration saved to ', montageFileNameStr]);
-        end
-
+        writeJson(config, montageFileNameStr)
+        
         % Save the configuration to .cfg file for neuralynx:
         configFileNameStr = get(configFileName, 'String');
         microsToDuplicateList = [];

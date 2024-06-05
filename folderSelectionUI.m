@@ -169,15 +169,7 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
                     jsonFilename = ensureJsonExtension(jsonFilename);
                 end
 
-                jsonText = jsonencode(data, 'PrettyPrint', true);
-                % Write the JSON file
-                fid = fopen(jsonFilename, 'w');
-                if fid ~= -1
-                    fwrite(fid, jsonText, 'char');
-                    fclose(fid);
-                else
-                    errordlg('Failed to write to JSON file.', 'File Error');
-                end
+                writeJson(data, jsonFilename)
             end
 
             delete(f);  % Close the window
@@ -201,10 +193,7 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
         end
 
         fullPath = fullfile(path, file);
-        fid = fopen(fullPath, 'r');
-        raw = fread(fid, inf, '*char')';
-        fclose(fid);
-        data = jsondecode(raw);
+        data = readJson(fullPath);
 
         % Set GUI components with loaded values
         if isfield(data, 'BaseDirectory') && ischar(data.BaseDirectory)
