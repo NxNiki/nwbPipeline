@@ -38,9 +38,12 @@ if ~exist("filePath", "var") || isempty(filePath)
     [filePath, expIds, outFilePath] = folderSelectionUI();
 end
 
-%% list csc and event files.
+%% read montage setting to rename output file names
+% this is used on IOWA data on which .ncs files are named differently.
 
-% csc files are grouped for each channel.
+montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1728_exp-43.json';
+[renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile);
+
 
 for i = 1:length(expIds)
 
@@ -50,6 +53,9 @@ for i = 1:length(expIds)
     if ~exist(expOutFilePath, "dir")
         mkdir(expOutFilePath);
     end
+
+    %% list csc and event files.
+    % csc files are grouped for each channel.
 
     groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     suffixRegPattern = '(?<=\_)\d*';
@@ -66,8 +72,9 @@ for i = 1:length(expIds)
     %% unpack macro files:
 
     macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
-    macroPattern = '^[RL].*[0-9]';
-    [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern);
+    % macroPattern = '^[RL].*[0-9]';
+    macroPattern = '^LFPx*.ncs';
+    [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern, renameMacroChannels);
 
     tic
     unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
@@ -77,8 +84,9 @@ for i = 1:length(expIds)
     %% unpack micro files:
 
     microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
-    microPattern = '^G[A-D].*[0-9]';
-    [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern);
+    % microPattern = '^G[A-D].*[0-9]';
+    microPattern = '^PDes*.ncs';
+    [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern, renameMicroChannels);
 
     tic
     unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
