@@ -1,4 +1,4 @@
-function runbatch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
+function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     % extract LFP after spike detection and clustering (spike sorting).
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
