@@ -1,4 +1,4 @@
-function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath, pattern)
+function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath, pattern, renameChannels)
 %createIOFiles create input/output file names to unpack.
 %   A single recording may have multiple segments with different files. The
 %   issue is the suffix of files for a single channel may not be correctly
@@ -10,17 +10,32 @@ if ~exist(channelOutFilePath, "dir")
     mkdir(channelOutFilePath);
 end
 
+if nargin < 4
+    renameChannels = [];
+end
+
 channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
 channelFileNames = channelFileNames(2:end,:);
 
 % select macro/micro files and rename output file names so that alphabetic order 
-% is consistent with temporal order. The macro files always start with 'R' 
-% or 'L' in the file name. The micro files always start with 'G[A-D]'.
+% is consistent with temporal order. 
+% For UCLA data, the macro files always start with 'R' or 'L' in the file 
+% name. The micro files always start with 'G[A-D]'.
+% For Iowa data, macro files have pattern: LFPx*.ncs
+% micro files have pattern: PDes*.ncs
 idx = cellfun(@(x)~isempty(regexp(x, pattern, 'match', 'once')), channelFileNames(:, 1));
 inFileNames = channelFileNames(idx, :);
 
 inFiles = inFileNames(:, 2:end);
-channels = inFileNames(:, 1);
+
+if ~isempty(renameChannels)
+    if length(renameChannels) ~= size(inFileNames, 1)
+        error('renamed channels does not have equal length to original channels')
+    end
+    channels = renameChannels;
+else
+    channels = inFileNames(:, 1);
+end
 numFilesEachChannel = size(inFiles, 2);
 
 suffix = arrayfun(@(y) sprintf('%03d.mat', y), 1:numFilesEachChannel, 'UniformOutput', false);
