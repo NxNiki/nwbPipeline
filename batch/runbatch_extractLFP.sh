@@ -4,7 +4,8 @@
 # error = Merged with joblog
 #$ -o /u/home/x/xinniu/cluster-output-extractLFP/job-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
-## Edit the line below as needed:
+## Edit the line below as needed. The data limit applies for each task individually,
+## so no need to change it if you submit more array tasks.
 #$ -l h_rt=10:00:00,h_data=100G
 ## Modify the parallel environment
 ## and the number of cores as needed:
@@ -34,9 +35,9 @@ echo "run extractLFP, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 cd /u/home/x/xinniu/nwbPipeline/batch
 
 # make a copy of batch script:
-if [ ! -f "runbatch_extractLFP_$JOB_ID.m" ]; then
-    echo "backup job script: runbatch_extractLFP_$JOB_ID.m"
-    cp runbatch_extractLFP.m runbatch_extractLFP_$JOB_ID.m
+if [ ! -f "runbatch_extractLFP_$JOB_ID.sh" ]; then
+    echo "backup job script: runbatch_extractLFP_$JOB_ID.sh"
+    cp runbatch_extractLFP.sh runbatch_extractLFP_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
@@ -45,7 +46,8 @@ matlab  -nosplash -nodisplay -singleCompThread <<EOF
     expIds = (8: 14);
     filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
     skipExist = 0;
-    runbatch_extractLFP_$JOB_ID($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
+    batch_extractLFP($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
+    system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;'])
     exit
 EOF
 
