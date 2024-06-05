@@ -4,8 +4,8 @@
 # error = Merged with joblog
 #$ -o /u/home/x/xinniu/cluster-log-spikeSort/job572-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
 #$ -j y
-## Edit the line below as needed. The data limit applies for each job individually,
-## so no need to change it if you submit more array jobs.
+## Edit the line below as needed. The data limit applies for each task individually,
+## so no need to change it if you submit more array tasks.
 #$ -l h_rt=24:00:00,h_data=100G
 ## Modify the parallel environment
 ## and the number of cores as needed:
@@ -43,10 +43,11 @@ fi
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
     workingDir = getDirectory();
-    expIds = (4: 7);
-    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
-    skipExist = [1, 1, 0];
-    runbatch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
+    expIds = (3: 11);
+    filePath = fullfile(workingDir, 'MovieParadigm/573_MovieParadigm');
+    skipExist = [0, 0, 0];
+    batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
+    system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;'])
     exit
 EOF
 
