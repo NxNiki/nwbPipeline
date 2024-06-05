@@ -1,4 +1,4 @@
-function runbatch_extractLFP(workerId, totalWorkers)
+function runbatch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     % extract LFP after spike detection and clustering (spike sorting).
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
@@ -9,13 +9,20 @@ function runbatch_extractLFP(workerId, totalWorkers)
         totalWorkers = 1;
     end
 
-    addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
-    workingDir = getDirectory();
+    if workerId > totalWorkers
+        disp("workerId larger than number of workers! batch exit.")
+        return
+    end
 
-    expIds = (4:7);
-    filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
+    if nargin < 3
+        addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
+        workingDir = getDirectory();
 
-    skipExist = 0;
+        expIds = (4:7);
+        filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
+
+        skipExist = 0;
+    end
     saveRaw = false;
 
     spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
