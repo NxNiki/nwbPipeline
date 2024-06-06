@@ -141,9 +141,11 @@ function MontageConfigUI()
                                   'Units', 'normalized', 'Position', [0.05, 0.95, 0.4, 0.04], 'Callback', @selectAllRows, 'FontSize', 12);
 
     % Create the table for macro channels
+    columnNames = {'', 'Label', 'Port Start', 'Port End'};
     channelTable = uitable('Parent', channelPanel, 'Units', 'normalized', 'Position', [0.05, 0.12, 0.9, 0.83], ...
-            'ColumnName', {'', 'Label', '# of Electrodes'}, 'ColumnEditable', [true, true, true], ...
-            'ColumnFormat', {'logical', 'char', 'numeric'}, 'Data', createDefaultTableData(), ...
+            'ColumnName', columnNames, 'ColumnEditable', [true, true, true, true], ...
+            'ColumnFormat', {'logical', 'char', 'numeric', 'numeric'}, 'CreateFcn', @createDefaultTableData, ...
+            'ColumnWidth', {40, 75, 70, 70}, ...
             'CellSelectionCallback', @cellSelectionCallback);
 
     % Add listeners for mouse clicks and key presses
@@ -187,21 +189,23 @@ function MontageConfigUI()
 
     % ---------------------- callback functions ------------------------- %
 
-    function data = createDefaultTableData()
+    function createDefaultTableData(hObject, ~)
         % Create default table data with brain labels and misc macros
         miscMacros = {'C3', 'C4', 'PZ', 'Ez', 'EOG1', 'EOG2', 'EMG1', 'EMG2', 'A1', 'A2', ...
                       'MICROPHONE', 'HR_Ref', 'HR', 'TTLRef', 'TTLSync', 'Analogue1', 'Analogue2'};
-        data = cell(length(brainLabels) + length(miscMacros), 3);
+
+        numColumns = length(get(hObject, 'ColumnName'));
+        data = cell(length(brainLabels) + length(miscMacros), numColumns);
         for i = 1:length(brainLabels)
             data{i, 1} = false;
             data{i, 2} = brainLabels{i};
-            data{i, 3} = 8;
         end
         for i = 1:length(miscMacros)
             data{length(brainLabels) + i, 1} = false;
             data{length(brainLabels) + i, 2} = miscMacros{i};
-            data{length(brainLabels) + i, 3} = 1;
         end
+
+        set(hObject, 'Data', data);
     end
 
     function updateFileNames(~, ~)
@@ -295,21 +299,10 @@ function MontageConfigUI()
         end
 
         % Load macro channels
-        channelData = cell(length(config.macroChannels), 3);
-        for i = 1:length(config.macroChannels)
-            channelData{i, 1} = true;
-            channelData{i, 2} = config.macroChannels{i};
-            channelData{i, 3} = config.macroNumChannels(i);
-        end
-
-        miscMacroData = cell(length(config.miscMacros), 3);
-        for i = 1:length(config.miscMacros)
-            miscMacroData{i, 1} = true;
-            miscMacroData{i, 2} = config.miscMacros{i};
-            miscMacroData{i, 3} = 1;
-        end
-
-        set(channelTable, 'Data', [channelData; miscMacroData]);
+        channelData = reshape(flatten(config.macroChannels), 3, [])';
+        miscMacroData = reshape(flatten(config.miscChannels), 3, [])';
+        Data = sortrows([channelData; miscMacroData], 3);
+        set(channelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
     end
 
     function saveConfig(~, ~)
@@ -352,18 +345,28 @@ function MontageConfigUI()
         end
 
         config.macroChannels = {};
-        config.miscMacros = {};
-        config.macroNumChannels = [];
+        config.miscChannels = {};
+        macroNumChannels = [];
+        macroChannels = {};
+        miscChannels = {};
         channelData = get(channelTable, 'Data');
+        incompleteRows = any(cellfun(@isempty, channelData(:, 2)), 2);
+        channelData = channelData(cell2mat(channelData(:, 1)) == 1 & ~incompleteRows, :);
         for i = 1:size(channelData, 1)
-            if ~isempty(channelData{i, 2}) && ~isempty(channelData{i, 3})
-                numChannels = channelData{i, 3};
-                if numChannels > 1
-                    config.macroChannels{end+1} = channelData{i, 2};
-                    config.macroNumChannels(end+1) = numChannels;
-                else
-                    config.miscMacros{end+1} = channelData{i, 2};
-                end
+            if isempty(channelData{i, 3})
+                channelData{i, 3} = channelData{i-1, 4} + 1;
+            end
+            if isempty(channelData{i, 4})
+                channelData{i, 4} = channelData{i, 3};
+            end
+            numChannels = channelData{i, 4} - channelData{i, 3} + 1;
+            if numChannels > 2
+                macroNumChannels(i) = numChannels;
+                config.macroChannels(end+1) = {channelData(i, 2:end)};
+                macroChannels(end+1) = channelData(i, 2);
+            else
+                config.miscChannels(end+1) = {channelData(i, 2:end)};
+                miscChannels(end+1) = channelData(i, 2);
             end
         end
 
@@ -374,11 +377,11 @@ function MontageConfigUI()
         configFileNameStr = get(configFileName, 'String');
         microsToDuplicateList = [];
         generatePegasusConfigFile(str2double(patientID), ...
-            config.macroChannels, ...
-            config.macroNumChannels, ...
+            macroChannels, ...
+            macroNumChannels, ...
             microChannels, ...
             microsToDuplicateList, ...
-            config.miscMacros, ...
+            miscChannels, ...
             configFileNameStr)
 
          showMessageBox(['Configuration saved to: ', newline, ...
@@ -411,10 +414,10 @@ function MontageConfigUI()
         data = get(channelTable, 'Data');
         rowToAdd = find(cell2mat(data(:, 1)), 1, 'last' );
         if isempty(rowToAdd) || rowToAdd == size(data, 1)
-            data(end + 1, :) = {false, '', ''};
+            data(end + 1, :) = {false, '', [], []};
         else
             data = [data(1:rowToAdd,:);
-                    {false, '', ''};
+                    {false, '', [], []};
                     data(rowToAdd+1:end,:)];
         end
         set(channelTable, 'Data', data);
