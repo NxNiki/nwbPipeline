@@ -26,6 +26,12 @@ channelFileNames = channelFileNames(2:end,:);
 idx = cellfun(@(x)~isempty(regexp(x, pattern, 'match', 'once')), channelFileNames(:, 1));
 inFileNames = channelFileNames(idx, :);
 
+% reorder file names by numerical suffix:
+formatString = @(str) regexprep(str, '(\d+)(?=\D*$)', '${sprintf(''%03d'', str2double($1))}');
+formattedStrings = cellfun(formatString, inFileNames(:, 1), 'UniformOutput', false);
+[~, sortOrder] = sort(formattedStrings);
+inFileNames = inFileNames(sortOrder, :);
+
 inFiles = inFileNames(:, 2:end);
 
 if ~isempty(renameChannels)

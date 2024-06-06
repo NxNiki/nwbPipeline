@@ -32,6 +32,18 @@ addpath(genpath(fileparts(scriptDir)));
 % 
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
+expIds = [43, 44, 45, 46, 47, 50];
+filePath = {...
+    '/Volumes/DATA/NLData/i728R/728-043_UCLA Control Videos/2023-12-11_16-02-08', ...
+    '/Volumes/DATA/NLData/i728R/728-044_UCLA Control Video Walking Dead/2023-12-11_16-22-45', ...
+    '/Volumes/DATA/NLData/i728R/728-045_UCLA Movie 24/2023-12-11_17-06-47', ...
+    '/Volumes/DATA/NLData/i728R/728-046_UCLA Movie 24 Recall/2023-12-11_18-48-32', ...
+    '/Volumes/DATA/NLData/i728R/728-047_EEG_WatchPat_Overnight/2023-12-11_19-31-40', ...
+    '/Volumes/DATA/NLData/i728R/728-050_Movie 24 Recall/2023-12-12_15-03-49', ...
+    };
+outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/1728_MovieParadigm';
+
+
 skipExist = 1;
 
 if ~exist("filePath", "var") || isempty(filePath)
@@ -57,6 +69,7 @@ for i = 1:length(expIds)
     %% list csc and event files.
     % csc files are grouped for each channel.
 
+    % groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     suffixRegPattern = '(?<=\_)\d*';
     orderByCreateTime = true;
@@ -73,11 +86,11 @@ for i = 1:length(expIds)
 
     macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
     % macroPattern = '^[RL].*[0-9]';
-    macroPattern = '^LFPx*.ncs';
+    macroPattern = '^LFPx*';
     [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern, renameMacroChannels);
 
     tic
-    unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
+    % unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
     toc
     disp('macro files unpack finished!')
 
@@ -85,7 +98,7 @@ for i = 1:length(expIds)
 
     microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
     % microPattern = '^G[A-D].*[0-9]';
-    microPattern = '^PDes*.ncs';
+    microPattern = '^PDes*';
     [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern, renameMicroChannels);
 
     tic
@@ -94,6 +107,8 @@ for i = 1:length(expIds)
     disp('micro files unpack finished!')
 
 end
+
+
 
 
 
