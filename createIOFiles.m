@@ -32,15 +32,16 @@ formattedStrings = cellfun(formatString, inFileNames(:, 1), 'UniformOutput', fal
 [~, sortOrder] = sort(formattedStrings);
 inFileNames = inFileNames(sortOrder, :);
 
-inFiles = inFileNames(:, 2:end);
-
 if ~isempty(renameChannels)
-    if length(renameChannels) ~= size(inFileNames, 1)
-        error('renamed channels does not have equal length to original channels')
+    if length(renameChannels) > size(inFileNames, 1)
+        error('renamed channels longer than original channels')
     end
-    channels = renameChannels;
+    nonEmptyChannels = find(~cellfun(@isempty, renameChannels));
+    channels = renameChannels(nonEmptyChannels);
+    inFiles = inFileNames(nonEmptyChannels, 2:end);
 else
     channels = inFileNames(:, 1);
+    inFiles = inFileNames(:, 2:end);
 end
 numFilesEachChannel = size(inFiles, 2);
 
