@@ -21,7 +21,7 @@ scripts/Rasters*.pdf
 batch/runbatch_spikeSorting_*.sh
 batch/runbatch_extractLFP_*.sh
 
-scripts/Patient-*.json
+*/Patient-*.json
 scripts/*.csv
 
 .idea/*
