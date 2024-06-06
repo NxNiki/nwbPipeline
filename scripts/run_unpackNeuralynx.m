@@ -90,7 +90,7 @@ for i = 1:length(expIds)
     [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern, renameMacroChannels);
 
     tic
-    % unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
+    unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
     toc
     disp('macro files unpack finished!')
 
@@ -102,7 +102,7 @@ for i = 1:length(expIds)
     [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern, renameMicroChannels);
 
     tic
-    unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
+    % unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
     toc
     disp('micro files unpack finished!')
 
