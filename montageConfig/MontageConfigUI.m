@@ -299,9 +299,7 @@ function MontageConfigUI()
         end
 
         % Load macro channels
-        channelData = reshape(flatten(config.macroChannels), 3, [])';
-        miscMacroData = reshape(flatten(config.miscChannels), 3, [])';
-        Data = sortrows([channelData; miscMacroData], 3);
+        Data = loadMacroChannels(config.macroChannels, config.miscChannels);
         set(channelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
     end
 

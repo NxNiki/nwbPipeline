@@ -1,12 +1,23 @@
-function [renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile)
+function [macroChannels, microChannels] = createChannels(montageConfigFile)
 % read montage json file and save macro and micro channel names as cell 
 % arrays.
 
 montageConfig = readJson(montageConfigFile);
 
-renameMacroChannels = {};
-renameMicroChannels = {};
+macroChannels = {};
 
+Data = loadMacroChannels(montageConfig.macroChannels, montageConfig.miscChannels);
+for i = 1: size(Data, 1)
+    numChannels = Data{i, 3} - Data{i, 2} + 1;
+    startIdx = Data{i, 2};
+    for j = 1: numChannels
+        macroChannels(startIdx+j-1) = {[Data{i, 1}, num2str(j)]};
+    end
+end
+
+macroChannels = macroChannels(:);
+
+microChannels = {};
 microConfig = montageConfig.Headstages;
 
 headStages = fieldnames(microConfig);
@@ -16,7 +27,8 @@ for i = 1: length(headStages)
         channel = microConfig.(headStages{i}).(ports{j});
         numChannel = channel.Micros;
         brainLabel = channel.BrainLabel;
-        microChannels = arrayfun(@(idx) [headStages{i}, num2str(j), '-', brainLabel, num2str(idx)], 1: numChannel, 'UniformOutput', false);
-        renameMicroChannels = [renameMicroChannels; microChannels(:)];
+        channels = arrayfun(@(idx) [headStages{i}, num2str(j), '-', brainLabel, num2str(idx)], 1: numChannel, 'UniformOutput', false);
+        microChannels = [microChannels; channels(:)];
     end
 end
+
