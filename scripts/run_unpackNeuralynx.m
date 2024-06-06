@@ -45,6 +45,10 @@ outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MoviePa
 
 
 skipExist = 1;
+% macroPattern = '^[RL].*[0-9]';
+% microPattern = '^G[A-D].*[0-9]';
+macroPattern = '^LFPx*';
+microPattern = '^PDes*';
 
 if ~exist("filePath", "var") || isempty(filePath)
     [filePath, expIds, outFilePath] = folderSelectionUI();
@@ -85,8 +89,6 @@ for i = 1:length(expIds)
     %% unpack macro files:
 
     macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
-    % macroPattern = '^[RL].*[0-9]';
-    macroPattern = '^LFPx*';
     [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern, renameMacroChannels);
 
     tic
@@ -97,12 +99,10 @@ for i = 1:length(expIds)
     %% unpack micro files:
 
     microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
-    % microPattern = '^G[A-D].*[0-9]';
-    microPattern = '^PDes*';
     [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern, renameMicroChannels);
 
     tic
-    % unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
+    unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
     toc
     disp('micro files unpack finished!')
 
