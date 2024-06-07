@@ -8,6 +8,7 @@ fname_in = par.fname_in;
 
 currentDir = pwd;
 [workingDir, fileName] = fileparts(fname);
+
 % cluster*.exe needs to work in the directory of the input file.
 cd(workingDir);
 
@@ -53,7 +54,7 @@ switch system_type
     case {'MAC'}
         cluster_file = which('cluster_mac.exe');
         [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
-   case {'MACI','MACI64'}
+    case {'MACI', 'MACI64'}
         cluster_file = which('cluster_maci.exe');
         [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
     case {'GLNX86'}  
@@ -87,12 +88,13 @@ end
 clu = load([fname '.dg_01.lab'], '-ascii');
 tree = load([fname '.dg_01'], '-ascii'); 
 
-
+disp('delete temp files for spike clustering...')
 delete(sprintf('%s.run', fname));    
 delete([fname '*.mag']);
 delete([fname '*.edges']);
 delete([fname '*.param']);
 % delete([fname '.knn']);
 delete(fname_in); 
+disp('delete files done!')
 
 cd(currentDir);
