@@ -38,16 +38,17 @@ cd /u/home/x/xinniu/nwbPipeline/batch
 if [ ! -f "runbatch_spikeSorting_$JOB_ID.sh" ]; then
     echo "backup job script: runbatch_spikeSorting_$JOB_ID.sh"
     cp runbatch_spikeSorting.sh runbatch_spikeSorting_$JOB_ID.sh
+    sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT, DO NOT EDIT!' runbatch_spikeSorting_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
     workingDir = getDirectory();
-    expIds = (3: 11);
-    filePath = fullfile(workingDir, 'MovieParadigm/573_MovieParadigm');
+    expIds = [6:9];
+    filePath = fullfile(workingDir, 'MovieParadigm/566_MovieParadigm');
     skipExist = [0, 0, 0];
     batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
-    system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;'])
+    system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;']);
     exit
 EOF
 
