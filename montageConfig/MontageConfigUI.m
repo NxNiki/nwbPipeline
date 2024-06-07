@@ -1,6 +1,8 @@
 function MontageConfigUI()
 % create configure file for extracelluar recordings (Neuralynx and
 % Blackrock). 
+    scriptDir = fileparts(mfilename('fullpath'));
+    addpath(genpath(fileparts(scriptDir)));
 
     % Create a figure for the UI
     f = figure('Position', [100, 100, 1000, 900], 'Name', 'Montage Setup');
