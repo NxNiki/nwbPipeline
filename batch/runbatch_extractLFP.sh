@@ -38,16 +38,17 @@ cd /u/home/x/xinniu/nwbPipeline/batch
 if [ ! -f "runbatch_extractLFP_$JOB_ID.sh" ]; then
     echo "backup job script: runbatch_extractLFP_$JOB_ID.sh"
     cp runbatch_extractLFP.sh runbatch_extractLFP_$JOB_ID.sh
+    sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT, DO NOT EDIT!' runbatch_extractLFP_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
     workingDir = getDirectory();
-    expIds = (8: 14);
-    filePath = fullfile(workingDir, 'MovieParadigm/572_MovieParadigm');
-    skipExist = 0;
+    expIds = (3: 11);
+    filePath = fullfile(workingDir, 'MovieParadigm/573_MovieParadigm');
+    skipExist = 1;
     batch_extractLFP($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
-    system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;'])
+    system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;']);
     exit
 EOF
 
