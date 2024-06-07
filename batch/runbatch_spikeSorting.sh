@@ -42,7 +42,7 @@ if [ ! -f "runbatch_spikeSorting_${job_name}_$JOB_ID.sh" ]; then
     cp runbatch_spikeSorting.sh runbatch_spikeSorting_${job_name}_$JOB_ID.sh
     sed -i '48i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
     sed -i '49i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
-    sed -i '38,46d' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
+    sed -i '40,46d' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
