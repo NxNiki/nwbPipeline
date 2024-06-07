@@ -32,13 +32,17 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 
 echo "Start Matlab"
 echo "run extractLFP, task id: $SGE_TASK_ID, total tasks: $total_tasks"
-cd /u/home/x/xinniu/nwbPipeline/batch
+
+job_name="562_MovieParadigm"
 
 # make a copy of batch script:
-if [ ! -f "runbatch_extractLFP_$JOB_ID.sh" ]; then
-    echo "backup job script: runbatch_extractLFP_$JOB_ID.sh"
-    cp runbatch_extractLFP.sh runbatch_extractLFP_$JOB_ID.sh
-    sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT, DO NOT EDIT!' runbatch_extractLFP_$JOB_ID.sh
+cd /u/home/x/xinniu/nwbPipeline/batch
+if [ ! -f "runbatch_extractLFP_${job_name}_$JOB_ID.sh" ]; then
+    echo "backup job script: runbatch_extractLFP_${job_name}_$JOB_ID.sh"
+    cp runbatch_extractLFP.sh runbatch_extractLFP_${job_name}_$JOB_ID.sh
+    sed -i '48i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' runbatch_extractLFP_${job_name}_$JOB_ID.sh
+    sed -i '49i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' runbatch_extractLFP_${job_name}_$JOB_ID.sh
+    sed -i '38,46d' runbatch_extractLFP_${job_name}_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
