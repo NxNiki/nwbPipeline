@@ -33,20 +33,24 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 echo "Start Matlab"
 echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
+job_name="562_MovieParadigm"
+
 # make a copy of batch script:
 cd /u/home/x/xinniu/nwbPipeline/batch
-if [ ! -f "runbatch_spikeSorting_$JOB_ID.sh" ]; then
-    echo "backup job script: runbatch_spikeSorting_$JOB_ID.sh"
-    cp runbatch_spikeSorting.sh runbatch_spikeSorting_$JOB_ID.sh
-    sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT, DO NOT EDIT!' runbatch_spikeSorting_$JOB_ID.sh
+if [ ! -f "runbatch_spikeSorting_${job_name}_$JOB_ID.sh" ]; then
+    echo "backup job script: runbatch_spikeSorting_${job_name}_$JOB_ID.sh"
+    cp runbatch_spikeSorting.sh runbatch_spikeSorting_${job_name}_$JOB_ID.sh
+    sed -i '48i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
+    sed -i '49i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
+    sed -i '38,46d' runbatch_spikeSorting_${job_name}_$JOB_ID.sh
 fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
-    workingDir = getDirectory();
-    expIds = [6:9];
-    filePath = fullfile(workingDir, 'MovieParadigm/566_MovieParadigm');
+    expIds = [5:7];
     skipExist = [0, 0, 0];
+    workingDir = getDirectory();
+    filePath = fullfile(workingDir, 'MovieParadigm/${job_name}');
     batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
     system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;']);
     exit
