@@ -142,11 +142,14 @@ function MontageConfigUI()
 
     % Create the table for macro channels
     columnNames = {'', 'Label', 'Port Start', 'Port End'};
-    channelTable = uitable('Parent', channelPanel, 'Units', 'normalized', 'Position', [0.05, 0.12, 0.9, 0.83], ...
-            'ColumnName', columnNames, 'ColumnEditable', [true, true, true, true], ...
-            'ColumnFormat', {'logical', 'char', 'numeric', 'numeric'}, 'CreateFcn', @createDefaultTableData, ...
-            'ColumnWidth', {40, 75, 70, 70}, ...
-            'CellSelectionCallback', @cellSelectionCallback);
+    channelTable = uitable('Parent', channelPanel, 'Units', 'normalized', ...
+        'Position', [0.05, 0.12, 0.9, 0.83], ...
+        'ColumnName', columnNames, ...
+        'ColumnEditable', [true, true, true, true], ...
+        'ColumnFormat', {'logical', 'char', 'numeric', 'numeric'}, ...
+        'ColumnWidth', {40, 75, 70, 70}, ...
+        'CreateFcn', @createDefaultTableData, ...
+        'CellSelectionCallback', @cellSelectionCallback);
 
     % Add listeners for mouse clicks and key presses
     set(channelTable, 'KeyPressFcn', @keyPressCallback);
@@ -350,16 +353,30 @@ function MontageConfigUI()
         channelData = get(channelTable, 'Data');
         incompleteRows = any(cellfun(@isempty, channelData(:, 2)), 2);
         channelData = channelData(cell2mat(channelData(:, 1)) == 1 & ~incompleteRows, :);
+        channelData = sortrows(channelData, 3);
+
         for i = 1:size(channelData, 1)
+
+            % automatically fill missing port index, assume each Label only
+            % has one port and no skipped ports.
             if isempty(channelData{i, 3})
-                channelData{i, 3} = channelData{i-1, 4} + 1;
+                if i == 1
+                    channelData{i, 3} = 1;
+                else
+                    channelData{i, 3} = channelData{i-1, 4} + 1;
+                end
             end
             if isempty(channelData{i, 4})
                 channelData{i, 4} = channelData{i, 3};
             end
+
+            if i > 1 && channelData{i, 3} <= channelData{i-1, 4}
+                error('overlap port index in macro channel: %s and %s\n', channelData{i-1, 2}, channelData{i, 2})
+            end
+
             numChannels = channelData{i, 4} - channelData{i, 3} + 1;
             if numChannels > 2
-                macroNumChannels(i) = numChannels;
+                macroNumChannels(end+1) = numChannels;
                 config.macroChannels(end+1) = {channelData(i, 2:end)};
                 macroChannels(end+1) = channelData(i, 2);
             else
