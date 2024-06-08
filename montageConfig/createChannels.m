@@ -4,6 +4,11 @@ function [macroChannels, microChannels] = createChannels(montageConfigFile)
 % value so that we can match to the .ncs files (unused channels will also
 % save files).
 
+if isempty(montageConfigFile)
+    [macroChannels, microChannels] = deal([]);
+    return
+end
+
 montageConfig = readJson(montageConfigFile);
 macroChannels = {};
 [~, Data] = loadMacroChannels(montageConfig.macroChannels, montageConfig.miscChannels);
