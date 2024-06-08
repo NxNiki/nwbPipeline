@@ -68,16 +68,12 @@ if ~exist("filePath", "var") || isempty(filePath)
     [filePath, expIds, outFilePath] = folderSelectionUI();
 end
 
-if ~isempty('montageConfigFile')
-    [renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile);
-else
-    [renameMacroChannels, renameMicroChannels] = deal([]);
-end
-
 if ~isempty(numParallelTasks)
     delete(gcp('nocreate'))
     parpool(numParallelTasks);
 end
+
+[renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile);
 
 for i = 1:length(expIds)
 
