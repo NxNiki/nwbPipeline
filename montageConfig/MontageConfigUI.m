@@ -159,6 +159,7 @@ function MontageConfigUI()
     
     % Initialize last selected row and Shift key state
     setappdata(channelTable, 'lastSelectedRow', []);
+    setappdata(channelTable, 'selectedCells', []);
     setappdata(channelTable, 'isShiftPressed', false);
 
     % Add/Remove rows buttons
@@ -168,6 +169,8 @@ function MontageConfigUI()
               'Units', 'normalized', 'Position', [0.55, 0.01, 0.4, 0.04], 'Callback', @removeRow, 'FontSize', 12);
     uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Up', ...
               'Units', 'normalized', 'Position', [0.05, 0.06, 0.4, 0.04], 'Callback', @moveUp, 'FontSize', 12);
+    uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
+              'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @moveDown, 'FontSize', 12);
     uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
               'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @moveDown, 'FontSize', 12);
 
@@ -355,20 +358,21 @@ function MontageConfigUI()
         channelData = get(channelTable, 'Data');
         incompleteRows = any(cellfun(@isempty, channelData(:, 2)), 2);
         channelData = channelData(cell2mat(channelData(:, 1)) == 1 & ~incompleteRows, :);
+        channelData(cellfun(@isempty, channelData(:, 3)), 3) = {NaN};
         channelData = sortrows(channelData, 3);
+        channelData(:, 1) = {true};
 
         for i = 1:size(channelData, 1)
-
             % automatically fill missing port index, assume each Label only
             % has one port and no skipped ports.
-            if isempty(channelData{i, 3})
+            if isempty(channelData{i, 3}) || isnan(channelData{i, 3})
                 if i == 1
                     channelData{i, 3} = 1;
                 else
                     channelData{i, 3} = channelData{i-1, 4} + 1;
                 end
             end
-            if isempty(channelData{i, 4})
+            if isempty(channelData{i, 4}) || isnan(channelData{i, 4})
                 channelData{i, 4} = channelData{i, 3};
             end
 
@@ -386,6 +390,8 @@ function MontageConfigUI()
                 miscChannels(end+1) = channelData(i, 2);
             end
         end
+
+        set(channelTable, 'Data', channelData);
 
         % Save the montage information to a JSON file
         writeJson(config, montageFileNameStr)
@@ -509,10 +515,34 @@ function MontageConfigUI()
         set(channelTable, 'Data', data);
     end
 
+    % function keyPressCallback(hObject, eventdata)
+    %     % Check if Shift key is pressed
+    %     if strcmp(eventdata.Key, 'shift')
+    %         setappdata(hObject, 'isShiftPressed', true);
+    %     end
+    % end
+
     function keyPressCallback(hObject, eventdata)
         % Check if Shift key is pressed
         if strcmp(eventdata.Key, 'shift')
             setappdata(hObject, 'isShiftPressed', true);
+        end
+        
+        % Handle backspace or delete key to clear selected cells
+        if strcmp(eventdata.Key, 'backspace') || strcmp(eventdata.Key, 'delete')
+            selectedCells = getappdata(hObject, 'selectedCells');
+            data = get(hObject, 'Data');
+            if ~isempty(selectedCells)
+                for idx = 1:size(selectedCells, 1)
+                    row = selectedCells(idx, 1);
+                    col = selectedCells(idx, 2);
+                    if col > 2  % only remove port index.
+                        data{row, col} = [];
+                    end
+                end
+                set(hObject, 'Data', data);
+                setappdata(hObject, 'selectedCells', []);  % Clear the selected cells data
+            end
         end
     end
 
@@ -528,6 +558,9 @@ function MontageConfigUI()
             return;
         end
 
+        selectedCells = eventdata.Indices;
+        setappdata(hObject, 'selectedCells', selectedCells);
+
         if size(eventdata.Indices) > 1
             selectedRows = eventdata.Indices(:, 1);
             selectedCols = eventdata.Indices(:, 2);
@@ -536,7 +569,7 @@ function MontageConfigUI()
             selectedCols = eventdata.Indices(2);
         end
 
-        if isempty(selectedRows) || any(selectedCols ~= 1)
+        if any(selectedCols ~= 1)
             return;
         end
         % Handle cell selection with Shift key functionality
