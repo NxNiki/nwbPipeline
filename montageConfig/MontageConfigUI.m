@@ -316,7 +316,9 @@ function MontageConfigUI()
         patientID = get(patientIDEdit, 'String');
         experimentID = get(experimentIDEdit, 'String');
         updateFileNames();
-        montageFileNameStr = get(montageFileName, 'String');
+        currentTimeTag = char(datetime('now'), '_yyyy-MM-dd_HH-mm-ss');
+        montageFileNameStr = strrep(get(montageFileName, 'String'), '.json',  [currentTimeTag, '.json']);
+        configFileNameStr = strrep(get(configFileName, 'String'), '.cfg', [currentTimeTag, '.cfg']);
 
         % Create a structure to hold the configuration
         config = struct();
@@ -402,7 +404,6 @@ function MontageConfigUI()
         writeJson(config, montageFileNameStr)
         
         % Save the configuration to .cfg file for neuralynx:
-        configFileNameStr = get(configFileName, 'String');
         microsToDuplicateList = [];
         generatePegasusConfigFile(str2double(patientID), ...
             macroChannels, ...
