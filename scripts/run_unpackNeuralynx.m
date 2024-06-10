@@ -52,6 +52,8 @@ skipExist = 1;
 macroPattern = '^LFPx*';
 microPattern = '^PDes*';
 
+eventPattern = '*.nev';
+
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
 montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1717_exp-49.json';
@@ -94,11 +96,21 @@ for i = 1:length(expIds)
 
     ignoreFilesWithSizeBelow = 16384;
 
-    tic
-    [groups, fileNames, channelFileNames, eventFileNames] = groupFiles(filePath{i}, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
-    toc
+    if ~exist(fullfile(expOutFilePath, 'channelFileNames.csv'), 'file') || ~skipExist
+        tic
+        [groups, fileNames, channelFileNames] = groupFiles(filePath{i}, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
+        writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
+        toc
+    end
 
-    writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
+    %% unpack Event Files:
+    eventOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_events', expId)];
+    [inEventFiles, outEventFiles] = createIOFiles(eventOutFilePath, expOutFilePath, eventPattern);
+    
+    tic
+    unpackData(inEventFiles, outEventFiles, eventOutFilePath, 1, skipExist);
+    toc
+    disp('event files unpack finished!')
 
     %% unpack macro files:
 
