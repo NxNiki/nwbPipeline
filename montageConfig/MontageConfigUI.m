@@ -357,9 +357,10 @@ function MontageConfigUI()
         miscChannels = {};
         channelData = get(channelTable, 'Data');
         incompleteRows = any(cellfun(@isempty, channelData(:, 2)), 2);
-        channelData = channelData(cell2mat(channelData(:, 1)) == 1 & ~incompleteRows, :);
-        channelData(cellfun(@isempty, channelData(:, 3)), 3) = {NaN};
-        channelData = sortrows(channelData, 3);
+        channelData = channelData(~incompleteRows, :);
+        
+        rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
+        channelData(rowsWithPortStart, :) = sortrows(channelData(rowsWithPortStart, :), 3);
         channelData(:, 1) = {true};
 
         for i = 1:size(channelData, 1)
@@ -373,7 +374,11 @@ function MontageConfigUI()
                 end
             end
             if isempty(channelData{i, 4}) || isnan(channelData{i, 4})
-                channelData{i, 4} = channelData{i, 3};
+                if i == size(channelData, 1) || isempty(channelData{i + 1, 3}) || isnan(channelData{i + 1, 3})
+                    channelData{i, 4} = channelData{i, 3};
+                else
+                    channelData{i, 4} = channelData{i+1, 3} - 1;
+                end
             end
 
             if i > 1 && channelData{i, 3} <= channelData{i-1, 4}
@@ -498,9 +503,9 @@ function MontageConfigUI()
             if startIdx(i) == 1
                 continue
             end
-            temp = data(startIdx(i) - 1, :);
-            data((startIdx(i): endIdx(i)) - 1, :) = data(startIdx(i): endIdx(i), :);
-            data(endIdx(i), :) = temp;
+            temp = data(startIdx(i) - 1, 1:2);
+            data((startIdx(i): endIdx(i)) - 1, 1:2) = data(startIdx(i): endIdx(i), 1:2);
+            data(endIdx(i), 1:2) = temp;
         end
     end
 
