@@ -1,4 +1,4 @@
-function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(inputPath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow)
+function [groups, fileNames, groupFileNames] = groupFiles(inputPath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow)
 % groupFiles: group files based on their name pattern.
 % Details:
 %    This function lists files in the directory that matches specific
@@ -110,6 +110,8 @@ if length(eventFileNames) > 1
     order = orderFilesByTime(eventFileNames);
     eventFileNames = eventFileNames(order);
 end
+
+groupFileNames = [groupFileNames; cell2table([{'Events'}, eventFileNames])];
 
 groups = table2cell(groupFileNames(:, 1));
 fileNames = table2cell(groupFileNames(:, 2:end));
