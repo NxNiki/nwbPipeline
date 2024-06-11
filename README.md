@@ -17,8 +17,18 @@ Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
 Run `MontageConfigUI.m` to open the UI to set the montage:
 
-![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/750943aa-0c6b-433d-9979-fd3dc7b1bd6d)
+![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/18fa6b1b-3a34-4f07-a18d-1bb9c57869bb)
 
+- Select channels with checkboxes, move them up/down, and remove or add new channels below.
+- Use `shift` to select/unselect multiple channels.
+- For macro channels, use shift to select multiple cells in the table and delete the contents with `backspace`/`delete`. The empty ports will be automatically filled with the following rules:
+    - If `Port Start` is empty, it will be set as `Port End` in the row above + 1.
+    - If `Port End` is empty,
+        - It will be set as `Port Start` in the row below - 1 if it is not empty
+        - Otherwise, it will be set as `Port Start` in the current row.
+
+If there are no skipped ports, you only need to set `Port Start`, `Port End` will be automatically filled. When both `Port Start` and `Port End` are empty at the end of the table, it will be filled assume each channel only takes one port.
+      
 After setting the montage, clicking `confirm` will save the configuration file (to set up the neuralynx device) and a JSON file, which saves the information in the UI and can be loaded.
 
 ### unpack data:
