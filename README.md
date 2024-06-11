@@ -42,6 +42,15 @@ You can either define the I/O path in the script or use the UI to select the fil
 
 ![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/d84a562c-816c-4a61-ba5e-4da2062eaabe)
 
+If you want to rename the channels, set the montage config file (created by `MontageConfigUI.m`) in the script.
+
+```
+montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1702_exp-46_2024-06-10_16-52-31.json';
+```
+Otherwise, set it empty:
+```
+montageConfigFile = [];
+```
 
 ### spike sorting:
 
@@ -57,9 +66,9 @@ and run in Matlab:
 scripts/run_spikeSorting
 ```
 
-This will run spike detection using a common threshold across all selected experiments and combine spikes in a single .mat file for each channel.
+This will run spike detection using the minimal threshold across all selected experiments and combine spikes in a single .mat file for each channel.
 
-Or define experiment ID and file path in `batch/runbatch_spikeSorting.m` and run on SGE:
+Or define `expIds` and `job_name` in `batch/runbatch_spikeSorting.m` and run on SGE (hoffman2):
 ```
 qsub batch/runbatch_spikeSorting.sh
 ```
@@ -70,7 +79,7 @@ Similar to spike sorting, define `expIds` and `filePath` in `scripts/run_extract
 ```
 scripts/run_extractLFP
 ```
-Or define `expIds` and `filePath` in `batch/runbatch_extractLFP.m` and run on SGE:
+Or define `expIds` and `job_name` in `batch/runbatch_extractLFP.m` and run on SGE:
 ```
 qsub batch/runbatch_extractLFP.sh
 ```
