@@ -46,21 +46,21 @@ addpath(genpath(fileparts(scriptDir)));
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
 skipExist = 1;
-% macroPattern = '^[RL].*[0-9]';
-% microPattern = '^G[A-D].*[0-9]';
+macroPattern = '^[RL].*[0-9]';
+microPattern = '^G[A-D].*[0-9]';
 
-macroPattern = '^LFPx*';
-microPattern = '^PDes*';
+% macroPattern = '^LFPx*';
+% microPattern = '^PDes*';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
-montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1717_exp-49.json';
-% montageConfigFile = [];
+% montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1702_exp-46_2024-06-10_16-52-31.json';
+montageConfigFile = [];
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
 % files are combined for sleep experiments. 
-numParallelTasks = 4;
+numParallelTasks = 8;
 % numParallelTasks = [];
 
 %%
