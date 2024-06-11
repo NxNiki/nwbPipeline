@@ -77,7 +77,7 @@ percentConcurrentSpikes = sum(hasSpikes, 2)/length(spikeFiles);
 percentConcurrentSpikesPrecise = sum(hasSpikesPrecise, 2);
 
 % get across channel spike codes:
-for fnum = 1:length(outFileNames)
+for fnum = 1:length(spikeFiles)
     
     if exist(outFileNames{fnum, 2}, 'file') && skipExist && ~updateCrossChannelSpikeCode
         continue
