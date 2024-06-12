@@ -33,7 +33,7 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 echo "Start Matlab"
 echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
-job_name="562_MovieParadigm"
+job_name="555_MovieParadigm"
 
 # make a copy of batch script:
 cd /u/home/x/xinniu/nwbPipeline/batch
@@ -47,7 +47,7 @@ fi
 
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
     addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
-    expIds = [5:7];
+    expIds = [3:5];
     skipExist = [0, 0, 0];
     workingDir = getDirectory();
     filePath = fullfile(workingDir, 'MovieParadigm/${job_name}');
