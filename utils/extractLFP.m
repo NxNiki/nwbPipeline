@@ -77,7 +77,6 @@ for i = 1: numFiles
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
     lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
-    lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     lfpFileObj.spikeGapLength = findGapLength(interpolateIndex);
 
     if saveRaw
@@ -87,6 +86,7 @@ for i = 1: numFiles
         lfpFileObj.rawTimestamps = timestamps;
         lfpFileObj.interpolateIndex = interpolateIndex;
         lfpFileObj.spikeIndex = spikeIndex;
+        lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
 
     % ---- check the distribution of spike gap length:
