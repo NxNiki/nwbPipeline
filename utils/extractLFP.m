@@ -69,11 +69,11 @@ for i = 1: numFiles
         spikeIndex = false(1, length(cscSignal));
     end
 
-    [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
+    [lfpSignal, downsampleFs, timestampsStart] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
 
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
-    lfpFileObj.lfp = lfpSignal;
-    lfpFileObj.lfpTimestamps = downSampledTimestamps;
+    lfpFileObj.lfp = single(lfpSignal);
+    lfpFileObj.lfpFs = downsampleFs;
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
     lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
