@@ -36,8 +36,8 @@ suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 
 % unpack ncs files:
 parfor i = 1:length(inFileNames)
-
-    [~, outFileName, ext] = fileparts(outFileNames{i});
+    [~, ~, ext] = fileparts(inFileNames{i});
+    [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
 

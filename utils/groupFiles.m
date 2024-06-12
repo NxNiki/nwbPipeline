@@ -112,7 +112,9 @@ if length(eventFileNames) > 1
 end
 
 % assume number of events file is same as the number of segments.
-groupFileNames = [groupFileNames; cell2table([{'Events'}, eventFileNames])];
+eventFiles = cell2table([{'Events'}, eventFileNames]);
+eventFiles.Properties.VariableNames{1} = 'fileGroup';
+groupFileNames = [groupFileNames; eventFiles];
 
 groups = table2cell(groupFileNames(:, 1));
 fileNames = table2cell(groupFileNames(:, 2:end));

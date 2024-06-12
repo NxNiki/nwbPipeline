@@ -54,7 +54,7 @@ microPattern = '^G[A-D].*[0-9]';
 % macroPattern = '^LFPx*';
 % microPattern = '^PDes*';
 
-eventPattern = '*.nev';
+eventPattern = 'Events*';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
