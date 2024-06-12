@@ -48,6 +48,8 @@ outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALY
 % TO DO: read unpack config file to skip UI.
 
 skipExist = 0;
+
+% patterns should not include file extension such as .ncs or .nev
 macroPattern = '^[RL].*[0-9]';
 microPattern = '^G[A-D].*[0-9]';
 
@@ -79,7 +81,7 @@ end
 
 [renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile);
 
-for i = 1:length(expIds)
+for i = 2:length(expIds)
 
     expId = expIds(i);
     expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
