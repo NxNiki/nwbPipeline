@@ -92,7 +92,7 @@ if orderByCreateTime && length(fileSuffix)>1
     % we assume the temporal order of files in each channel is
     % consistent, so just check the order of the first channel and apply
     % it to the remaining channels.
-    fprintf("groupFiles: order files by create time for group: %s. \n", fileGroup{1});
+    fprintf("groupFiles: order files by create time for channel: %s. \n", fileGroup{1});
     order = orderFilesByTime(groupFileNames(1,:), REVERSE_TEMPORAL_ORDER);
     groupFileNames = groupFileNames(:, order);
 elseif length(fileSuffix)>1
@@ -106,14 +106,20 @@ groupFileNames.Properties.VariableNames{1} = 'fileGroup';
 eventFileNames = getNeuralynxFiles(inputPath, '.nev', ignoreFilesWithSizeBelow);
 eventFileNames = cellfun(@(x) fullfile(inputPath, x), eventFileNames, 'UniformOutput', false);
 if length(eventFileNames) > 1
-    % order .nev files by start time stamp:
+    fprintf("groupFiles: order event files by create time. \n");
     order = orderFilesByTime(eventFileNames);
     eventFileNames = eventFileNames(order);
 end
 
-% assume number of events file is same as the number of segments.
-eventFiles = cell2table([{'Events'}, eventFileNames]);
-eventFiles.Properties.VariableNames{1} = 'fileGroup';
+% TO DO datatable is annoying to work with. stick with cell perhaps.
+% assume number of events file is same as or less than (no events occurs
+% during experiment) the number of segments.
+eventFiles = cell(1, size(groupFileNames, 2));
+eventFiles(:) = {''}; % empty cell cause error when reading from csv.
+eventFiles{1} = 'Events';
+eventFiles(2:length(eventFileNames)+1) = eventFileNames;
+eventFiles = cell2table(eventFiles);
+eventFiles.Properties.VariableNames = groupFileNames.Properties.VariableNames;
 groupFileNames = [groupFileNames; eventFiles];
 
 groups = table2cell(groupFileNames(:, 1));
