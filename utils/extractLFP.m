@@ -40,7 +40,7 @@ for i = 1: numFiles
     % to reduce edge effects - especially for the sleep data 
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
-    [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
+    [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
@@ -69,7 +69,7 @@ for i = 1: numFiles
         spikeIndex = false(1, length(cscSignal));
     end
 
-    [lfpSignal, downsampleFs, timestampsStart] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
+    [lfpSignal, downsampleFs] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
 
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
     lfpFileObj.lfp = single(lfpSignal);

@@ -1,4 +1,4 @@
-function [lfpSignal, downsampleFs, timestampStart] = antiAliasing(cscSignal, timestamps)
+function [lfpSignal, downsampleFs] = antiAliasing(cscSignal, timestamps)
 % downsample csc signal to 2kHz
 
 % this is the one I would recommend using but open to other options
@@ -53,5 +53,3 @@ ts_2k = timestamps(1):1/downsampleFs:timestamps(end);
 
 % Or use decimate or decimateBy (Emily) to downsample the signal?
 lfpSignal = interp1(timestamps, flt_data_conc, ts_2k);
-
-timestampStart = ts_2k(1);
