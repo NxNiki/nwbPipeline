@@ -1,4 +1,4 @@
-function [lfpSignal, downSampledTimestamps, timestampStart] = antiAliasing(cscSignal, timestamps)
+function [lfpSignal, downsampleFs, timestampStart] = antiAliasing(cscSignal, timestamps)
 % downsample csc signal to 2kHz
 
 % this is the one I would recommend using but open to other options
@@ -8,6 +8,8 @@ f_info.Fstop = 1000;        % Stopband Frequency
 f_info.Apass = 0.0001;      % Passband Ripple (dB)
 f_info.Astop = 65;          % Stopband Attenuation (dB)
 f_info.match = 'passband';  % Band to match exactly
+
+downsampleFs = 2000; % Hz
 
 % Construct an FDESIGN object and call its CHEBY2 method.
 h  = fdesign.lowpass(f_info.Fpass, f_info.Fstop, f_info.Apass, f_info.Astop, f_info.Fs);
@@ -47,10 +49,9 @@ flt_data_conc(nan_idx) = NaN;
 % but we only want to do this if there is a time gap between the recordings
 
 % create a 2kHz time vector that spans the full series
-ts_2k = timestamps(1):1/2000:timestamps(end);
+ts_2k = timestamps(1):1/downsampleFs:timestamps(end);
 
 % Or use decimate or decimateBy (Emily) to downsample the signal?
 lfpSignal = interp1(timestamps, flt_data_conc, ts_2k);
 
-downSampledTimestamps = ts_2k - ts_2k(1);
 timestampStart = ts_2k(1);
