@@ -111,6 +111,7 @@ if length(eventFileNames) > 1
     eventFileNames = eventFileNames(order);
 end
 
+% assume number of events file is same as the number of segments.
 groupFileNames = [groupFileNames; cell2table([{'Events'}, eventFileNames])];
 
 groups = table2cell(groupFileNames(:, 1));
