@@ -37,27 +37,29 @@ addpath(genpath(fileparts(scriptDir)));
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/1728_MovieParadigm';
 
 %%% -------- for testing: --------- %%%
-% expIds = [4:5];
-% filePath = {...
-%     '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57', ...
-%     '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35', ...
-%     };
-% 
-% outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+expIds = [4:5];
+filePath = {...
+    '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57', ...
+    '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35', ...
+    };
 
-skipExist = 1;
-% macroPattern = '^[RL].*[0-9]';
-% microPattern = '^G[A-D].*[0-9]';
+outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
-macroPattern = '^LFPx*';
-microPattern = '^PDes*';
+% TO DO: read unpack config file to skip UI.
+
+skipExist = 0;
+macroPattern = '^[RL].*[0-9]';
+microPattern = '^G[A-D].*[0-9]';
+
+% macroPattern = '^LFPx*';
+% microPattern = '^PDes*';
 
 eventPattern = '*.nev';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
-montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1717_exp-49.json';
-% montageConfigFile = [];
+% montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1717_exp-49.json';
+montageConfigFile = [];
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
@@ -89,7 +91,6 @@ for i = 1:length(expIds)
     %% list csc and event files.
     % csc files are grouped for each channel.
 
-    % groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     suffixRegPattern = '(?<=\_)\d*';
     orderByCreateTime = true;
