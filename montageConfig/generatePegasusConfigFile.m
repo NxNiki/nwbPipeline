@@ -27,7 +27,9 @@ makeBaseOfConfigFile(fid,patientNum);
 makeBaseOfConfigFile(fid2,patientNum);
 
 for i=1:length(microList)
-    addMicrosToConfig(fid,i,microList{i},allPossibleMicros{i},ismember(microList{i},microsToDuplicateList));
+    if ~isempty(microList{i})
+        addMicrosToConfig(fid,i,microList{i},allPossibleMicros{i},ismember(microList{i},microsToDuplicateList));
+    end
 end
 
 % startsAt = [0 cumsum(nChannels(1:end-1))]+96; % removed the +96 because

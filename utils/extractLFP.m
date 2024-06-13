@@ -40,7 +40,7 @@ for i = 1: numFiles
     % to reduce edge effects - especially for the sleep data 
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
-    [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
+    [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
@@ -69,15 +69,14 @@ for i = 1: numFiles
         spikeIndex = false(1, length(cscSignal));
     end
 
-    [lfpSignal, downSampledTimestamps, timestampsStart] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
+    [lfpSignal, downsampleTs] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
 
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
-    lfpFileObj.lfp = lfpSignal;
-    lfpFileObj.lfpTimestamps = downSampledTimestamps;
+    lfpFileObj.lfp = single(lfpSignal);
+    lfpFileObj.lfpTimestamps = downsampleTs;
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
     lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
-    lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     lfpFileObj.spikeGapLength = findGapLength(interpolateIndex);
 
     if saveRaw
@@ -87,6 +86,7 @@ for i = 1: numFiles
         lfpFileObj.rawTimestamps = timestamps;
         lfpFileObj.interpolateIndex = interpolateIndex;
         lfpFileObj.spikeIndex = spikeIndex;
+        lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
 
     % ---- check the distribution of spike gap length:
