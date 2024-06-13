@@ -15,7 +15,6 @@ if nargin < 4
 end
 
 channelFileNames = readtable(fullfile(expOutFilePath, 'channelFileNames.csv'), Delimiter=',');
-
 channelFileNames = table2cell(channelFileNames);
 
 % select macro/micro files and rename output file names so that alphabetic order 
