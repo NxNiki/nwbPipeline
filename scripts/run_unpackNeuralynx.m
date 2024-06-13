@@ -66,8 +66,8 @@ montageConfigFile = [];
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
 % files are combined for sleep experiments. 
-numParallelTasks = 4;
-% numParallelTasks = [];
+% numParallelTasks = 4;
+numParallelTasks = [];
 
 %%
 if ~exist("filePath", "var") || isempty(filePath)
@@ -81,7 +81,7 @@ end
 
 [renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile);
 
-for i = 2:length(expIds)
+for i = 1:length(expIds)
 
     expId = expIds(i);
     expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];

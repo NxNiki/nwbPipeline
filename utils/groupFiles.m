@@ -36,9 +36,6 @@ function [groups, fileNames, groupFileNames] = groupFiles(inputPath, groupRegPat
 %
 %    groupFileNames - dataTable [m, n + 1]. data table combines groups and
 %    fileNames, this can be saved as .csv file to check the files combined.
-%
-%    eventFileNames - cell [n]. '.env' files to be combined. If no event
-%    files found in directories{i}, it will be empty.
 
 % Example:
 %{
@@ -111,7 +108,6 @@ if length(eventFileNames) > 1
     eventFileNames = eventFileNames(order);
 end
 
-% TO DO datatable is annoying to work with. stick with cell perhaps.
 % assume number of events file is same as or less than (no events occurs
 % during experiment) the number of segments.
 eventFiles = cell(1, size(groupFileNames, 2));
