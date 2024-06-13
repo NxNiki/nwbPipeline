@@ -10,7 +10,7 @@ if length(eventsFile)==1
 else
     eventsFile = dir(fullfile(cleanPathForThisSystem(thisExp.linkToRaw),'Events*.nev'));
     if ~isempty(eventsFile)
-        eventsFile = fullfile(cleanPathForThisSystem(thisExp.linkToRaw),eventsFile.name);
+        eventsFile = fullfile(cleanPathForThisSystem(thisExp.linkToRaw), eventsFile.name);
     end
 end
 if isempty(eventsFile) || ~exist(eventsFile,'file')
