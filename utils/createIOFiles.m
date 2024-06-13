@@ -14,8 +14,9 @@ if nargin < 4
     renameChannels = [];
 end
 
-channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
-channelFileNames = channelFileNames(2:end,:);
+channelFileNames = readtable(fullfile(expOutFilePath, 'channelFileNames.csv'), Delimiter=',');
+
+channelFileNames = table2cell(channelFileNames);
 
 % select macro/micro files and rename output file names so that alphabetic order 
 % is consistent with temporal order. 
