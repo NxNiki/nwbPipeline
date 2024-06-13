@@ -19,6 +19,13 @@ Run `MontageConfigUI.m` to open the UI to set the montage:
 
 ![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/18fa6b1b-3a34-4f07-a18d-1bb9c57869bb)
 
+
+#### Micro channels:
+- Select `Custom` to input the channel label if it is not in the popup menu.
+- To skip a channel, set `Micros` to 0.
+
+#### Macro channels:
+
 - Select channels with checkboxes, move them up/down, and remove or add new channels below.
 - Use `shift` to select/unselect multiple channels.
 - For macro channels, use shift to select multiple cells in the table and delete the contents with `backspace`/`delete`. The empty ports will be automatically filled with the following rules:
