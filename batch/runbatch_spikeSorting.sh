@@ -20,11 +20,10 @@ expIds="[12]"  # MATLAB array format
 skipExist="[0, 0, 0]"  # MATLAB logical array
 
 ## Set the SGE parameters (#$ is not a comment)
-
 #$ -cwd
 # Use the current working directory for the job execution
 
-#$ -o /u/home/x/xinniu/cluster-log-spikeSort/job572-$JOB_ID/joblog_$JOB_ID_$TASK_ID.txt
+#$ -o /u/home/x/xinniu/sgelog-$expName/patient-$patientId/job-spikeSort-$JOB_ID/task_$TASK_ID.txt
 # Redirect the standard output and standard error to a specific file
 # $JOB_ID and $TASK_ID are environment variables provided by the scheduler
 
