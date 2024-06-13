@@ -79,7 +79,7 @@ if [ ! -f $backupScript ]; then
     cp runbatch_spikeSorting.sh $backupScript
     sed -i '13i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' $backupScript
     sed -i '14i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' $backupScript
-    sed -i '72,85d' $backupScript
+    sed -i '69,83d' $backupScript
 fi
 
 ## run matlab function:
