@@ -37,24 +37,24 @@ addpath(genpath(fileparts(scriptDir)));
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/1728_MovieParadigm';
 
 %%% -------- for testing: --------- %%%
-expIds = [4:5];
-filePath = {...
-    '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57', ...
-    '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35', ...
-    };
-
-outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
+% expIds = [4:5];
+% filePath = {...
+%     '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP4_Movie_24_Pre_Sleep/2024-01-26_20-46-57', ...
+%     '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/RAW_NLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35', ...
+%     };
+% 
+% outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
 % TO DO: read unpack config file to skip UI.
 
-skipExist = 0;
+skipExist = 1;
 
 % patterns should not include file extension such as .ncs or .nev
-macroPattern = '^[RL].*[0-9]';
-microPattern = '^G[A-D].*[0-9]';
+% macroPattern = '^[RL].*[0-9]';
+% microPattern = '^G[A-D].*[0-9]';
 
-% macroPattern = '^LFPx*';
-% microPattern = '^PDes*';
+macroPattern = '^LFPx*';
+microPattern = '^PDes*';
 
 eventPattern = 'Events*';
 
@@ -66,8 +66,8 @@ montageConfigFile = [];
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
 % files are combined for sleep experiments. 
-% numParallelTasks = 4;
-numParallelTasks = [];
+numParallelTasks = 4;
+% numParallelTasks = [];
 
 %%
 if ~exist("filePath", "var") || isempty(filePath)
