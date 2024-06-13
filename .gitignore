@@ -20,6 +20,7 @@ scripts/Rasters*.pdf
 
 batch/runbatch_spikeSorting_*.sh
 batch/runbatch_extractLFP_*.sh
+batch/jobs_*
 
 */Patient-*.json
 scripts/*.csv
