@@ -13,7 +13,7 @@ function timestampsOut = linearizeTimestamps(timestampsIn, Fs)
         return
     end
 
-    gapIdx = [0, gapIdx, length(timestampsIn)];
+    gapIdx = [1, gapIdx, length(timestampsIn)];
     timestampsOut = cell(1, length(gapIdx) - 1);
     for i = 2: length(gapIdx)
         if gapIdx(i) - gapIdx(i-1) >= minIntervalLength
