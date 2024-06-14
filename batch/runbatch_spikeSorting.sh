@@ -15,7 +15,7 @@
 #$ -cwd
 # Use the current working directory for the job execution
 
-#$ -o /u/home/x/xinniu/sgelog/job-spikeSort-$JOB_ID/task_$TASK_ID.txt
+#$ -o $HOME/sgelog/job-spikeSort-$JOB_ID/task_$TASK_ID.txt
 # Redirect the standard output and standard error to a specific file
 # $JOB_ID and $TASK_ID are environment variables provided by the scheduler
 
