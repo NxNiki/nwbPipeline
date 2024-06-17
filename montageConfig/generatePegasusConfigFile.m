@@ -1,5 +1,5 @@
-function generatePegasusConfigFile(patientNum,macroList,macroNumChannels,...
-    microList,microsToDuplicateList,miscMacros,savePath)
+function generatePegasusConfigFile(patientNum, macroList, macroNumChannels,...
+    microList, microsToDuplicateList, miscMacros, savePath)
 
 % SYNTAX: generatePegasusConfigFile(patientNum,macroList,macrosWithNon7,...
 %     microList,miscMacros,savePath)
@@ -15,20 +15,20 @@ if ~exist('miscMacros','var')|| isempty(miscMacros)
         'Analogue1','Analogue2'};
 end
 
-if ~exist('microsToDuplicateList','var')||isempty(microsToDuplicateList)
+if ~exist('microsToDuplicateList', 'var')||isempty(microsToDuplicateList)
     microsToDuplicateList = {}; %{'RAH','RMH','LAH','LMH','REC','LEC','RA','LA','RPHG','LPHG'};
 end
 
 allPossibleMicros = {'GA1','GA2','GA3','GA4','GB1','GB2','GB3','GB4','GC1','GC2','GC3','GC4'};
 
-fid = fopen(savePath,'w');
-fid2 = fopen(strrep(savePath,'.cfg','_MacrosOnly.cfg'),'w');
-makeBaseOfConfigFile(fid,patientNum);
-makeBaseOfConfigFile(fid2,patientNum);
+fid = fopen(savePath, 'w');
+fid2 = fopen(strrep(savePath, '.cfg', '_MacrosOnly.cfg'), 'w');
+makeBaseOfConfigFile(fid, patientNum);
+makeBaseOfConfigFile(fid2, patientNum);
 
 for i=1:length(microList)
     if ~isempty(microList{i})
-        addMicrosToConfig(fid,i,microList{i},allPossibleMicros{i},ismember(microList{i},microsToDuplicateList));
+        addMicrosToConfig(fid, i, microList{i}, allPossibleMicros{i}, ismember(microList{i}, microsToDuplicateList));
     end
 end
 
@@ -36,13 +36,13 @@ end
 % we are moving macros to sources 1-4:
 startsAt = [0 cumsum(macroNumChannels(1:end-1))];
 for i=1:length(macroList)
-    addMacrosToConfig(fid,startsAt(i),macroList{i},macroNumChannels(i));
-    addMacrosToConfig(fid2,startsAt(i),macroList{i},macroNumChannels(i));
+    addMacrosToConfig(fid, startsAt(i), macroList{i}, macroNumChannels(i));
+    addMacrosToConfig(fid2, startsAt(i), macroList{i}, macroNumChannels(i));
 end
 
 miscStart = startsAt(end)+macroNumChannels(end);
 for i=1:length(miscMacros)
-    addMiscToConfig(fid,miscStart+i-1,miscMacros{i});
+    addMiscToConfig(fid, miscStart+i-1, miscMacros{i});
 end
 
 % if ~ismember('MICROPHONE',miscMacros)
@@ -50,22 +50,22 @@ end
 % end
 
 for i=1:length(microList)
-    addSpikesToConfig(fid,i,microList{i},allPossibleMicros{i});
+    addSpikesToConfig(fid, i, microList{i}, allPossibleMicros{i});
 end
 
-addFinalPointsToConfig(fid,1);
-addFinalPointsToConfig(fid2,1);
+addFinalPointsToConfig(fid, 1);
+addFinalPointsToConfig(fid2, 1);
 
 % Micro Window
 setUpTimeWindow(fid,'Micro Window');
 for i=1:length(microList)
-    addCSCtoPlotWindow(fid,microList{i},allPossibleMicros{i});
+    addCSCtoPlotWindow(fid, microList{i}, allPossibleMicros{i});
 end
 
 setUpTimeWindow(fid,'Alternate Reference Micro Window');
 for i=1:length(microList)
-    if ismember(microList{i},microsToDuplicateList)
-        addCSCtoPlotWindow(fid,microList{i},'AltRef');
+    if ismember(microList{i}, microsToDuplicateList)
+        addCSCtoPlotWindow(fid, microList{i}, 'AltRef');
     end
 end
 
@@ -73,8 +73,8 @@ end
 setUpTimeWindow(fid, 'Macro Window')
 setUpTimeWindow(fid2,'Macro Window')
 for i=1:length(macroList)
-    addCSCtoPlotWindow(fid,macroList{i},macroNumChannels(i));
-    addCSCtoPlotWindow(fid2,macroList{i},macroNumChannels(i));
+    addCSCtoPlotWindow(fid, macroList{i}, macroNumChannels(i));
+    addCSCtoPlotWindow(fid2, macroList{i}, macroNumChannels(i));
 end
 
 % Sleep Montage
@@ -83,14 +83,16 @@ sleepMacros = {'C3','C4','PZ','Ez',...
 
 setUpTimeWindow(fid,'Sleep Montage')
 for i=1:length(sleepMacros)
-    addCSCtoPlotWindow(fid,sleepMacros{i},'Sleep Montage');
+    if ismember(sleepMacros{i}, miscMacros)
+        addCSCtoPlotWindow(fid, sleepMacros{i}, 'Sleep Montage');
+    end
 end
 
 % Microphone etc
 extraPlots = {'MICROPHONE','TTLSync','HR'};
-setUpTimeWindow(fid,'Additional Plots')
+setUpTimeWindow(fid, 'Additional Plots')
 for i=1:length(extraPlots)
-    addCSCtoPlotWindow(fid,extraPlots{i},'Additional Plots');
+    addCSCtoPlotWindow(fid, extraPlots{i}, 'Additional Plots');
 end
 
 setUpSpikeWindow(fid);
