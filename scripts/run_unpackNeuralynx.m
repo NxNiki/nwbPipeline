@@ -50,17 +50,17 @@ addpath(genpath(fileparts(scriptDir)));
 skipExist = 1;
 
 % patterns should not include file extension such as .ncs or .nev
-% macroPattern = '^[RL].*[0-9]';
-% microPattern = '^G[A-D].*[0-9]';
+macroPattern = '^[RL].*[0-9]';
+microPattern = '^G[A-D].*[0-9]';
 
-macroPattern = '^LFPx*';
-microPattern = '^PDes*';
+% macroPattern = '^LFPx*';
+% microPattern = '^PDes*';
 
 eventPattern = 'Events*';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
-montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1702_exp-46_2024-06-10_16-52-31.json';
+% montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-573_exp-1.json';
 % montageConfigFile = [];
 
 %%% define number of task in parfor:

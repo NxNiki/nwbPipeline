@@ -1,4 +1,5 @@
 function processTTLs()
+% THIS IS NOT USED. USE UNPACKDATA.M TO UNPACK EVENTS FILE
 
 eventsFile = dir(fullfile(rawPath,'Events*.nev'));
 if length(eventsFile)>1
