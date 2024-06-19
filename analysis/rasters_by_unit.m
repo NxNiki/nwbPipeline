@@ -1,34 +1,22 @@
-function [] = rasters_by_unit(subject, exp, imageDirectory, plotResponsive, useExportFig)
+function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, useExportFig, outputPath)
 
-expInfo = getExperimentInfo(subject, exp);
-if isfield(expInfo, 'linkToConvertedData')
-    trialFolder = expInfo.linkToConvertedData;
-else
-    trialFolder = expInfo.rawUnpacked;
+if ~exist(outputPath, "dir")
+    mkdir(outputPath)
 end
-isBR = strcmp(expInfo.recordingSystem, 'BlackRock');
-if isBR
-    sr = 3e4;
-else
-    sr = 32e3;
-end
-%trialStruct = load(fullfile(expInfo.pdmDataFolder, 'trialStruct.mat'));
-channelMetaDataFile = load(fullfile(expInfo.pdmDataFolder, 'channelMetaData.mat'));
-% clusterFile = load(fullfile(trialFolder, 'clusterCharacteristics_video.mat'));
-clusterFile = load(fullfile(trialFolder, 'clusterCharacteristics.mat'));
 
-channelData = channelMetaDataFile.channelData;
-allClusters = clusterFile.clusterCharacteristics;
+sr = 32e3;
+
+clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
+allClusters = clusterFileObj.clusterCharacteristics;
 
 close all;
-tic
 plotsPerPage = 17;
 
 if plotResponsive
-    clustersToPlot = allClusters(allClusters.numSelective > 0 & allClusters.cluster_num>0, :);
+    clustersToPlot = allClusters(allClusters.numSelective > 0 & allClusters.cluster_num > 0, :);
     clustersToPlot = sortrows(clustersToPlot,'selectivity','descend');
 else
-    clustersToPlot = allClusters(allClusters.cluster_num>0 & allClusters.firingRate > .15, :); %& allClusters.rejectCluster == 0, :);
+    clustersToPlot = allClusters(allClusters.cluster_num > 0 & allClusters.firingRate > .15, :); %& allClusters.rejectCluster == 0, :);
     clustersToPlot = sortrows(clustersToPlot,'csc_num','ascend');
 end
 
@@ -36,13 +24,6 @@ totalNumStimuli = length(clustersToPlot{1, 'screeningInfo'}{1});
 pagesPerCluster =  ceil(clustersToPlot{:, 'numSelective'}/plotsPerPage); %ceil(totalNumStimuli/plotsPerPage)*ones(size(responsiveClusters, 1), 1);
 pagesPerCluster(pagesPerCluster==0) = 1;
 numPages = sum(pagesPerCluster);
-
-%  figs = {};
-%  for i = 1:numPages
-%      figs{i} = figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
-%                     'PaperUnits','inches','PaperPosition',[0 0 11 8.5],'PaperOrientation','landscape', 'Visible', 'off');
-%      set(gcf, 'Color', 'white');%set(gcf,'units','normalized','outerposition',[0 0 1 1])
-%  end
 
 titleRect = [0 .9625 1 .025];
 
@@ -55,11 +36,10 @@ allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)','match','once');
 allAudioDir = dir(fullfile(imageDirectory, '*.aiff'));
 allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 
-
 figNames = {};
 
 parfor i = 1:numPages
-    figNames{i} = fullfile(trialFolder, ['rasters_p' num2str(i) '.pdf']);
+    figNames{i} = fullfile(outputPath, ['rasters_p' num2str(i) '.pdf']);
     figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
         'PaperUnits','inches','PaperPosition',[0 0 11 8.5],'PaperOrientation','landscape', 'Visible', 'off');
     set(gcf, 'Color', 'white');
@@ -101,7 +81,9 @@ parfor i = 1:numPages
     unitsToPlot = (posInPage-1)*plotsPerPage + [1:plotsPerPage];
     unitsToPlot(unitsToPlot > totalNumStimuli) = [];
 
-    imageLimits = [-500 1000]; audioLimits = [-500 2000]; videoLimits = [-1000 10000];
+    imageLimits = [-500 1000]; 
+    audioLimits = [-500 2000]; 
+    videoLimits = [-1000 10000];
     for j = 1:length(unitsToPlot)
 
         imageAxes = axes(gcf, 'Position', getAxisRect(j, 1));
@@ -207,12 +189,8 @@ parfor i = 1:numPages
         end
 
     end
-    if isfield(channelData, 'channel')
-        channelIdx = find([channelData.channel]==clustersToPlot{unitToPlot, 'csc_num'});
-    else
-        channelIdx = clustersToPlot{unitToPlot, 'csc_num'};
-    end
-    thisTitle = ['CSC' num2str(clustersToPlot{unitToPlot, 'csc_num'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' ' channelData(channelIdx).brainRegion ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
+    
+    thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
     annotation('textbox',[0 .9625 1 .025],'units','normalized', 'String',thisTitle,'EdgeColor','none', 'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold','Interpreter','tex');
     if useExportFig
         export_fig(gcf, figNames{i}, '-dpf');
@@ -227,7 +205,7 @@ if useExportFig
     append_pdfs(fullfile(trialFolder, 'Rasters_all.pdf'), figNames);
 else
     if plotResponsive
-        merge_fn = ['Rasters_p' num2str(subject) '_ScreeningX_responsiveUnits'];
+        merge_fn = ['Rasters_p' num2str(subject), '_ScreeningX_responsiveUnits'];
     else
         merge_fn = ['Rasters_p' num2str(subject) '_ScreeningX_allUnits'];
     end
@@ -243,28 +221,34 @@ else
     end
 
 end
-toc
 close all;
 end
 
 function [rect] = getAxisRect(pos, sub_pos)
-pos = pos + 1;
-vertNum = floor((pos-1)/6)+1;
-horzNum = mod(pos-1, 6) + 1;
-
-nCols = 6; nRows = 3;
-top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
-verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
-
-if sub_pos==1, subpos_factor = verticalMinSize+verticalMajSize+2*verticalMin;
-elseif sub_pos == 2, subpos_factor = verticalMinSize+verticalMin;
-else subpos_factor = 0;
-end
-
-rect(1) = edge + (horzNum-1)*(horizSize+horiz);
-rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
-rect(3) = horizSize;
-if sub_pos == 1 || sub_pos == 2, rect(4) = verticalMajSize; else rect(4) = verticalMinSize; end
+    pos = pos + 1;
+    vertNum = floor((pos-1)/6)+1;
+    horzNum = mod(pos-1, 6) + 1;
+    
+    nCols = 6; nRows = 3;
+    top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
+    verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
+    verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
+    horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
+    
+    if sub_pos==1
+        subpos_factor = verticalMinSize+verticalMajSize+2*verticalMin;
+    elseif sub_pos == 2
+        subpos_factor = verticalMinSize+verticalMin;
+    else 
+        subpos_factor = 0;
+    end
+    
+    rect(1) = edge + (horzNum-1)*(horizSize+horiz);
+    rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
+    rect(3) = horizSize;
+    if sub_pos == 1 || sub_pos == 2
+        rect(4) = verticalMajSize; 
+    else 
+        rect(4) = verticalMinSize; 
+    end
 end

@@ -76,7 +76,6 @@ tsEvent = tsAlign - tsAlign(1) + ttlLogAlign{1, 1};
 plot(tsEvent, 'r--');
 hold on
 plot(cell2mat(ttlLogAlign(:, 1)), 'Color', [.2, .1, .9, .7], 'LineWidth', 1);
-set(gca, 'YScale', 'log');
 r = corr(tsEvent, cell2mat(ttlLogAlign(:, 1)));
 title(sprintf('timestamp: r = %0.3f', r))
 
