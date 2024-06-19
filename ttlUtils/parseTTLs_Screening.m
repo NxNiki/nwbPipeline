@@ -11,7 +11,7 @@ function [trials, TTLs, unrecognizedTTLs, TTLsUsedForTrialParsing, TTLsIgnoredFo
 TTLs = parseDAQTTLs(eventsFile, ttlLogFile);
 
 %% divide TTLs by type
-matches = @(str)cellfun(@(x)~isempty(regexp(x,str,'once')),TTLs(:,2));
+matches = @(str)cellfun(@(x)~isempty(regexp(x,str,'once')), TTLs(:,2));
 
 serialInit = find(matches('serial_init'));
 expt_start = find(matches('STARTING EXPERIMENT'));
