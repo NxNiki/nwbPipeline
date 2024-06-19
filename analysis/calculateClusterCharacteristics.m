@@ -12,12 +12,15 @@ maxNoiseProminence = 2;
 maxWaveformsToInclude = 2500;
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
-spikeFiles = dir(fullfile(spikeFolder, '*_spikes.mat'));
 timestampsFileObj = matfile(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
 
 dataLength = numel(timestampsFileObj.timeStamps)/sr;
 time0 = timestampsFileObj.time0;
 clusterCharacteristics = [];
+
+if isfield(trials, 'patient')
+    info.patient_num = trials(1).patient;
+end
 
 for i = 1:length(clusterFiles)
     info.csc_num = i;
@@ -26,22 +29,19 @@ for i = 1:length(clusterFiles)
     end
     clusterFileObj = matfile(fullfile(spikeFolder, clusterFiles(i).name));
     cluster_class = clusterFileObj.cluster_class;
-    rejectedSpikes = clusterFileObj.spikeIdxRejected;
-    spikeFileObj = matfile(fullfile(spikeFolder, spikeFiles(i).name));
-    spikes = spikeFileObj.spikes;
-    spikes(rejectedSpikes, :) = [];
+    spikes = clusterFileObj.spikes;
+    % rejectedSpikes = clusterFileObj.spikeIdxRejected;
+    % spikeFileName = strrep(strrep(clusterFiles(i).name, 'times_', ''), '.mat', '_spikes.mat');
+    % spikeFileObj = matfile(fullfile(spikeFolder, spikeFileName));
+    % spikes = spikeFileObj.spikes;
+    % spikes(rejectedSpikes, :) = [];
+
+    pattern = '(?<=times_G[A-D][1-4]-)\w+(?=.mat)'; % regular expression with lookbehind and lookahead
+    info.cluster_region = extractChannelName(clusterFiles(i).name, pattern);
 
     clusterNums = unique(cluster_class(:, 1));
     for j = 1:length(clusterNums)
         info.cluster_num = clusterNums(j);
-
-        pattern = '(?<=times_GA1-)\w+(?=.mat)'; % regular expression with lookbehind and lookahead
-        match = regexp(clusterFiles(i).name, pattern, 'match');
-        info.cluster_region = upper(match{1});
-
-        if isfield(trials, 'patient')
-            info.patient_num = trials(1).patient;
-        end
 
         allWaveforms = spikes(cluster_class(:, 1) == clusterNums(j), :);
         allTimes = cluster_class(cluster_class(:, 1) == clusterNums(j), 2)/1e3;
@@ -135,6 +135,4 @@ end
 
 clusterCharacteristics = sortrows(clusterCharacteristics,1);
 
-end
-function [] = getScreeningInfo()
 end
