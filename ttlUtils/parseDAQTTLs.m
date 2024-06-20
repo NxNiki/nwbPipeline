@@ -1,9 +1,15 @@
-function TTLs = parseDAQTTLs(eventsFile, ttlLogFile, ttlSavePath)
+function TTLs = parseDAQTTLs(eventsFile, ttlLogFiles, ttlSavePath)
 % timestamps in event file should be converted to seconds.
 % ttlCode is the TTL neuralyn received
 % ttlLog is the TTL experiment device send.
 
+if nargin < 3
+    ttlSavePath = ['TTLLog-', datetime('now', 'Format', 'yyyy-MM-dd_HH:mm:ss')];
+end
 
+if ~iscell(ttlLogFiles) 
+    ttlLogFiles = {ttlLogFiles};
+end
 eventsFileObj = matfile(eventsFile, "Writable", false);
 ts = eventsFileObj.timestamps;
 ttlCode = eventsFileObj.TTLs;
@@ -14,34 +20,27 @@ ttlCode(inds) = [];
 ttlCode = ttlCode(:);
 ts = ts(:);
 
-ttlLogFileObj = matfile(ttlLogFile);
-ttlLog = ttlLogFileObj.ttlLog;
+ttlLog = [];
+for i = 1: length(ttlLogFiles)
+    ttlLogFileObj = matfile(ttlLogFiles{i});
+    ttlLog = [ttlLog; ttlLogFileObj.ttlLog];
+end
 
 if ~isequal(cell2mat(ttlLog(:,3)), ttlCode(:))
-    [ttlLog, ts] = realignTTLs(ttlLog, ts, ttlCode);
+    [ttlLog, ts] = realignTTLs(ttlLog, ts, ttlCode, ttlSavePath);
 end
 
 % we want time stamps from Neuralynx and strings from the TTL log
 TTLs = arrayfun(@(x)x, ts, 'uniformoutput', 0);
 TTLs(:,2) = cellfun(@(x)x, ttlLog(:,2), 'uniformoutput', 0);
 
-if exist('ttlSavePath','var') && ~isempty(ttlSavePath)
-    save(ttlSavePath, 'TTLs');
+save(ttlSavePath, 'TTLs');
+
 end
-end
 
-function [ttlLogAlign,tsAlign] = realignTTLs(ttlLog, ts, ttlCode)
+function [ttlLogAlign,tsAlign] = realignTTLs(ttlLog, ts, ttlCode, ttlSavePath)
 
-warning('This isn''t implemented yet. Please write it, or just realign your TTLs yourself...');
-disp('Please align such that ttlLog, ts, and ttlCode are the same length (and ttlLog(:,3) is equal to ttlCode), and then type ''return''');
-disp('If there are multiple TTL log files, load all and concantencate them by: ttlLog1 = [ttlLog1; ttlLog] and then continue.')
-
-ttlLog1 = ttlLog;
-keyboard
-ttlLog = ttlLog1;
-
-% load additional ttl log files and run:
-% ttlLog = [ttlLog1; ttlLog];
+warning('realign ttlLog and ttlCode');
 
 % remove test ttl at the begining of ttlLog:
 ttlLogTs = cell2mat(ttlLog(:, 1));
@@ -66,20 +65,27 @@ ttlLogAlign = ttlLog(idx1, :);
 ttlCodeAlign = ttlCode(idx2, :);
 tsAlign = ts(idx2, :);
 
-figure;
-plot(ttlCodeAlign);
-hold on
-plot(cell2mat(ttlLogAlign(:, 3)), 'r--');
+% Create a new figure
+fig = figure;
 
-figure;
+% Plot 1
+subplot(3, 1, 1);
+plot(ttlCodeAlign);
+hold on;
+plot(cell2mat(ttlLogAlign(:, 3)), 'r--');
+title('Plot 1: TTL Code Align');
+
+% Plot 2
+subplot(3, 1, 2);
 tsEvent = tsAlign - tsAlign(1) + ttlLogAlign{1, 1};
 plot(tsEvent, 'r--');
-hold on
+hold on;
 plot(cell2mat(ttlLogAlign(:, 1)), 'Color', [.2, .1, .9, .7], 'LineWidth', 1);
 r = corr(tsEvent, cell2mat(ttlLogAlign(:, 1)));
-title(sprintf('timestamp: r = %0.3f', r))
+title(sprintf('Timestamp: r = %0.3f', r));
 
-figure
+% Plot 3
+subplot(3, 1, 3);
 ts1diff = diff(tsAlign);
 ts2diff = diff(cell2mat(ttlLogAlign(:, 1)));
 
@@ -88,13 +94,16 @@ idx2 = isoutlier(ts2diff, 'quartiles');
 
 plot(ts1diff(~idx1 & ~idx2), ts2diff(~idx1 & ~idx2), '.');
 r = corr(ts1diff(~idx1 & ~idx2), ts2diff(~idx1 & ~idx2));
-title(sprintf('timestamp difference: r = %0.3f (outlier removed)', r));
+title(sprintf('Timestamp Difference: r = %0.3f (Outliers Removed)', r));
+
+% Save the figure to a specified path
+saveas(fig, fullfile(ttlSavePath, 'TTLAlignment.png'));
+
 
 while any(cell2mat(ttlLogAlign(:, 3)) ~= ttlCodeAlign)
-    msgbox('TTL code not aligned!', 'Warning', 'warn');
+    msgbox('TTL code not aligned! You need to fix it manually and continue', 'Warning', 'warn');
+    keyboard
 end
-keyboard
-close all
 
 end
 
