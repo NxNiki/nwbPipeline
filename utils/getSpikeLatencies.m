@@ -2,6 +2,8 @@ function [ latencies, indices ] = getSpikeLatencies( stim_onsets, spike_times, e
 %GETSPIKELATENCIES gets latencies of all spikes belonging to trial epochs
 %   Detailed explanation goes here
 
+    spike_times = sort(spike_times);
+
     lb = arrayfun(@(x) closest_value(spike_times, x, 0), stim_onsets + epoch(1));
     ub = arrayfun(@(x) closest_value(spike_times, x, 1), stim_onsets + epoch(2));
     indices = arrayfun(@(lb,ub) lb+1:ub-1, lb, ub, 'UniformOutput',0);
