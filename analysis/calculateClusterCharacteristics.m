@@ -13,9 +13,9 @@ maxWaveformsToInclude = 2500;
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
 timestampsFileObj = matfile(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
-
-dataLength = numel(timestampsFileObj.timeStamps)/sr;
-time0 = timestampsFileObj.time0;
+timestamps = timestampsFileObj.timeStamps;
+dataLength = numel(timestamps)/sr;
+time0 = timestamps(1);
 clusterCharacteristics = [];
 
 if isfield(trials, 'patient')
@@ -29,7 +29,10 @@ for i = 1:length(clusterFiles)
     end
     clusterFileObj = matfile(fullfile(spikeFolder, clusterFiles(i).name));
     cluster_class = clusterFileObj.cluster_class;
+    
     spikes = clusterFileObj.spikes;
+    cluster_class(:, 2) = cluster_class(:, 2) / 1000;
+
     % rejectedSpikes = clusterFileObj.spikeIdxRejected;
     % spikeFileName = strrep(strrep(clusterFiles(i).name, 'times_', ''), '.mat', '_spikes.mat');
     % spikeFileObj = matfile(fullfile(spikeFolder, spikeFileName));
@@ -44,12 +47,17 @@ for i = 1:length(clusterFiles)
         info.cluster_num = clusterNums(j);
 
         allWaveforms = spikes(cluster_class(:, 1) == clusterNums(j), :);
-        allTimes = cluster_class(cluster_class(:, 1) == clusterNums(j), 2)/1e3;
+        allTimes = cluster_class(cluster_class(:, 1) == clusterNums(j), 2);
         ISI = diff(allTimes);
         info.allTimes = allTimes;
-        info.noiseProminence = max([2*sum(ISI>.0156&ISI<0.0176)/max(sum(ISI>.0116&ISI<.0156),sum(ISI>.0176&ISI<.0216)), ...
-            2*sum(ISI>.0323&ISI<0.0343)/max(sum(ISI>.0283&ISI<.0323),sum(ISI>.0343&ISI<.0383)), ...
-            2*sum(ISI>.009&ISI<0.011)/max(sum(ISI>.005&ISI<.009),sum(ISI>.011&ISI<.015))]);
+        info.noiseProminence = max([ ...
+            2*sum(ISI>.0156&ISI<0.0176)/max(sum(ISI>.0116&ISI<.0156), ...
+            sum(ISI>.0176&ISI<.0216)), ...
+            2*sum(ISI>.0323&ISI<0.0343)/max(sum(ISI>.0283&ISI<.0323), ...
+            sum(ISI>.0343&ISI<.0383)), ...
+            2*sum(ISI>.009&ISI<0.011)/max(sum(ISI>.005&ISI<.009), ...
+            sum(ISI>.011&ISI<.015)) ...
+            ]);
         info.firingRate = size(allWaveforms, 1)/dataLength;
         info.refPeriodViolations = sum(ISI < .003)/size(allWaveforms, 1);
         info.meanAmplitude = mean(allWaveforms(:, 23));
@@ -89,7 +97,8 @@ for i = 1:length(clusterFiles)
         [ baselineLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-500 0]);
         [ stimLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [0 1000]);
         [ allLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-1000 10000]);
-        binEdges1 = 0:100:1000; binEdges2 = 50:100:950;
+        binEdges1 = 0:100:1000; 
+        binEdges2 = 50:100:950;
         baselineDistribution = cellfun(@numel, baselineLatencies);
 
         spikesToAllImages1 = cell2mat(cellfun(@(x)histcounts(x, binEdges1), stimLatencies, 'UniformOutput', 0)');

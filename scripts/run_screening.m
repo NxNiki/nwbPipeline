@@ -15,10 +15,16 @@ imageDirectory = fullfile(expFilePath, '/trial1');
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
 
-% eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
-% ttlLogFile = fullfile(expFilePath, "/from laptop/ttlLog573-02-May-2024-14-54-53.mat");
-% trials = parseTTLs_Screening(eventFile, ttlLogFile);
-% save(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
+if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file")
+    eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
+    ttlLogFiles = {
+        fullfile(expFilePath, "573-screening Log/573-02-May-2024-14-54-53/from laptop/ttlLog573-02-May-2024-14-54-53.mat");
+        fullfile(expFilePath, "573-screening Log/573-02-May-2024-15-23-30/from laptop/TTLs573-02-May-2024-15-23-30_room1.mat")
+        };
+    TTLs = parseDAQTTLs(eventFile, ttlLogFiles, expFilePath);
+    trials = parseTTLs_Screening(TTLs);
+    save(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
+end
 
 %%
 load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');

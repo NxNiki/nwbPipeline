@@ -1,16 +1,8 @@
-function [trials, TTLs, unrecognizedTTLs, TTLsUsedForTrialParsing, TTLsIgnoredForTrialParsing] = parseTTLs_Screening(eventsFile, ttlLogFile)
-% Events are the output of the .nev file.
+function [trials, unrecognizedTTLs, TTLsUsedForTrialParsing, TTLsIgnoredForTrialParsing] = parseTTLs_Screening(TTLs)
 % This parses events into an n-TTL by 2 cell array with times and strings
 % in each column.
-% By accepting TTLs instead of events in the first argument, this allows
-% someone to hand-modify the TTL cell array and then return it for furhter
-% processing, in case something strange happened with the TTL creation
-% during the experiment.
 
-%% Load TTLs
-TTLs = parseDAQTTLs(eventsFile, ttlLogFile);
-
-%% divide TTLs by type
+% divide TTLs by type
 matches = @(str)cellfun(@(x)~isempty(regexp(x,str,'once')), TTLs(:,2));
 
 serialInit = find(matches('serial_init'));
@@ -55,8 +47,7 @@ if sessionIncludedStimulation
     warning('Parsing for stimulation hasn''t been implemented yet!!');
 end
 
-%% Create trial info from TTLs
-
+% Create trial info from TTLs
 trialTemplate = struct('entryNumber',[],'trialNumber',[],...
     'trialTag',[],'imageID',[],'roomNumber',[],'roomInstruction',[],...
     'trialStartTime',[],'stimulusOnsetTime',[],...
@@ -80,6 +71,7 @@ imageCharactersitcs = struct('human',[],'place',[],'animal',[],'edible',[],...
     'naturalLandscape',[],'cuteAnimal',[],'scaryAnimal',[],'livesOnLand',[],...
     'livesInWater',[],'canFly',[],'mammal',[],'adult',[],'dangerous',[],...
     'cartoon',[],'containsLetters',[],'containsPlants',[]);
+
 charactersticFieldNames = {'human','place','animal','edible',...
     'fantasyCreature','sportEvent','man',...
     'filmOrTVcelebrity','sportsCelebrity','musicCelebrity',...
@@ -165,7 +157,6 @@ for s=1:length(stimPresentations)
     thisTrial.imageCharacteristics = theseCharacterstics;
     trials(s) = thisTrial;
 end
-
 
 trialTags = {trials.trialTag};
 for t=1:length(trials)
