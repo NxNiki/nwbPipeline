@@ -30,16 +30,19 @@ for i = 1:length(clusterFiles)
     clusterFileObj = matfile(fullfile(spikeFolder, clusterFiles(i).name));
     cluster_class = clusterFileObj.cluster_class;
     
-    spikes = clusterFileObj.spikes;
-    cluster_class(:, 2) = cluster_class(:, 2) / 1000;
-
-    % rejectedSpikes = clusterFileObj.spikeIdxRejected;
-    % spikeFileName = strrep(strrep(clusterFiles(i).name, 'times_', ''), '.mat', '_spikes.mat');
-    % spikeFileObj = matfile(fullfile(spikeFolder, spikeFileName));
-    % spikes = spikeFileObj.spikes;
-    % spikes(rejectedSpikes, :) = [];
-
-    pattern = '(?<=times_G[A-D][1-4]-)\w+(?=.mat)'; % regular expression with lookbehind and lookahead
+    if ismember('spikes', who(clusterFileObj))
+        spikes = clusterFileObj.spikes;
+        cluster_class(:, 2) = cluster_class(:, 2) / 1000;
+    else
+        rejectedSpikes = clusterFileObj.spikeIdxRejected;
+        spikeFileName = strrep(strrep(clusterFiles(i).name, 'times_', ''), '.mat', '_spikes.mat');
+        spikeFileObj = matfile(fullfile(spikeFolder, spikeFileName));
+        spikes = spikeFileObj.spikes;
+        spikes(rejectedSpikes, :) = [];
+    end
+    
+    % regular expression with lookbehind and lookahead
+    pattern = '(?<=times_)G[A-D][1-4]-\w+(?=.mat)'; 
     info.cluster_region = extractChannelName(clusterFiles(i).name, pattern);
 
     clusterNums = unique(cluster_class(:, 1));
