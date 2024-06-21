@@ -2,7 +2,7 @@
 # =========================================
 # Script Name: runbatch_spikeSorting.sh
 # Description: submit matlab batch jobs to SGE 
-# Usage: qsub ./runbatch_spikeSorting.sh [options]
+# Usage: qsub ./runbatch_spikeSorting.sh
 # Parameters:
 #   - expName: str, This should be consistent to the file path in unpacked data.
 #   - patientId: str, This should be consistent to the file path in unpacked data.
@@ -11,19 +11,11 @@
 # =========================================
 
 
-## Set the experiment parameters ==========
-expName="GoldmineGems"
-patientId="567"
-
-## Set MATLAB parameters
-expIds="[12]"  # MATLAB array format
-skipExist="[0, 0, 0]"  # MATLAB logical array
-
-## Set the SGE parameters (#$ is not a comment)
+## Set the SGE parameters (#$ is not a comment, and will be processed before the shell variables are evaluated)
 #$ -cwd
 # Use the current working directory for the job execution
 
-#$ -o /u/home/x/xinniu/sgelog-$expName/patient-$patientId/job-spikeSort-$JOB_ID/task_$TASK_ID.txt
+#$ -o $HOME/sgelog/job-spikeSort-$JOB_ID/task_$TASK_ID.txt
 # Redirect the standard output and standard error to a specific file
 # $JOB_ID and $TASK_ID are environment variables provided by the scheduler
 
@@ -49,6 +41,15 @@ skipExist="[0, 0, 0]"  # MATLAB logical array
 # Each task will have a unique $TASK_ID
 
 
+## Set the experiment parameters ==========
+expName="GoldmineGems"
+patientId="573"
+
+## Set MATLAB parameters
+expIds="[14]"  # MATLAB array format
+skipExist="[0, 0, 0]"  # MATLAB logical array
+
+
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
 # To see which versions of matlab are available use: module av matlab
@@ -68,7 +69,7 @@ echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
 ## make a copy of batch script:
 cd /u/home/x/xinniu/nwbPipeline/batch
-if [ ! -d jobs_${expName} ]
+if [ ! -d jobs_${expName} ]; then
     mkdir jobs_${expName}
 fi
 
