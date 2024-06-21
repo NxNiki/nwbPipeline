@@ -45,7 +45,7 @@ parfor i = 1:numPages
     set(gcf, 'Color', 'white');
     disp([num2str(i) ' of ' num2str(numPages)]);
     cumSumClusters = [0; cumsum(pagesPerCluster)];
-    unitToPlot = find( i - cumSumClusters > 0, 1, 'last');
+    unitToPlot = find(i - cumSumClusters > 0, 1, 'last');
     posInPage = i - cumSumClusters(unitToPlot);
     nPagesInUnit = cumSumClusters(unitToPlot+1)-cumSumClusters(unitToPlot);
     clusterInfo = struct2table(clustersToPlot{unitToPlot, 'screeningInfo'}{1});
@@ -187,7 +187,6 @@ parfor i = 1:numPages
             histogram(histAxes, allSpikeTimes, -500:50:1000);
             xlim(histAxes, [-500, 1000]);   xticks(histAxes, -500:500:1000);
         end
-
     end
     
     thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
@@ -202,7 +201,7 @@ parfor i = 1:numPages
     close all;
 end
 if useExportFig
-    append_pdfs(fullfile(trialFolder, 'Rasters_all.pdf'), figNames);
+    append_pdfs(fullfile(outputPath, 'Rasters_all.pdf'), figNames);
 else
     if plotResponsive
         merge_fn = ['Rasters_p' num2str(subject), '_ScreeningX_responsiveUnits'];
@@ -214,9 +213,9 @@ else
     for i = 2:length(mergeSegments)
         filenames1 = figNames(mergeSegments(i-1): (mergeSegments(i)-1));
         if length(filenames1) > 1
-            mergePdfs(filenames1, fullfile(trialFolder, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))));
+            mergePdfs(filenames1, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))));
         else
-            movefile(filenames1{1}, fullfile(trialFolder, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
+            movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
         end
     end
 

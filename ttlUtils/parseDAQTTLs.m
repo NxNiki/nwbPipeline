@@ -34,7 +34,7 @@ end
 TTLs = arrayfun(@(x)x, ts, 'uniformoutput', 0);
 TTLs(:,2) = cellfun(@(x)x, ttlLog(:,2), 'uniformoutput', 0);
 
-save(ttlSavePath, 'TTLs');
+save(fullfile(ttlSavePath, 'TTLs.mat'), 'TTLs');
 
 end
 
@@ -69,14 +69,14 @@ tsAlign = ts(idx2, :);
 fig = figure;
 
 % Plot 1
-subplot(3, 1, 1);
+subplot(2, 2, [1, 2]);
 plot(ttlCodeAlign);
 hold on;
 plot(cell2mat(ttlLogAlign(:, 3)), 'r--');
 title('Plot 1: TTL Code Align');
 
 % Plot 2
-subplot(3, 1, 2);
+subplot(2, 2, 3);
 tsEvent = tsAlign - tsAlign(1) + ttlLogAlign{1, 1};
 plot(tsEvent, 'r--');
 hold on;
@@ -85,7 +85,7 @@ r = corr(tsEvent, cell2mat(ttlLogAlign(:, 1)));
 title(sprintf('Timestamp: r = %0.3f', r));
 
 % Plot 3
-subplot(3, 1, 3);
+subplot(2, 2, 4);
 ts1diff = diff(tsAlign);
 ts2diff = diff(cell2mat(ttlLogAlign(:, 1)));
 
