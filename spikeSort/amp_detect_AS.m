@@ -23,7 +23,7 @@ end
 
 w_pre = param.w_pre;
 w_post = param.w_post;
-ref = floor(1.5 * param.sr/1000);
+ref = floor(1.5 * param.sr/1000); % refractory period 
 detect = param.detection;
 sample_ref = floor(ref/2);
 index = [];

@@ -42,18 +42,18 @@
 
 
 ## Set the experiment parameters ==========
-expName="GoldmineGems"
+expName="Screening"
 patientId="573"
 
 ## Set MATLAB parameters
-expIds="[14]"  # MATLAB array format
+expIds="[1]"  # MATLAB array format
 skipExist="[0, 0, 0]"  # MATLAB logical array
-
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
 # To see which versions of matlab are available use: module av matlab
 module load matlab/R2023b
+
 
 #### DO NOT EDIT THINGS BELOW
 
@@ -68,7 +68,10 @@ echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
 
 ## make a copy of batch script:
-cd /u/home/x/xinniu/nwbPipeline/batch
+# Get the directory containing the currently executing script
+SCRIPT_DIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
+echo $SCRIPT_DIR
+cd $SCRIPT_DIR
 if [ ! -d jobs_${expName} ]; then
     mkdir jobs_${expName}
 fi
@@ -78,9 +81,9 @@ backupScript="jobs_${expName}/runbatch_spikeSorting_${expName}${patientId}_$JOB_
 if [ ! -f $backupScript ]; then
     echo "backup job script: $backupScript"
     cp runbatch_spikeSorting.sh $backupScript
-    sed -i '13i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' $backupScript
-    sed -i '14i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' $backupScript
-    sed -i '69,83d' $backupScript
+    sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' $backupScript
+    sed -i '44i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' $backupScript
+    sed -i '69,87d' $backupScript
 fi
 
 ## run matlab function:
@@ -102,6 +105,3 @@ echo " "
 
 # this site shows how to do array jobs: https://info.hpc.sussex.ac.uk/hpc-guide/how-to/array.html
 # (better than the Hoffman site https://www.hoffman2.idre.ucla.edu/Using-H2/Computing/Computing.html#how-to-build-a-submission-script)
-
-
- 
