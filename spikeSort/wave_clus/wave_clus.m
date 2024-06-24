@@ -29,9 +29,9 @@ function varargout = wave_clus(varargin)
 % USER_DATA{1} = par;
 % USER_DATA{2} = spikes;
 % USER_DATA{3} = index; EM: This is not in time! This is in index, so if
-%                           sampling rate is N, you must subtract 1 and 
+%                           sampling rate is N, you must subtract 1 and
 %                           divide by N to convert to time in seconds since
-%                           recording start. Will save this value in USER_DATA{18} 
+%                           recording start. Will save this value in USER_DATA{18}
 % USER_DATA{4} = clu;
 % USER_DATA{5} = tree;
 % USER_DATA{7} = inspk;
@@ -115,7 +115,7 @@ function varargout = wave_clus_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 clus_colors = [0 0 1; 1 0 0; 0 0.5 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0; 0.25 0.25 0.25];
-set(0,'DefaultAxesColorOrder',clus_colors)
+set(0,'DefaultAxesColorOrder', clus_colors)
 
 
 % --- Executes on button press in load_data_button.
@@ -151,21 +151,21 @@ fn = get(handles.file_name,'String');
 fn = [fn e];
 num = regexp(fn,'\d*','match','once');
 if ~isempty(num)
-    
+
     switch thisTag
         case {'loadNext','rejectSaveLoad','saveAndLoadNext'}
             filename = strrep(fn,num,num2str(str2num(num)+1));
-%             filename = strrep(filename,'_notch','');
+            %             filename = strrep(filename,'_notch','');
         case {'loadPrevious','saveAndLoadPrevious'}
             filename = strrep(fn,num,num2str(str2num(num)-1));
-%             filename = strrep(filename,'_notch','');
+            %             filename = strrep(filename,'_notch','');
         case {'reloadThis'}
             filename = fn;
-%             filename = strrep(filename,'_notch','');
+            %             filename = strrep(filename,'_notch','');
         case {'load_data_button'}
             if ~isempty(handles.channelToLoad.String)
                 filename = strrep(fn,num,handles.channelToLoad.String);
-%                 filename = strrep(filename,'_notch','');
+                %                 filename = strrep(filename,'_notch','');
                 set(handles.channelToLoad,'String','');
             else
                 filename = '';
@@ -182,26 +182,26 @@ fprintf('%s...',filename)
 switch char(handles.datatype)
     case 'Simulator'
         if isempty(filename)
-            [filename, pathname] = uigetfile('C_*.mat','Select file');
+            [filename, pathname] = uigetfile('G[A-B][1-4]-*.mat','Select file');
         end
         set(handles.file_name,'string',['Loading:    ' pathname filename]);
         cd(pathname);
         %load(filename);                                 %Load data
         load([pathname filename]);                      %Load data
         x.data=data;
-        x.sr=1000./samplingInterval;
-        
+        x.sr=1000./milliseconds(samplingInterval);
+
         handles.par = set_parameters_simulation(x.sr,filename,handles);     % Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
-        
+
         [spikes,thr,index] = amp_detect_wc(x.data,handles);     % Detection with amp. thresh.
         [inspk] = wave_features_wc(spikes,handles);             % Extract spike features.
-        
+
         %Interaction with SPC
         set(handles.file_name,'string','Running SPC ...');
         handles.par.fname_in = 'tmp_data';
         fname_in = handles.par.fname_in;
-        
+
         if handles.par.permut == 'y'
             if handles.par.match == 'y';
                 naux = min(handles.par.max_spk,size(inspk,1));
@@ -220,14 +220,14 @@ switch char(handles.datatype)
                 inspk_aux = inspk;
             end
         end
-        
-        save([fname_in],'inspk_aux','-ascii');                      %Input file for SPC
-        handles.par.fname = [handles.par.fname '_wc'];          %Output filename of SPC
+
+        save([fname_in],'inspk_aux','-ascii');                  % Input file for SPC
+        handles.par.fname = [handles.par.fname '_wc'];          % Output filename of SPC
         handles.par.fnamespc = handles.par.fname;
         handles.par.fnamesave = handles.par.fnamespc;
         [clu,tree] = run_cluster(handles);
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -237,14 +237,14 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
-        USER_DATA{2}=spikes;
-        USER_DATA{3}=index;
+
+        USER_DATA{2} = spikes;
+        USER_DATA{3} = index;
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
         USER_DATA{7} = inspk;
-        set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
+        set(handles.wave_clus_figure, 'userdata', USER_DATA)
+
     case 'CSC data'                                              %Neuralynx (CSC files)
         if isempty(filename)
             [filename, pathname] = uigetfile('*.Ncs','Select file');
@@ -266,7 +266,7 @@ switch char(handles.datatype)
         sr = 512*1e6/delta_time;
         handles.par = set_parameters_CSC(sr,filename,handles);     % Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
-        
+
         %Load continuous data
         if strcmp(handles.par.tmax,'all')                          %Loads all data
             index_all=[];
@@ -285,17 +285,17 @@ switch char(handles.datatype)
             recmin=tsmin;
             tsmin = TimeStamps(int64(tsmin));
             tsmax = TimeStamps(int64(tsmax));
-            
+
             for j=1:length(tsmin)
-                
+
                 Samples=fread(f,512*(recmax(j)-recmin(j)+1),'512*int16=>int16',8+4+4+4);
                 x=double(Samples(:))';
                 clear Samples;
-                
+
                 %GETS THE GAIN AND CONVERTS THE DATA TO MICRO V.
                 eval(['scale_factor=textread(''CSC' num2str(channel) '.Ncs'',''%s'',41);']);
                 x=x*str2num(scale_factor{41})*1e6;
-                
+
                 handles.flag = j;                                   %flag for plotting only in the 1st loop
                 [spikes,thr,index]  = amp_detect_wc(x,handles);     %detection with amp. thresh.
                 index = index*1e6/sr+tsmin(j);
@@ -330,9 +330,9 @@ switch char(handles.datatype)
             [spikes,thr,index] = amp_detect_wc(x,handles);          %Detection with amp. thresh.
         end
         fclose(f);
-        
+
         [inspk] = wave_features_wc(spikes,handles);                 %Extract spike features.
-        
+
         if handles.par.permut == 'y'
             if handles.par.match == 'y';
                 naux = min(handles.par.max_spk,size(inspk,1));
@@ -351,7 +351,7 @@ switch char(handles.datatype)
                 inspk_aux = inspk;
             end
         end
-        
+
         %Interaction with SPC
         set(handles.file_name,'string','Running SPC ...');
         fname_in = handles.par.fname_in;
@@ -362,7 +362,7 @@ switch char(handles.datatype)
         handles.par.fname = [handles.par.fname '_wc'];              %Output filename of SPC
         [clu,tree] = run_cluster(handles);
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -372,13 +372,13 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
         USER_DATA{7} = inspk;
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
-        
+
+
     case 'CSC data (pre-clustered)'                                 %Neuralynx (CSC files)
         if isempty(filename)
             [filename, pathname] = uigetfile('*.Ncs','Select file'); if ~filename,return;end
@@ -399,20 +399,20 @@ switch char(handles.datatype)
         clear TimeStamps;
         handles.par = set_parameters_CSC(sr,filename,handles);      %Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
-        
+
         %Load spikes and parameters
         eval(['load times_CSC' num2str(channel) ';']);
         index=cluster_class(:,2)';
-        
+
         %Load clustering results
         fname = [handles.par.fname '_ch' num2str(channel)];         %filename for interaction with SPC
         clu=load([fname '.dg_01.lab']);
         tree=load([fname '.dg_01']);
         handles.par.fnamespc = fname;
         handles.par.fnamesave = handles.par.fnamespc;
-        
+
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -422,7 +422,7 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{2} = spikes;
         USER_DATA{3} = index;
         USER_DATA{4} = clu;
@@ -431,20 +431,20 @@ switch char(handles.datatype)
             USER_DATA{7} = inspk;
         end
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
+
         % LOAD CSC DATA (for plotting)
         fseek(f,16384+8+4+4+4,'bof');                               %put pointer to the beginning of data
         Samples=fread(f,ceil(sr*60),'512*int16=>int16',8+4+4+4);
         x=double(Samples(:))';
         clear Samples;
         fclose(f);
-        
+
         %GETS THE GAIN AND CONVERTS THE DATA TO MICRO V.
         eval(['scale_factor=textread(''CSC' num2str(channel) '.Ncs'',''%s'',41);']);
         x=x*str2num(scale_factor{41})*1e6;
-        
+
         [spikes,thr,index] = amp_detect_wc(x,handles);              %Detection with amp. thresh.
-        
+
     case 'Sc data'
         if isempty(filename)
             [filename, pathname] = uigetfile('*.Nse','Select file');
@@ -461,13 +461,13 @@ switch char(handles.datatype)
         handles.par = set_parameters_Sc(filename,handles);          %Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
         axes(handles.cont_data); cla
-        
+
         [spikes] = spike_alignment(spikes,handles);
-        
+
         [inspk] = wave_features_wc(spikes,handles);                 %Extract spike features.
-        
+
         if handles.par.permut == 'y'
-            if handles.par.match == 'y';
+            if handles.par.match == 'y'
                 naux = min(handles.par.max_spk,size(inspk,1));
                 ipermut = randperm(length(inspk));
                 ipermut(naux+1:end) = [];
@@ -477,14 +477,14 @@ switch char(handles.datatype)
                 inspk_aux = inspk(ipermut,:);
             end
         else
-            if handles.par.match == 'y';
+            if handles.par.match == 'y'
                 naux = min(handles.par.max_spk,size(inspk,1));
                 inspk_aux = inspk(1:naux,:);
             else
                 inspk_aux = inspk;
             end
         end
-        
+
         %Interaction with SPC
         set(handles.file_name,'string','Running SPC ...');
         handles.par.fname_in = 'tmp_data';
@@ -496,7 +496,7 @@ switch char(handles.datatype)
         handles.par.fnamespc = handles.par.fname;
         [clu,tree] = run_cluster(handles);
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -506,19 +506,19 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{2} = spikes;
         USER_DATA{3} = index/1000;
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
         USER_DATA{7} = inspk;
-        set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
+        set(handles.wave_clus_figure, 'userdata', USER_DATA)
+
     case 'Sc data (pre-clustered)'
         if isempty(filename)
             [filename, pathname] = uigetfile('*.Nse','Select file');
         end
-        set(handles.file_name,'string',['Loading:    ' pathname filename]);
+        set(handles.file_name, 'string', ['Loading:    ' pathname filename]);
         cd(pathname);
         if length(filename) == 7
             channel = filename(3);
@@ -530,18 +530,18 @@ switch char(handles.datatype)
         handles.par = set_parameters_Sc(filename,handles);          %Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
         axes(handles.cont_data); cla
-        
+
         [spikes] = spike_alignment(spikes,handles);
-        
+
         %Load clustering results
         fname = [handles.par.fname '_ch' num2str(channel)];         %filename for interaction with SPC
         clu=load([fname '.dg_01.lab']);
         tree=load([fname '.dg_01']);
         handles.par.fnamespc = fname;
         handles.par.fnamesave = handles.par.fnamespc;
-        
+
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -551,24 +551,24 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{2} = spikes;
         USER_DATA{3} = index/1000;
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
-        
+
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
-        
+
+
     case 'ASCII'            % ASCII matlab files
         if isempty(filename)
             [filename, pathname] = uigetfile('*.mat','Select file');
         end
-        set(handles.file_name,'string',['Loading:    ' pathname filename]);
+        set(handles.file_name, 'string', ['Loading:    ' pathname filename]);
         cd(pathname);
         handles.par = set_parameters_ascii(filename,handles);       %Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
-        
+
         index_all=[];
         spikes_all=[];
         for j=1:handles.par.segments                                %that's for cutting the data into pieces
@@ -579,24 +579,24 @@ switch char(handles.datatype)
             tsmax = j*floor(length(data)/handles.par.segments);
             x=data(tsmin:tsmax); clear data;
             handles.flag = 1;                                      %flag for ploting only in the 1st loop
-            
+
             % SPIKE DETECTION WITH AMPLITUDE THRESHOLDING
             [spikes,thr,index]  = amp_detect_wc(x,handles);        %detection with amp. thresh.
             index=index+tsmin-1;
-            
+
             index_all = [index_all index];
             spikes_all = [spikes_all; spikes];
         end
         index = index_all *1e3/handles.par.sr;                     %spike times in ms.
         spikes = spikes_all;
-        
+
         USER_DATA = get(handles.wave_clus_figure,'userdata');
         USER_DATA{2}=spikes;
         USER_DATA{3}=index;
         set(handles.wave_clus_figure,'userdata',USER_DATA);
-        
+
         [inspk] = wave_features_wc(spikes,handles);                %Extract spike features.
-        
+
         if handles.par.permut == 'y'
             if handles.par.match == 'y';
                 naux = min(handles.par.max_spk,size(inspk,1));
@@ -615,7 +615,7 @@ switch char(handles.datatype)
                 inspk_aux = inspk;
             end
         end
-        
+
         %Interaction with SPC
         set(handles.file_name,'string','Running SPC ...');
         handles.par.fname_in = 'tmp_data';
@@ -625,10 +625,10 @@ switch char(handles.datatype)
             filename(1:end-4)];                                %filename if "save clusters" button is pressed
         handles.par.fname = [handles.par.fname '_wc'];             %Output filename of SPC
         handles.par.fnamespc = handles.par.fname;
-        
+
         [clu,tree] = run_cluster(handles);
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -638,43 +638,42 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
         USER_DATA{7} = inspk;
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
-        
+
     case 'ASCII (pre-clustered)'                                   %ASCII matlab files
         if isempty(filename)
             [filename, pathname] = uigetfile('*.mat','Select file');
         end
         set(handles.file_name,'string',['Loading:    ' pathname filename]);
         cd(pathname);
-        
+
         %In case of polytrode data
-        if strcmp(filename(1:5),'times')
+        if strcmp(filename(1:5), 'times')
             filename = filename(7:end);
-            handles.par = set_parameters_pol(filename,handles);      %Load parameters
+            handles.par = set_parameters_pol(filename, handles);      %Load parameters
         else
-            handles.par = set_parameters_ascii(filename,handles);      %Load parameters
+            handles.par = set_parameters_ascii(filename, handles);    %Load parameters
         end
-        
-        set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
-        
+
+        set(handles.min_clus_edit,'string', num2str(handles.par.min_clus));
+
         %Load spikes and parameters
         eval(['load times_' filename ';']);
-        index=cluster_class(:,2)';
-        
+        index = cluster_class(:,2)';
+
         %Load clustering results
         fname = [handles.par.fname '_' filename(1:end-4)];         %filename for interaction with SPC
         clu=load([fname '.dg_01.lab']);
         tree=load([fname '.dg_01']);
         handles.par.fnamespc = fname;
         handles.par.fnamesave = fname;
-        
-        USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
+        USER_DATA = get(handles.wave_clus_figure, 'userdata');
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -684,7 +683,7 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{2} = spikes;
         USER_DATA{3} = index;
         USER_DATA{4} = clu;
@@ -693,7 +692,7 @@ switch char(handles.datatype)
             USER_DATA{7} = inspk;
         end
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
+
         %Load continuous data (for ploting)
         if ~strcmp(filename(1:4),'poly')
             load(filename);
@@ -704,7 +703,7 @@ switch char(handles.datatype)
             end
             [spikes,thr,index] = amp_detect_wc(x,handles);                   %Detection with amp. thresh.
         end
-        
+
     case 'ASCII spikes'
         if isempty(filename)
             [filename, pathname] = uigetfile('*.mat','Select file');
@@ -714,14 +713,14 @@ switch char(handles.datatype)
         handles.par = set_parameters_ascii_spikes(filename,handles);     %Load parameters
         set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
         axes(handles.cont_data); cla
-        
+
         %Load spikes
         load(filename);
-        
+
         [spikes] = spike_alignment(spikes,handles);
-        
+
         [inspk] = wave_features_wc(spikes,handles);                      %Extract spike features.
-        
+
         if handles.par.permut == 'y'
             if handles.par.match == 'y';
                 naux = min(handles.par.max_spk,size(inspk,1));
@@ -740,7 +739,7 @@ switch char(handles.datatype)
                 inspk_aux = inspk;
             end
         end
-        
+
         %Interaction with SPC
         set(handles.file_name,'string','Running SPC ...');
         handles.par.fname_in = 'tmp_data';
@@ -750,9 +749,9 @@ switch char(handles.datatype)
             filename(1:end-4)];                             %filename if "save clusters" button is pressed
         handles.par.fname = [handles.par.fname '_wc'];          %Output filename of SPC
         handles.par.fnamespc = handles.par.fname;
-        [clu,tree] = run_cluster(handles);
+        [clu, tree] = run_cluster(handles);
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -762,42 +761,60 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{2} = spikes;
         USER_DATA{3} = index(:)';
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
         USER_DATA{7} = inspk;
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
-        
+
+
     case 'ASCII spikes (pre-clustered)'
         if isempty(filename)
             [filename, pathname] = uigetfile('*.mat','Select file'); if ~filename,return;end
         end
         set(handles.file_name,'string',['Loading:    ' pathname filename]);
-        cd(pathname);
-        %         handles.par = set_parameters_ascii_spikes(filename,handles);     %Load parameters
-        handles.par = set_joint_parameters_CSC(filename,handles); %EM: Replaced the default wave_clus parameters with those that we've been using
-        set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
-        %         axes(handles.cont_data); EM: removed call to axes.
-        cla(handles.cont_data);
         
+        basePath = fileparts(pathname);
+        
+        % handles.par = set_parameters_ascii_spikes(filename,handles);     %Load parameters
+        handles.par = set_joint_parameters_CSC(filename); %EM: Replaced the default wave_clus parameters with those that we've been using
+        % HISTOGRAM PARAMETERS
+        for i=1:handles.par.max_clus+1
+            eval(['par.nbins' num2str(i-1) ' = 100;']);  % # of bins for the ISI histograms
+            eval(['par.bin_step' num2str(i-1) ' = 1;']);  % percentage number of bins to plot
+        end
+    
+        % Sets to zero fix buttons from aux figures
+        for i=4:handles.par.max_clus
+            eval(['par.fix' num2str(i) '=0;'])
+        end
+        try % will fail on initial call, but not when data is being loaded?
+            par.filename = filename;
+        end
+        USER_DATA = get(handles.wave_clus_figure,'userdata');
+        USER_DATA{1} = par;
+        set(handles.wave_clus_figure,'userdata',USER_DATA);
+        set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
+        % axes(handles.cont_data); EM: removed call to axes.
+        cla(handles.cont_data);
+
         %Load spikes and parameters
         %         eval(['load times_' filename ';']); EM: no need to use eval here
-        
+
         % we want to make it possible to choose the _spikes file but still
         % load the times_ file. So we just remove _spikes from the filename
         % first.
         filename = strrep(filename,'_spikes','');
-        
-        if ~exist(['times_',filename],'file')
-            warning([filename,' does not exist. Move on...'])
+        timesFile = fullfile(pathname, ['times_',filename]);
+        if ~exist(timesFile,'file')
+            warning(['times_',filename,' does not exist. Move on...'])
             return
         end
-        load(['times_',filename]);
+        load(timesFile);
         index=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line above.
-        
+
         %Load clustering results
         fname = [handles.par.fname '_' filename(1:end-4)];               %filename for interaction with SPC
         if ~exist([fname '.dg_01.lab'],'file')
@@ -807,9 +824,9 @@ switch char(handles.datatype)
         tree=load([fname '.dg_01']);
         handles.par.fnamespc = fname;
         handles.par.fnamesave = fname;
-        
+
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        
+
         if exist('ipermut')
             clu_aux = zeros(size(clu,1),length(index)) + 1000;
             for i=1:length(ipermut)
@@ -819,14 +836,14 @@ switch char(handles.datatype)
             clu = clu_aux; clear clu_aux
             USER_DATA{12} = ipermut;
         end
-        
+
         USER_DATA{2} = spikes;
         USER_DATA{3} = index(:)';
         USER_DATA{4} = clu;
         USER_DATA{5} = tree;
         USER_DATA{7} = inspk;
         set(handles.wave_clus_figure,'userdata',USER_DATA)
-        
+
 end
 
 temp=find_temp(tree,handles);                                   %Selects temperature.
@@ -874,34 +891,34 @@ handles.setclus = 0;
 
 %% Add sampling rate info
 if exist(fullfile(pathname,filename),'file')
-cscData = load(fullfile(pathname,filename),'samplingInterval');
-try
-samplingRate = 1000/cscData.samplingInterval;
-catch
-    samplingRate = 1000/cscData.samplingInterval.samplingInterval;
-end
+    cscData = load(fullfile(pathname,filename),'samplingInterval');
+    try
+        samplingRate = 1000/cscData.samplingInterval;
+    catch
+        samplingRate = 1000/cscData.samplingInterval.samplingInterval;
+    end
 else
     if length(USER_DATA)<18 || isempty(USER_DATA{18})
-    gd = findobj('name','updateOrAddSession');
-    if ~isempty(gd)
-        gd = guidata(gd);
-    switch gd.recordingSystem.SelectedObject.String
-        case 'BlackRock'
-            samplingRate = 30000;
-        case 'Neuralynx'
-            samplingRate = questdlg('What was the sampling rate?','SR','32000','40000','32000');
-        samplingRate = eval(samplingRate);
-        otherwise
-            samplingRate = NaN;
-    end
-    else
-        samplingRate = questdlg('What was the sampling rate?','SR','30000','32000','40000','32000');
-        samplingRate = eval(samplingRate);
-    end
+        gd = findobj('name','updateOrAddSession');
+        if ~isempty(gd)
+            gd = guidata(gd);
+            switch gd.recordingSystem.SelectedObject.String
+                case 'BlackRock'
+                    samplingRate = 30000;
+                case 'Neuralynx'
+                    samplingRate = questdlg('What was the sampling rate?','SR','32000','40000','32000');
+                    samplingRate = eval(samplingRate);
+                otherwise
+                    samplingRate = NaN;
+            end
+        else
+            samplingRate = questdlg('What was the sampling rate?','SR','30000','32000','40000','32000');
+            samplingRate = eval(samplingRate);
+        end
     else
         samplingRate = USER_DATA{18};
     end
-end 
+end
 cla(handles.cont_data)
 USER_DATA{18} = samplingRate;
 set(handles.wave_clus_figure,'userdata',USER_DATA)
@@ -984,7 +1001,6 @@ for i=4:par.max_clus
 end
 USER_DATA{1} = par;
 set(handles.wave_clus_figure,'userdata',USER_DATA);
-
 
 % --- Change min_clus_edit
 function min_clus_edit_Callback(hObject, eventdata, handles)
@@ -1079,7 +1095,7 @@ switch currentver
             ipermut = USER_DATA{12};
             exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' inspk',' ipermut',' -v6;');
         end
-        
+
     otherwise
         if isempty(USER_DATA{7}) && isempty(USER_DATA{12})
             exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes');
@@ -1159,7 +1175,7 @@ if nClusts>28
         'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
     print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'f']);
 end
- fprintf('Finished!\n')
+fprintf('Finished!\n')
 
 
 % --- Executes on selection change in data_type_popupmenu.
@@ -1408,7 +1424,7 @@ par = USER_DATA{1};
 cluster_results = USER_DATA{10};
 par.bin_step1 = str2num(get(hObject, 'String'));
 USER_DATA{1} = par;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 handles.setclus = 1;
 handles.force = 0;
 handles.merge = 0;
@@ -1696,9 +1712,6 @@ elseif strcmp(par.filename(1:13),'C_sim_script_')
 end
 
 
-
-
-
 % --- Executes during object creation, after setting all properties.
 function isi1_nbins_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to isi1_nbins (see GCBO)
@@ -1883,7 +1896,7 @@ plot_spikes(handles);
 % USER_DATA = get(handles.wave_clus_figure,'userdata');
 % clustering_results = USER_DATA{10};
 % set(handles.wave_clus_figure,'userdata',USER_DATA);
-% 
+%
 % set(handles.fix1_button,'value',0);
 % set(handles.fix2_button,'value',0);
 % set(handles.fix3_button,'value',0);
@@ -1925,9 +1938,9 @@ USER_DATA{19} = new_func{1};
 classes = USER_DATA{6};
 ts = USER_DATA{3}*1e-3;
 if ~isempty(new_func{1})
-f = eval(new_func{1});
-rejectInds = f(ts);
-classes(rejectInds) = 0;
+    f = eval(new_func{1});
+    rejectInds = f(ts);
+    classes(rejectInds) = 0;
 end
 USER_DATA{6} = classes;
 set(handles.wave_clus_figure,'userdata',USER_DATA);
@@ -1957,7 +1970,7 @@ for i=1:max(classes)
     newNSpikes = 0;
     nFeatures = size(inspk,2);
     while nSpikes > nFeatures && nSpikes>newNSpikes
-            inCluster = classes == i;
+        inCluster = classes == i;
         nSpikes = sum(inCluster);
         M = mahal(inspk,inspk(inCluster,:));
         Lspk = 1-chi2cdf(M,nFeatures);
@@ -1971,8 +1984,6 @@ USER_DATA{6} = classes;
 set(handles.wave_clus_figure,'userdata',USER_DATA);
 plot_spikes(handles)
 fprintf('Finished!\n')
-    
-
 
 % --- Executes on button press in PlotContinuous.
 function PlotContinuous_Callback(hObject, eventdata, handles)

@@ -180,13 +180,13 @@ end
 movefile(outFileNameTemp, outFileName);
 
 % remove temp files:
-if exist([current_par.fname '.dg_01.lab'], "file")
-    delete([current_par.fname '.dg_01.lab'])
-end
-
-if exist([current_par.fname '.dg_01'], "file")
-    delete([current_par.fname '.dg_01'])
-end
+% if exist([current_par.fname '.dg_01.lab'], "file")
+%     delete([current_par.fname '.dg_01.lab'])
+% end
+% 
+% if exist([current_par.fname '.dg_01'], "file")
+%     delete([current_par.fname '.dg_01'])
+% end
 
 end
 % mahal function incase system doesn't have it
