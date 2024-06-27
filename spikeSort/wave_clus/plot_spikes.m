@@ -13,18 +13,16 @@ class_bkup = USER_DATA{9};
 % class_bkup = class_bkup;
 inspk = USER_DATA{7};
 temp = USER_DATA{8};
-ls = size(spikes,2);
+ls = size(spikes, 2);
 par.to_plot_std = 1;                % # of std from mean to plot
 
 merge = handles.merge;
 minclus = handles.minclus;
 clustering_results = USER_DATA{10};
 
-
 % Closes aux figures
-h_figs = get(0,'children');
-h_fig  = findobj(h_figs,'tag','wave_clus_figure');
-
+h_figs = get(0, 'children');
+h_fig  = findobj(h_figs, 'tag', 'wave_clus_figure');
 
 % EM: It's inefficient to close all of these if you're just going to open
 % them again shortly. Set to visible off instead.
@@ -36,8 +34,8 @@ h_fig  = findobj(h_figs,'tag','wave_clus_figure');
 % h_fig6= findobj(h_figs,'tag','wave_clus_aux5');
 % close(h_fig1); close(h_fig2); close(h_fig3); close(h_fig4); close(h_fig5); close(h_fig6);
 
-aux_figs = cellfun(@(x)findobj(h_figs,'tag',['wave_clus_aux',x]),...
-    {'','1','2','3','4','5'},'uniformoutput',0);
+aux_figs = cellfun(@(x)findobj(h_figs, 'tag', ['wave_clus_aux',x]),...
+    {'','1','2','3','4','5'}, 'uniformoutput', 0);
 for m=1:length(aux_figs)
     if ~isempty(aux_figs{m})
         set(0,'currentFigure',aux_figs{m});
@@ -49,7 +47,6 @@ for m=1:length(aux_figs)
         arrayfun(@(x)cla(x,'reset'),ch);
     end
 end
-
 
 % Extract spike features if needed
 if get(handles.spike_shapes_button,'value') ==0
@@ -89,7 +86,7 @@ while i<=min(max(class_bkup),par.max_clus);
 %         for k=i+1:par.max_clus
 %             class_bkup(class_bkup==k)=k-1;
 %         end
-class_bkup(class_bkup>=i) = class_bkup(class_bkup>=i)-1;
+        class_bkup(class_bkup>=i) = class_bkup(class_bkup>=i)-1;
     else
         i=i+1;
     end
@@ -105,7 +102,6 @@ else
 end
 nclusters = length(find(cluster_sizes(:) >= sizemin_clus));
 
-
 % Get fixed clusters
 fix_class2 = [];
 nfix_class = [];
@@ -119,7 +115,7 @@ for m=1:3
             classes(classes==nclusters)=0;
             haveResetClustersAlready = 1;
         end
-        classes(fix_class)=nclusters;
+        classes(fix_class) = nclusters;
         ifixflag(nclusters)=1;
         fix_class2 = [fix_class2 fix_class];
         nfix_class = [nfix_class m];
@@ -128,10 +124,10 @@ end
 
 % Get fixed clusters from aux figures
 for i=4:par.max_clus
-    if isfield(par,['fix' num2str(i)])
-        fixx = par.(['fix',num2str(i)]);
+    if isfield(par, ['fix', num2str(i)])
+        fixx = par.(['fix', num2str(i)]);
         if fixx == 1
-            nclusters = nclusters +1;
+            nclusters = nclusters + 1;
             fix_class = USER_DATA{22+i-3}';
             if ~haveResetClustersAlready
                 classes(classes==nclusters)=0;
@@ -299,14 +295,13 @@ for i = 1:nclusters+1
 %             xlim([1 ls])
 %     else %this was originally an elseif, but I want this to be true all
 %     the time, so I commented out the above.
-        if get(handles.spike_shapes_button,'value') ==1
-            av   = mean(spikes(classDefs{i},:));
-            plot(handles.projections,1:ls,av,'color',colors(i),'linewidth',2);
+        if get(handles.spike_shapes_button, 'value') ==1
+            av = mean(spikes(classDefs{i}, :));
+            plot(handles.projections, 1:ls, av, 'color', colors(i), 'linewidth', 2);
             xlim([1 ls])
         else
-            plot(inspk(classDefs{i},1),inspk(classDefs{i},2),'.','color', colors(i) ,'markersize',.5);
+            plot(inspk(classDefs{i}, 1), inspk(classDefs{i}, 2), '.', 'color', colors(i) , 'markersize', .5);
         end
-        
         
         if i < 5
             ax = handles.(['spikes', num2str(i-1)]);
@@ -333,31 +328,31 @@ for i = 1:nclusters+1
             end
             xlim(ax,[1 ls])
             
-            if i>1; ylimit = [ylimit;get(ax,'ylim')]; end;
+            if i>1; ylimit = [ylimit; get(ax, 'ylim')]; end;
             nSpikes = length(classDefs{i});
-            title(ax,['Cluster ' num2str(i-1) ':  nSpikes = ' num2str(nSpikes)],'Fontweight','bold');
+            title(ax, ['Cluster ' num2str(i-1) ':  nSpikes = ' num2str(nSpikes)], 'Fontweight', 'bold');
             
             isiAx = handles.(['isi' num2str(i-1)]);
             times{i} = diff(spk_times(classDefs{i}));
             % Calculates # ISIs < 3ms
             bin_step_temp = 1;
-            [N,X]=hist(times{i},0:bin_step_temp:par.(['nbins', num2str(i-1)]));
+            [N,X]=hist(times{i}, 0:bin_step_temp:par.(['nbins', num2str(i-1)]));
             multi_isi= sum(N(1:3));
             pct_violations = multi_isi/length(times{i});
             % Builds and plots the histogram
-            bar(isiAx,X(1:end-1),N(1:end-1))
-            xlim(isiAx,[0 par.(['nbins' num2str(i-1)])])
+            bar(isiAx, X(1:end-1), N(1:end-1))
+            xlim(isiAx, [0 par.(['nbins' num2str(i-1)])])
             %The following line generates an error in Matlab 7.3
             %eval(['set(get(gca,''children''),''FaceColor'',''' colors(i) ''',''EdgeColor'',''' colors(i) ''',''Linewidth'',0.01);']);
-            title(isiAx,[num2str(multi_isi) ' in < 3ms (',num2str(pct_violations*100),'%)'])
+            title(isiAx, [num2str(multi_isi) ' in < 3ms (', num2str(pct_violations*100), '%)'])
             xlabel(isiAx,'ISI (ms)');
         else
             par.axes_nr = i;
             par.ylimit = ylimit;
             par.class_to_plot = classDefs{i};
-            par.plot_all_button = get(handles.plot_all_button,'value');
+            par.plot_all_button = get(handles.plot_all_button, 'value');
             USER_DATA{1} = par;
-            set(handles.wave_clus_figure,'userdata',USER_DATA)
+            set(handles.wave_clus_figure, 'userdata', USER_DATA)
             if i < 10
                 wave_clus_aux
             elseif i < 15
@@ -371,7 +366,7 @@ for i = 1:nclusters+1
             else
                 wave_clus_aux5
             end
-            %-------------------------------------------------------------------------
+            %--------------------------------------------------------------
         end
     end
 end

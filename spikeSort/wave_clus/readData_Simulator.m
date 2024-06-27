@@ -1,7 +1,7 @@
 function readData_Simulator(filename, handles)
 
 if isempty(filename)
-    [filename, pathname] = uigetfile('G[A-B][1-4]-*.mat','Select file');
+    [filename, pathname] = uigetfile('*.mat','Select file');
 end
 set(handles.file_name,'string',['Loading:    ' pathname filename]);
 cd(pathname);

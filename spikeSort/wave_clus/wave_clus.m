@@ -21,7 +21,6 @@ function varargout = wave_clus(varargin)
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
 % Edit the above text to modify the response to help wave_clus
-
 % Last Modified by GUIDE v2.5 10-Jan-2023 14:57:13
 
 % JMG101208
@@ -50,10 +49,10 @@ function varargout = wave_clus(varargin)
 % USER_DATA{20} - USER_DATA{42}, fix clusters
 
 
-
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
-gui_State = struct('gui_Name',       mfilename, ...
+gui_State = struct( ...
+    'gui_Name',  mfilename, ...
     'gui_Singleton',  gui_Singleton, ...
     'gui_OpeningFcn', @wave_clus_OpeningFcn, ...
     'gui_OutputFcn',  @wave_clus_OutputFcn, ...
@@ -96,13 +95,11 @@ set(handles.fix1_button,'value',0);
 set(handles.fix2_button,'value',0);
 set(handles.fix3_button,'value',0);
 
-
 % Update handles structure
 guidata(hObject, handles);
 
 % UIWAIT makes wave_clus wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-
 
 % --- Outputs from this function are returned to the command line.
 function varargout = wave_clus_OutputFcn(hObject, eventdata, handles)
@@ -116,7 +113,6 @@ varargout{1} = handles.output;
 
 clus_colors = [0 0 1; 1 0 0; 0 0.5 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0; 0.25 0.25 0.25];
 set(0,'DefaultAxesColorOrder', clus_colors)
-
 
 % --- Executes on button press in load_data_button.
 function load_data_button_Callback(hObject, eventdata, handles)
@@ -147,25 +143,20 @@ if isa(hObject,'matlab.ui.container.ContextMenu')
 end
 
 fn = get(handles.file_name,'String');
-[~,fn,e] = fileparts(fn);
+[~,fn, e] = fileparts(fn);
 fn = [fn e];
 num = regexp(fn,'\d*','match','once');
 if ~isempty(num)
-
     switch thisTag
         case {'loadNext','rejectSaveLoad','saveAndLoadNext'}
             filename = strrep(fn, num, num2str(str2num(num)+1));
-            %             filename = strrep(filename,'_notch','');
         case {'loadPrevious','saveAndLoadPrevious'}
             filename = strrep(fn, num, num2str(str2num(num)-1));
-            %             filename = strrep(filename,'_notch','');
         case {'reloadThis'}
             filename = fn;
-            %             filename = strrep(filename,'_notch','');
         case {'load_data_button'}
             if ~isempty(handles.channelToLoad.String)
                 filename = strrep(fn, num, handles.channelToLoad.String);
-                %                 filename = strrep(filename,'_notch','');
                 set(handles.channelToLoad,'String','');
             else
                 filename = '';
@@ -173,7 +164,7 @@ if ~isempty(num)
         otherwise
             filename = '';
     end
-    pathname = [pwd,filesep];
+    pathname = [pwd, filesep];
 else
     filename = '';
 end
@@ -181,106 +172,87 @@ fprintf('%s...',filename)
 
 switch char(handles.datatype)
     case 'Simulator'
-        readData_Simulator(filename, handles);
-    case 'CSC data'                                              %Neuralynx (CSC files)
-        readData_CSCData(filename, handles);
-    case 'CSC data (pre-clustered)'                              %Neuralynx (CSC files)
-        readData_CSCPreClustered(filename, handles);
+        cluster_class = readData_Simulator(filename, handles);
+    case 'CSC data'                                              % Neuralynx (CSC files)
+        cluster_class = readData_CSCData(filename, handles);
+    case 'CSC data (pre-clustered)'                              % Neuralynx (CSC files)
+        cluster_class = readData_CSCPreClustered(filename, handles);
     case 'Sc data'
-        readData_ScData(filename, handles);
+        cluster_class = readData_ScData(filename, handles);
     case 'Sc data (pre-clustered)'
-        readData_ScPreClustered(filename, handles);
-    case 'ASCII'            % ASCII matlab files
-        readData_ASCII(filename, handles);
-    case 'ASCII (pre-clustered)'                                   %ASCII matlab files
-        readData_ASCIIpreClustered(filename, handles);
+        cluster_class = readData_ScPreClustered(filename, handles);
+    case 'ASCII'                                                 % ASCII matlab files
+        cluster_class = readData_ASCII(filename, handles);
+    case 'ASCII (pre-clustered)'                                 % ASCII matlab files
+        cluster_class = readData_ASCIIpreClustered(filename, handles);
     case 'ASCII spikes'
-        readData_ASCIISpikes(filename, handles);
+        cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
-        readData
-
+        [filename, pathname] = uigetfile('*.mat','Select file'); 
+        if ~filename
+            return
+        end
+        [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
-temp=find_temp2(tree, handles);                                   %Selects temperature.
+temp=find_temp2(tree, handles);                                  % Selects temperature.
 set(handles.file_name,'string',[pathname filename]);
 
 % EM: This is where identification gets set. But really, we want to use the
 % classes from the times_CSC file because in the unsupervised case they
 % already exist, and if we've looked at these spikes before, that is where
 % they get saved.
-
-if size(clu,2)-2 < size(spikes,1);
+guidata(hObject, handles);
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
+spikes = USER_DATA{2};
+if size(clu,2)-2 < size(spikes,1)
     classes = clu(temp(end),3:end)+1;
-    if ~exist('ipermut')
-        classes = [classes(:)' zeros(1,size(spikes,1)-handles.par.max_spk)];
+    if ~exist('ipermut', 'var')
+        classes = [classes(:)' zeros(1,size(spikes,1) - handles.par.max_spk)];
     end
 else
     classes = clu(temp(end),3:end)+1;
 end
 
 saved_classes = cluster_class(:,1);
-
-guidata(hObject, handles);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
 USER_DATA{6} = saved_classes(:)';
 USER_DATA{8} = temp(end);
 USER_DATA{9} = saved_classes(:)';                                     %backup for non-forced classes.
 
 %% definition of clustering_results
-clustering_results = [];
-clustering_results(:,1) = repmat(temp,length(classes),1); % GUI temperatures
+clustering_results      = [];
+clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
 clustering_results(:,2) = classes'; % GUI classes
-clustering_results(:,3) = repmat(temp,length(classes),1); % original temperatures
+clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
-clustering_results(:,5) = repmat(handles.par.min_clus,length(classes),1); % minimum number of clusters
-clustering_results_bk = clustering_results; % old clusters for undo actions
+clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
+clustering_results_bk   = clustering_results; % old clusters for undo actions
 USER_DATA{10} = clustering_results;
 USER_DATA{11} = clustering_results_bk;
+
 handles.force = 0;
 handles.merge = 0;
 handles.reject = 0;
 handles.undo = 0;
 handles.minclus = handles.par.min_clus;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 handles.setclus = 0;
 
 %% Add sampling rate info
-if exist(fullfile(pathname,filename),'file')
-    cscData = load(fullfile(pathname,filename),'samplingInterval');
-    try
-        samplingRate = 1000/cscData.samplingInterval;
-    catch
-        samplingRate = 1000/cscData.samplingInterval.samplingInterval;
-    end
+if length(USER_DATA)<18 || isempty(USER_DATA{18})
+    samplingRate = questdlg('What was the sampling rate?','SR','30000','32000','40000','32000');
+    samplingRate = eval(samplingRate);
 else
-    if length(USER_DATA)<18 || isempty(USER_DATA{18})
-        gd = findobj('name','updateOrAddSession');
-        if ~isempty(gd)
-            gd = guidata(gd);
-            switch gd.recordingSystem.SelectedObject.String
-                case 'BlackRock'
-                    samplingRate = 30000;
-                case 'Neuralynx'
-                    samplingRate = questdlg('What was the sampling rate?','SR','32000','40000','32000');
-                    samplingRate = eval(samplingRate);
-                otherwise
-                    samplingRate = NaN;
-            end
-        else
-            samplingRate = questdlg('What was the sampling rate?','SR','30000','32000','40000','32000');
-            samplingRate = eval(samplingRate);
-        end
-    else
-        samplingRate = USER_DATA{18};
-    end
+    samplingRate = USER_DATA{18};
 end
+
 cla(handles.cont_data)
 USER_DATA{18} = samplingRate;
 set(handles.wave_clus_figure, 'userdata', USER_DATA)
 
 %% mark clusters when new data is loaded
 plot_spikes(handles);
-mark_clusters_temperature_diagram(handles,tree,clustering_results,1);
+mark_clusters_temperature_diagram(handles, tree, clustering_results, 1);
 fprintf('Finished!\n')
 
 % --- Executes on button press in change_temperature_button.
@@ -305,7 +277,6 @@ USER_DATA{6} = classes(:)';
 USER_DATA{8} = temp;
 USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
 handles.par.num_temp = min(handles.par.num_temp,size(clu,1));
-
 
 handles.minclus = min_clus;
 clustering_results = USER_DATA{10};
@@ -352,7 +323,6 @@ set(handles.fix2_button,'value',0);
 set(handles.fix3_button,'value',0);
 for i=4:par.max_clus
     par.(['fix',num2str(i)]) = 0;
-    %  EM: avoid using eval whenever possible    eval(['par.fix' num2str(i) '=0;']);
 end
 USER_DATA{1} = par;
 set(handles.wave_clus_figure,'userdata',USER_DATA);
@@ -394,7 +364,6 @@ set(handles.fix3_button,'value',0);
 for i=4:par.max_clus
     eval(['par.fix' num2str(i) '=0;']);
 end
-
 
 % --- Executes on button press in save_clusters_button.
 function save_clusters_button_Callback(hObject, eventdata, handles)
@@ -450,7 +419,6 @@ switch currentver
             ipermut = USER_DATA{12};
             exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' inspk',' ipermut',' -v6;');
         end
-
     otherwise
         if isempty(USER_DATA{7}) && isempty(USER_DATA{12})
             exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes');
@@ -619,8 +587,6 @@ for i=4:par.max_clus
     eval(['par.fix' num2str(i) '=0;']);
 end
 
-
-
 % PLOT ALL PROJECTIONS BUTTON
 % --------------------------------------------------------------------
 function Plot_all_projections_button_Callback(hObject, eventdata, handles)
@@ -714,6 +680,7 @@ handles.minclus = cluster_results(1,5);
 plot_spikes(handles);
 % -------------------------------------------------------------------
 function spike_features_button_Callback(hObject, eventdata, handles)
+
 set(gcbo,'value',1);
 set(handles.spike_shapes_button,'value',0);
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -726,10 +693,10 @@ handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles);
 
-
 %SETTING OF SPIKE PLOTS
 % --------------------------------------------------------------------
 function plot_all_button_Callback(hObject, eventdata, handles)
+
 set(gcbo,'value',1);
 set(handles.plot_average_button,'value',0);
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -741,6 +708,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles);
+
 % --------------------------------------------------------------------
 function plot_average_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
@@ -878,15 +846,11 @@ handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
 
-
-
 %SETTING OF ISI BUTTONS
-
 % --------------------------------------------------------------------
 function isi1_accept_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
 set(handles.isi1_reject_button,'value',0);
-
 % --------------------------------------------------------------------
 function isi1_reject_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
@@ -905,13 +869,13 @@ handles.merge = 0;
 handles.reject = 1;
 handles.setclus = 1;
 handles.minclus = clustering_results(1,5);
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 plot_spikes(handles)
 
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 clustering_results = USER_DATA{10};
-mark_clusters_temperature_diagram(handles,tree,clustering_results)
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(gcbo,'value',0);
 set(handles.isi1_accept_button,'value',1);
@@ -939,13 +903,13 @@ handles.merge = 0;
 handles.reject = 1;
 handles.setclus = 1;
 handles.minclus = clustering_results(1,5);
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 plot_spikes(handles)
 
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 clustering_results = USER_DATA{10};
-mark_clusters_temperature_diagram(handles,tree,clustering_results)
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 
 set(gcbo,'value',0);
 set(handles.isi2_accept_button,'value',1);
@@ -953,12 +917,12 @@ set(handles.isi2_accept_button,'value',1);
 % --------------------------------------------------------------------
 function isi3_accept_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
-set(handles.isi3_reject_button,'value',0);
+set(handles.isi3_reject_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi3_reject_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
-set(handles.isi3_accept_button,'value',0);
+set(handles.isi3_accept_button, 'value', 0);
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 classes = USER_DATA{6};
 tree = USER_DATA{5};
@@ -1224,14 +1188,12 @@ function rejectSaveLoad_Callback(hObject, eventdata, handles)
 % hObject    handle to rejectSaveLoad (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-1;
 
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 par = USER_DATA{1};
 spikes = USER_DATA{2};
 classes = USER_DATA{6};
 inspk = USER_DATA{7};
-
 
 classes = zeros(size(classes));
 
@@ -1258,7 +1220,6 @@ plot_spikes(handles);
 % for i=4:par.max_clus
 %     eval(['par.fix' num2str(i) '=0;']);
 % end
-
 
 save_clusters_button_Callback(hObject, eventdata, handles)
 load_data_button_Callback(hObject, eventdata, handles)
@@ -1288,7 +1249,7 @@ new_func = inputdlg(['Please enter an anonymous function of one variable, ',...
     'into classes. Note: It is HIGHLY RECOMMENDED that you only use this ',...
     'function for excluding spikes during times when you know you will not',...
     ' analyze data (e.g. between trials when noise was introduced)'],...
-    'Enter exclusion function',1,{curr_func});
+    'Enter exclusion function', 1, {curr_func});
 USER_DATA{19} = new_func{1};
 classes = USER_DATA{6};
 ts = USER_DATA{3}*1e-3;
@@ -1298,9 +1259,8 @@ if ~isempty(new_func{1})
     classes(rejectInds) = 0;
 end
 USER_DATA{6} = classes;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 plot_spikes(handles)
-
 
 % --- Executes on button press in mahalDistRemoveSpikes.
 function mahalDistRemoveSpikes_Callback(hObject, eventdata, handles)
@@ -1308,7 +1268,7 @@ function mahalDistRemoveSpikes_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 fprintf('Removing spikes by Mahalanobis Distance...')
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 handles.force = 0;
 handles.merge = 0;
 handles.undo = 1;
@@ -1336,7 +1296,7 @@ for i=1:max(classes)
 end
 warning('on','MATLAB:nearlySingularMatrix');
 USER_DATA{6} = classes;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 plot_spikes(handles)
 fprintf('Finished!\n')
 
@@ -1345,8 +1305,9 @@ function PlotContinuous_Callback(hObject, eventdata, handles)
 % hObject    handle to PlotContinuous (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 % Add continuous data to plot
-cscData = load(handles.par.filename);
+cscData = load(fullfile(handles.par.pathname, handles.par.filename));
 cscData.data = reshape(cscData.data,1,[]);
 samplingRate = 1000/cscData.samplingInterval;
 cscData.data = resample(double(cscData.data),1000,samplingRate);
