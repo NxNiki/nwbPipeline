@@ -207,7 +207,7 @@ if handles.force==1
 end
 
 % new temperature when merge
-if handles.merge == 1 & ~isempty(nfix_class)
+if handles.merge == 1 && ~isempty(nfix_class)
     clustering_results(fix_class2,3) = mtemp;
     clustering_results(fix_class2,4) = clustering_results(imerge(1),4);
 end
@@ -219,7 +219,7 @@ clustering_results(:,5) = minclus; % GUI minimum cluster
 % The temperature of the non-fixed spikes will be
 % the GUI temperature (temp) and cluster number will be
 % the GUI cluster number (classes)
-if length(fix_class2)~=0 & handles.merge==0 & handles.undo==0 & handles.reject==0 & handles.force==0
+if length(fix_class2)~=0 && handles.merge==0 && handles.undo==0 && handles.reject==0 && handles.force==0
     % selects the index of the non-fixed spikes
     % since those are the ones which are going to be updated
     ind_non_fix = 1:length(classes);
@@ -232,7 +232,7 @@ end
 clustering_results(:,2) = classes;
 % If there are no fix and rejected clusters and undo operations,
 % original classes are the same as current classes
-if length(fix_class2)==0 & handles.reject==0 & handles.undo==0 & handles.merge==0 & handles.force==0
+if length(fix_class2)==0 && handles.reject==0 && handles.undo==0 && handles.merge==0 && handles.force==0
     clustering_results(:,4) = clustering_results(:,2); % clusters
     clustering_results(:,3) = temp; % temperatures
 end
@@ -246,7 +246,7 @@ if length(USER_DATA)>=19 && ~isempty(USER_DATA{19})
     rejectInds = f(ts);
     classes(rejectInds) = 0;
     USER_DATA{6} = classes;
-    classDefs = arrayfun(@(x)find(classes==x),0:(length(classDefs)-1),'uniformoutput',0);
+    classDefs = arrayfun(@(x)find(classes==x),0:(length(classDefs)-1), 'uniformoutput', 0);
     nowEmpty = cellfun(@(x)isempty(x),classDefs);
     oldClusterNums = 0:length(classDefs)-1;
     classDefs(nowEmpty) = [];
@@ -372,7 +372,7 @@ for i = 1:nclusters+1
 end
 
 %Resize axis
-if ~strcmp(char(handles.datatype),'Sc data') & ~strcmp(char(handles.datatype),'Sc data (pre-clustered)')
+if ~strcmp(char(handles.datatype), 'Sc data') && ~strcmp(char(handles.datatype), 'Sc data (pre-clustered)')
     if ~isempty(ylimit)
         ymin = min(ylimit(:,1));
         ymax = max(ylimit(:,2));

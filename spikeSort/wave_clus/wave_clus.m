@@ -40,12 +40,9 @@ function varargout = wave_clus(varargin)
 % USER_DATA{10} = clustering_results
 % USER_DATA{11} = clustering_results_bk
 % USER_DATA{12} = ipermut, indexes of the previously permuted spikes for clustering taking random number of points
-%
 % USER_DATA{13} - USER_DATA{17}, for future changes
-%
-% USER_DATA{18} =  sampling frequency
+% USER_DATA{18} = sampling frequency
 % USER_DATA{19} = function to reject all spikes in a time range
-%
 % USER_DATA{20} - USER_DATA{42}, fix clusters
 
 
@@ -58,7 +55,7 @@ gui_State = struct( ...
     'gui_OutputFcn',  @wave_clus_OutputFcn, ...
     'gui_LayoutFcn',  [], ...
     'gui_Callback',   []);
-if nargin & isstr(varargin{1})
+if nargin && isstr(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
 
@@ -205,10 +202,10 @@ set(handles.file_name,'string',[pathname filename]);
 guidata(hObject, handles);
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 spikes = USER_DATA{2};
-if size(clu,2)-2 < size(spikes,1)
+if size(clu,2)-2 < size(spikes, 1)
     classes = clu(temp(end),3:end)+1;
     if ~exist('ipermut', 'var')
-        classes = [classes(:)' zeros(1,size(spikes,1) - handles.par.max_spk)];
+        classes = [classes(:)' zeros(1,size(spikes, 1) - handles.par.max_spk)];
     end
 else
     classes = clu(temp(end),3:end)+1;
@@ -276,12 +273,12 @@ USER_DATA{1} = par;
 USER_DATA{6} = classes(:)';
 USER_DATA{8} = temp;
 USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
-handles.par.num_temp = min(handles.par.num_temp,size(clu,1));
+handles.par.num_temp = min(handles.par.num_temp, size(clu,1));
 
 handles.minclus = min_clus;
 clustering_results = USER_DATA{10};
 clustering_results_bk = USER_DATA{11};
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 temperature=handles.par.mintemp+temp*handles.par.tempstep;
 
 switch par.temp_plot
@@ -341,9 +338,9 @@ USER_DATA{6} = classes(:)';
 USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
 clustering_results = USER_DATA{10};
 clustering_results(:,5) = par.min_clus;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 
-mark_clusters_temperature_diagram(handles,tree,clustering_results)
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
 handles.setclus = 0;
 handles.force = 0;
 handles.merge = 0;
@@ -351,10 +348,10 @@ handles.undo = 0;
 handles.reject = 0;
 handles.minclus = par.min_clus;
 plot_spikes(handles);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
-set(handles.wave_clus_figure,'userdata',USER_DATA);
-mark_clusters_temperature_diagram(handles,tree,clustering_results)
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
+mark_clusters_temperature_diagram(handles,tree, clustering_results)
 
 set(handles.force_button,'value',0);
 set(handles.force_button,'string','Force');
@@ -376,7 +373,7 @@ classes = USER_DATA{6};
 
 % get user name:
 sortedBy = handles.sorterName.String;
-if isempty(sortedBy) || strcmp(sortedBy,'Enter your name')
+if isempty(sortedBy) || strcmp(sortedBy, 'Enter your name')
     n = inputdlg('Please enter your name','Sorter''s name?',1);
     sortedBy = n{1};
     handles.sorterName.String = sortedBy;
@@ -437,7 +434,7 @@ end
 
 eval(exec_line);
 
-if(~strcmp(handles.par.fnamespc,handles.par.fnamesave))
+if(~strcmp(handles.par.fnamespc, handles.par.fnamesave))
     copyfile([handles.par.fnamespc '.dg_01.lab'], [handles.par.fnamesave '.dg_01.lab']);
     copyfile([handles.par.fnamespc '.dg_01'], [handles.par.fnamesave '.dg_01']);
 end
@@ -500,7 +497,6 @@ if nClusts>28
 end
 fprintf('Finished!\n')
 
-
 % --- Executes on selection change in data_type_popupmenu.
 function data_type_popupmenu_Callback(hObject, eventdata, handles)
 aux = get(hObject, 'String');
@@ -508,13 +504,11 @@ aux1 = get(hObject, 'Value');
 handles.datatype = aux(aux1);
 guidata(hObject, handles);
 
-
 % --- Executes on button press in set_parameters_button.
 function set_parameters_button_Callback(hObject, eventdata, handles)
 helpdlg('Check the set_parameters files in the subdirectory Wave_clus\Parameters_files');
 
-
-%SETTING OF FORCE MEMBERSHIP
+% SETTING OF FORCE MEMBERSHIP
 % --------------------------------------------------------------------
 function force_button_Callback(hObject, eventdata, handles)
 %set(gcbo,'value',1);
@@ -552,7 +546,7 @@ switch par.force_feature
         f_out = spikes(find(classes==0),:);
     case 'wav'
         if isempty(inspk)
-            [inspk] = wave_features_wc(spikes,handles);        % Extract spike features.
+            [inspk] = wave_features_wc(spikes, handles);        % Extract spike features.
             USER_DATA{7} = inspk;
         end
         f_in  = inspk(find(classes~=0 & classes~=-1),:);
@@ -576,9 +570,9 @@ handles.undo = 0;
 
 plot_spikes(handles);
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 
 set(handles.fix1_button,'value',0);
 set(handles.fix2_button,'value',0);
@@ -619,7 +613,6 @@ set(h_fig3,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 
-
 % fix2 button --------------------------------------------------------------------
 function fix2_button_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -640,7 +633,6 @@ set(h_fig4,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
-
 
 % fix3 button --------------------------------------------------------------------
 function fix3_button_Callback(hObject, eventdata, handles)
@@ -663,7 +655,6 @@ set(h_fig3,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 
-
 %SETTING OF SPIKE FEATURES OR PROJECTIONS
 % --------------------------------------------------------------------
 function spike_shapes_button_Callback(hObject, eventdata, handles)
@@ -678,6 +669,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles);
+
 % -------------------------------------------------------------------
 function spike_features_button_Callback(hObject, eventdata, handles)
 
@@ -723,7 +715,6 @@ handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles);
 
-
 %% SETTING OF ISI HISTOGRAMS
 % --------------------------------------------------------------------
 function isi1_nbins_Callback(hObject, eventdata, handles)
@@ -740,6 +731,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi1_bin_step_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -755,6 +747,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi2_nbins_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -770,6 +763,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi2_bin_step_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -785,6 +779,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi3_nbins_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -800,6 +795,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi3_bin_step_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -815,6 +811,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi0_nbins_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -830,6 +827,7 @@ handles.reject = 0;
 handles.undo = 0;
 handles.minclus = cluster_results(1,5);
 plot_spikes(handles)
+
 % --------------------------------------------------------------------
 function isi0_bin_step_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -851,6 +849,7 @@ plot_spikes(handles)
 function isi1_accept_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
 set(handles.isi1_reject_button,'value',0);
+
 % --------------------------------------------------------------------
 function isi1_reject_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
@@ -990,8 +989,6 @@ end
 USER_DATA{1} = par;
 set(handles.wave_clus_figure,'userdata',USER_DATA);
 
-
-
 % --- Executes on button press in merge_button.
 function merge_button_Callback(hObject, eventdata, handles)
 handles.force = 0;
@@ -1018,7 +1015,6 @@ end
 USER_DATA{1} = par;
 set(handles.wave_clus_figure,'userdata',USER_DATA);
 
-
 % --- Executes on button press in Plot_polytrode_channels_button.
 function Plot_polytrode_button_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
@@ -1029,7 +1025,6 @@ elseif strcmp(par.filename(1:13),'C_sim_script_')
     handles.simname = par.filename;
     Plot_simulations(handles)
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function isi1_nbins_CreateFcn(hObject, eventdata, handles)
@@ -1043,7 +1038,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function isi1_bin_step_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to isi1_bin_step (see GCBO)
@@ -1055,7 +1049,6 @@ function isi1_bin_step_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function isi2_nbins_CreateFcn(hObject, eventdata, handles)
@@ -1069,7 +1062,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function isi2_bin_step_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to isi2_bin_step (see GCBO)
@@ -1081,7 +1073,6 @@ function isi2_bin_step_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function isi3_nbins_CreateFcn(hObject, eventdata, handles)
@@ -1095,7 +1086,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function isi3_bin_step_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to isi3_bin_step (see GCBO)
@@ -1107,7 +1097,6 @@ function isi3_bin_step_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function isi0_nbins_CreateFcn(hObject, eventdata, handles)
@@ -1121,7 +1110,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function isi0_bin_step_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to isi0_bin_step (see GCBO)
@@ -1133,7 +1121,6 @@ function isi0_bin_step_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function min_clus_edit_CreateFcn(hObject, eventdata, handles)
@@ -1147,13 +1134,11 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in pushbutton13.
 function pushbutton13_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton13 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 % --- Executes during object creation, after setting all properties.
 function data_type_popupmenu_CreateFcn(hObject, eventdata, handles)
@@ -1166,7 +1151,6 @@ function data_type_popupmenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --------------------------------------------------------------------
 function Untitled_1_Callback(hObject, eventdata, handles)
@@ -1181,7 +1165,6 @@ function reloadThis_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 load_data_button_Callback(hObject, eventdata, handles)
-
 
 % --- Executes on button press in rejectSaveLoad.
 function rejectSaveLoad_Callback(hObject, eventdata, handles)
@@ -1318,10 +1301,10 @@ set(handles.cont_data,'xlim',[0,ts(end)],'ylim',[-M M])
 set(handles.spikeRaster,'xlim',[0,ts(end)])
 spikesName = regexprep(handles.par.filename,'(\d+)','$1_spikes');
 try
-    hold(handles.cont_data,'on')
-    load(spikesName,'timesZeroedOutForSpikeDetection');
-    for i=1:size(timesZeroedOutForSpikeDetection,1)
-        plot(handles.cont_data,timesZeroedOutForSpikeDetection(i,:),[0 0],'y','linewidth',3);
+    hold(handles.cont_data, 'on')
+    load(spikesName, 'timesZeroedOutForSpikeDetection');
+    for i=1:size(timesZeroedOutForSpikeDetection, 1)
+        plot(handles.cont_data, timesZeroedOutForSpikeDetection(i,:), [0 0], 'y', 'linewidth', 3);
     end
 end
 % --- Executes on button press in noiseReject.
@@ -1330,8 +1313,6 @@ function noiseReject_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-
 function channelToLoad_Callback(hObject, eventdata, handles)
 % hObject    handle to channelToLoad (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1339,7 +1320,6 @@ function channelToLoad_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of channelToLoad as text
 %        str2double(get(hObject,'String')) returns contents of channelToLoad as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function channelToLoad_CreateFcn(hObject, eventdata, handles)
@@ -1352,7 +1332,6 @@ function channelToLoad_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes on button press in loadPrevious.
 function loadPrevious_Callback(hObject, eventdata, handles)
@@ -1384,8 +1363,6 @@ function saveAndLoadNext_Callback(hObject, eventdata, handles)
 save_clusters_button_Callback(hObject, eventdata, handles)
 load_data_button_Callback(hObject, eventdata, handles)
 
-
-
 function sorterName_Callback(hObject, eventdata, handles)
 % hObject    handle to sorterName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1393,7 +1370,6 @@ function sorterName_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of sorterName as text
 %        str2double(get(hObject,'String')) returns contents of sorterName as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function sorterName_CreateFcn(hObject, eventdata, handles)
