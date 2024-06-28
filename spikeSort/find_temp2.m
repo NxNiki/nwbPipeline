@@ -1,4 +1,4 @@
-function [temp] = find_temp(tree,handles);
+function [temp] = find_temp2(tree,handles)
 % Selects the temperature.
 
 num_temp=min(handles.par.num_temp,size(tree,1));
