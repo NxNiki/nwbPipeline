@@ -101,25 +101,25 @@ spikes=zeros(nspk,ls+4);
 excludedSpikes = spikes;
 excludedIndex = index;
 xf=[xf zeros(1,w_post)];
-for i=1:nspk                          %Eliminates artifacts
+for i=1:nspk                            % Eliminates artifacts
     if max(abs( xf(index(i)-w_pre:index(i)+w_post) )) < thrmax               
         spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
     else
         excludedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
     end
 end
-aux = spikes(:,w_pre)==0;       %erases indexes that were artifacts
-spikes(aux,:)=[];
-index(aux)=[];
-excludedSpikes(~aux,:) = [];
-excludedIndex(~aux) = [];
+aux = spikes(:, w_pre)==0;              % erases indexes that were artifacts
+spikes(aux, :) = [];
+index(aux) = [];
+excludedSpikes(~aux, :) = [];
+excludedIndex(~aux, :) = [];
 detectionParams.excludedSpikes = excludedSpikes;
 detectionParams.excludedIndex = excludedIndex;
 
         
 switch param.interpolation
     case 'n'
-        spikes(:,end-1:end)=[];       %eliminates borders that were introduced for interpolation 
+        spikes(:,end-1:end)=[];         % eliminates borders that were introduced for interpolation 
         spikes(:,1:2)=[];
     case 'y'
         %Does interpolation
