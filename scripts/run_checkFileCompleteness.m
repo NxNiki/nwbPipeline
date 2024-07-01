@@ -1,3 +1,8 @@
+% when unpack got interrupted by connection error, some files may not be
+% complete. this script checks if timeend is a the unpacked file, otherwise
+% the file is incomplete and should be re-unpacked. This is not necessary
+% as in the recent update, we use a temp file to save incomplete data.
+
 % check completeness of unpacked .mat files
 % hidden .mat file and incomplete files will be deleted.
 

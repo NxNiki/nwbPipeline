@@ -79,7 +79,7 @@ end
 
 % SPIKE STORING (with or without interpolation)
 ls = w_pre + w_post;
-spikes = zeros(nspk,ls+4);
+spikes = zeros(nspk, ls+4);
 
 xf(length(xf)+1:length(xf)+w_post)=0;
 

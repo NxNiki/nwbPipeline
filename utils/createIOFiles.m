@@ -14,8 +14,8 @@ if nargin < 4
     renameChannels = [];
 end
 
-channelFileNames = readcell(fullfile(expOutFilePath, 'channelFileNames.csv'));
-channelFileNames = channelFileNames(2:end,:);
+channelFileNames = readtable(fullfile(expOutFilePath, 'channelFileNames.csv'), Delimiter=',');
+channelFileNames = table2cell(channelFileNames);
 
 % select macro/micro files and rename output file names so that alphabetic order 
 % is consistent with temporal order. 
@@ -23,6 +23,7 @@ channelFileNames = channelFileNames(2:end,:);
 % name. The micro files always start with 'G[A-D]'.
 % For Iowa data, macro files have pattern: LFPx*.ncs
 % micro files have pattern: PDes*.ncs
+% Events files have pattern: Events*.nev
 idx = cellfun(@(x)~isempty(regexp(x, pattern, 'match', 'once')), channelFileNames(:, 1));
 inFileNames = channelFileNames(idx, :);
 

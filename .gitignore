@@ -27,7 +27,9 @@ scripts/*.csv
 
 .idea/*
 
-config_*.cfg
-montage_*.json
+*.cfg
+*montage_*.json
 
 batch/sedDLFclD
+
+*_old.m

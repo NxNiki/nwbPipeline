@@ -1,4 +1,7 @@
 function [ttlLogAlign, ttlCodeAlign, tsAlign] = alignTTL(ttlLog, ttlCode, ts)
+
+% THIS IS OLD SOLUTION, USE LONGESTCOMMONSEQUENCE.M TO ALIGNTTL.
+
 % ttlLog: cell array with columns: ts, ttl message, ttl code.
 % ttlCode: index ranging from 1 to 100
 % this function match ttlLog and ttlCode based on ttlcode and timestamps.
