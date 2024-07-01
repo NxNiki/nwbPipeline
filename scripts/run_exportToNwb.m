@@ -7,7 +7,7 @@
 
 clear
 
-expId = 1;
+expId = 2;
 filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 % expId = 5;
@@ -34,7 +34,7 @@ timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 % sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
 date = '1900-01-01'; %Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
-sessionStartTime = datetime(date,'Format','yyyy-MM-dd');
+sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
 % generateCore('2.6.0');
 

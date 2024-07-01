@@ -36,7 +36,7 @@ suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 
 % unpack ncs files:
 parfor i = 1:length(inFileNames)
-    inFileName = inFileNames{i};
+    [~, ~, ext] = fileparts(inFileNames{i});
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
@@ -50,31 +50,45 @@ parfor i = 1:length(inFileNames)
     end
 
     if verbose
-        fprintf('unpack: %s\nto: %s\n', inFileName, outFileName);
+        fprintf('unpack: %s\nto: %s\n', inFileNames{i}, outFileName);
     end
 
     timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);
 
-    [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
-    num_samples = length(signal);
-    timeend = (num_samples-1) * samplingInterval;
-
-    matobj = matfile(outFileNameTemp, 'Writable', true);
-    matobj.samplingInterval = samplingInterval;
-    matobj.samplingIntervalSeconds = seconds(samplingInterval);
-    matobj.data = signal;
-    matobj.time0 = 0;
-    matobj.timeend = timeend;
-    matobj.timeendSeconds = seconds(timeend);
-
-    if computeTS(i)
-        matobj = matfile(timestampFullFile, Writable=true);
-        matobj.timeStamps = timeStamps;
+    if strcmp(ext, '.ncs')
+        [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
+        num_samples = length(signal);
+        timeend = (num_samples-1) * samplingInterval;
+    
+        matobj = matfile(outFileNameTemp, 'Writable', true);
         matobj.samplingInterval = samplingInterval;
         matobj.samplingIntervalSeconds = seconds(samplingInterval);
+        matobj.data = signal;
         matobj.time0 = 0;
         matobj.timeend = timeend;
         matobj.timeendSeconds = seconds(timeend);
+    
+        if computeTS(i)
+            matobj = matfile(timestampFullFile, Writable=true);
+            matobj.timeStamps = timeStamps;
+            matobj.samplingInterval = samplingInterval;
+            matobj.samplingIntervalSeconds = seconds(samplingInterval);
+            matobj.time0 = 0;
+            matobj.timeend = timeend;
+            matobj.timeendSeconds = seconds(timeend);
+        end
+    elseif strcmp(ext, '.nev')
+        [timeStamps, TTLs, header] = Nlx2MatEV_v3(inFileNames{i}, [1 0 1 0 0], 1,1,[]);
+        dt = diff(timeStamps);
+        inds = find(dt<50 & dt>0);
+        TTLs(inds) = [];
+        timeStamps(inds) = [];
+        timeStamps = timeStamps*1e-6;
+
+        matobj = matfile(outFileNameTemp, 'Writable', true);
+        matobj.TTLs = TTLs;
+        matobj.timestamps = timeStamps;
+        matobj.header = header;
     end
 
     movefile(outFileNameTemp, outFileName);

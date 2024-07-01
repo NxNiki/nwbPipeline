@@ -1,4 +1,4 @@
-function [idx1, idx2, L] = LongestCommonSubsequence(arr1, arr2)
+function [idx1, idx2, L] = longestCommonSubsequence(arr1, arr2)
 
     % This function finds the longest common subsequence that respects the frequencies
     % of element occurrences up to each point in the arrays.

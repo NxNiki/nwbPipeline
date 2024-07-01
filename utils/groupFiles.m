@@ -1,4 +1,4 @@
-function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(inputPath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow)
+function [groups, fileNames, groupFileNames] = groupFiles(inputPath, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow)
 % groupFiles: group files based on their name pattern.
 % Details:
 %    This function lists files in the directory that matches specific
@@ -36,9 +36,6 @@ function [groups, fileNames, groupFileNames, eventFileNames] = groupFiles(inputP
 %
 %    groupFileNames - dataTable [m, n + 1]. data table combines groups and
 %    fileNames, this can be saved as .csv file to check the files combined.
-%
-%    eventFileNames - cell [n]. '.env' files to be combined. If no event
-%    files found in directories{i}, it will be empty.
 
 % Example:
 %{
@@ -92,7 +89,7 @@ if orderByCreateTime && length(fileSuffix)>1
     % we assume the temporal order of files in each channel is
     % consistent, so just check the order of the first channel and apply
     % it to the remaining channels.
-    fprintf("groupFiles: order files by create time for group: %s. \n", fileGroup{1});
+    fprintf("groupFiles: order files by create time for channel: %s. \n", fileGroup{1});
     order = orderFilesByTime(groupFileNames(1,:), REVERSE_TEMPORAL_ORDER);
     groupFileNames = groupFileNames(:, order);
 elseif length(fileSuffix)>1
@@ -106,10 +103,20 @@ groupFileNames.Properties.VariableNames{1} = 'fileGroup';
 eventFileNames = getNeuralynxFiles(inputPath, '.nev', ignoreFilesWithSizeBelow);
 eventFileNames = cellfun(@(x) fullfile(inputPath, x), eventFileNames, 'UniformOutput', false);
 if length(eventFileNames) > 1
-    % order .nev files by start time stamp:
+    fprintf("groupFiles: order event files by create time. \n");
     order = orderFilesByTime(eventFileNames);
     eventFileNames = eventFileNames(order);
 end
+
+% assume number of events file is same as or less than (no events occurs
+% during experiment) the number of segments.
+eventFiles = cell(1, size(groupFileNames, 2));
+eventFiles(:) = {''}; % empty cell cause error when reading from csv.
+eventFiles{1} = 'Events';
+eventFiles(2:length(eventFileNames)+1) = eventFileNames;
+eventFiles = cell2table(eventFiles);
+eventFiles.Properties.VariableNames = groupFileNames.Properties.VariableNames;
+groupFileNames = [groupFileNames; eventFiles];
 
 groups = table2cell(groupFileNames(:, 1));
 fileNames = table2cell(groupFileNames(:, 2:end));
