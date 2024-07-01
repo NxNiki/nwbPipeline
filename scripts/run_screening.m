@@ -1,84 +1,56 @@
+% before run_screening.m, make sure data is unpacked and spike sorted.
+
 clear
+scriptDir = fileparts(mfilename('fullpath'));
+addpath(genpath(fileparts(scriptDir)));
 
 patient = 573;
-exp = 13;
+expId = 1;
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/573_Screening';
+% filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/Screening/573_Screening';
 
-trialFolder = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/CSC_data', patient, exp);
+% make sure log files are ordered correctly:
+ttlLogFiles = {
+    fullfile(expFilePath, "573-screening Log/573-02-May-2024-14-54-53/from laptop/ttlLog573-02-May-2024-14-54-53.mat");
+    fullfile(expFilePath, "573-screening Log/573-02-May-2024-15-23-30/from laptop/TTLs573-02-May-2024-15-23-30_room1.mat")
+    };
 
-addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/DataPipeline_Screening'));
-rmpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/DataPipeline_Screening/Utilities/chronux'));
+expFilePath = [filePath, '/Experiment', sprintf('%d', expId)];
+spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
+imageDirectory = fullfile(expFilePath, '/trial1');
 
-%% unpack data (only for Iowa data):
+%% parse TTLs:
+% this will create TTL.mat and trialStruct.mat
 
-dataFolder='/Volumes/DATA/NLData/i720R/720-098_UCLA_Screening1/2024-04-29_14-41-45';
+if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file")
+    eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
 
-if ~exist(trialFolder, "dir")
-    mkdir(trialFolder)
+    TTLs = parseDAQTTLs(eventFile, ttlLogFiles, expFilePath);
+    trials = parseTTLs_Screening(TTLs);
+    save(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
 end
 
-computeTS = 1;
-[data, timeStamps, samplingInterval, chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(1) '.ncs']), computeTS);
-time0 = timeStamps(1); 
-timeend = timeStamps(end);
+%%
+load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
+cscFilePath = fullfile(expFilePath, '/CSC_micro');
+[clusterCharacteristics] = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials);
+% [clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, imageDirectory);
 
-save_aux(1, data, time0, timeend, samplingInterval, trialFolder);
-save(fullfile(trialFolder, 'lfpTimeStamps.mat'), 'time0', 'timeend', 'timeStamps', 'samplingInterval'); 
+save(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics');
+%%
 
-start = 97;
-endIdx = 112;
-computeTS = 0;
-
-parfor i=start: endIdx
-    fprintf(['processing file: %d, ' fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), '\n'], i);
-    %if ~exist(['CSC' num2str(i) '.mat'], 'file')
-
-    [data, ~, samplingInterval, chNum] = Nlx_readCSC(fullfile(dataFolder, ['PDes' num2str(i) '.ncs']), computeTS);
-    data = data';
-    save_aux(i, data, time0, timeend, samplingInterval, trialFolder);
- %   end
-end
-
-disp('unpacking finished!')
+% command = ['chmod -R 775 ', filePath];
+% system(command)
 
 %%
 
-automaticScreeningAnalyze5(trialFolder);
-
-%%
-% use PDM to add patient and session before proceeding with the following
-% steps:
-
-imageDirectory = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening/Experiment%d/trial1', patient, exp);
-
-updateChannelMetaData(patient, exp)
-% [clusterCharacteristics] = calculateClusterCharacteristics(patient, exp, 1, trialFolder);
-[clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, 1, imageDirectory);
+% TO DO save plots for video separately.
+outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
+rasters_by_unit(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
+rasters_by_unit(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
+rasters_by_image(patient, spikeFilePath, imageDirectory, 0, outputPath);
 
 %%
 
-command = ['chmod -R 775 ', trialFolder];
-system(command)
 
-patientInfoFolder = ' /Users/XinNiuAdmin/HoffmanMount/data/PATIENT_DATABASE/Patient1720';
-command = ['chmod -R 775 ', patientInfoFolder];
-system(command)
-
-%%
-
-rasters_by_unit(patient, exp, imageDirectory, 1, 0)
-rasters_by_unit(patient, exp, imageDirectory, 0, 0)
-
-rasters_by_image(patient, exp, imageDirectory, 0);
-
-%%
-
-% rasters_by_unit_video(patient, exp, imageDirectory, 1, 0)
-rasters_by_unit_video(patient, exp, imageDirectory, 0, 0)
-rasters_by_image(patient, exp, imageDirectory, 0);
-
-
-
-function save_aux(i, data, time0, timeend, samplingInterval, outputDir)
-    save(fullfile(outputDir, ['CSC' num2str(i) '.mat']), 'data', 'time0', 'timeend', 'samplingInterval');
-end
 

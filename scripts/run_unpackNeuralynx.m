@@ -45,12 +45,18 @@ addpath(genpath(fileparts(scriptDir)));
 % 
 % outFilePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm';
 
+% TO DO: read unpack config file to skip UI.
+
 skipExist = 1;
+
+% patterns should not include file extension such as .ncs or .nev
 macroPattern = '^[RL].*[0-9]';
 microPattern = '^G[A-D].*[0-9]';
 
 % macroPattern = '^LFPx*';
 % microPattern = '^PDes*';
+
+eventPattern = 'Events*';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
@@ -87,18 +93,27 @@ for i = 1:length(expIds)
     %% list csc and event files.
     % csc files are grouped for each channel.
 
-    % groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     groupRegPattern = '.*?(?=\_\d{1}|\.ncs)';
     suffixRegPattern = '(?<=\_)\d*';
     orderByCreateTime = true;
 
     ignoreFilesWithSizeBelow = 16384;
 
-    tic
-    [groups, fileNames, channelFileNames, eventFileNames] = groupFiles(filePath{i}, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
-    toc
+    if ~exist(fullfile(expOutFilePath, 'channelFileNames.csv'), 'file') || ~skipExist
+        tic
+        [groups, fileNames, channelFileNames] = groupFiles(filePath{i}, groupRegPattern, suffixRegPattern, orderByCreateTime, ignoreFilesWithSizeBelow);
+        writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
+        toc
+    end
 
-    writetable(channelFileNames, fullfile(expOutFilePath, 'channelFileNames.csv'));
+    %% unpack Event Files:
+    eventOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_events', expId)];
+    [inEventFiles, outEventFiles] = createIOFiles(eventOutFilePath, expOutFilePath, eventPattern);
+    
+    tic
+    unpackData(inEventFiles, outEventFiles, eventOutFilePath, 1, skipExist);
+    toc
+    disp('event files unpack finished!')
 
     %% unpack macro files:
 

@@ -171,7 +171,7 @@ cluster_class(:, 2) = spikeTimestamps;
 outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
 outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
 
-save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', '-v7.3');
+save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', 'inspk', '-v7.3');
 
 if exist('ipermut','var')
     save(outFileNameTemp, 'ipermut', '-append');
@@ -180,13 +180,13 @@ end
 movefile(outFileNameTemp, outFileName);
 
 % remove temp files:
-if exist([current_par.fname '.dg_01.lab'], "file")
-    delete([current_par.fname '.dg_01.lab'])
-end
-
-if exist([current_par.fname '.dg_01'], "file")
-    delete([current_par.fname '.dg_01'])
-end
+% if exist([current_par.fname '.dg_01.lab'], "file")
+%     delete([current_par.fname '.dg_01.lab'])
+% end
+% 
+% if exist([current_par.fname '.dg_01'], "file")
+%     delete([current_par.fname '.dg_01'])
+% end
 
 end
 % mahal function incase system doesn't have it

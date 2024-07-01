@@ -1,0 +1,12 @@
+pynwb
+h5py
+numpy
+scipy
+matplotlib
+pandas
+seaborn
+jupyter
+scikit-learn
+statsmodels
+nilearn
+mne
