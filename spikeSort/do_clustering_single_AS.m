@@ -47,7 +47,7 @@ end
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
 inspk = wave_features(spikes, par);     % takes wavelet coefficients.
 par.inputs = size(inspk, 2);            % number of inputs to the clustering
-naux = min(par.max_spk, size(spikes,1));
+naux = min(par.max_spk, size(spikes, 1));
 
 if par.permut == 'n'
     % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
