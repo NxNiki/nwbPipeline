@@ -42,12 +42,12 @@
 
 
 ## Set the experiment parameters ==========
-expName="Screening"
-patientId="573"
+expName="MovieParadigm"
+patientId="567"
 
 ## Set MATLAB parameters
-expIds="[1]"  # MATLAB array format
-skipExist="[0, 0, 0]"  # MATLAB logical array
+expIds="[6:10]" 
+skipExist="[1, 1, 0]"  # [spike detection, spike code, spike clustering]
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
