@@ -28,7 +28,7 @@ for i = 1: numFiles
     lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
     outputFiles{i} = lfpFilename;
 
-    if exist(lfpFilename, "file") && skipExist    
+    if exist(lfpFilename, "file") && skipExist
         continue
     end
 
@@ -64,8 +64,9 @@ for i = 1: numFiles
         end
         [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
     else
-        fprintf('spike file: %s not found!\n', spikeDetectFiles{i});
-        % cscSignalSpikesRemoved = cscSignal;
+        if ~isempty(spikeDetectFiles) && length(spikeDetectFiles) >= i
+            fprintf('spike file: %s not found!\n', spikeDetectFiles{i});
+        end
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
         interpolateIndex = false(1, length(cscSignal));
@@ -102,7 +103,7 @@ for i = 1: numFiles
         lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
 
-    
+
     % ---- check the distribution of spike gap length:
     figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
     h = histogram(lfpFileObj.spikeGapLength);
