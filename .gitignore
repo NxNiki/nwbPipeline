@@ -24,6 +24,9 @@ batch/jobs_*
 
 */Patient-*.json
 scripts/*.csv
+scripts/*.png
+scripts/*.jpg
+scripts/*.mat
 
 .idea/*
 
