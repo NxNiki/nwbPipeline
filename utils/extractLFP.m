@@ -55,7 +55,6 @@ for i = 1: numFiles
         % except for multi-exp analysis in which case there is large gaps
         % between experiments.
         fprintf('index of last spike: %d\n', spikeTimestamps(end) * Fs);
-
         if ~removeRejectedSpikes && ~isempty(spikeClusterFiles) && exist(spikeClusterFiles{i}, "file")
             spikeClusterFileObj = matfile(spikeClusterFiles{i});
             rejectedSpikes = spikeClusterFileObj.rejectedSpikes;
@@ -106,8 +105,11 @@ for i = 1: numFiles
     lfpFileObj.lfpTimestamps = downsampleTs;
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
-    lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
-    lfpFileObj.spikeGapLength = spikeGapLength;
+
+    if Fs > 2000
+        lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
+        lfpFileObj.spikeGapLength = spikeGapLength;
+    end
 
     if saveRaw
         % save Raw data to check interpolation:
@@ -119,7 +121,6 @@ for i = 1: numFiles
         lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
     movefile(lfpFilenameTemp, lfpFilename);
-
 end
 end
 

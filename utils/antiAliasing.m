@@ -25,8 +25,8 @@ f_info.type = 'cheby2';
 nan_idx = isnan(cscSignal);
 
 % fill in any NaN so we can filter (this is slow)
-if ~sum(nan_idx) 
-    cscSignal = fillmissing(cscSignal, 'linear', 1, 'EndValues', 'nearest');
+if sum(nan_idx) > 0
+    cscSignal = fillmissing(cscSignal(:), 'linear', 1, 'EndValues', 'nearest');
 end
 
 if length(unique(diff(timestamps))) > 1
