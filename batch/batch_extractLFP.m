@@ -21,14 +21,18 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
         expIds = (4:7);
         filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
 
-        skipExist = 0;
+        skipExist = [0, 0];
+    end
+
+    if length(skipExist) == 1
+        skipExist = [skipExist, skipExist];
     end
     saveRaw = false;
 
-    spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
-    microLFPPath = fullfile(spikeFilePath, 'LFP_micro');
+    expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 
     %% micro electrodes:
+    microLFPPath = fullfile(expFilePath, 'LFP_micro');
     [microFiles, timestampFiles] = readFilePath(expIds, filePath);
 
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
@@ -46,10 +50,22 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
     spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
 
-    lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist, saveRaw);
+    lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist(1), saveRaw);
     writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
 
-    disp('lfp extraction finished!');
+    disp('micro lfp extraction finished!');
+
+    %% macro electrodes:
+    macroLFPPath = fullfile(expFilePath, 'LFP_macro');
+    [macroFiles, timestampFiles] = readFilePath(expIds, filePath, 'macro');
+
+    % delete(gcp('nocreate')) 
+    % parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
+
+    lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
+    writecell(lfpFiles, fullfile(macroLFPPath, 'lfpFiles.csv'));
+
+    disp('macro lfp extraction finished!');
 
 end
 
