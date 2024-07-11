@@ -13,18 +13,18 @@ saveRaw = false;
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 %% micro electrodes:
-microLFPPath = fullfile(expFilePath, 'LFP_micro');
-[microFiles, timestampFiles] = readFilePath(expIds, filePath);
-
-% delete(gcp('nocreate')) 
-% parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
-
-spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-[~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
-spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
-
-lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, '', microLFPPath, '', skipExist, saveRaw);
-writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
+% microLFPPath = fullfile(expFilePath, 'LFP_micro');
+% [microFiles, timestampFiles] = readFilePath(expIds, filePath);
+% 
+% % delete(gcp('nocreate')) 
+% % parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
+% 
+% spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
+% [~, spikeFiles] = createSpikeFileName(microFiles(:, 1));
+% spikeFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeFiles, UniformOutput=false);
+% 
+% lfpFiles = extractLFP(microFiles, timestampFiles, spikeFiles, '', microLFPPath, '', skipExist, saveRaw);
+% writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
 
 %% macro electrodes:
 macroLFPPath = fullfile(expFilePath, 'LFP_macro');
