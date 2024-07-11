@@ -64,7 +64,8 @@ for i = 1: numFiles
         end
         [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
         spikeGapLength = findGapLength(interpolateIndex);
-        % ---- check the distribution of spike gap length:
+
+        % check the distribution of spike gap length:
         figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
         h = histogram(spikeGapLength);
         set(gca, 'YScale', 'log');
@@ -77,7 +78,6 @@ for i = 1: numFiles
         title(filePath , 'FontSize', 13);
         saveas(h, fullfile(outputPath, [fileName, '.png']), 'png');
         close
-        % ---- 
     else
         if ~isempty(spikeDetectFiles) && length(spikeDetectFiles) >= i
             fprintf('spike file: %s not found!\n', spikeDetectFiles{i});
