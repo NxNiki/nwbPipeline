@@ -401,8 +401,8 @@ cluster_class=zeros(size(spikes,1),2);
 cluster_class(:,1) = classes(:);
 cluster_class(:,2) = USER_DATA{3}';
 
-outfile=['times_' par.filename(1:end-4)];
-outfile = strrep(outfile,'_spikes','');
+[pathname, fn] = fileparts(get(handles.file_name, 'String'));
+outfile = fullfile(pathname, strrep(['times_' fn],'_spikes',''));
 
 currentver = version;
 currentver = currentver(1);
@@ -925,14 +925,13 @@ set(handles.isi3_reject_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi3_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
+set(gcbo, 'value', 1);
 set(handles.isi3_accept_button, 'value', 0);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 classes = USER_DATA{6};
 tree = USER_DATA{5};
 
 ilab = find(classes==3);
-
 classes(find(classes==3))=0;
 USER_DATA{6} = classes;
 USER_DATA{9} = classes;
@@ -943,7 +942,7 @@ handles.force = 0;
 handles.merge = 0;
 handles.reject = 1;
 handles.setclus = 1;
-handles.minclus = clustering_results(1,5);
+handles.minclus = clustering_results(1, 5);
 set(handles.wave_clus_figure,'userdata',USER_DATA);
 plot_spikes(handles)
 
