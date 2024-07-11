@@ -1,7 +1,7 @@
 function timestampsOut = linearizeTimestamps(timestampsIn, Fs)
     % create a linearized timetamps with fixed sampling intervals.
     % skip gaps larger than a threshold.
-    % timestamps are assume in unit of seconds.
+    % timestamps are assumed in unit of seconds.
 
     samplingInterval = 1 / Fs;
     tsDiff = diff(timestampsIn);
