@@ -139,33 +139,36 @@ if isa(hObject,'matlab.ui.container.ContextMenu')
     thisTag = 'loadNext';
 end
 
-fn = get(handles.file_name,'String');
-[~,fn, e] = fileparts(fn);
-fn = [fn e];
-num = regexp(fn,'\d*','match','once');
+[pathname, fn, e] = fileparts(get(handles.file_name, 'String'));
+fn = [fn, e];
+
+spikeFiles = dir(fullfile(pathname, 'G*_spikes.mat'));
+spikeFiles = {'', spikeFiles(:).name, ''};
+
+num = find(strcmp(spikeFiles, fn));
 if ~isempty(num)
     switch thisTag
-        case {'loadNext','rejectSaveLoad','saveAndLoadNext'}
-            filename = strrep(fn, num, num2str(str2num(num)+1));
-        case {'loadPrevious','saveAndLoadPrevious'}
-            filename = strrep(fn, num, num2str(str2num(num)-1));
+        case {'loadNext', 'rejectSaveLoad', 'saveAndLoadNext'}
+            filename = spikeFiles{num+1};
+        case {'loadPrevious', 'saveAndLoadPrevious'}
+            filename = spikeFiles{num-1};
         case {'reloadThis'}
             filename = fn;
         case {'load_data_button'}
             if ~isempty(handles.channelToLoad.String)
                 filename = strrep(fn, num, handles.channelToLoad.String);
-                set(handles.channelToLoad,'String','');
+                set(handles.channelToLoad, 'String', '');
             else
                 filename = '';
             end
         otherwise
             filename = '';
     end
-    pathname = [pwd, filesep];
+    % pathname = [pwd, filesep];
 else
     filename = '';
 end
-fprintf('%s...',filename)
+fprintf('%s...', filename)
 
 switch char(handles.datatype)
     case 'Simulator'
@@ -185,15 +188,17 @@ switch char(handles.datatype)
     case 'ASCII spikes'
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
-        [filename, pathname] = uigetfile('*.mat','Select file'); 
-        if ~filename
-            return
+        if isempty(filename)
+            [filename, pathname] = uigetfile('*.mat','Select file'); 
+            if ~filename
+                return
+            end
         end
         [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
 temp=find_temp2(tree, handles);                                  % Selects temperature.
-set(handles.file_name,'string',[pathname filename]);
+set(handles.file_name, 'string', fullfile(pathname, filename));
 
 % EM: This is where identification gets set. But really, we want to use the
 % classes from the times_CSC file because in the unsupervised case they
@@ -214,7 +219,7 @@ end
 saved_classes = cluster_class(:,1);
 USER_DATA{6} = saved_classes(:)';
 USER_DATA{8} = temp(end);
-USER_DATA{9} = saved_classes(:)';                                     %backup for non-forced classes.
+USER_DATA{9} = saved_classes(:)';                                     % backup for non-forced classes.
 
 %% definition of clustering_results
 clustering_results      = [];
@@ -404,31 +409,31 @@ currentver = currentver(1);
 switch currentver
     case {'7'}
         if isempty(USER_DATA{7}) && isempty(USER_DATA{12})
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' -v6;');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' -v6;');
         elseif isempty(USER_DATA{7}) && ~isempty(USER_DATA{12})
             ipermut = USER_DATA{12};
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' ipermut',' -v6;');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' ipermut',' -v6;');
         elseif ~isempty(USER_DATA{7}) && isempty(USER_DATA{12})
             inspk = USER_DATA{7};
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' inspk',' -v6;');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' inspk',' -v6;');
         else
             inspk = USER_DATA{7};
             ipermut = USER_DATA{12};
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' inspk',' ipermut',' -v6;');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' inspk',' ipermut',' -v6;');
         end
     otherwise
         if isempty(USER_DATA{7}) && isempty(USER_DATA{12})
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes');
         elseif isempty(USER_DATA{7}) && ~isempty(USER_DATA{12})
             ipermut = USER_DATA{12};
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' ipermut');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' ipermut');
         elseif ~isempty(USER_DATA{7}) && isempty(USER_DATA{12})
             inspk = USER_DATA{7};
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' inspk');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' inspk');
         else
             inspk = USER_DATA{7};
             ipermut = USER_DATA{12};
-            exec_line = strcat('save',' ''',outfile,'''',' sorterName cluster_class',' par',' spikes',' inspk',' ipermut');
+            exec_line = strcat('save',' ''',outfile,'''',' sortedBy cluster_class',' par',' spikes',' inspk',' ipermut');
         end
 end
 

@@ -1,4 +1,7 @@
 function outputFiles = extractLFP(cscFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, outputPath, experimentName, skipExist, saveRaw)
+% remove spikes and downsample csc signal to 2000k hz.
+% for macros or micro with no spikes detected remove spikes will be
+% skipped.
 
 if nargin < 6 || isempty(experimentName)
     experimentName = '';
@@ -14,8 +17,7 @@ if nargin < 8
 end
 
 removeRejectedSpikes = true;
-
-makeOutputPath(cscFiles, outputPath, skipExist)
+makeOutputPath(cscFiles, outputPath, skipExist);
 numFiles = size(cscFiles, 1);
 outputFiles = cell(numFiles, 1);
 
@@ -41,6 +43,7 @@ for i = 1: numFiles
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
+    Fs = seconds(1) / samplingInterval;
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
@@ -51,7 +54,7 @@ for i = 1: numFiles
         % the index of last spike should be close to the end of csc signal.
         % except for multi-exp analysis in which case there is large gaps
         % between experiments.
-        fprintf('index of last spike: %d\n', spikeTimestamps(end) * (seconds(1) / samplingInterval));
+        fprintf('index of last spike: %d\n', spikeTimestamps(end) * Fs);
 
         if ~removeRejectedSpikes && ~isempty(spikeClusterFiles) && exist(spikeClusterFiles{i}, "file")
             spikeClusterFileObj = matfile(spikeClusterFiles{i});
@@ -61,7 +64,7 @@ for i = 1: numFiles
         end
         [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
     else
-        fprintf('spike file: %s not found!\n', spikeDetectFiles{i})
+        fprintf('spike file: %s not found!\n', spikeDetectFiles{i});
         % cscSignalSpikesRemoved = cscSignal;
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
@@ -69,7 +72,17 @@ for i = 1: numFiles
         spikeIndex = false(1, length(cscSignal));
     end
 
-    [lfpSignal, downsampleTs] = antiAliasing(cscSignalSpikeInterpolated, timestamps);
+    if abs(Fs - 32000) < 10
+        Fs = 32000;
+    elseif abs(Fs - 30000) < 10
+        Fs = 30000;
+    elseif abs(Fs - 2000) < 10
+        Fs = 2000;
+    else
+        warning('deviated sampling frequency: %f', Fs);
+    end
+
+    [lfpSignal, downsampleTs] = antiAliasing(cscSignalSpikeInterpolated, timestamps, Fs);
 
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
     lfpFileObj.lfp = single(lfpSignal);
@@ -89,6 +102,7 @@ for i = 1: numFiles
         lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
 
+    
     % ---- check the distribution of spike gap length:
     figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
     h = histogram(lfpFileObj.spikeGapLength);
