@@ -1,6 +1,6 @@
 function [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles)
 
-set(handles.file_name,'string',['Loading:    ' pathname filename]);
+% set(handles.file_name,'string',['Loading:    ' pathname filename]);
 
 % handles.par = set_parameters_ascii_spikes(filename,handles);     %Load parameters
 handles.par = set_joint_parameters_CSC(filename); %EM: Replaced the default wave_clus parameters with those that we've been using
