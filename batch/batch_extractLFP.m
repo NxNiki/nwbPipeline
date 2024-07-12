@@ -59,8 +59,11 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     macroLFPPath = fullfile(expFilePath, 'LFP_macro');
     [macroFiles, timestampFiles] = readFilePath(expIds, filePath, 'macro');
 
+    macroFiles = macroFiles(jobIds, :);
+    fprintf(['macroFiles: \n', sprintf('%s\n', macroFiles{:})]);
+
     lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
-    writecell(lfpFiles, fullfile(macroLFPPath, 'lfpFiles.csv'));
+    writecell(lfpFiles, fullfile(macroLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
 
     disp('macro lfp extraction finished!');
 
