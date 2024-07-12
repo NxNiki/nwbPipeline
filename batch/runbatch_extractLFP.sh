@@ -46,7 +46,7 @@ expName="MovieParadigm"
 patientId="573"
 
 ## Set MATLAB parameters
-expIds="[3:11]"  # MATLAB array format
+expIds="[3:7]"  # MATLAB array format
 skipExist="[1, 0]"  # MATLAB logical array
 
 
