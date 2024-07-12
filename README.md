@@ -13,7 +13,7 @@ Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
 `batch`: Pipelines to run on SGE.
 
-### set montage:
+### Set montage:
 
 Run `MontageConfigUI.m` to open the UI to set the montage:
 
@@ -38,7 +38,7 @@ If there are no skipped ports, you only need to set `Port Start`, `Port End` wil
       
 After setting the montage, clicking `confirm` will save the configuration file (to set up the neuralynx device) and a JSON file, which saves the information in the UI and can be loaded.
 
-### unpack data:
+### Unpack data:
 
 Run in Matlab:
 ```
@@ -59,7 +59,7 @@ Otherwise, set it empty:
 montageConfigFile = [];
 ```
 
-### spike sorting:
+### Automatic spike sorting:
 
 Define experiment ID and file path in `scripts/run_spikeSorting.m` to run spike sorting:
 
@@ -80,22 +80,25 @@ Or define `expIds` and `job_name` in `batch/runbatch_spikeSorting.m` and run on 
 qsub batch/runbatch_spikeSorting.sh
 ```
 
-### extract LFP:
+### Extract LFP:
 
 Similar to spike sorting, define `expIds` and `filePath` in `scripts/run_extractLFP.m` and run in matlab:
+
 ```
 scripts/run_extractLFP
 ```
+
 Or define `expIds` and `job_name` in `batch/runbatch_extractLFP.m` and run on SGE:
+
 ```
 qsub batch/runbatch_extractLFP.sh
 ```
 
-### export to NWB:
+### Export to NWB:
 
 <WIP>
 
-### manual spike sort:
+### Manual spike sort:
 
 To do manual spike sort, run `wave_clus` in matlab command window, or open `wave_clus.m` and press Run button. Press `Load Data` and select the *_spike.mat file created by automatic spike sorting.
 > You need to run all three steps of automatic spike sorting before the manual spike sort.
