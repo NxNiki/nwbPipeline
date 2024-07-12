@@ -84,7 +84,7 @@ for i = 1: numFiles
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
         interpolateIndex = false(1, length(cscSignal));
-        spikeGapLength = findGapLength(interpolateIndex);
+        spikeGapLength = [];
         spikeIndex = false(1, length(cscSignal));
     end
 
