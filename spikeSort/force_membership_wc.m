@@ -38,15 +38,16 @@ switch par.template_type
     case 'center'
         [centers, sd, pd] = build_templates(class_in,f_in); % we are going to ignore pd
         sdnum = par.template_sdnum;
-        for i=1:nspk,
+        for i=1:nspk
             class_out(i) = nearest_neighbor(f_out(i,:),centers,sdnum*sd);        
         end
         
     case 'ml'
-        [mu inv_sigma] = fit_gaussian(f_in,class_in);
-        for i=1:nspk,
+        [mu, inv_sigma] = fit_gaussian(f_in,class_in);
+        for i=1:nspk
             class_out(i) = ML_gaussian(f_out(i,:),mu,inv_sigma);
         end
+
     case 'mahal'
         classes = unique(class_in);
         mdistance = zeros(length(classes), nspk);
@@ -58,12 +59,11 @@ switch par.template_type
         end
         sdnum = par.template_sdnum;
         for i = 1:nspk
-             [d winner] = min(mdistance(:,i));
+             [d, winner] = min(mdistance(:,i));
              if sqrt(d) < sdnum*maxdist(winner)
                  class_out(i) = classes(winner);
              end
         end
-        
         
     otherwise
         sprintf('force_membership(): <%s> is not a known template type.\n',par.template_type);
