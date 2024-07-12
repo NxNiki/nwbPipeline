@@ -43,11 +43,11 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="567"
+patientId="573"
 
 ## Set MATLAB parameters
-expIds="[6:10]" 
-skipExist="[1, 1, 0]"  # [spike detection, spike code, spike clustering]
+expIds="[3:7]" 
+skipExist="[1, 1, 1]"  # [spike detection, spike code, spike clustering]
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
