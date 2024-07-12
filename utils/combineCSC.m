@@ -10,7 +10,7 @@ if nargin < 3 || isempty(maxGapDuration)
 end
 
 if nargin < 4
-    useSinglePrecision = false;
+    useSinglePrecision = true;
 end
 
 GAP_THRESHOLD = 2;
@@ -63,7 +63,7 @@ timestamps = timestamps - timestamps(1);
 if useSinglePrecision
     % large number lose precision so we save relative timestamps if use
     % single precision.
-    timestampsSingle = single(timestamps - timestamps(1));
+    timestampsSingle = single(timestamps);
     if ~any(diff(timestampsSingle)==0)
         timestamps = timestampsSingle;
     end
