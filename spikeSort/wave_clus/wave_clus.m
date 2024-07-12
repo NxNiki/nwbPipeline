@@ -242,7 +242,7 @@ handles.setclus = 0;
 
 %% Add sampling rate info
 if length(USER_DATA)<18 || isempty(USER_DATA{18})
-    samplingRate = questdlg('What was the sampling rate?','SR','30000','32000','40000','32000');
+    samplingRate = questdlg('What was the sampling rate?', 'SR', '30000', '32000', '40000', '32000');
     samplingRate = eval(samplingRate);
 else
     samplingRate = USER_DATA{18};
@@ -263,16 +263,16 @@ axes(handles.temperature_plot)
 hold off
 [temp aux]= ginput(1);                                          %gets the mouse input
 temp = round((temp-handles.par.mintemp)/handles.par.tempstep);
-if temp < 1; temp=1;end                                         %temp should be within the limits
+if temp < 1; temp=1; end                                         %temp should be within the limits
 if temp > handles.par.num_temp; temp=handles.par.num_temp; end
 min_clus = round(aux);
-set(handles.min_clus_edit,'string',num2str(min_clus));
+set(handles.min_clus_edit, 'string', num2str(min_clus));
 
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 par = USER_DATA{1};
 par.min_clus = min_clus;
 clu = USER_DATA{4};
-classes = clu(temp,3:end)+1;
+classes = clu(temp,3:end) + 1;
 tree = USER_DATA{5};
 USER_DATA{1} = par;
 USER_DATA{6} = classes(:)';
@@ -283,8 +283,8 @@ handles.par.num_temp = min(handles.par.num_temp, size(clu,1));
 handles.minclus = min_clus;
 clustering_results = USER_DATA{10};
 clustering_results_bk = USER_DATA{11};
-set(handles.wave_clus_figure,'userdata', USER_DATA);
-temperature=handles.par.mintemp+temp*handles.par.tempstep;
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
+temperature=handles.par.mintemp + temp * handles.par.tempstep;
 
 switch par.temp_plot
     case 'lin'
@@ -300,10 +300,10 @@ switch par.temp_plot
 end
 xlim([0 handles.par.maxtemp])
 xlabel('Temperature');
-if par.temp_plot == 'log'
-    set(get(gca,'ylabel'),'vertical','Cap');
+if strcmp(par.temp_plot, 'log')
+    set(get(gca,'ylabel'), 'vertical', 'Cap');
 else
-    set(get(gca,'ylabel'),'vertical','Baseline');
+    set(get(gca,'ylabel'), 'vertical', 'Baseline');
 end
 ylabel('Clusters size');
 
@@ -314,11 +314,11 @@ handles.reject = 0;
 handles.undo = 0;
 plot_spikes(handles);
 % force_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
 clustering_results_bk = USER_DATA{11};
 mark_clusters_temperature_diagram(handles,tree,clustering_results,0)
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(handles.fix1_button,'value',0);
 set(handles.fix2_button,'value',0);
@@ -331,7 +331,7 @@ set(handles.wave_clus_figure,'userdata',USER_DATA);
 
 % --- Change min_clus_edit
 function min_clus_edit_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 par.min_clus = str2num(get(hObject, 'String'));
 clu = USER_DATA{4};
@@ -343,7 +343,7 @@ USER_DATA{6} = classes(:)';
 USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
 clustering_results = USER_DATA{10};
 clustering_results(:,5) = par.min_clus;
-set(handles.wave_clus_figure,'userdata', USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 handles.setclus = 0;
@@ -358,13 +358,14 @@ clustering_results = USER_DATA{10};
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 mark_clusters_temperature_diagram(handles,tree, clustering_results)
 
-set(handles.force_button,'value',0);
-set(handles.force_button,'string','Force');
-set(handles.fix1_button,'value',0);
-set(handles.fix2_button,'value',0);
-set(handles.fix3_button,'value',0);
+set(handles.force_button, 'value', 0);
+set(handles.force_button, 'string', 'Force');
+set(handles.fix1_button, 'value', 0);
+set(handles.fix2_button, 'value', 0);
+set(handles.fix3_button, 'value', 0);
 for i=4:par.max_clus
-    eval(['par.fix' num2str(i) '=0;']);
+    % eval(['par.fix' num2str(i) '=0;']);
+    par.(['fix', num2str(i)]) = 0;
 end
 
 % --- Executes on button press in save_clusters_button.
@@ -401,8 +402,9 @@ cluster_class=zeros(size(spikes,1),2);
 cluster_class(:,1) = classes(:);
 cluster_class(:,2) = USER_DATA{3}';
 
-outfile=['times_' par.filename(1:end-4)];
-outfile = strrep(outfile,'_spikes','');
+[pathname, fn] = fileparts(get(handles.file_name, 'String'));
+outFileName = strrep(['times_' fn], '_spikes','');
+outfile = fullfile(pathname, outFileName);
 
 currentver = version;
 currentver = currentver(1);
@@ -446,59 +448,32 @@ end
 
 %Save figures
 nClusts = max(cluster_class(:,1));
-switch outfile(7:9)
+switch outFileName(7:9)
     case 'pol'
         startInd = 10;
     otherwise
         startInd = 7;
 end
 
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-set(h_fig,'papertype','usletter','paperorientation','portrait',...
-    'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'_new']);
-
+h_figs = get(0, 'children');
+saveWaveClusFigure(h_figs, 'wave_clus_figure',   pathname, outFileName(startInd:end))
 if nClusts>3
-    h_fig = findobj(h_figs,'tag','wave_clus_aux');
-    set(h_fig,'papertype','usletter','paperorientation','portrait',...
-        'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-    print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'a_new']);
+    saveWaveClusFigure(h_figs, 'wave_clus_aux',  pathname, outFileName(startInd:end))
 end
-
 if nClusts>8
-    h_fig= findobj(h_figs,'tag','wave_clus_aux1');
-    set(h_fig,'papertype','usletter','paperorientation','portrait',...
-        'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-    print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'b']);
+    saveWaveClusFigure(h_figs, 'wave_clus_aux1', pathname, outFileName(startInd:end))
 end
-
 if nClusts>13
-    h_fig= findobj(h_figs,'tag','wave_clus_aux2');
-    set(h_fig,'papertype','usletter','paperorientation','portrait',...
-        'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-    print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'c']);
+    saveWaveClusFigure(h_figs, 'wave_clus_aux2', pathname, outFileName(startInd:end))
 end
-
 if nClusts>18
-    h_fig= findobj(h_figs,'tag','wave_clus_aux3');
-    set(h_fig,'papertype','usletter','paperorientation','portrait',...
-        'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-    print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'d']);
+    saveWaveClusFigure(h_figs, 'wave_clus_aux3', pathname, outFileName(startInd:end))
 end
-
 if nClusts>23
-    h_fig= findobj(h_figs,'tag','wave_clus_aux4');
-    set(h_fig,'papertype','usletter','paperorientation','portrait',...
-        'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-    print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'e']);
+    saveWaveClusFigure(h_figs, 'wave_clus_aux4', pathname, outFileName(startInd:end))
 end
-
 if nClusts>28
-    h_fig= findobj(h_figs,'tag','wave_clus_aux5');
-    set(h_fig,'papertype','usletter','paperorientation','portrait',...
-        'paperunits','inches','paperposition',[.25 .25 10.5 7.8])
-    print(h_fig,'-djpeg',['fig2print_' outfile(startInd:end),'f']);
+    saveWaveClusFigure(h_figs, 'wave_clus_aux5', pathname, outFileName(startInd:end))
 end
 fprintf('Finished!\n')
 
@@ -538,8 +513,8 @@ if get(handles.fix3_button,'value') ==1
 end
 % Get fixed clusters from aux figures
 for i=4:par.max_clus
-    eval(['fixx = par.fix' num2str(i) ';']);
-    if fixx == 1
+    % eval(['fixx = par.fix' num2str(i) ';']);
+    if par.(['fix', num2str(i)]) == 1
         fix_class = USER_DATA{22+i-3}';
         classes(fix_class)=-1;
     end
@@ -577,13 +552,14 @@ plot_spikes(handles);
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
-set(handles.wave_clus_figure,'userdata', USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(handles.fix1_button,'value',0);
 set(handles.fix2_button,'value',0);
 set(handles.fix3_button,'value',0);
 for i=4:par.max_clus
-    eval(['par.fix' num2str(i) '=0;']);
+    % eval(['par.fix' num2str(i) '=0;']);
+    par.(['fix', num2str(i)]) = 0;
 end
 
 % PLOT ALL PROJECTIONS BUTTON
@@ -599,66 +575,15 @@ end
 
 % fix1 button --------------------------------------------------------------------
 function fix1_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure,'userdata');
-classes = USER_DATA{6};
-fix_class = find(classes==1);
-if get(handles.fix1_button,'value') ==1
-    USER_DATA{20} = fix_class;
-else
-    USER_DATA{20} = [];
-end
-set(handles.wave_clus_figure,'userdata',USER_DATA)
-h_figs=get(0,'children');
-h_fig4 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux1');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux3');
-set(h_fig4,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
+fixButton(handles, 1, 20)
 
 % fix2 button --------------------------------------------------------------------
 function fix2_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure,'userdata');
-classes = USER_DATA{6};
-fix_class = find(classes==2);
-if get(handles.fix2_button,'value') ==1
-    USER_DATA{21} = fix_class;
-else
-    USER_DATA{21} = [];
-end
-set(handles.wave_clus_figure,'userdata',USER_DATA)
-h_figs=get(0,'children');
-h_fig4 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux1');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux3');
-set(h_fig4,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
+fixButton(handles, 2, 21)
 
 % fix3 button --------------------------------------------------------------------
 function fix3_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure,'userdata');
-classes = USER_DATA{6};
-fix_class = find(classes==3);
-if get(handles.fix3_button,'value') ==1
-    USER_DATA{22} = fix_class;
-else
-    USER_DATA{22} = [];
-end
-set(handles.wave_clus_figure,'userdata',USER_DATA)
-h_figs=get(0,'children');
-h_fig4 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux1');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux3');
-set(h_fig4,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
+fixButton(handles, 3, 22)
 
 %SETTING OF SPIKE FEATURES OR PROJECTIONS
 % --------------------------------------------------------------------
@@ -776,7 +701,7 @@ par = USER_DATA{1};
 cluster_results = USER_DATA{10};
 par.bin_step2 = str2num(get(hObject, 'String'));
 USER_DATA{1} = par;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 handles.setclus = 1;
 handles.force = 0;
 handles.merge = 0;
@@ -840,7 +765,7 @@ par = USER_DATA{1};
 cluster_results = USER_DATA{10};
 par.bin_step0 = str2num(get(hObject, 'String'));
 USER_DATA{1} = par;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 handles.setclus = 1;
 handles.force = 0;
 handles.merge = 0;
@@ -858,8 +783,8 @@ set(handles.isi1_reject_button,'value',0);
 % --------------------------------------------------------------------
 function isi1_reject_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
-set(handles.isi1_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+set(handles.isi1_accept_button, 'value', 0);
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 classes = USER_DATA{6};
 tree = USER_DATA{5};
 classes(find(classes==1))=0;
@@ -872,31 +797,31 @@ handles.force = 0;
 handles.merge = 0;
 handles.reject = 1;
 handles.setclus = 1;
-handles.minclus = clustering_results(1,5);
+handles.minclus = clustering_results(1, 5);
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 plot_spikes(handles)
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(gcbo,'value',0);
-set(handles.isi1_accept_button,'value',1);
+set(handles.isi1_accept_button, 'value', 1);
 
 % --------------------------------------------------------------------
 function isi2_accept_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
-set(handles.isi2_reject_button,'value',0);
+set(handles.isi2_reject_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi2_reject_button_Callback(hObject, eventdata, handles)
 set(gcbo,'value',1);
-set(handles.isi2_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+set(handles.isi2_accept_button, 'value', 0);
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 classes = USER_DATA{6};
 tree = USER_DATA{5};
-classes(find(classes==2))=0;
+classes(find(classes==2)) = 0;
 USER_DATA{6} = classes;
 USER_DATA{9} = classes;
 
@@ -906,7 +831,7 @@ handles.force = 0;
 handles.merge = 0;
 handles.reject = 1;
 handles.setclus = 1;
-handles.minclus = clustering_results(1,5);
+handles.minclus = clustering_results(1, 5);
 set(handles.wave_clus_figure,'userdata', USER_DATA);
 plot_spikes(handles)
 
@@ -925,14 +850,13 @@ set(handles.isi3_reject_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi3_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
+set(gcbo, 'value', 1);
 set(handles.isi3_accept_button, 'value', 0);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 classes = USER_DATA{6};
 tree = USER_DATA{5};
 
 ilab = find(classes==3);
-
 classes(find(classes==3))=0;
 USER_DATA{6} = classes;
 USER_DATA{9} = classes;
@@ -943,17 +867,17 @@ handles.force = 0;
 handles.merge = 0;
 handles.reject = 1;
 handles.setclus = 1;
-handles.minclus = clustering_results(1,5);
+handles.minclus = clustering_results(1, 5);
 set(handles.wave_clus_figure,'userdata',USER_DATA);
 plot_spikes(handles)
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
-mark_clusters_temperature_diagram(handles,tree,clustering_results)
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(gcbo,'value',0);
-set(handles.isi3_accept_button,'value',1);
+set(handles.isi3_accept_button, 'value', 1);
 
 if isempty(ilab)
     nlab = imread('filelist.xlj','jpg'); figure('color','k'); image(nlab); axis off; set(gcf,'NumberTitle','off');
@@ -966,33 +890,33 @@ handles.merge = 0;
 handles.undo = 1;
 handles.setclus = 0;
 handles.reject = 0;
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 clustering_results_bk = USER_DATA{11};
 USER_DATA{6} = clustering_results_bk(:,2); % old gui classes
 USER_DATA{10} = clustering_results_bk;
 handles.minclus = clustering_results_bk(1,5);
 USER_DATA{8} = clustering_results_bk(1,1); % old gui temperatures
-set(handles.wave_clus_figure,'userdata',USER_DATA)
+set(handles.wave_clus_figure, 'userdata', USER_DATA)
 plot_spikes(handles) % plot_spikes updates USER_DATA{11}
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 tree = USER_DATA{5};
 clustering_results = USER_DATA{10};
 clustering_results_bk = USER_DATA{11};
 
-mark_clusters_temperature_diagram(handles,tree,clustering_results_bk)
+mark_clusters_temperature_diagram(handles, tree, clustering_results_bk)
 min_clus = handles.minclus;
-set(handles.min_clus_edit,'string',num2str(min_clus));
-set(handles.wave_clus_figure,'userdata',USER_DATA)
-set(handles.wave_clus_figure,'userdata',USER_DATA)
-set(handles.fix1_button,'value',0);
-set(handles.fix2_button,'value',0);
-set(handles.fix3_button,'value',0);
+set(handles.min_clus_edit, 'string', num2str(min_clus));
+set(handles.wave_clus_figure, 'userdata', USER_DATA)
+set(handles.wave_clus_figure, 'userdata', USER_DATA)
+set(handles.fix1_button, 'value', 0);
+set(handles.fix2_button, 'value', 0);
+set(handles.fix3_button, 'value', 0);
 for i=4:par.max_clus
     eval(['par.fix' num2str(i) '=0;']);
 end
 USER_DATA{1} = par;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 % --- Executes on button press in merge_button.
 function merge_button_Callback(hObject, eventdata, handles)
@@ -1009,8 +933,8 @@ plot_spikes(handles)
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 tree = USER_DATA{5};
 clustering_results = USER_DATA{10};
-mark_clusters_temperature_diagram(handles,tree,clustering_results)
-set(handles.wave_clus_figure,'userdata',USER_DATA)
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
+set(handles.wave_clus_figure,'userdata', USER_DATA)
 set(handles.fix1_button,'value',0);
 set(handles.fix2_button,'value',0);
 set(handles.fix3_button,'value',0);
@@ -1018,7 +942,7 @@ for i=4:par.max_clus
     eval(['par.fix' num2str(i) '=0;']);
 end
 USER_DATA{1} = par;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure,'userdata', USER_DATA);
 
 % --- Executes on button press in Plot_polytrode_channels_button.
 function Plot_polytrode_button_Callback(hObject, eventdata, handles)
@@ -1039,7 +963,7 @@ function isi1_nbins_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1051,7 +975,7 @@ function isi1_bin_step_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1063,7 +987,7 @@ function isi2_nbins_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1075,7 +999,7 @@ function isi2_bin_step_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1087,7 +1011,7 @@ function isi3_nbins_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1099,7 +1023,7 @@ function isi3_bin_step_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1111,7 +1035,7 @@ function isi0_nbins_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1123,7 +1047,7 @@ function isi0_bin_step_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1135,7 +1059,7 @@ function min_clus_edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1153,7 +1077,7 @@ function data_type_popupmenu_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0, 'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -1177,16 +1101,16 @@ function rejectSaveLoad_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
-par = USER_DATA{1};
-spikes = USER_DATA{2};
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
+% par = USER_DATA{1};
+% spikes = USER_DATA{2};
 classes = USER_DATA{6};
-inspk = USER_DATA{7};
+% inspk = USER_DATA{7};
 
 classes = zeros(size(classes));
 
 USER_DATA{6} = classes(:)';
-set(handles.wave_clus_figure,'userdata',USER_DATA)
+set(handles.wave_clus_figure,'userdata', USER_DATA)
 
 clustering_results = USER_DATA{10};
 handles.minclus = clustering_results(1,5);
@@ -1296,15 +1220,15 @@ function PlotContinuous_Callback(hObject, eventdata, handles)
 
 % Add continuous data to plot
 cscData = load(fullfile(handles.par.pathname, handles.par.filename));
-cscData.data = reshape(cscData.data,1,[]);
+cscData.data = reshape(cscData.data, 1, []);
 samplingRate = 1000/cscData.samplingInterval;
-cscData.data = resample(double(cscData.data),1000,samplingRate);
+cscData.data = resample(double(cscData.data), 1000, samplingRate);
 ts = 0:(1/1000):(length(cscData.data)-1)/1000;
-plot(handles.cont_data,ts,cscData.data)
-M = prctile(abs(cscData.data),99.75);
-set(handles.cont_data,'xlim',[0,ts(end)],'ylim',[-M M])
-set(handles.spikeRaster,'xlim',[0,ts(end)])
-spikesName = regexprep(handles.par.filename,'(\d+)','$1_spikes');
+plot(handles.cont_data, ts, cscData.data)
+M = prctile(abs(cscData.data), 99.75);
+set(handles.cont_data, 'xlim', [0,ts(end)], 'ylim', [-M M])
+set(handles.spikeRaster, 'xlim', [0,ts(end)])
+spikesName = regexprep(handles.par.filename, '(\d+)', '$1_spikes');
 try
     hold(handles.cont_data, 'on')
     load(spikesName, 'timesZeroedOutForSpikeDetection');

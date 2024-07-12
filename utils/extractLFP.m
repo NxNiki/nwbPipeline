@@ -28,7 +28,7 @@ for i = 1: numFiles
     lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
     outputFiles{i} = lfpFilename;
 
-    if exist(lfpFilename, "file") && skipExist    
+    if exist(lfpFilename, "file") && skipExist
         continue
     end
 
@@ -55,7 +55,6 @@ for i = 1: numFiles
         % except for multi-exp analysis in which case there is large gaps
         % between experiments.
         fprintf('index of last spike: %d\n', spikeTimestamps(end) * Fs);
-
         if ~removeRejectedSpikes && ~isempty(spikeClusterFiles) && exist(spikeClusterFiles{i}, "file")
             spikeClusterFileObj = matfile(spikeClusterFiles{i});
             rejectedSpikes = spikeClusterFileObj.rejectedSpikes;
@@ -63,12 +62,29 @@ for i = 1: numFiles
             spikeTimestamps(rejectedSpikes) = [];
         end
         [cscSignalSpikeInterpolated, spikeIntervalPercentage, interpolateIndex, spikeIndex] = interpolateSpikes(cscSignal, timestamps, spikes, spikeTimestamps);
+        spikeGapLength = findGapLength(interpolateIndex);
+
+        % check the distribution of spike gap length:
+        figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
+        h = histogram(spikeGapLength);
+        set(gca, 'YScale', 'log');
+        if max(h.Values)*1.1 > min(h.Values(h.Values>0))*.8
+            ylim([min(h.Values(h.Values>0))*.8,  max(h.Values)*1.1]);
+        end
+        [filePath, fileName] = fileparts(channelFiles{1});
+        xlabel(sprintf('gap length of interpolation (max gap duration: %.3f seconds)', max(spikeGapLength) * seconds(samplingInterval)), 'FontSize', 15);
+        ylabel(['Frequency (', fileName, ')'], 'FontSize', 15);
+        title(filePath , 'FontSize', 13);
+        saveas(h, fullfile(outputPath, [fileName, '.png']), 'png');
+        close
     else
-        fprintf('spike file: %s not found!\n', spikeDetectFiles{i});
-        % cscSignalSpikesRemoved = cscSignal;
+        if ~isempty(spikeDetectFiles) && length(spikeDetectFiles) >= i
+            fprintf('spike file: %s not found!\n', spikeDetectFiles{i});
+        end
         cscSignalSpikeInterpolated = cscSignal;
         spikeIntervalPercentage = 0;
         interpolateIndex = false(1, length(cscSignal));
+        spikeGapLength = findGapLength(interpolateIndex);
         spikeIndex = false(1, length(cscSignal));
     end
 
@@ -89,8 +105,11 @@ for i = 1: numFiles
     lfpFileObj.lfpTimestamps = downsampleTs;
     lfpFileObj.experimentName = experimentName;
     lfpFileObj.timestampsStart = timestampsStart;
-    lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
-    lfpFileObj.spikeGapLength = findGapLength(interpolateIndex);
+
+    if Fs > 2000
+        lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
+        lfpFileObj.spikeGapLength = spikeGapLength;
+    end
 
     if saveRaw
         % save Raw data to check interpolation:
@@ -101,25 +120,7 @@ for i = 1: numFiles
         lfpFileObj.spikeIndex = spikeIndex;
         lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
-
-    
-    % ---- check the distribution of spike gap length:
-    figure('Position', [100, 100, 1000, 500], 'Visible', 'off');
-    h = histogram(lfpFileObj.spikeGapLength);
-    set(gca, 'YScale', 'log');
-    if max(h.Values)*1.1 > min(h.Values(h.Values>0))*.8
-        ylim([min(h.Values(h.Values>0))*.8,  max(h.Values)*1.1]);
-    end
-    [filePath, fileName] = fileparts(channelFiles{1});
-    xlabel(sprintf('gap length of interpolation (max gap duration: %.3f seconds)', max(lfpFileObj.spikeGapLength) * seconds(samplingInterval)), 'FontSize', 15);
-    ylabel(['Frequency (', fileName, ')'], 'FontSize', 15);
-    title(filePath , 'FontSize', 13);
-    saveas(h, fullfile(outputPath, [fileName, '.png']), 'png');
-    close
-    % ---- 
-
     movefile(lfpFilenameTemp, lfpFilename);
-
 end
 end
 

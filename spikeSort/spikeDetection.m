@@ -41,7 +41,7 @@ for i = 1: size(cscFiles, 1)
 
     spikes = cell(nSegments, 1);
     xfDetect = cell(nSegments, 1);
-    ExpName = cell(nSegments, 1);
+    ExpNameId = cell(nSegments, 1);
     spikeTimestamps = cell(nSegments, 1);
     duration = 0;
 
@@ -74,17 +74,19 @@ for i = 1: size(cscFiles, 1)
             timestamps = tsSingle;
         end
 
-        ExpName{j} = repmat(experimentName(j), 1, length(index));
+        ExpNameId{j} = repmat(j, 1, length(index));
         spikeTimestamps{j} = timestamps(index);
     end
 
     fprintf('write spikes to file:\n %s\n', tempSpikeFilename);
 
+    % in case server connection is lost:
     try
         matobj = matfile(tempSpikeFilename, 'Writable', true);
         matobj.spikes = single(vertcat(spikes{:}));
         matobj.param = param;
-        matobj.ExpName = [ExpName{:}];
+        matobj.ExpNameId = int8([ExpNameId{:}]);
+        matobj.ExpName = experimentName;
         matobj.timestampsStart = timestampsStart;
         matobj.outputStruct = outputStruct;
         matobj.spikeTimestamps = [spikeTimestamps{:}];
