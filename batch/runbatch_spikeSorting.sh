@@ -47,12 +47,13 @@ patientId="573"
 
 ## Set MATLAB parameters
 expIds="[3:7]" 
-skipExist="[1, 1, 1]"  # [spike detection, spike code, spike clustering]
+skipExist="[1, 1, 0]"  # [spike detection, spike code, spike clustering]
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
 # To see which versions of matlab are available use: module av matlab
 module load matlab/R2023b
+SCRIPT_DIR="/u/home/x/xinniu/nwbPipeline/batch"
 
 
 #### DO NOT EDIT THINGS BELOW
@@ -69,8 +70,6 @@ echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
 ## make a copy of batch script:
 # Get the directory containing the currently executing script
-SCRIPT_DIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
-echo $SCRIPT_DIR
 cd $SCRIPT_DIR
 if [ ! -d jobs_${expName} ]; then
     mkdir jobs_${expName}
