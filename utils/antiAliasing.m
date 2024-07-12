@@ -48,10 +48,10 @@ if Fs ~= downsampleFs
     % for interp1 to fill time gaps with add a NaN between data from each recording 
     % and add a corresponding timestamp to the time
     % but we only want to do this if there is a time gap between the recordings
-    % 
+    
     % create a 2kHz time vector that spans the full series
-    % ts_2k = linearizeTimestamps(timestamps, downsampleFs);
-    % 
+    ts_2k = linearizeTimestamps(timestamps, downsampleFs);
+
     % Or use decimate or decimateBy (Emily) to downsample the signal?
     lfpSignal = interp1(timestamps, flt_data_conc, ts_2k);
     startTs = ts_2k(1);
