@@ -522,23 +522,23 @@ end
 
 switch par.force_feature
     case 'spk'
-        f_in  = spikes(find(classes~=0 & classes~=-1),:);
-        f_out = spikes(find(classes==0),:);
+        f_in  = spikes(classes~=0 & classes~=-1,:);
+        f_out = spikes(classes==0,:);
     case 'wav'
         if isempty(inspk)
             [inspk] = wave_features_wc(spikes, handles);        % Extract spike features.
             USER_DATA{7} = inspk;
         end
-        f_in  = inspk(find(classes~=0 & classes~=-1),:);
-        f_out = inspk(find(classes==0),:);
+        f_in  = inspk(classes~=0 & classes~=-1,:);
+        f_out = inspk(classes==0,:);
 end
 
-class_in = classes(find(classes~=0 & classes~=-1));
-class_out = force_membership_wc(f_in, class_in, f_out, handles);
-classes(find(classes==0)) = class_out;
+class_in = classes(classes~=0 & classes~=-1);
+class_out = force_membership_wc(f_in, class_in, f_out, par);
+classes(classes==0) = class_out;
 
 USER_DATA{6} = classes(:)';
-set(handles.wave_clus_figure,'userdata',USER_DATA)
+set(handles.wave_clus_figure,'userdata', USER_DATA)
 
 clustering_results = USER_DATA{10};
 handles.minclus = clustering_results(1,5);
