@@ -26,6 +26,7 @@ for i = 1: numFiles
     [~, channelFilename] = fileparts(channelFiles{1});
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
     lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
+    lfpTimestampFileName = fullfile(outputPath, 'lfpTimestamps.mat');
     outputFiles{i} = lfpFilename;
 
     if exist(lfpFilename, "file") && skipExist
@@ -100,17 +101,13 @@ for i = 1: numFiles
 
     [lfpSignal, downsampleTs] = antiAliasing(cscSignalSpikeInterpolated, timestamps, Fs);
 
+    % save LFP:
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
     lfpFileObj.lfp = single(lfpSignal);
-    lfpFileObj.lfpTimestamps = downsampleTs;
-    lfpFileObj.experimentName = experimentName;
-    lfpFileObj.timestampsStart = timestampsStart;
-
     if Fs > 2000
         lfpFileObj.spikeIntervalPercentage = spikeIntervalPercentage;
         lfpFileObj.spikeGapLength = spikeGapLength;
     end
-
     if saveRaw
         % save Raw data to check interpolation:
         lfpFileObj.cscSignal = cscSignal;
@@ -121,6 +118,14 @@ for i = 1: numFiles
         lfpFileObj.numberOfMissingSamples = round(length(cscSignal) * spikeIntervalPercentage);
     end
     movefile(lfpFilenameTemp, lfpFilename);
+
+    % save timestamps:
+    if ~exist(lfpTimestampFileName, "file")
+        lfpTimestampFileObj = matfile(lfpTimestampFileName, "Writable", true);
+        lfpTimestampFileObj.lfpTimestamps = downsampleTs;
+        lfpTimestampFileObj.experimentName = experimentName;
+        lfpTimestampFileObj.timestampsStart = timestampsStart;
+    end
 end
 end
 
