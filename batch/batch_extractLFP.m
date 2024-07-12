@@ -45,7 +45,7 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     microFiles = microFiles(jobIds, :);
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
 
-    spikeFilePath = fullfile(spikeFilePath, 'CSC_micro_spikes');
+    spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
     [spikeDetectFiles, spikeClusterFiles] = createSpikeFileName(microFiles(:, 1));
     spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
     spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
