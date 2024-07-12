@@ -95,6 +95,14 @@ qsub batch/runbatch_extractLFP.sh
 
 <WIP>
 
+### manual spike sort:
+
+To do manual spike sort, run `wave_clus` in matlab command window, or open `wave_clus.m` and press Run button. Press `Load Data` and select the *_spike.mat file created by automatic spike sorting.
+
+![image](https://github.com/user-attachments/assets/a10ae600-e170-4388-a403-2fbb59c1052d)
+
+>> You need to run all three steps of automatic spike sorting before the manual spike sort.
+
 ## config.m
 
 This script contains the global parameters for the pipeline. Including name patterns for micro and macro files, files that are ignored when unpacking, etc.
