@@ -98,10 +98,10 @@ qsub batch/runbatch_extractLFP.sh
 ### manual spike sort:
 
 To do manual spike sort, run `wave_clus` in matlab command window, or open `wave_clus.m` and press Run button. Press `Load Data` and select the *_spike.mat file created by automatic spike sorting.
+> You need to run all three steps of automatic spike sorting before the manual spike sort.
 
 ![image](https://github.com/user-attachments/assets/a10ae600-e170-4388-a403-2fbb59c1052d)
 
->> You need to run all three steps of automatic spike sorting before the manual spike sort.
 
 ## config.m
 
