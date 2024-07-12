@@ -7,7 +7,7 @@
 #   - expName: str, This should be consistent to the file path in unpacked data.
 #   - patientId: str, This should be consistent to the file path in unpacked data.
 #   - expIds: matlab array, Define experiments to run spike sorting at line 78.
-#   - skipExists: 1 by 3 logical matlab array, whether to skip: spikeDetection, spikeCode, spikeClustering.
+#   - skipExists: 1 by 2 logical matlab array, whether to skip LFP extraction for micro and macro channels, respectively
 # =========================================
 
 
@@ -42,12 +42,12 @@
 
 
 ## Set the experiment parameters ==========
-expName="GoldmineGems"
+expName="MovieParadigm"
 patientId="573"
 
 ## Set MATLAB parameters
-expIds="[14]"  # MATLAB array format
-skipExist="0"  # MATLAB logical array
+expIds="[3:11]"  # MATLAB array format
+skipExist="[1, 0]"  # MATLAB logical array
 
 
 ## load the job environment:
