@@ -59,9 +59,6 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     macroLFPPath = fullfile(expFilePath, 'LFP_macro');
     [macroFiles, timestampFiles] = readFilePath(expIds, filePath, 'macro');
 
-    % delete(gcp('nocreate')) 
-    % parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
-
     lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
     writecell(lfpFiles, fullfile(macroLFPPath, 'lfpFiles.csv'));
 
