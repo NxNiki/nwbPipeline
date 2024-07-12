@@ -1,6 +1,6 @@
 function [signal ,timestamps, samplingIntervalSeconds, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
-%combineCSC Combine CSC signals. filling gaps with NaNs if gap between
-%segments larger than threshold.
+% combineCSC Combine CSC signals. filling gaps with NaNs if gap between
+% segments larger than threshold.
 
 % signalFiles: cell(n, 1)
 % timestampFiles: cell(n, 1)
@@ -57,12 +57,13 @@ signalCombined = [signalCombined(:), signalGap(:)]';
 signal = [signalCombined{:}];
 timestampsCombined = [timestampsCombined(:), timestampsGap(:)]';
 timestamps = [timestampsCombined{:}];
+
+% large number lose precision so we save relative timestamps so that we can
+% use single precision.
 timestampsStart = timestamps(1);
 timestamps = timestamps - timestamps(1);
 
 if useSinglePrecision
-    % large number lose precision so we save relative timestamps if use
-    % single precision.
     timestampsSingle = single(timestamps);
     if ~any(diff(timestampsSingle)==0)
         timestamps = timestampsSingle;
