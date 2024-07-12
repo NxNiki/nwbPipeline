@@ -1,9 +1,15 @@
 function [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles)
+% This function read *_spikes.mat file with corresponding times_*.mat,
+% data_*.dg_01 and data_*.dg_01.lab file.
 
-% set(handles.file_name,'string',['Loading:    ' pathname filename]);
+% As wave_clus also saves result as times_*.mat file. We will check
+% variables in times_*.mat to load spikes accordingly. This makes it
+% inconvenient to redo manual spike clustering. Consider use new name for
+% manual spike clustering in the future.
 
-% handles.par = set_parameters_ascii_spikes(filename,handles);     %Load parameters
+
 handles.par = set_joint_parameters_CSC(filename); %EM: Replaced the default wave_clus parameters with those that we've been using
+
 % HISTOGRAM PARAMETERS
 for i=1:handles.par.max_clus + 1
     handles.par.(['nbins' num2str(i-1)]) = 100;  % # of bins for the ISI histograms
@@ -65,9 +71,11 @@ if exist('ipermut', 'var')
 end
 
 if ismember("spikeIdxRejected", who(timesFileObj))
+    % times_* file created by automatic clustering:
     spikes = spikeFileObj.spikes;
     spikes(timesFileObj.spikeIdxRejected, :) = [];
 else
+    % time_* file created by wave_clus:
     spikes = timesFileObj.spikes;
 end
 
