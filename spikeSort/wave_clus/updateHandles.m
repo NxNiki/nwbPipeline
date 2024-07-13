@@ -1,11 +1,11 @@
-function handles = updateHandles(handles, fieldsTrue, fieldsFalse, clusterIdx)
-    if nargin < 2
+function updateHandles(hObject, handles, fieldsTrue, fieldsFalse, clusterIdx)
+    if nargin < 3
         fieldsTrue = [];
     end
-    if nargin < 3
+    if nargin < 4
         fieldsFalse = [];
     end
-    if nargin < 4
+    if nargin < 5
         clusterIdx = 10;
     end
     
@@ -20,4 +20,6 @@ function handles = updateHandles(handles, fieldsTrue, fieldsFalse, clusterIdx)
     for i = 1:length(fieldsFalse)
         handles.(fieldsFalse{i}) = 0;
     end
+
+    guidata(hObject, handles);
 end
