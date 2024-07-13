@@ -1,4 +1,4 @@
-function fixButton(handles, class, userDataIdx, handleKey)
+function fixButton(hObject, handles, class, userDataIdx, handleKey)
 
     USER_DATA = get(handles.wave_clus_figure, 'userdata');
     classes = USER_DATA{6};
@@ -19,5 +19,7 @@ function fixButton(handles, class, userDataIdx, handleKey)
     set(h_fig3, 'userdata', USER_DATA)
     set(h_fig2, 'userdata', USER_DATA)
     set(h_fig1, 'userdata', USER_DATA)
+
+    guidata(hObject, handles);
 
 end
