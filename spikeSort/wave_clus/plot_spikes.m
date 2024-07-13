@@ -50,7 +50,7 @@ end
 
 % Extract spike features if needed
 if get(handles.spike_shapes_button,'value') ==0
-    if isempty(inspk) | (length(inspk)~=size(spikes,1))
+    if isempty(inspk) || (length(inspk)~=size(spikes,1))
         [inspk] = wave_features_wc(spikes, handles);
         USER_DATA{7} = inspk;
     end
@@ -67,7 +67,7 @@ end
 
 % Classes should be consecutive numbers
 i=1;
-while i<=min(max(classes),par.max_clus);
+while i<=min(max(classes),par.max_clus)
     if isempty(classes(classes==i))
         % This code can get stuck in an infinite loop if there are no
         % clusters between i and par.max_clus... So I replace it with the
@@ -81,7 +81,7 @@ while i<=min(max(classes),par.max_clus);
     end
 end
 i=1;
-while i<=min(max(class_bkup),par.max_clus);
+while i<=min(max(class_bkup),par.max_clus)
     if isempty(class_bkup(class_bkup==i))
 %         for k=i+1:par.max_clus
 %             class_bkup(class_bkup==k)=k-1;
@@ -144,7 +144,7 @@ end
 
 % Merge operations
 mtemp = 0;
-if handles.merge == 1 & ~isempty(nfix_class)
+if handles.merge == 1 && ~isempty(nfix_class)
     imerge = find(clustering_results(:,2)==nfix_class(1)); % index for the original temperature that will represent all the fixed classes
     mtemp = clustering_results(imerge(1),3); % temperature that represents all the fixed classes
     classes(fix_class2) = nfix_class(1); % labels all the fixed classes with the new number
@@ -157,7 +157,7 @@ classDefs = cell(nclusters,1);
 for i=1:nclusters
     class_temp = find(classes==i);
     %     eval(['class_temp = find(classes==' num2str(i) ');'])
-    if ((ifixflag(i)==1) & (~isempty(class_temp)))
+    if ((ifixflag(i)==1) && (~isempty(class_temp)))
         ifixflagc = 1;
     else
         ifixflagc = 0;
@@ -219,7 +219,7 @@ clustering_results(:,5) = minclus; % GUI minimum cluster
 % The temperature of the non-fixed spikes will be
 % the GUI temperature (temp) and cluster number will be
 % the GUI cluster number (classes)
-if length(fix_class2)~=0 && handles.merge==0 && handles.undo==0 && handles.reject==0 && handles.force==0
+if ~isempty(fix_class2) && handles.merge==0 && handles.undo==0 && handles.reject==0 && handles.force==0
     % selects the index of the non-fixed spikes
     % since those are the ones which are going to be updated
     ind_non_fix = 1:length(classes);
@@ -232,7 +232,7 @@ end
 clustering_results(:,2) = classes;
 % If there are no fix and rejected clusters and undo operations,
 % original classes are the same as current classes
-if length(fix_class2)==0 && handles.reject==0 && handles.undo==0 && handles.merge==0 && handles.force==0
+if isempty(fix_class2) && handles.reject==0 && handles.undo==0 && handles.merge==0 && handles.force==0
     clustering_results(:,4) = clustering_results(:,2); % clusters
     clustering_results(:,3) = temp; % temperatures
 end
@@ -328,7 +328,7 @@ for i = 1:nclusters+1
             end
             xlim(ax,[1 ls])
             
-            if i>1; ylimit = [ylimit; get(ax, 'ylim')]; end;
+            if i>1; ylimit = [ylimit; get(ax, 'ylim')]; end
             nSpikes = length(classDefs{i});
             title(ax, ['Cluster ' num2str(i-1) ':  nSpikes = ' num2str(nSpikes)], 'Fontweight', 'bold');
             
