@@ -1,6 +1,5 @@
+function mark_clusters_temperature_diagram(handles, tree, clustering_results, newData)
 % MARK CLUSTERS IN TEMPERATURE DIAGRAM
-
-function mark_clusters_temperature_diagram(handles,tree,clustering_results,newData)
 % EM: added 'newData' as a var. When we're loading new data, clear the plot
 % and make the diagram, but no need to do so for data that's already been
 % loaded.
@@ -20,14 +19,14 @@ end
 
 if length(unique(clustering_results(:,2))) < nclasses
 i=1; 
-while i<= nclasses, 
-    if sum(clustering_results(:,2)==i)==0,
+while i<= nclasses
+    if sum(clustering_results(:,2)==i)==0
         indsToSubtract = clustering_results(:,2)>i; 
         clustering_results(indsToSubtract,[2 4]) = clustering_results(indsToSubtract,[2 4]) - 1;
         nclasses = nclasses-1;
-    else,
+    else
         i=i+1;
-    end;
+    end
 end
 end
 
@@ -86,7 +85,7 @@ switch handles.par.temp_plot
 end
 xlim(handles.temperature_plot,[0 handles.par.maxtemp])
 xlabel('Temperature'); 
-if handles.par.temp_plot == 'log' 
+if strcmp(handles.par.temp_plot, 'log') 
     set(get(handles.temperature_plot,'ylabel'),'vertical','Cap');
 else
     set(get(handles.temperature_plot,'ylabel'),'vertical','Baseline');
