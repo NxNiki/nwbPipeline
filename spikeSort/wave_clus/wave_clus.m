@@ -322,28 +322,21 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles,tree,clustering_results,0)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-% set(handles.fix1_button,'value',0);
-% set(handles.fix2_button,'value',0);
-% set(handles.fix3_button,'value',0);
-% for i=4:par.max_clus
-%     par.(['fix',num2str(i)]) = 0;
-% end
-% USER_DATA{1} = par;
-% set(handles.wave_clus_figure,'userdata', USER_DATA);
+set(handles.fix1_button,'value', 1);
 updateFixButtonHandle(hObject, handles)
 
 % --- Change min_clus_edit
 function min_clus_edit_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
-par.min_clus = str2num(get(hObject, 'String'));
+par.min_clus = str2double(get(hObject, 'String'));
 clu = USER_DATA{4};
 temp = USER_DATA{8};
 classes = clu(temp,3:end)+1;
 tree = USER_DATA{5};
 USER_DATA{1} = par;
 USER_DATA{6} = classes(:)';
-USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
+USER_DATA{9} = classes(:)';                                     % backup for non-forced classes.
 clustering_results = USER_DATA{10};
 clustering_results(:,5) = par.min_clus;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
@@ -363,14 +356,6 @@ mark_clusters_temperature_diagram(handles,tree, clustering_results)
 
 set(handles.force_button, 'value', 0);
 set(handles.force_button, 'string', 'Force');
-
-
-% set(handles.fix1_button, 'value', 0);
-% set(handles.fix2_button, 'value', 0);
-% set(handles.fix3_button, 'value', 0);
-% for i=4:par.max_clus
-%     par.(['fix', num2str(i)]) = 0;
-% end
 updateFixButtonHandle(hObject, handles)
 
 % --- Executes on button press in save_clusters_button.
@@ -507,13 +492,6 @@ set(handles.wave_clus_figure, 'userdata', USER_DATA)
 
 updateHandles(hObject, handles, {'setclus', 'force'}, {'merge', 'reject', 'undo'});
 plot_spikes(handles);
-
-% set(handles.fix1_button,'value',0);
-% set(handles.fix2_button,'value',0);
-% set(handles.fix3_button,'value',0);
-% for i=4:par.max_clus
-%     par.(['fix', num2str(i)]) = 0;
-% end
 updateFixButtonHandle(hObject, handles);
 
 % PLOT ALL PROJECTIONS BUTTON
@@ -529,15 +507,15 @@ end
 
 % fix1 button --------------------------------------------------------------------
 function fix1_button_Callback(hObject, eventdata, handles)
-fixButton(handles, 1, 20, 'fix1_button')
+fixButton(hObject, handles, 1, 20, 'fix1_button')
 
 % fix2 button --------------------------------------------------------------------
 function fix2_button_Callback(hObject, eventdata, handles)
-fixButton(handles, 2, 21, 'fix2_button')
+fixButton(hObject, handles, 2, 21, 'fix2_button')
 
 % fix3 button --------------------------------------------------------------------
 function fix3_button_Callback(hObject, eventdata, handles)
-fixButton(handles, 3, 22, 'fix3_button')
+fixButton(hObject, handles, 3, 22, 'fix3_button')
 
 %SETTING OF SPIKE FEATURES OR PROJECTIONS
 % --------------------------------------------------------------------
@@ -717,17 +695,6 @@ plot_spikes(handles) % plot_spikes updates USER_DATA{11}
 tree = USER_DATA{5};
 mark_clusters_temperature_diagram(handles, tree, clustering_results_bk)
 set(handles.min_clus_edit, 'string', num2str(handles.minclus));
-
-% set(handles.fix1_button, 'value', 0);
-% set(handles.fix2_button, 'value', 0);
-% set(handles.fix3_button, 'value', 0);
-% 
-% par = USER_DATA{1};
-% for i=4:par.max_clus
-%     par.(['fix', num2str(i)]) = 0;
-% end
-% USER_DATA{1} = par;
-% set(handles.wave_clus_figure, 'userdata', USER_DATA);
 updateFixButtonHandle(hObject, handles)
 
 % --- Executes on button press in merge_button.
@@ -741,17 +708,6 @@ USER_DATA = get(handles.wave_clus_figure,'userdata');
 tree = USER_DATA{5};
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
-
-% set(handles.fix1_button,'value',0);
-% set(handles.fix2_button,'value',0);
-% set(handles.fix3_button,'value',0);
-% 
-% par = USER_DATA{1};
-% for i=4:par.max_clus
-%     par.(['fix', num2str(i)]) = 0;
-% end
-% USER_DATA{1} = par;
-% set(handles.wave_clus_figure,'userdata', USER_DATA);
 updateFixButtonHandle(hObject, handles)
 
 % --- Executes on button press in Plot_polytrode_channels_button.
