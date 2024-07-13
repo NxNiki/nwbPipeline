@@ -156,9 +156,6 @@ uicontrol('parent',dest,'units','normalized',...
     'callback',{@changeSize,ch,1,sizeDecrease});
 
 
-
-
-
 function showHide(varargin)
 box = varargin{1};
 pointCloud = varargin{3};
@@ -248,7 +245,7 @@ ckBoxes = checkboxes(end:-1:1); %want ordered from first to last to correspond w
 xy = varargin{3};
 values = logical(cellfun(@(x)get(x,'value'),ckBoxes));
 if sum(values) > 1
-    disp('Please have only one cluster class selected when you choose this button');
+    msgbox('Please have only one cluster class selected when you choose this button');
     return
 elseif sum(values) == 1
 
