@@ -2,17 +2,14 @@
 clear
 
 % expId = 4;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
+% filePath = 'MovieParadigm/570_MovieParadigm';
 
 expId = 2;
 filePath = 'Screening/572_Screening';
 
-% expId = 2;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
-
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = 0; 
+skipExist = [0, 0]; 
 saveRaw = 1;
 
 expFilePath = [filePath, sprintf('/Experiment-%d/', expId)];
@@ -32,8 +29,19 @@ spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
 spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
 spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
 
-lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist, saveRaw);
+lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist(1), saveRaw);
 writecell(lfpFiles, fullfile(microLFPPath, 'lfpFiles.csv'));
+
+
+%% macro electrodes:
+macroLFPPath = fullfile(expFilePath, 'LFP_macro');
+[macroFiles, timestampFiles] = readFilePath(expIds, filePath, 'macro');
+
+% delete(gcp('nocreate')) 
+% parpool(3); % each channel will take nearly 20GB memory for multi-exp analysis.
+
+lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
+writecell(lfpFiles, fullfile(macroLFPPath, 'lfpFiles.csv'));
 
 
 
