@@ -22,9 +22,9 @@ ts2k = linearizeTimestamps(ts32k, Fs);
 % check difference in ts:
 df2 = unique(diff(ts2k))
 
-%% load timestamps:
-tsObj1 = matfile('lfpTimeStamps_macro_001.mat');
-tsObj2 = matfile('lfpTimeStamps_macro_002.mat');
+%% load timestamps for different experiments:
+tsObj1 = matfile('lfpTimeStamps_macro_exp001.mat');
+tsObj2 = matfile('lfpTimeStamps_macro_exp002.mat');
 tsMacro = [tsObj1.timeStamps, tsObj2.timeStamps];
 % downsample ts at 20k hz
 Fs = 2000;
@@ -32,6 +32,9 @@ ts2k = linearizeTimestamps(tsMacro(:), Fs);
 
 % check difference in ts:
 df3 = unique(diff(ts2k))
+
+
+%% load timestamps with multiple e
 
 %% plot result:
 subplot(3, 1, 1)
