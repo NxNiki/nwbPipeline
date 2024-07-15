@@ -5,7 +5,7 @@ clear
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 
 expId = 2;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening';
+filePath = 'Screening/572_Screening';
 
 % expId = 2;
 % filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
@@ -15,7 +15,7 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/572_Screening'
 skipExist = 0; 
 saveRaw = 1;
 
-expFilePath = [filePath, sprintf('/Experiment%d/', expId)];
+expFilePath = [filePath, sprintf('/Experiment-%d/', expId)];
 microLFPPath = fullfile(expFilePath, 'LFP_micro');
 
 %% micro electrodes:
