@@ -28,6 +28,9 @@ scripts/*.png
 scripts/*.jpg
 scripts/*.mat
 
+test/*/LFP_micro
+test/*/LFP_macro
+
 .idea/*
 
 *.cfg
