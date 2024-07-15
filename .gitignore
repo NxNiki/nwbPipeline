@@ -28,8 +28,7 @@ scripts/*.png
 scripts/*.jpg
 scripts/*.mat
 
-test/*/LFP_micro
-test/*/LFP_macro
+test/Screening/572_Screening/Experiment-2/LFP_micro/*
 
 .idea/*
 
