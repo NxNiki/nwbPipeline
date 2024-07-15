@@ -20,12 +20,16 @@ if numFiles ~= length(timestampsFiles)
 end
 signalCombined = cell(1, numFiles);
 timestampsCombined = cell(1, numFiles);
-samplingInterval = zeros(numFiles, 1);
+samplingInterval = nan(numFiles, 1);
 
 for i = 1: numFiles
-    fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
-    [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i});
-    [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i});
+    if exist(signalFiles{i}, "file")
+        fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
+        [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i});
+        [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i});
+    else
+        warning("file does not exist: %s", signalFiles{i});
+    end
 end
 
 % check if timestamps and signals have same length:
@@ -35,7 +39,7 @@ signalLength = cellfun("length", signalCombined);
 if any(timestampLength ~= signalLength)
     error(["missmatched length of signal and timestamps: \n", sprintf('%s \n', signalFiles{timestampLength ~= signalLength})])
 end
-samplingInterval = unique(samplingInterval);
+samplingInterval = unique(samplingInterval(~isnan(samplingInterval)));
 if length(samplingInterval) > 1
     error('sampling Interval not match across files!');
 end
@@ -57,6 +61,11 @@ signalCombined = [signalCombined(:), signalGap(:)]';
 signal = [signalCombined{:}];
 timestampsCombined = [timestampsCombined(:), timestampsGap(:)]';
 timestamps = [timestampsCombined{:}];
+
+if isempty(signal) || isempty(timestamps)
+    timestampsStart = [];
+    return
+end
 
 % large number lose precision so we save relative timestamps so that we can
 % use single precision.

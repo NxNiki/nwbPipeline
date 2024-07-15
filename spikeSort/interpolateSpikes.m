@@ -9,6 +9,11 @@ samplingRate = 32000;
 interpolateRangePre = round(interpolateRangePre / (seconds(1)/samplingRate));
 interpolateRangePost = round(interpolateRangePost / (seconds(1)/samplingRate));
 
+if max(signalTimestamps) < max(spikeTimestamps)
+    warning("spikes extending signal are removed! Check spikes file match with micro CSC file!")
+    spikeTimestamps = spikeTimestamps(spikeTimestamps<=max(signalTimestamps));
+end
+
 spikeIntervalPercentage = 0;
 spikeIndexInSignal = interp1(signalTimestamps, 1:length(signalTimestamps), spikeTimestamps, 'nearest');
 interpolateIndex = false(1, length(signal));

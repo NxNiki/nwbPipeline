@@ -1,8 +1,6 @@
 % run_extractLFP
 clear
 
-% expIds = (4);
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
 expIds = (3:11);
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
 
