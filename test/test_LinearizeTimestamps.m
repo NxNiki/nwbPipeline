@@ -1,3 +1,6 @@
+clear
+close
+
 %% create ts at 32k hz:
 samplingInterval = 1/32000;
 ts32k = 0: samplingInterval: 300;
