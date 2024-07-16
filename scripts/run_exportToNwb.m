@@ -7,7 +7,9 @@
 
 clear
 
-expId = 2;
+expIds = 2;
+expName = 'Screening';
+patientId = 569;
 filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
 
 % expId = 5;
@@ -18,18 +20,17 @@ filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening'
 % 1: skip existing files.
 skipExist = 1; 
 
-outFilePath = [filePath, sprintf('/Experiment%d/nwb', expId)];
+outFilePath = [filePath, sprintf('/Experiment-%d/nwb', expIds)];
 
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);
 end
 
+expFilePath = fullfile(filePath, sprintf('/Experiment-%d/', expIds));
 %% read timestamp files and init nwb:
 
-microFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro', expId));
-timestampFiles = dir(fullfile(microFilePath, 'lfpTimeStamps*.mat'));
-timestampFiles = fullfile(microFilePath, {timestampFiles.name});
-
+% timestampFiles = dir(fullfile(microFilePath, '/CSC_micro/lfpTimeStamps*.mat'));
+% timestampFiles = fullfile(microFilePath, {timestampFiles.name});
 % tsObj = matfile(timestampFiles{1});
 % sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
@@ -39,17 +40,17 @@ sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 % generateCore('2.6.0');
 
 nwb = NwbFile( ...
-    'session_description', 'sub-550_exp-1_Screening',...
-    'identifier', 'sub-550_exp-1_Screening', ...
+    'session_description', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName],...
+    'identifier', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName], ...
     'session_start_time', sessionStartTime, ...
     'timestamps_reference_time', sessionStartTime, ...
     'general_experimenter', 'My Name', ... % optional
-    'general_session_id', 'session_1234', ... % optional
+    'general_session_id', '', ... % optional
     'general_institution', 'UCLA', ... % optional
     'general_related_publications', ''); % optional
 
 subject = types.core.Subject( ...
-    'subject_id', '550', ...
+    'subject_id', num2str(patientId), ...
     'age', '', ...
     'description', '', ...
     'species', 'human', ...
@@ -58,9 +59,8 @@ subject = types.core.Subject( ...
 nwb.general_subject = subject;
 
 %% Electrodes Table:
-numShanks = 1;
-numChannelsPerShank = 4;
- 
+
+microLFPFilePath = fullfile(expFilePath, '/LFP_micro');
 ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
     'colnames', {'x', 'y', 'z', 'location', 'group', 'group_name', 'label'}, ...
     'description', 'all electrodes');
@@ -70,8 +70,10 @@ Device = types.core.Device(...
     'manufacturer', 'Neuralynx' ...
 );
 
-shankLabel = {'GB'};
-electrodeLabel = {'ROF'};
+shankLabel = {'GA1', 'GB', 'GC', 'GD'};
+electrodeLabel = {'ROF', ''};
+numShanks = length(shankLabel);
+numChannelsPerShank = 8;
 
 nwb.general_devices.set('array', Device);
 for iShank = 1:numShanks
@@ -127,38 +129,19 @@ electrode_table_region = types.hdmf_common.DynamicTableRegion( ...
 % nwb.acquisition.set('ElectricalSeries', electrical_series);
 
 %% LFP:
+samplingRate = 2000;
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment%d/LFP_micro', expId));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFiles = fullfile(lfpFilePath, {lfpFiles.name});
+lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
+lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro/lfpTimestamps.mat', expIds));
+nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, 'microLFP');
 
-lfpSignals = cell(1, length(lfpFiles));
-for i = 1: length(lfpFiles)
-    lfpObj = matfile(lfpFiles{i});
-    lfpSignals{i} = lfpObj.lfp;
-end
-lfpSignal = vertcat(lfpSignals{:});
-
-
-electrical_series = types.core.ElectricalSeries( ...
-    'starting_time', 0.0, ... % seconds
-    'starting_time_rate', 2000., ... % Hz
-    'data', lfpSignal, ...
-    'electrodes', electrode_table_region, ...
-    'data_unit', 'volts');
- 
-lfp = types.core.LFP('ElectricalSeries', electrical_series);
- 
-ecephys_module = types.core.ProcessingModule(...
-    'description', 'extracellular electrophysiology');
- 
-ecephys_module.nwbdatainterface.set('LFP', lfp);
-
-nwb.processing.set('ecephys', ecephys_module);
+lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
+lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
+nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, 'macroLFP');
 
 %% spikes:
 
-spikeFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro_spikes', expId));
+spikeFilePath = fullfile(filePath, sprintf('/Experiment-%d/CSC_micro_spikes', expIds));
 spikeFileNames = dir(fullfile(spikeFilePath, 'times*.mat'));
 spikeFileNames = fullfile(spikeFilePath, {spikeFileNames.name});
 
@@ -178,7 +161,6 @@ nwb.units = types.core.Units( ...
     'electrodes_index', electrodes_index, ...
     'waveform_mean', types.hdmf_common.VectorData('data', spikeWaveFormMean', 'description', 'Mean Spike Waveforms') ...
 );
-
 
 % save wave forms:
 % nwb.units.vectordata.set('waveform_mean', types.hdmf_common.VectorData('data', spikeWaveFormMean', 'description', 'Mean Spike Waveforms'));
