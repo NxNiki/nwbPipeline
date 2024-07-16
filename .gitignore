@@ -28,6 +28,9 @@ scripts/*.png
 scripts/*.jpg
 scripts/*.mat
 
+test/Screening/572_Screening/Experiment-2/LFP_micro/*
+test/Screening/572_Screening/Experiment-2/LFP_macro/
+
 .idea/*
 
 *.cfg

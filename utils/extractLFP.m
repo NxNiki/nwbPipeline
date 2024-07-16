@@ -27,8 +27,7 @@ for i = 1: numFiles
     lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
     lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
     lfpTimestampFileName = fullfile(outputPath, 'lfpTimestamps.mat');
-    outputFiles{i} = lfpFilename;
-
+    
     if exist(lfpFilename, "file") && skipExist
         continue
     end
@@ -44,6 +43,12 @@ for i = 1: numFiles
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
+
+    if isempty(cscSignal)
+        return
+    else
+        outputFiles{i} = lfpFilename;
+    end
     Fs = seconds(1) / samplingInterval;
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
