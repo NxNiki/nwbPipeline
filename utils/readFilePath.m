@@ -11,7 +11,7 @@ expNamesId = 1;
 
 for i = 1: length(expIds)
     expId = expIds(i);
-    cscFilePath = [filePath, sprintf('/Experiment%d', expId)];
+    cscFilePath = [filePath, sprintf('/Experiment-%d', expId)];
     if strcmp(channel, 'micro')
         cscFilePath = fullfile(cscFilePath, 'CSC_micro');
     elseif strcmp(channel, 'macro')

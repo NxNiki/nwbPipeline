@@ -6,7 +6,7 @@ if isempty(par)
 end
 spikes = USER_DATA{2};
 spk_times = USER_DATA{3};
-clu = USER_DATA{4};
+% clu = USER_DATA{4};
 classes = USER_DATA{6};
 classes = classes(:)';
 class_bkup = USER_DATA{9};
@@ -263,7 +263,7 @@ nclusters = max(classes);
 % Updates clustering_results and clustering_results_bk in USER_DATA
 USER_DATA{10} = clustering_results;
 USER_DATA{11} = clustering_results_bk;
-set(handles.wave_clus_figure,'userdata',USER_DATA)
+% set(handles.wave_clus_figure,'userdata',USER_DATA)
 
 for i=20:55
     USER_DATA{i} = [];
@@ -287,7 +287,7 @@ for i = 1:nclusters+1
         %PLOTS SPIKES OR PROJECTIONS
         
         hold(handles.projections,'on')
-        max_spikes=min(length(classDefs{i}),par.max_spikes);
+        max_spikes=min(length(classDefs{i}), par.max_spikes);
         sup_spikes=length(classDefs{i});
         permut = randperm(sup_spikes); permut = permut(1:max_spikes);
 %         if get(handles.spike_shapes_button,'value') ==1 && get(handles.plot_all_button,'value') ==1

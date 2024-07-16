@@ -208,12 +208,12 @@ guidata(hObject, handles);
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 spikes = USER_DATA{2};
 if size(clu,2)-2 < size(spikes, 1)
-    classes = clu(temp(end),3:end)+1;
+    classes = clu(temp(end), 3:end)+1;
     if ~exist('ipermut', 'var')
         classes = [classes(:)' zeros(1,size(spikes, 1) - handles.par.max_spk)];
     end
 else
-    classes = clu(temp(end),3:end)+1;
+    classes = clu(temp(end), 3:end)+1;
 end
 
 saved_classes = cluster_class(:,1);
@@ -240,7 +240,6 @@ handles.setclus = 0;
 
 handles.minclus = handles.par.min_clus;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
-
 
 %% Add sampling rate info
 if length(USER_DATA)<18 || isempty(USER_DATA{18})
