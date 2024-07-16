@@ -1,5 +1,5 @@
-% run_extractLFP
 clear
+close
 
 % expId = 4;
 % filePath = 'MovieParadigm/570_MovieParadigm';
