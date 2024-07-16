@@ -1,4 +1,4 @@
-function updateParam(hObject, handles, parKey)
+function handles = updateParam(hObject, handles, parKey)
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
