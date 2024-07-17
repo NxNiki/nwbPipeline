@@ -47,8 +47,8 @@ patientId="573"
 
 ## Set MATLAB parameters
 expIds="[3:7]"  # MATLAB array format
-skipExist="[1, 0]"  # MATLAB logical array
-
+skipExist="[0, 1]"  # MATLAB logical array
+codePath="/u/home/x/xinniu/nwbPipeline/"
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
@@ -66,9 +66,8 @@ echo " "
 echo "Start Matlab"
 echo "run LFP extraction, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
-
 ## make a copy of batch script:
-cd /u/home/x/xinniu/nwbPipeline/batch
+cd ${codePath}/batch
 if [ ! -d jobs_${expName} ]; then
     mkdir jobs_${expName}
 fi
@@ -85,7 +84,7 @@ fi
 
 ## run matlab function:
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    addpath(genpath(${codePath}));
     expIds = ${expIds};
     skipExist = ${skipExist};
     workingDir = getDirectory();
