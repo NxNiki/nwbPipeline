@@ -16,7 +16,7 @@ temp = USER_DATA{8};
 ls = size(spikes, 2);
 par.to_plot_std = 1;                % # of std from mean to plot
 
-merge = handles.merge;
+% merge = handles.merge;
 minclus = handles.minclus;
 clustering_results = USER_DATA{10};
 
@@ -333,12 +333,13 @@ for i = 1:nclusters+1
             title(ax, ['Cluster ' num2str(i-1) ':  nSpikes = ' num2str(nSpikes)], 'Fontweight', 'bold');
             
             isiAx = handles.(['isi' num2str(i-1)]);
-            times{i} = diff(spk_times(classDefs{i}));
+            % times{i} = diff(spk_times(classDefs{i})); % Xin
+            spkTimeDiff = diff(spk_times(classDefs{i}));
             % Calculates # ISIs < 3ms
             bin_step_temp = 1;
-            [N,X]=hist(times{i}, 0:bin_step_temp:par.(['nbins', num2str(i-1)]));
+            [N,X]=hist(spkTimeDiff, 0:bin_step_temp:par.(['nbins', num2str(i-1)]));
             multi_isi= sum(N(1:3));
-            pct_violations = multi_isi/length(times{i});
+            pct_violations = multi_isi/length(spkTimeDiff);
             % Builds and plots the histogram
             bar(isiAx, X(1:end-1), N(1:end-1))
             xlim(isiAx, [0 par.(['nbins' num2str(i-1)])])
