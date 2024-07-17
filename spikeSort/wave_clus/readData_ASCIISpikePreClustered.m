@@ -49,7 +49,7 @@ cluster_class = timesFileObj.cluster_class;
 spikeTimestamps=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line above.
 
 %Load clustering results
-fname = [handles.par.fname '_' filename(1:end-4)];               % filename for interaction with SPC
+fname = [handles.par.fname '_' filename(1:end-4)];              % filename for interaction with SPC
 if ~exist([fname '.dg_01.lab'], 'file')
     fname = strrep(fname, 'CSC', 'ch');
 end
@@ -80,7 +80,7 @@ else
 end
 
 USER_DATA{2} = spikes;
-USER_DATA{3} = spikeTimestamps(:)';
+USER_DATA{3} = spikeTimestamps(:)' * 1000;                      % convert from seconds to milliseconds.
 USER_DATA{4} = clu;
 USER_DATA{5} = tree;
 USER_DATA{7} = timesFileObj.inspk;
