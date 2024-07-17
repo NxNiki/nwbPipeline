@@ -285,7 +285,7 @@ handles.minclus = min_clus;
 % clustering_results = USER_DATA{10};
 % clustering_results_bk = USER_DATA{11};
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
-temperature=handles.par.mintemp + temp * handles.par.tempstep;
+temperature = handles.par.mintemp + temp * handles.par.tempstep;
 
 switch par.temp_plot
     case 'lin'
@@ -616,7 +616,7 @@ classes(classes==1)=0;
 USER_DATA{6} = classes;
 USER_DATA{9} = classes;
 
-handles = updateHandles(hObject, handles, {'setclus','reject'}, {'force', 'merge',  'undo'}, 10);
+handles = updateHandles(hObject, handles, {'setclus', 'reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
 
 clustering_results = USER_DATA{10};
@@ -647,10 +647,10 @@ plot_spikes(handles)
 
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
-set(handles.wave_clus_figure,'userdata', USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(gcbo,'value',0);
-set(handles.isi2_accept_button,'value',1);
+set(handles.isi2_accept_button, 'value', 1);
 
 % --------------------------------------------------------------------
 function isi3_accept_button_Callback(hObject, eventdata, handles)
