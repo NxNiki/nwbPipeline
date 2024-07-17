@@ -17,9 +17,9 @@ negSpikes = spikeMean <= spikeMedian;
 
 if sum(posSpikes(spikeIdx)) > sum(negSpikes(spikeIdx)) * 10
     % keep positive spikes:
-    cluster_class(negSpikes) = 0;
+    cluster_class(negSpikes, 1) = 0;
 else
-    cluster_class(posSpikes) = 0;
+    cluster_class(posSpikes, 1) = 0;
 end
 
 end
