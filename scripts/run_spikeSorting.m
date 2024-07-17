@@ -1,8 +1,7 @@
 % run spike detection and spike sorting to the unpacked data:
 clear
 
-% addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
-addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+addpath(genpath('/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline'));
 
 expIds = (4:8);
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/568_MovieParadigm';
