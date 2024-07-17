@@ -6,7 +6,7 @@ if size(spikes, 1) ~= size(cluster_class, 1)
     error('size of spikes and cluster_class not match!')
 end
 
-spikeIdx = cluster_class(1, :) > 0;
+spikeIdx = cluster_class(:, 1) > 0;
 
 % calcualte the number of pos and neg spikes:
 spikeMean = mean(spikes, 2);
