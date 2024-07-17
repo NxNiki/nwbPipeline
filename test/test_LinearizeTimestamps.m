@@ -34,7 +34,6 @@ ts2k = linearizeTimestamps(tsMacro(:), Fs);
 % check difference in ts:
 df3 = unique(diff(ts2k))
 
-
 %% load timestamps with multiple segments:
 
 tsObj1 = matfile('lfpTimeStamps_macro_seg004.mat');
@@ -56,6 +55,3 @@ set(gca, 'YScale', 'log');
 subplot(3, 1, 3)
 plot(df3, '*')
 set(gca, 'YScale', 'log');
-
-
-end

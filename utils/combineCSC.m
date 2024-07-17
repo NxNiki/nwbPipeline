@@ -14,6 +14,8 @@ if nargin < 4
 end
 
 GAP_THRESHOLD = 2;
+
+
 numFiles = length(signalFiles);
 if numFiles ~= length(timestampsFiles)
     error('signalFiles and timeStampFiles should have same length!');
@@ -23,12 +25,13 @@ timestampsCombined = cell(1, numFiles);
 samplingInterval = nan(numFiles, 1);
 
 for i = 1: numFiles
+    [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i});
     if exist(signalFiles{i}, "file")
         fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
         [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i});
-        [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i});
     else
-        warning("file does not exist: %s", signalFiles{i});
+        warning("CSC file not exist: \n%s.\n Data will be filled with NaNs\n", signalFiles{i});
+        signalCombined{i} = nan(numel(timestampsCombined{i}), 1);
     end
 end
 
