@@ -189,7 +189,7 @@ switch char(handles.datatype)
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
         if isempty(filename)
-            [filename, pathname] = uigetfile('*.mat','Select file'); 
+            [filename, pathname] = uigetfile('*_spikes.mat','Select file'); 
             if ~filename
                 return
             end
