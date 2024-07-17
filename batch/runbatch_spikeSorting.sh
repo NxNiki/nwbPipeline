@@ -46,7 +46,11 @@ expName="MovieParadigm"
 patientId="573"
 
 ## Set MATLAB parameters
+<<<<<<< HEAD
 expIds="[3:11]" 
+=======
+expIds="[3:8]" 
+>>>>>>> update batch
 skipExist="[1, 1, 0]"  # [spike detection, spike code, spike clustering]
 
 ## load the job environment:
