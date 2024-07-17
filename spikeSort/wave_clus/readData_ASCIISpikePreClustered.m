@@ -48,7 +48,11 @@ timesFileObj = matfile(timesFile);
 cluster_class = timesFileObj.cluster_class;
 spikeTimestamps=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line above.
 
+<<<<<<< HEAD
 clu = timesFileObj.clu;
+=======
+clu = timeFileObj.clu;
+>>>>>>> 16ad2bf (save clu and tree (try to avoid saving them in binary files)
 tree = timesFileObj.tree;
 
 %Load clustering results
