@@ -1,6 +1,10 @@
-function [clusterCharacteristics] = calculateClusterCharacteristics(spikeFolder, CSCFolder, trials)
+function [clusterCharacteristics] = calculateClusterCharacteristics(spikeFolder, CSCFolder, trials, imageDir)
 %CALCULATECLUSTERCHARACTERISTICS Summary of this function goes here
 %   Detailed explanation goes here
+
+if nargin < 4
+    imageDir = [];
+end
 
 log10_thresh = 3;
 sr = 32e3;
@@ -10,6 +14,14 @@ maxLateRangeRatio = 1;
 maxMeanStandardErr = 2;
 maxNoiseProminence = 2;
 maxWaveformsToInclude = 2500;
+
+imageNames = unique({trials.trialTag});
+if ~isempty(imageDir)
+    allVideoDir = dir(fullfile(imageDir, '*.mp4'));
+    allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)', 'match', 'once');
+    [videoNames, videoIdxes] = intersect(imageNames, allVideoTrialTags);
+    imageNames(videoIdxes) = []; 
+end
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
 timestampsFileObj = matfile(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
@@ -91,60 +103,69 @@ for i = 1:length(clusterFiles)
         else
             info.waveDuration = 1000*(maxLocation - 1)/sr;
         end
-
-        screeningInfo = struct;
-        imageNames = unique({trials.trialTag});
-        numStimuli = length(imageNames);
-        stim_onsets = 1e3*([trials.stimulusOnsetTime] - time0);
-
-        [ baselineLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-500 0]);
-        [ stimLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [0 1000]);
-        [ allLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-1000 10000]);
-        binEdges1 = 0:100:1000; 
-        binEdges2 = 50:100:950;
-        baselineDistribution = cellfun(@numel, baselineLatencies);
-
-        spikesToAllImages1 = cell2mat(cellfun(@(x)histcounts(x, binEdges1), stimLatencies, 'UniformOutput', 0)');
-        spikesToAllImages2 = cell2mat(cellfun(@(x)histcounts(x, binEdges2), stimLatencies, 'UniformOutput', 0)');
-        allFR = zeros(1, numStimuli);
-        allScores = zeros(1, numStimuli);
-        for k = 1:numStimuli
-            screeningInfo(k).imageName = imageNames{k};
-            relevantTrials = find(strcmp({trials.trialTag}, imageNames{k}));
-            stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
-
-            allFR(k) = stimSpikes;
-            screeningInfo(k).spikes = allLatencies(relevantTrials);
-            screeningInfo(k).name = imageNames{k};
-
-            if stimSpikes < 3
-                screeningInfo(k).score = 0;
-                allScores(k) = 0;
-                continue;
-            end
-
-            pr = [];
-            for h = 1:2:19
-                pr(h) = ranksum(baselineDistribution, 5*spikesToAllImages1(relevantTrials, ceil(h/2)), 'tail', 'left');
-            end
-            for h = 2:2:18
-                pr(h) = ranksum(baselineDistribution, 5*spikesToAllImages2(relevantTrials, h/2), 'tail', 'left');
-            end
-            [~, ~, ~, pr] = fdr_bh(pr);
-            scoreTrace = -log10(pr);
-            screeningInfo(k).score = max(scoreTrace);
-            allScores(k) = max(scoreTrace);
-            screeningInfo(k).responseOnset = find(scoreTrace > log10_thresh, 1)*50;
+        
+        [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
+        if ~isempty(videoNames)
+            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
         end
-        info.screeningInfo = {screeningInfo};
-        info.numSelective = sum(allScores > log10_thresh);
-        FRThresh = linspace(0, max(allFR), 1000);
-        scoreVals = arrayfun(@(x)sum(allFR > x), FRThresh)/numStimuli;
-        info.selectivity = 1-2*mean(scoreVals);
         clusterCharacteristics = [clusterCharacteristics; struct2table(info, 'AsArray', 1)];
     end
 end
 
-clusterCharacteristics = sortrows(clusterCharacteristics,1);
+clusterCharacteristics = sortrows(clusterCharacteristics, 1);
+
+end
+
+function [screeningInfo, numSelective, selectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, imageNames, binEdges1, binEdges2)
+
+screeningInfo = struct;
+numStimuli = length(imageNames);
+stim_onsets = 1e3*([trials.stimulusOnsetTime] - time0);
+
+[ baselineLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-500 0]);
+[ stimLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [0 1000]);
+[ allLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-1000 10000]);
+
+baselineToStimRatio = 500/mode(diff(binEdges1));
+baselineDistribution = cellfun(@numel, baselineLatencies);
+
+spikesToAllImages1 = cell2mat(cellfun(@(x)histcounts(x, binEdges1), stimLatencies, 'UniformOutput', 0)');
+spikesToAllImages2 = cell2mat(cellfun(@(x)histcounts(x, binEdges2), stimLatencies, 'UniformOutput', 0)');
+allFR = zeros(1, numStimuli);
+allScores = zeros(1, numStimuli);
+for k = 1:numStimuli
+    screeningInfo(k).imageName = imageNames{k};
+    relevantTrials = find(strcmp({trials.trialTag}, imageNames{k}));
+    stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
+    
+    allFR(k) = stimSpikes;
+    screeningInfo(k).spikes = allLatencies(relevantTrials);
+    screeningInfo(k).name = imageNames{k};
+    
+    if stimSpikes < 3
+        screeningInfo(k).score = 0;
+        allScores(k) = 0;
+        continue;
+    end
+    
+    pr = zeros(1, 19);
+    for h = 1:2:19
+        pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages1(relevantTrials, ceil(h/2)), 'tail', 'left');
+    end
+    for h = 2:2:18
+        pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages2(relevantTrials, h/2), 'tail', 'left');
+    end
+    [~, ~, ~, pr] = fdr_bh(pr);
+    scoreTrace = -log10(pr);
+    screeningInfo(k).score = max(scoreTrace);
+    allScores(k) = max(scoreTrace);
+    screeningInfo(k).responseOnset = find(scoreTrace > log10_thresh, 1)*mode(diff(binEdges1))/2;
+end
+
+screeningInfo = {screeningInfo};
+numSelective = sum(allScores > log10_thresh);
+FRThresh = linspace(0, max(allFR), 1000);
+scoreVals = arrayfun(@(x)sum(allFR > x), FRThresh)/numStimuli;
+selectivity = 1-2*mean(scoreVals);
 
 end
