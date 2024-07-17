@@ -9,11 +9,11 @@ end
 spikeIdx = cluster_class(:, 1) > 0;
 
 % calcualte the number of pos and neg spikes:
-spikeMean = mean(spikes, 2);
-spikeMedian = median(spikes, 2);
+spikePeakMean = mean(spikes(:, 20:27), 2);
+% spikeMedian = median(spikes, 2);
 
-posSpikes = spikeMean > spikeMedian;
-negSpikes = spikeMean <= spikeMedian;
+posSpikes = spikePeakMean > 0;
+negSpikes = spikePeakMean <= 0;
 
 if sum(posSpikes(spikeIdx)) > sum(negSpikes(spikeIdx)) * 10
     % keep positive spikes:
