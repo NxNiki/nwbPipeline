@@ -15,10 +15,10 @@ cd(workingDir);
 [~, fileNameIn] = fileparts(fname_in);
 
 % DELETE PREVIOUS FILES
-if exist([fname '.dg_01.lab'], 'file')
-    delete([fname '.dg_01.lab']);
-    delete([fname '.dg_01']);
-end
+% if exist([fname '.dg_01.lab'], 'file')
+%     delete([fname '.dg_01.lab']);
+%     delete([fname '.dg_01']);
+% end
 
 dat = load(fname_in, '-ascii');
 n = length(dat);
@@ -88,13 +88,15 @@ end
 clu = load([fname '.dg_01.lab'], '-ascii');
 tree = load([fname '.dg_01'], '-ascii'); 
 
-disp('delete temp files for spike clustering...')
+fprintf('delete temp files for spike clustering\n %s', fname);
 delete(sprintf('%s.run', fname));    
 delete([fname '*.mag']);
 delete([fname '*.edges']);
 delete([fname '*.param']);
 % delete([fname '.knn']);
 delete(fname_in); 
+delete([fname '.dg_01.lab']);
+delete([fname '.dg_01']);
 disp('delete files done!')
 
 cd(currentDir);

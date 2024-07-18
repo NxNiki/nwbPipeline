@@ -84,7 +84,7 @@ end
 for i = 1:length(expIds)
 
     expId = expIds(i);
-    expOutFilePath = [outFilePath, sprintf('/Experiment%d/', expId)];
+    expOutFilePath = [outFilePath, sprintf('/Experiment-%d/', expId)];
 
     if ~exist(expOutFilePath, "dir")
         mkdir(expOutFilePath);
@@ -107,7 +107,7 @@ for i = 1:length(expIds)
     end
 
     %% unpack Event Files:
-    eventOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_events', expId)];
+    eventOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_events', expId)];
     [inEventFiles, outEventFiles] = createIOFiles(eventOutFilePath, expOutFilePath, eventPattern);
     
     tic
@@ -117,7 +117,7 @@ for i = 1:length(expIds)
 
     %% unpack macro files:
 
-    macroOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_macro/', expId)];
+    macroOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_macro/', expId)];
     [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern, renameMacroChannels);
 
     tic
@@ -127,7 +127,7 @@ for i = 1:length(expIds)
 
     %% unpack micro files:
 
-    microOutFilePath = [outFilePath, sprintf('/Experiment%d/CSC_micro/', expId)];
+    microOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_micro/', expId)];
     [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern, renameMicroChannels);
 
     tic
