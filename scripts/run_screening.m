@@ -42,14 +42,9 @@ if ~exist(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), "file")
     
     save(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics');
 end
-%%
-
-% command = ['chmod -R 775 ', filePath];
-% system(command)
 
 %%
 
-% TO DO save plots for video separately.
 outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
 rasters_by_unit(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
 rasters_by_unit(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)

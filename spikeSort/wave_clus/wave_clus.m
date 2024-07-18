@@ -78,7 +78,6 @@ function wave_clus_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for wave_clus
 handles.output = hObject;
-% handles.datatype ='CSC data (pre-clustered)';
 set(handles.data_type_popupmenu,'value',8);
 handles.datatype = 'ASCII spikes (pre-clustered)';
 set(handles.isi1_accept_button,'value',1);
@@ -232,12 +231,6 @@ clustering_results_bk   = clustering_results; % old clusters for undo actions
 USER_DATA{10} = clustering_results;
 USER_DATA{11} = clustering_results_bk;
 
-% handles.force = 0;
-% handles.merge = 0;
-% handles.reject = 0;
-% handles.undo = 0;
-% handles.setclus = 0;
-% handles.minclus = handles.par.min_clus;
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'}, [], handles.par.min_clus);
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
@@ -273,13 +266,13 @@ USER_DATA = get(handles.wave_clus_figure,'userdata');
 par = USER_DATA{1};
 par.min_clus = min_clus;
 clu = USER_DATA{4};
-classes = clu(temp,3:end) + 1;
+classes = clu(temp, 3:end) + 1;
 tree = USER_DATA{5};
 USER_DATA{1} = par;
 USER_DATA{6} = classes(:)';
 USER_DATA{8} = temp;
 USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
-handles.par.num_temp = min(handles.par.num_temp, size(clu,1));
+handles.par.num_temp = min(handles.par.num_temp, size(clu, 1));
 
 handles.minclus = min_clus;
 % clustering_results = USER_DATA{10};
@@ -308,11 +301,6 @@ else
 end
 ylabel('Clusters size');
 
-% handles.setclus = 0;
-% handles.force = 0;
-% handles.merge = 0;
-% handles.reject = 0;
-% handles.undo = 0;
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
 
@@ -342,13 +330,6 @@ clustering_results(:,5) = par.min_clus;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
-
-% handles.setclus = 0;
-% handles.force = 0;
-% handles.merge = 0;
-% handles.undo = 0;
-% handles.reject = 0;
-% handles.minclus = par.min_clus;
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'}, [], par.min_clus);
 
 plot_spikes(handles);
