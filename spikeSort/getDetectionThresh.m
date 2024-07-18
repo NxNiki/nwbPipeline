@@ -26,4 +26,5 @@ function [outputStruct, param] = getDetectionThresh(channelFiles)
     % with a long stretch of flat, and will then find millions of spikes in
     % the non-flat section.
     outputStruct.thr = max(min(thr), 18);
+    
 end

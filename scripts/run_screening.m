@@ -4,24 +4,27 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 573;
-expId = 1;
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/573_Screening';
+patient = 571;
+expId = 2;
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/571_Screening';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/Screening/573_Screening';
 
-% make sure log files are ordered correctly:
+expFilePath = [filePath, '/Experiment', sprintf('%d', expId)];
+
+% In mose case we only have 1 ttlLog file. If the experiment is paused by
+% some reason, multiple files are craeted. Make sure log files are ordered
+% correctly:
 ttlLogFiles = {
-    fullfile(expFilePath, "573-screening Log/573-02-May-2024-14-54-53/from laptop/ttlLog573-02-May-2024-14-54-53.mat");
-    fullfile(expFilePath, "573-screening Log/573-02-May-2024-15-23-30/from laptop/TTLs573-02-May-2024-15-23-30_room1.mat")
+    fullfile(expFilePath, "571-17-Jul-2024-13-4-14/from laptop/ttlLog571-17-Jul-2024-13-4-14.mat");
+    %fullfile(expFilePath, "573-screening Log/573-02-May-2024-15-23-30/from laptop/TTLs573-02-May-2024-15-23-30_room1.mat")
     };
 
-expFilePath = [filePath, '/Experiment', sprintf('%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
 imageDirectory = fullfile(expFilePath, '/trial1');
 
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
-
+expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file")
     eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
 
@@ -31,20 +34,17 @@ if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file")
 end
 
 %%
-load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
-cscFilePath = fullfile(expFilePath, '/CSC_micro');
-[clusterCharacteristics] = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials);
-% [clusterCharacteristics] = calculateClusterCharacteristics_video(patient, exp, imageDirectory);
 
-save(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics');
-%%
-
-% command = ['chmod -R 775 ', filePath];
-% system(command)
+if ~exist(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), "file")
+    load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
+    cscFilePath = fullfile(expFilePath, '/CSC_micro');
+    [clusterCharacteristics] = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials, imageDirectory);
+    
+    save(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics');
+end
 
 %%
 
-% TO DO save plots for video separately.
 outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
 rasters_by_unit(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
 rasters_by_unit(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
