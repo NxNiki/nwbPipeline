@@ -48,16 +48,16 @@ timesFileObj = matfile(timesFile);
 cluster_class = timesFileObj.cluster_class;
 spikeTimestamps=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line above.
 
-% clu = timeFileObj.clu;
-% tree = timesFileObj.tree;
+clu = timeFileObj.clu;
+tree = timesFileObj.tree;
 
 %Load clustering results
 fname = [handles.par.fname '_' filename(1:end-4)];              % filename for interaction with SPC
 if ~exist([fname '.dg_01.lab'], 'file')
     fname = strrep(fname, 'CSC', 'ch');
 end
-clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
-tree = load(fullfile(pathname, [fname '.dg_01']));
+% clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
+% tree = load(fullfile(pathname, [fname '.dg_01']));
 
 handles.par.fnamespc  = fname;
 handles.par.fnamesave = fname;
