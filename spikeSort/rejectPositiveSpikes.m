@@ -7,10 +7,10 @@ if size(spikes, 1) ~= size(cluster_class, 1)
 end
 
 spikeIdx = cluster_class(:, 1) > 0;
-peakWindow = par.w_pre - 5: par.w_pre + 5;
+
 % calcualte the number of pos and neg spikes:
+peakWindow = par.w_pre - 5: par.w_pre + 5;
 spikePeakMean = mean(spikes(:, peakWindow), 2);
-% spikeMedian = median(spikes, 2);
 
 posSpikes = spikePeakMean > 0;
 negSpikes = spikePeakMean <= 0;

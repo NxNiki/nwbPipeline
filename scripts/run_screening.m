@@ -34,11 +34,14 @@ if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file")
 end
 
 %%
-load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
-cscFilePath = fullfile(expFilePath, '/CSC_micro');
-[clusterCharacteristics] = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials, imageDirectory);
 
-save(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics');
+if ~exist(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), "file")
+    load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
+    cscFilePath = fullfile(expFilePath, '/CSC_micro');
+    [clusterCharacteristics] = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials, imageDirectory);
+    
+    save(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics');
+end
 %%
 
 % command = ['chmod -R 775 ', filePath];
