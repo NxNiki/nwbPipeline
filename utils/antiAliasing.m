@@ -3,6 +3,11 @@ function [lfpSignal, downsampleTs, startTs] = antiAliasing(cscSignal, timestamps
 % It is assumed no large gaps in the timestamps or linearizing will lead to huge lfpSignal
 % with interpolated values. will fix this with improved timestamps linearization.
 
+if all(isnan(cscSignal))
+    [lfpSignal, downsampleTs, startTs] = deal([]);
+    return
+end
+
 % this is the one I would recommend using but open to other options
 f_info.Fs = Fs;             % Neuralynx: micro 32000, macro 2000, Blackrock: micro 30000, macro 2000.
 f_info.Fpass = 300;         % Passband Frequency
