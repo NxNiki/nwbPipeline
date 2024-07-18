@@ -27,7 +27,7 @@ end
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 USER_DATA{1} = handles.par;
 set(handles.wave_clus_figure,'userdata', USER_DATA);
-set(handles.min_clus_edit,'string',num2str(handles.par.min_clus));
+set(handles.min_clus_edit,'string', num2str(handles.par.min_clus));
 % axes(handles.cont_data); EM: removed call to axes.
 cla(handles.cont_data);
 
@@ -48,13 +48,17 @@ timesFileObj = matfile(timesFile);
 cluster_class = timesFileObj.cluster_class;
 spikeTimestamps=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line above.
 
+clu = timesFileObj.clu;
+tree = timesFileObj.tree;
+
 %Load clustering results
 fname = [handles.par.fname '_' filename(1:end-4)];              % filename for interaction with SPC
 if ~exist([fname '.dg_01.lab'], 'file')
     fname = strrep(fname, 'CSC', 'ch');
 end
-clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
-tree = load(fullfile(pathname, [fname '.dg_01']));
+% clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
+% tree = load(fullfile(pathname, [fname '.dg_01']));
+
 handles.par.fnamespc  = fname;
 handles.par.fnamesave = fname;
 

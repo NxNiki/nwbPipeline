@@ -93,6 +93,7 @@ parfor i = 1:numPages
         audioLookupIdx = find(strcmp(allAudioTrialTags, thisImageTrialTag), 1);
         if ~isempty(imageLookupIdx)
             image = imread(fullfile(imageDirectory, allImageDir(imageLookupIdx).name));
+            image = imresize(image, .2);
             imshow(image, 'Parent', imageAxes);
         elseif ~isempty(videoLookupIdx)
             try
