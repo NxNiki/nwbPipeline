@@ -88,7 +88,7 @@ end
 clu = load([fname '.dg_01.lab'], '-ascii');
 tree = load([fname '.dg_01'], '-ascii'); 
 
-disp('delete temp files for spike clustering...')
+fprintf('delete temp files for spike clustering\n %s', fname);
 delete(sprintf('%s.run', fname));    
 delete([fname '*.mag']);
 delete([fname '*.edges']);
