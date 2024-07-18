@@ -15,10 +15,10 @@ cd(workingDir);
 [~, fileNameIn] = fileparts(fname_in);
 
 % DELETE PREVIOUS FILES
-if exist([fname '.dg_01.lab'], 'file')
-    delete([fname '.dg_01.lab']);
-    delete([fname '.dg_01']);
-end
+% if exist([fname '.dg_01.lab'], 'file')
+%     delete([fname '.dg_01.lab']);
+%     delete([fname '.dg_01']);
+% end
 
 dat = load(fname_in, '-ascii');
 n = length(dat);
@@ -95,6 +95,8 @@ delete([fname '*.edges']);
 delete([fname '*.param']);
 % delete([fname '.knn']);
 delete(fname_in); 
+delete([fname '.dg_01.lab']);
+delete([fname '.dg_01']);
 disp('delete files done!')
 
 cd(currentDir);
