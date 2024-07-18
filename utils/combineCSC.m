@@ -1,4 +1,4 @@
-function [signal ,timestamps, samplingIntervalSeconds, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
+function [signal ,timestamps, samplingIntervalDuration, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
 % combineCSC Combine CSC signals. filling gaps with NaNs if gap between
 % segments larger than threshold.
 
@@ -25,10 +25,10 @@ timestampsCombined = cell(1, numFiles);
 samplingInterval = nan(numFiles, 1);
 
 for i = 1: numFiles
-    [timestampsCombined{i}, ~] = readTimestamps(timestampsFiles{i});
+    [timestampsCombined{i}, ~, samplingInterval(i)] = readTimestamps(timestampsFiles{i});
     if exist(signalFiles{i}, "file")
         fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
-        [signalCombined{i}, samplingInterval(i)] = readCSC(signalFiles{i});
+        signalCombined{i} = readCSC(signalFiles{i});
     else
         warning("CSC file not exist: \n%s.\n Data will be filled with NaNs\n", signalFiles{i});
         signalCombined{i} = nan(numel(timestampsCombined{i}), 1);
@@ -47,15 +47,15 @@ if length(samplingInterval) > 1
     error('sampling Interval not match across files!');
 end
 
-samplingIntervalSeconds = seconds(samplingInterval);
+samplingIntervalDuration = seconds(samplingInterval);
 timestampsCombinedNext = timestampsCombined(2:end);
 signalGap = cell(1, numFiles);
 timestampsGap = cell(1, numFiles);
 % fill gaps between experiments/segments with NaNs:
 for i = 2: numFiles
     gapInterval = min(seconds(timestampsCombinedNext{i-1}(1) - timestampsCombined{i-1}(end)), maxGapDuration);
-    if gapInterval / samplingIntervalSeconds > GAP_THRESHOLD
-        gapLength = floor(gapInterval/samplingIntervalSeconds);
+    if gapInterval / samplingIntervalDuration > GAP_THRESHOLD
+        gapLength = floor(gapInterval/samplingIntervalDuration);
         signalGap{i-1} = NaN(1, gapLength);
         timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + (0: samplingInterval: samplingInterval * (gapLength - 1));
     end

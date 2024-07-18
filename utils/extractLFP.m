@@ -44,11 +44,12 @@ for i = 1: numFiles
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
 
-    if isempty(cscSignal)
+    if isempty(cscSignal) || all(isnan(cscSignal))
         return
     else
         outputFiles{i} = lfpFilename;
     end
+    disp(samplingInterval)
     Fs = seconds(1) / samplingInterval;
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
