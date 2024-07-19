@@ -11,6 +11,10 @@ function [outputStruct, param] = getDetectionThresh(channelFiles)
     thrmax = nan(length(channelFiles), 1);
 
     for i = 1:length(channelFiles)
+        if ~exist(channelFiles{i}, "file")
+            warning("file not exist: %s", channelFiles{i})
+            continue
+        end
         [x, samplingInterval] = readCSC(channelFiles{i});
         % assume same sampling interval across channels.
         param.sr = 1/samplingInterval;

@@ -17,6 +17,10 @@ outFileNames = cell(length(spikeFiles), 2);
 % calculate spikeCodes:
 for fnum = 1:length(spikeFiles)
 
+    if ~exist(spikeFiles{fnum}, 'file')
+        continue
+    end
+
     spikeFile = spikeFiles{fnum};
     [~, filename, ext] = fileparts(spikeFile);
 
