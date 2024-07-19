@@ -148,6 +148,7 @@ spikeFiles = dir(fullfile(pathname, 'G*_spikes.mat'));
 spikeFiles = {'', spikeFiles(:).name, ''};
 
 num = find(strcmp(spikeFiles, fn));
+filename = '';
 if ~isempty(num)
     switch thisTag
         case {'loadNext', 'rejectSaveLoad', 'saveAndLoadNext'}
@@ -160,14 +161,8 @@ if ~isempty(num)
             if ~isempty(handles.channelToLoad.String)
                 filename = strrep(fn, num, handles.channelToLoad.String);
                 set(handles.channelToLoad, 'String', '');
-            else
-                filename = '';
             end
-        otherwise
-            filename = '';
     end
-else
-    filename = '';
 end
 fprintf('%s...', filename)
 
@@ -335,7 +330,7 @@ plot_spikes(handles);
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
-mark_clusters_temperature_diagram(handles,tree, clustering_results)
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
 
 set(handles.force_button, 'value', 0);
 set(handles.force_button, 'string', 'Force');
@@ -684,8 +679,7 @@ function merge_button_Callback(hObject, eventdata, handles)
 handles = updateHandles(hObject, handles, {'merge'}, {'setclus', 'reject', 'force', 'undo'}, 10);
 plot_spikes(handles)
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
-
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 tree = USER_DATA{5};
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
@@ -851,7 +845,7 @@ USER_DATA = get(handles.wave_clus_figure, 'userdata');
 classes = USER_DATA{6};
 classes = zeros(size(classes));
 USER_DATA{6} = classes(:)';
-set(handles.wave_clus_figure,'userdata', USER_DATA)
+set(handles.wave_clus_figure, 'userdata', USER_DATA)
 
 handles = updateHandles(hObject, handles, [], {'setclus', 'reject', 'force', 'undo', 'merge'}, 10);
 plot_spikes(handles);
@@ -893,7 +887,7 @@ if ~isempty(new_func{1})
     classes(rejectInds) = 0;
 end
 USER_DATA{6} = classes;
-set(handles.wave_clus_figure,'userdata', USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 plot_spikes(handles)
 
 % --- Executes on button press in mahalDistRemoveSpikes.
