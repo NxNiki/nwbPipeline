@@ -22,23 +22,21 @@ end
 % Set up blank axes
 nRows = 8;
 nCols = 6;
-pv = makePosVecFunction(nRows,nCols);
-set(dest,'units','normalized');
-newAx = axes('parent',dest,'units','normalized', 'position',pv(1,nCols,nRows-2,nRows-2));
-
-
+pv = makePosVecFunction(nRows, nCols);
+set(dest, 'units', 'normalized');
+newAx = axes('parent', dest, 'units', 'normalized', 'position', pv(1, nCols, nRows-2, nRows-2));
 
 % Find all the axes that are in the projection window so that we can cycle
 % through them
 
 % f = get(dest,'parent');
-% allAxes = get(f,'children'); 
+% allAxes = get(f,'children');
 % isAx = arrayfun(@(x)strcmp(get(x,'type'),'axes'),allAxes);
-% 
+%
 % % delete anything that isn't axes
 % allAxes = allAxes(isAx);
 % % reorder so oldest is first
-% allAxes = allAxes(end:-1:1); 
+% allAxes = allAxes(end:-1:1);
 % set(allAxes,'XLimMode','manual','YLimMode','manual');
 
 [x,y] = meshgrid(1:size(allAxes,2),1:size(allAxes,1));
@@ -48,7 +46,7 @@ empties = arrayfun(@(x)strcmp(class(x),'matlab.graphics.GraphicsPlaceholder'),al
 allAxes(empties) = []; x(empties) = []; y(empties) = [];
 
 if exist('thisSyncBox','var')
-allAxChildren = arrayfun(@(x)els2cells(get(x,'children')),allAxes,'uniformoutput',0);
+    allAxChildren = arrayfun(@(x)els2cells(get(x,'children')),allAxes,'uniformoutput',0);
     set(syncBox,'callback',@SyncMainPanel);
 end
 if exist('cutOnThisButton','var')
@@ -68,7 +66,7 @@ uicontrol('parent',dest,'units','normalized',...
 
 pickProjection([],[],newAx,dest,allAxes)
 figure(get(dest,'parent'))
-
+end
 
 
 function pickProjection(varargin)
@@ -95,10 +93,10 @@ switch varargin{1}.Tag
     case 'choose'
         axInd = []; attempt = 0;
         while isempty(axInd) && attempt<5
-        ginput(1);
-        attempt = attempt+1;
-        ax1 = gca;
-        axInd = find(ismember(allAxes,ax1));
+            ginput(1);
+            attempt = attempt+1;
+            ax1 = gca;
+            axInd = find(ismember(allAxes,ax1));
         end
     case 'next'
         axInd = axInd+1;
@@ -154,6 +152,7 @@ sizeDecrease = uicontrol('parent',dest,'units','normalized',...
 uicontrol('parent',dest,'units','normalized',...
     'position',pv(3,.5,nRows-1.5,.5),'style','pushbutton','string','^',...
     'callback',{@changeSize,ch,1,sizeDecrease});
+end
 
 
 function showHide(varargin)
@@ -166,6 +165,8 @@ else
     pointCloud.Visible = 'off';
 end
 SyncMainPanel
+end
+
 
 function changeColor(varargin)
 global checkboxes swatches allAxChildren
@@ -177,6 +178,8 @@ set(checkboxes{ind},'backgroundcolor',newCol);
 set(pointCloud,'color',newCol)
 cellfun(@(pl)set(pl{ind},'color',newCol),allAxChildren);
 % cellfun(@(pl)cellfun(@(chil,onOff)set(chil,'visible',onOff),pl,newVisibleVals),allAxChildren)
+end
+
 
 function showHideAll(varargin)
 global checkboxes lastState
@@ -195,18 +198,20 @@ if length(unique(thisState)) > 1 || isempty(lastState) % not currently showing/h
     end
 else % currently showing/hiding all, so return to previous state
     for i = 1:length(lines)
-    switch lastState(i)
-        case 1
-            set(lines(i),'Visible','on');
-            set(checkboxes{i},'Value',1)
-        case 0
-            set(lines(i),'Visible','off');
-            set(checkboxes{i},'Value',0)
-    end
+        switch lastState(i)
+            case 1
+                set(lines(i),'Visible','on');
+                set(checkboxes{i},'Value',1)
+            case 0
+                set(lines(i),'Visible','off');
+                set(checkboxes{i},'Value',0)
+        end
     end
 end
 lastState = thisState;
 SyncMainPanel
+end
+
 
 function changeSize(varargin)
 lines = varargin{3}; multiplier = varargin{4};
@@ -225,6 +230,8 @@ else
     set(sizeDecrease,'enable','on')
 end
 set(lines,'markerSize',newSize);
+end
+
 
 function SyncMainPanel(varargin)
 global checkboxes allAxChildren syncBox
@@ -238,6 +245,8 @@ if syncBox.Value
 end
 
 cellfun(@(pl)cellfun(@(chil,onOff)set(chil,'visible',onOff),pl,newVisibleVals),allAxChildren)
+end
+
 
 function cutOnThis(varargin)
 global checkboxes axInd
@@ -249,25 +258,19 @@ if sum(values) > 1
     return
 elseif sum(values) == 1
 
-thisClass = find(values);
+    thisClass = find(values);
 else
     thisClass = 0;
 end
 %%
 features = xy(axInd,:);
-f = figure('units','normalized','position',[0.3902    0.0667    0.5027    0.8618]);
+f = figure('units','normalized','position',[0.1    0.0667    0.9    0.8618]);
 pv = makePosVecFunction(5.5,24);
 ax(1) = axes('parent',f,'units','normalized','position',pv(1,19,1,1)); hold on;
 ax(2) = axes('parent',f,'units','normalized','position',pv(1,19,2,1));hold on;
 ax(3) = axes('parent',f,'units','normalized','position',pv(1,19,3,1));hold on;
-
 ax(4) = axes('parent',f,'units','normalized','position',pv(1,7,5,2));hold on;
-
 ax(5) = axes('parent',f,'units','normalized','position',pv(12,7,5,2));hold on;
-
-
-
-
 
 waveClusFig = findobj('tag','wave_clus_figure');
 handles = guidata(waveClusFig);
@@ -292,13 +295,13 @@ for clust = 0:length(ckBoxes)
         col = .5*[1 1 1];
     end
     if sum(theseSpikes)>0
-    theseLines(4+clust) = plot(ax(1),spikeTimes(theseSpikes),spikeAmplitudes(theseSpikes),'.','color',col);
+        theseLines(4+clust) = plot(ax(1),spikeTimes(theseSpikes),spikeAmplitudes(theseSpikes),'.','color',col);
     end
     if clust==thisClass
         theseLines(1) = plot(ax(2),spikeTimes(theseSpikes),feature1(theseSpikes),'.','color',col);
         theseLines(2) = plot(ax(3),spikeTimes(theseSpikes),feature2(theseSpikes),'.','color',col);
         theseLines(3) = plot(ax(4),feature2(theseSpikes),feature1(theseSpikes),'.','color',col);
-        plot(ax(5),waveforms(randsample(find(theseSpikes),min(sum(theseSpikes),500)),:)');
+        plot(ax(5), waveforms(randsample(find(theseSpikes), min(sum(theseSpikes), 500)), :)');
     end
 end
 set(ax(1:3),'xlim',[0 max(spikeTimes)]);
@@ -344,8 +347,8 @@ removeButton(5) = uicontrol('parent',f,'units','normalized',...
 
 saveButton(3) = uicontrol('parent',f,'units','normalized',...
     'position',pv(7,2.5,5.5,.5),'style','pushbutton',...
-    'string','Keep this polygon for splitting','callback',...
-    {@addPolygon,f,theseSpikes,removeButton},'visible','off');
+    'string', '<html>Keep this polygon<br />for splitting</html>', 'callback',...
+    {@addPolygon,f,theseSpikes,removeButton}, 'visible', 'off');
 
 sizeDecrease = uicontrol('parent',f,'units','normalized',...
     'position',pv(8,1,5,.25),'style','pushbutton','string','v',...
@@ -359,22 +362,23 @@ arrayfun(@(b,i)set(b,'callback',{@markToRemove,ax,spikeTimes,features,i,f,...
     removeButton,1:5,'uniformoutput',0);
 set(keepLast,'callback',{@keepRevert,'keep',keepLast,revertLast,removeButton,f})
 set(revertLast,'callback',{@keepRevert,'revert',keepLast,revertLast,removeButton,f})
-    
+end
+
 
 function markToRemove(varargin)
 ax = varargin{3};spikeTimes = varargin{4};
-features = varargin{5}; ind = varargin{6}; 
+features = varargin{5}; ind = varargin{6};
 f = varargin{7};theseSpikes=varargin{8}';
 waveforms = varargin{9};
 
 switch ind
     case {1,2,3}
-in = UIInPolygon(spikeTimes,features(ind,:));
+        in = UIInPolygon(spikeTimes,features(ind,:));
     case 4
-  in = UIInPolygon(features(3,:),features(2,:));
+        in = UIInPolygon(features(3,:),features(2,:));
     case 5
         in = UIInPolygon(repmat(1:size(waveforms,2),size(waveforms,1),1),waveforms);
-    in = any(in,2)';
+        in = any(in,2)';
 end
 if sum(theseSpikes & in)
     for i = 1:size(features,1)
@@ -400,6 +404,8 @@ end
 guidata(f,h);
 set(varargin{10},'visible','on');
 set(varargin{11},'visible','off');
+end
+
 
 function keepRevert(varargin)
 switch varargin{3}
@@ -414,26 +420,28 @@ switch varargin{3}
 end
 set([varargin{4:5}],'visible','off');
 set(varargin{6},'visible','on');
-1;
+end
+
 
 function saveChanges(varargin)
 h = guidata(varargin{3});
 toRemove = any(h.toRemove,1) & varargin{4}';
 
-waveClusFig = findobj('tag','wave_clus_figure');
+waveClusFig = findobj('tag', 'wave_clus_figure');
 handles = guidata(waveClusFig);
 USER_DATA = get(handles.wave_clus_figure,'userdata');
-handles.force = 0;
-handles.merge = 0;
-handles.undo = 1;
-handles.setclus = 0;
-handles.reject = 0;
-clustering_results_bk = USER_DATA{11};
-handles.minclus = clustering_results_bk(1,5);
-classes = USER_DATA{6};
+% handles.force = 0;
+% handles.merge = 0;
+% handles.undo = 1;
+% handles.setclus = 0;
+% handles.reject = 0;
+% clustering_results_bk = USER_DATA{11};
+% handles.minclus = clustering_results_bk(1,5);
+handles = updateHandles([], handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'}, 11);
 
+classes = USER_DATA{6};
 currentClass = unique(classes(toRemove));
-assert(length(currentClass)==1,'It looks like you''re cutting on more than one class. How did this happen?')
+assert(length(currentClass)==1, 'It looks like you''re cutting on more than one class. How did this happen?')
 
 switch varargin{5}
     case 'new'
@@ -451,14 +459,16 @@ switch varargin{5}
 end
 
 USER_DATA{6} = classes;
-set(handles.wave_clus_figure,'userdata',USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 plot_spikes(handles)
 if strcmp(varargin{5},'split')
     rejectAndForce(currentClass);
 else
-fprintf('Finished!\n')
+    fprintf('Finished!\n')
 end
 close(varargin{3})
+end
+
 
 function addPolygon(varargin)
 h = guidata(varargin{3});
@@ -467,6 +477,8 @@ if ~isfield(h,'theseSpikes')
 end
 set(varargin{5},'visible','on')
 guidata(varargin{3},h);
+end
+
 
 function compareWaveforms(varargin)
 h = guidata(varargin{3});
@@ -487,8 +499,9 @@ if nRejected > 8000
     rejInds = randsample(nRejected,8000);
     rejected = rejected(rejInds,:);
 end
-figure; 
-ax(1) = subplot(311); hold on; plot(kept','b'); plot(rejected','r'); 
-ax(2) = subplot(312); title(sprintf('kept (%d)',nKept)); plot(kept'); 
+figure;
+ax(1) = subplot(311); hold on; plot(kept','b'); plot(rejected','r');
+ax(2) = subplot(312); title(sprintf('kept (%d)',nKept)); plot(kept');
 ax(3) = subplot(313); title(sprintf('rejected (%d)', nRejected')); plot(rejected')
 linkaxes(ax)
+end

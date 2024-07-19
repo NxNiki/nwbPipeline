@@ -32,6 +32,9 @@ function handles = updateHandles(hObject, handles, fieldsTrue, fieldsFalse, clus
     for i = 1:length(fieldsFalse)
         handles.(fieldsFalse{i}) = 0;
     end
+    
+    if ~isempty(hObject)
+        guidata(hObject, handles);
+    end
 
-    guidata(hObject, handles);
 end
