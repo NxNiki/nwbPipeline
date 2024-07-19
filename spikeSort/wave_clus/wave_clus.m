@@ -614,8 +614,8 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-% set(gcbo,'value',0);
-set(handles.isi2_accept_button, 'value', 0);
+set(hObject, 'value', 0);
+set(handles.isi2_accept_button, 'value', 1);
 
 % --------------------------------------------------------------------
 function isi3_accept_button_Callback(hObject, eventdata, handles)
@@ -633,8 +633,8 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-% set(gcbo,'value',0);
-set(handles.isi3_accept_button, 'value', 0);
+set(hObject, 'value', 0);
+set(handles.isi3_accept_button, 'value', 1);
 
 
 % --- Executes on button press in undo_button.
