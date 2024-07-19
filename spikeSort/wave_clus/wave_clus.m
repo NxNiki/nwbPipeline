@@ -45,6 +45,9 @@ function varargout = wave_clus(varargin)
 % USER_DATA{19} = function to reject all spikes in a time range
 % USER_DATA{20} - USER_DATA{42}, fix clusters
 
+% add parent directory to search path so we don't need to do it manually:
+scriptDir = fileparts(mfilename('fullpath'));
+addpath(genpath(fileparts(scriptDir)));
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -145,6 +148,7 @@ spikeFiles = dir(fullfile(pathname, 'G*_spikes.mat'));
 spikeFiles = {'', spikeFiles(:).name, ''};
 
 num = find(strcmp(spikeFiles, fn));
+filename = '';
 if ~isempty(num)
     switch thisTag
         case {'loadNext', 'rejectSaveLoad', 'saveAndLoadNext'}
@@ -157,15 +161,8 @@ if ~isempty(num)
             if ~isempty(handles.channelToLoad.String)
                 filename = strrep(fn, num, handles.channelToLoad.String);
                 set(handles.channelToLoad, 'String', '');
-            else
-                filename = '';
             end
-        otherwise
-            filename = '';
     end
-    % pathname = [pwd, filesep];
-else
-    filename = '';
 end
 fprintf('%s...', filename)
 
@@ -275,8 +272,6 @@ USER_DATA{9} = classes(:)';                                     %backup for non-
 handles.par.num_temp = min(handles.par.num_temp, size(clu, 1));
 
 handles.minclus = min_clus;
-% clustering_results = USER_DATA{10};
-% clustering_results_bk = USER_DATA{11};
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 temperature = handles.par.mintemp + temp * handles.par.tempstep;
 
@@ -306,7 +301,6 @@ plot_spikes(handles);
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
-% clustering_results_bk = USER_DATA{11};
 mark_clusters_temperature_diagram(handles,tree,clustering_results,0)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
@@ -317,11 +311,13 @@ updateFixButtonHandle(hObject, handles)
 function min_clus_edit_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
-par.min_clus = str2double(get(hObject, 'String'));
 clu = USER_DATA{4};
-temp = USER_DATA{8};
-classes = clu(temp,3:end)+1;
 tree = USER_DATA{5};
+temp = USER_DATA{8};
+
+classes = clu(temp,3:end)+1;
+par.min_clus = str2double(get(hObject, 'String'));
+
 USER_DATA{1} = par;
 USER_DATA{6} = classes(:)';
 USER_DATA{9} = classes(:)';                                     % backup for non-forced classes.
@@ -333,10 +329,10 @@ mark_clusters_temperature_diagram(handles, tree, clustering_results)
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'}, [], par.min_clus);
 
 plot_spikes(handles);
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-clustering_results = USER_DATA{10};
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
-mark_clusters_temperature_diagram(handles,tree, clustering_results)
+% USER_DATA = get(handles.wave_clus_figure, 'userdata');
+% clustering_results = USER_DATA{10};
+% set(handles.wave_clus_figure, 'userdata', USER_DATA);
+mark_clusters_temperature_diagram(handles, tree, clustering_results)
 
 set(handles.force_button, 'value', 0);
 set(handles.force_button, 'string', 'Force');
@@ -483,7 +479,9 @@ updateFixButtonHandle(hObject, handles);
 function Plot_all_projections_button_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
+
 if strcmp(par.filename(1:4),'poly')
+    % do this need this part? Xin.
     Plot_amplitudes(handles)
 else
     Plot_all_features(handles)
@@ -583,19 +581,20 @@ plot_spikes(handles)
 %SETTING OF ISI BUTTONS
 % --------------------------------------------------------------------
 function isi1_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
+set(hObject,'value',1);
 set(handles.isi1_reject_button,'value',0);
 
 % --------------------------------------------------------------------
 function isi1_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi1_accept_button, 'value', 0);
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-classes = USER_DATA{6};
-tree = USER_DATA{5};
-classes(classes==1)=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
+set(hObject, 'value', 1);
+% set(handles.isi1_accept_button, 'value', 0);
+% USER_DATA = get(handles.wave_clus_figure, 'userdata');
+% classes = USER_DATA{6};
+% tree = USER_DATA{5};
+% classes(classes==1)=0;
+% USER_DATA{6} = classes;
+% USER_DATA{9} = classes;
+[handles, USER_DATA, tree] = rejectCluster(hObject, handles, 1);
 
 handles = updateHandles(hObject, handles, {'setclus', 'reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
@@ -604,25 +603,25 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-set(gcbo,'value',0);
-set(handles.isi1_accept_button, 'value', 1);
+% set(gcbo,'value',0);
+set(handles.isi1_accept_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi2_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
+set(hObject,'value',1);
 set(handles.isi2_reject_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi2_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi2_accept_button, 'value', 0);
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-classes = USER_DATA{6};
-tree = USER_DATA{5};
-classes(classes==2) = 0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-
+set(hObject, 'value', 1);
+% set(handles.isi2_accept_button, 'value', 0);
+% USER_DATA = get(handles.wave_clus_figure, 'userdata');
+% classes = USER_DATA{6};
+% tree = USER_DATA{5};
+% classes(classes==2) = 0;
+% USER_DATA{6} = classes;
+% USER_DATA{9} = classes;
+[handles, USER_DATA, tree] = rejectCluster(hObject, handles, 2);
 handles = updateHandles(hObject, handles, {'setclus','reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
 
@@ -630,25 +629,25 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-set(gcbo,'value',0);
-set(handles.isi2_accept_button, 'value', 1);
+% set(gcbo,'value',0);
+set(handles.isi2_accept_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi3_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
+set(hObject,'value',1);
 set(handles.isi3_reject_button, 'value', 0);
 
 % --------------------------------------------------------------------
 function isi3_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo, 'value', 1);
-set(handles.isi3_accept_button, 'value', 0);
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-classes = USER_DATA{6};
-tree = USER_DATA{5};
-classes(classes==3)=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-
+set(hObject, 'value', 1);
+% set(handles.isi3_accept_button, 'value', 0);
+% USER_DATA = get(handles.wave_clus_figure, 'userdata');
+% classes = USER_DATA{6};
+% tree = USER_DATA{5};
+% classes(classes==3)=0;
+% USER_DATA{6} = classes;
+% USER_DATA{9} = classes;
+[handles, USER_DATA, tree] = rejectCluster(hObject, handles, 3);
 handles = updateHandles(hObject, handles, {'setclus','reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
 
@@ -656,13 +655,9 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-set(gcbo,'value',0);
-set(handles.isi3_accept_button, 'value', 1);
+% set(gcbo,'value',0);
+set(handles.isi3_accept_button, 'value', 0);
 
-ilab = find(classes==3, 1);
-if isempty(ilab)
-    nlab = imread('filelist.xlj','jpg'); figure('color','k'); image(nlab); axis off; set(gcf,'NumberTitle','off');
-end
 
 % --- Executes on button press in undo_button.
 function undo_button_Callback(hObject, eventdata, handles)
@@ -687,8 +682,7 @@ function merge_button_Callback(hObject, eventdata, handles)
 handles = updateHandles(hObject, handles, {'merge'}, {'setclus', 'reject', 'force', 'undo'}, 10);
 plot_spikes(handles)
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
-
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 tree = USER_DATA{5};
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
@@ -854,7 +848,7 @@ USER_DATA = get(handles.wave_clus_figure, 'userdata');
 classes = USER_DATA{6};
 classes = zeros(size(classes));
 USER_DATA{6} = classes(:)';
-set(handles.wave_clus_figure,'userdata', USER_DATA)
+set(handles.wave_clus_figure, 'userdata', USER_DATA)
 
 handles = updateHandles(hObject, handles, [], {'setclus', 'reject', 'force', 'undo', 'merge'}, 10);
 plot_spikes(handles);
@@ -869,7 +863,7 @@ function excludeTimesButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles = updateHandles(hObject, handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'}, 11);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 curr_func = USER_DATA{19};
 if isempty(curr_func)
     curr_func = '';
@@ -896,7 +890,7 @@ if ~isempty(new_func{1})
     classes(rejectInds) = 0;
 end
 USER_DATA{6} = classes;
-set(handles.wave_clus_figure,'userdata', USER_DATA);
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
 plot_spikes(handles)
 
 % --- Executes on button press in mahalDistRemoveSpikes.
