@@ -660,10 +660,6 @@ set(handles.wave_clus_figure, 'userdata', USER_DATA);
 set(gcbo,'value',0);
 set(handles.isi3_accept_button, 'value', 1);
 
-ilab = find(classes==3, 1);
-if isempty(ilab)
-    nlab = imread('filelist.xlj','jpg'); figure('color','k'); image(nlab); axis off; set(gcf,'NumberTitle','off');
-end
 
 % --- Executes on button press in undo_button.
 function undo_button_Callback(hObject, eventdata, handles)
