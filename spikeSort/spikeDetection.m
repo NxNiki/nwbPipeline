@@ -21,6 +21,11 @@ outputFiles = cell(1, size(cscFiles, 1));
 for i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);
+
+    if all(cellfun(@(x)~exist(x, "file"), cscFiles(i, :)))
+        continue
+    end
+
     spikeFilename = createSpikeFileName(channelFiles{1});
     tempSpikeFilename = ['temp_', spikeFilename];
 
@@ -108,6 +113,8 @@ for i = 1: size(cscFiles, 1)
         fprintf('Error message: %s\n', ME.message);
     end
 end
+
+outputFiles = outputFiles(cellfun(@(x)~isempty(x), outputFiles));
 
 end
 
