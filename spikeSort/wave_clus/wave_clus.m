@@ -45,6 +45,9 @@ function varargout = wave_clus(varargin)
 % USER_DATA{19} = function to reject all spikes in a time range
 % USER_DATA{20} - USER_DATA{42}, fix clusters
 
+% add parent directory to search path so we don't need to do it manually:
+scriptDir = fileparts(mfilename('fullpath'));
+addpath(genpath(fileparts(scriptDir)));
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -483,7 +486,9 @@ updateFixButtonHandle(hObject, handles);
 function Plot_all_projections_button_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
+
 if strcmp(par.filename(1:4),'poly')
+    % do this need this part? Xin.
     Plot_amplitudes(handles)
 else
     Plot_all_features(handles)
