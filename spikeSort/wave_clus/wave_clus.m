@@ -166,7 +166,6 @@ if ~isempty(num)
         otherwise
             filename = '';
     end
-    % pathname = [pwd, filesep];
 else
     filename = '';
 end
@@ -278,8 +277,6 @@ USER_DATA{9} = classes(:)';                                     %backup for non-
 handles.par.num_temp = min(handles.par.num_temp, size(clu, 1));
 
 handles.minclus = min_clus;
-% clustering_results = USER_DATA{10};
-% clustering_results_bk = USER_DATA{11};
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 temperature = handles.par.mintemp + temp * handles.par.tempstep;
 
@@ -309,7 +306,6 @@ plot_spikes(handles);
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
-% clustering_results_bk = USER_DATA{11};
 mark_clusters_temperature_diagram(handles,tree,clustering_results,0)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
@@ -874,7 +870,7 @@ function excludeTimesButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles = updateHandles(hObject, handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'}, 11);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 curr_func = USER_DATA{19};
 if isempty(curr_func)
     curr_func = '';
