@@ -36,4 +36,5 @@ function handles = updateHandles(hObject, handles, fieldsTrue, fieldsFalse, clus
     if ~isempty(hObject)
         guidata(hObject, handles);
     end
+
 end
