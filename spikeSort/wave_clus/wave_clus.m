@@ -261,10 +261,14 @@ set(handles.min_clus_edit, 'string', num2str(min_clus));
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
+spikes = USER_DATA{2};
 par.min_clus = min_clus;
 clu = USER_DATA{4};
 classes = clu(temp, 3:end) + 1;
 tree = USER_DATA{5};
+
+classes = rejectPositiveSpikes(spikes, classes); % why par.w_pre is a vector here?
+
 USER_DATA{1} = par;
 USER_DATA{6} = classes(:)';
 USER_DATA{8} = temp;
@@ -595,8 +599,8 @@ clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
-% set(gcbo,'value',0);
-set(handles.isi1_accept_button, 'value', 0);
+set(hObject, 'value', 0);
+set(handles.isi1_accept_button, 'value', 1);
 
 % --------------------------------------------------------------------
 function isi2_accept_button_Callback(hObject, eventdata, handles)
