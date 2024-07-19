@@ -13,6 +13,7 @@ function [handles, USER_DATA, tree] = rejectCluster(hObject, handles, clusterIdx
     classes = USER_DATA{6};
     tree = USER_DATA{5};
     classes(classes==clusterIdx) = 0;
+    classes = shrinkClassIndex(classes);
     USER_DATA{6} = classes;
     USER_DATA{9} = classes;
     set(handles.wave_clus_figure, 'userdata', USER_DATA);
