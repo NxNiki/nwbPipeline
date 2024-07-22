@@ -24,6 +24,10 @@ negSpikes = spikePeakMean <= 0;
 clusterIndices = unique(cluster_class(cluster_class > 0));
 for i = 1:length(clusterIndices)
     spikeIdx = cluster_class == clusterIndices(i);
+
+    if sum(spikeIdx) < 100
+        continue
+    end
     
     if sum(posSpikes(spikeIdx)) > sum(negSpikes(spikeIdx)) * 10
         % keep positive spikes if their number is larger than 10 times of 
