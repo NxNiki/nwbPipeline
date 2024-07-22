@@ -220,7 +220,7 @@ USER_DATA{9} = saved_classes(:)';                                     % backup f
 %% definition of clustering_results
 clustering_results      = [];
 clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
-clustering_results(:,2) = classes'; % GUI classes
+clustering_results(:,2) = rejectPositiveSpikes(spikes, classes'); % GUI classes
 clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
 clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
@@ -303,10 +303,10 @@ ylabel('Clusters size');
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
 
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
+% USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
+% set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(handles.fix1_button,'value', 1);
 updateFixButtonHandle(hObject, handles)
@@ -639,7 +639,6 @@ set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(hObject, 'value', 0);
 set(handles.isi3_accept_button, 'value', 1);
-
 
 % --- Executes on button press in undo_button.
 function undo_button_Callback(hObject, eventdata, handles)
