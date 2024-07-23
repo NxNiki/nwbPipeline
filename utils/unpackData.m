@@ -2,17 +2,16 @@ function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % unpackData(inFileNames, outFilePath, verbose): read neuralynx file and
 % save to .mat files.
 
-% inFileName: datatable(m, 1). '.ncs' files for one experiment. Should have same
-% timestamps.
+% inFileName: datatable(m, 1). '.ncs' files for one experiment. Should have
+% same timestamps.
 
-% timestamps: Unix time
-% samplingInterval: matlab duration object.
+% timestamps: Unix time samplingInterval: matlab duration object.
 % samplingRate can be calculate as: seconds(1)/samplingInterval.
 
 % This function uses library developed by Ueli Rutishauser:
-% https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html
-% As this function calls mex files complied in intel/amd machine, it will
-% not work on mac with Matlab >= 2023b which run natively on apple silicon.
+% https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html As
+% this function calls mex files complied in intel/amd machine, it will not
+% work on mac with Matlab >= 2023b which run natively on apple silicon.
 
 
 if nargin < 4 || isempty(verbose)
@@ -83,7 +82,7 @@ parfor i = 1:length(inFileNames)
         inds = find(dt<50 & dt>0);
         TTLs(inds) = [];
         timeStamps(inds) = [];
-        timeStamps = timeStamps*1e-6;
+        timeStamps = timeStamps*1e-6; % convert timestamps to seconds.
 
         matobj = matfile(outFileNameTemp, 'Writable', true);
         matobj.TTLs = TTLs;
