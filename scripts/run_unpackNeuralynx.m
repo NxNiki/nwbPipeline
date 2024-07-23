@@ -1,4 +1,4 @@
-% unpack the macro neuralynx data.
+% unpack the macro and micro neuralynx data.
 % this script should run with Matlab 2023a or earlier if on Mac with apple
 % silicon.
 
