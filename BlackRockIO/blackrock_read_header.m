@@ -6,35 +6,20 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
     if nargin < 3 || isempty(chunkSize)
         chunkSize = 2e6;
     end
-    
-    [~, ~, ext] = fileparts(inFile);
-    switch ext
-        case '.ns5'
-            samp_freq_hz = 30000; %neuroport_samp_freq_hz;
-            outputFilePath = fullfile(expFilePath, 'CSC_micro');
-            tsFileName = fullfile(outputFilePath, 'lfpTimeStamps_001.mat');
-        case '.ns2'
-            samp_freq_hz = 1000;
-            outputFilePath = fullfile(expFilePath, 'LFPXWide');
-            tsFileName = fullfile(outputFilePath, 'lfpTimeStamps_001.mat');
-        case '.ns3'
-            samp_freq_hz = 2000;
-            outputFilePath = fullfile(expFilePath, 'CSC_macro');
-            tsFileName = fullfile(outputFilePath, 'lfpTimeStamps_ns3.mat');
-        case '.ns4'
-            samp_freq_hz = 10000;
-            outputFilePath = fullfile(expFilePath, 'MACROBRfast');
-            tsFileName = fullfile(outputFilePath, 'lfpTimeStamps_ns4.mat');
+
+    if nargin < 4 || isempty(skipExist)
+        skipExist = 1;
     end
-    electrodeInfoFileName = fullfile(outputFilePath, ['electrode_info_', strrep(ext, '.', ''), '.mat']);
+    
+    [samplingInterval, outputFilePath, electrodeInfoFileName] = parseInputFile(inFile, expFilePath);
+    tsFileName = fullfile(outputFilePath, 'lfpTimeStamps_001.mat');
+    electrodeInfoFileName = fullfile(outputFilePath, electrodeInfoFileName);
     
     if skipExist && exist(tsFileName, "file") && exist(electrodeInfoFileName, "file")
         return
     end
 
     bytes_per_samp = 2;
-    samplingInterval =  seconds(1) / samp_freq_hz;
-    
     fid = fopen(inFile, 'r', 'ieee-le');
     if fid == -1
         error('Could not open samples file.');
@@ -115,7 +100,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
     
 
     % save timestamps:
-    timeStamps = colonByLength(0, 1/samp_freq_hz, num_samples);
+    timeStamps = colonByLength(0, seconds(samplingInterval), num_samples);
     time0 = 0; 
     timeend = timeStamps(end);
 
@@ -123,13 +108,13 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
         mkdir(outputFilePath)
     end
     
-    save(fullfile(outputFilePath, tsFileName), 'timeStamps', 'time0', 'timeend', 'samplingInterval', '-v7.3');
+    save(tsFileName, 'timeStamps', 'time0', 'timeend', 'samplingInterval', '-v7.3');
     
     % save electrode_info:
     num_chunks = ceil(num_samples ./ chunkSize);
     % save general info about the electrodes and recording times:
-    save([outputFilePath, 'electrode_info_', strrep(ext, '.', ''), '.mat'], 'enum', 'nchan', 'period', 'inFile', ...
-        'samp_freq_hz', 'bytes_per_samp', 'num_samples', 'chunkSize', 'num_chunks');
+    save(electrodeInfoFileName, 'enum', 'nchan', 'period', 'inFile', ...
+         'bytes_per_samp', 'num_samples', 'chunkSize', 'num_chunks');
 
     fclose(fid);
 end
