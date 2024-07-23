@@ -9,7 +9,7 @@ venv/
 
 # Ignore macOS system files
 .DS_Store
-Nlx2Mat/.DS_Store/*
+Nlx2Mat/.DS_Store
 
 # Ignore Jupyter notebook checkpoints
 .ipynb_checkpoints/
