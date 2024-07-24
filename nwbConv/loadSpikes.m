@@ -1,10 +1,10 @@
-function [unitsTimeStamp, unitsWaveForm, unitsWaveFormMean, electrodeIndex] = loadSpikes(spikeFiles)
+function [unitsTimeStamp, unitsWaveForm, unitsWaveFormMean, electrodeIndex] = loadSpikes(spikesFiles, timesFiles)
 % read units in spike files and concatenate timestamps, waveform, and file
 % name in a one dimensional cell array.
 % this is used to save spikes into nwb file.
 
 
-numFiles = length(spikeFiles);
+numFiles = length(timesFiles);
 unitsTimeStamp = cell(numFiles, 1);
 unitsWaveForm = cell(numFiles, 1);
 unitsWaveFormMean = cell(numFiles, 1);
@@ -12,10 +12,13 @@ electrodeIndex = cell(numFiles, 1);
 
 for i = 1:numFiles
 
-    spikeFileObj = matfile(spikeFiles{i});
-    spikes = spikeFileObj.spikes;
-    spikeClass = spikeFileObj.cluster_class(:, 1);
-    spikeTimestamps = spikeFileObj.cluster_class(:, 2)';
+    timesFileObj = matfile(timesFiles{i});
+    spikeClass = timesFileObj.cluster_class(:, 1);
+    spikeTimestamps = timesFileObj.cluster_class(:, 2)';
+
+    spikesFilesObj = matfile(spikesFiles{i});
+    spikes = spikesFilesObj.spikes;
+    spikes(timesFileObj.spikeIdxRejected, :) = [];
     
     % remove un-clustered spikes:
     spikes = spikes(spikeClass ~= 0,:);
@@ -32,7 +35,7 @@ for i = 1:numFiles
     unitsLabeli(:) = {i - 1};
 
     for u = 1:length(units)
-        fprintf('load spike: %s, unit %d...\n', spikeFiles{i}, units(u));
+        fprintf('load spike: %s, unit %d...\n', timesFiles{i}, units(u));
     
         unitsTimeStampi{u} = spikeTimestamps(spikeClass==units(u));
         unitsWaveFormi{u} = spikes(spikeClass==units(u), :);

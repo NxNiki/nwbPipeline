@@ -7,18 +7,17 @@
 
 clear
 
+scriptDir = fileparts(mfilename('fullpath'));
+addpath(genpath(fileparts(scriptDir)));
+cd(scriptDir)
+
+Device = 'Neuralynx Pegasus';
+manufacturer = 'Neuralynx';
+
 expIds = 2;
 expName = 'Screening';
-patientId = 569;
-filePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/Screening/569_Screening';
-
-% expId = 5;
-% filePath = '/Users/XinNiuAdmin/Documents/NWBTest/inputNLX/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35';
-% outFilePath = '/Users/XinNiuAdmin/Documents/NWBTest/output/MovieParadigm/570_MovieParadigm';
-
-% 0: will remove all previous unpack files.
-% 1: skip existing files.
-skipExist = 1; 
+patientId = 572;
+filePath = 'Screening/572_Screening';
 
 outFilePath = [filePath, sprintf('/Experiment-%d/nwb', expIds)];
 
@@ -58,53 +57,22 @@ subject = types.core.Subject( ...
 );
 nwb.general_subject = subject;
 
-%% Electrodes Table:
-
-microLFPFilePath = fullfile(expFilePath, '/LFP_micro');
-ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
-    'colnames', {'x', 'y', 'z', 'location', 'group', 'group_name', 'label'}, ...
-    'description', 'all electrodes');
- 
+%% Electrodes Table for micros:
 Device = types.core.Device(...
-    'description', 'Neuralynx Pegasus', ...
+    'description', Device, ...
     'manufacturer', 'Neuralynx' ...
 );
 
-shankLabel = {'GA'};
-electrodeLabel = {'ROF'};
-numShanks = length(shankLabel);
-numChannelsPerShank = 8;
+microLFPFilePath = fullfile(expFilePath, '/LFP_micro');
+lfpFiles = dir(fullfile(microLFPFilePath, 'G*_lfp.mat'));
+lfpFiles = arrayfun(@(x)fullfile(x.folder, x.name), lfpFiles, UniformOutput=false);
 
-nwb.general_devices.set('array', Device);
-for iShank = 1:numShanks
-    shankGroupName = sprintf([shankLabel{iShank}, '%d'], iShank);
-    EGroup = types.core.ElectrodeGroup( ...
-        'description', sprintf('electrode group for %s', shankGroupName), ...
-        'location', electrodeLabel{iShank}, ...
-        'device', types.untyped.SoftLink(Device) ...
-    );
-    
-    nwb.general_extracellular_ephys.set(shankGroupName, EGroup);
-    for iElectrode = 1:numChannelsPerShank
-        location = sprintf(['%s-', electrodeLabel{iShank}, '%d'], shankGroupName, iElectrode);
-        ElectrodesDynamicTable.addRow( ...
-            'x', 111, ...
-            'y', 111, ...
-            'z', 111, ...
-            'location', location, ...
-            'group', types.untyped.ObjectView(EGroup), ...
-            'group_name', shankGroupName, ...
-            'label', location);
-    end
-end
+[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFiles, Device);
 
-ElectrodesDynamicTable.toTable()
-nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
 
-electrode_table_region = types.hdmf_common.DynamicTableRegion( ...
-    'table', types.untyped.ObjectView(ElectrodesDynamicTable), ...
-    'description', 'all electrodes', ...
-    'data', (0:length(ElectrodesDynamicTable.id.data)-1)');
+%% Electrodes Table for macros:
+% in most cases the table for macros are same for micro so we just use that
+% of the micros to save macro LFP.
 
 
 %%  Electrical Series:
@@ -133,20 +101,23 @@ samplingRate = 2000;
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
 lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro/lfpTimestamps.mat', expIds));
-nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, 'microLFP');
+nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
 lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
-nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, 'macroLFP');
+nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
 
 %% spikes:
 
 spikeFilePath = fullfile(filePath, sprintf('/Experiment-%d/CSC_micro_spikes', expIds));
-spikeFileNames = dir(fullfile(spikeFilePath, 'times*.mat'));
+spikeFileNames = dir(fullfile(spikeFilePath, '*_spikes.mat'));
 spikeFileNames = fullfile(spikeFilePath, {spikeFileNames.name});
 
+timesFileNames = dir(fullfile(spikeFilePath, 'times*.mat'));
+timesFileNames = fullfile(spikeFilePath, {timesFileNames.name});
+
 % load spikes for all channels:
-[spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames);
+[spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames, timesFileNames);
 
 [spike_times_vector, spike_times_index] = util.create_indexed_column(spikeTimestamps);
 [electrodes, electrodes_index] = util.create_indexed_column(spikeElectrodesIdx, [], '/general/extracellular_ephys/electrodes' );
