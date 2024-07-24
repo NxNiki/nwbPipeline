@@ -1,7 +1,7 @@
 # nwbPipeline
 Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
-- **set montage:** Set the montage information which maps the device channel to the brain region.
+- [**set montage:**](subsection-111) Set the montage information which maps the device channel to the brain region.
 - **unpack raw data:** Read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
 - **automatic spike sort:** Detect spikes and cluster spikes into units.
 - **extract LFP:** Remove spikes in the raw csc signals and downsample to 2k Hz.
@@ -109,6 +109,21 @@ When you update the code, run the test:
 ```
 test/test_exportToNwb.m
 ```
+
+### read NWB with Python
+
+It is recommended that a virtual environment be started for this project. Then install dependencies for Python:
+```
+pip install -r requirements.txt
+```
+
+Start jupyter-notebook in a terminal:
+```
+jupyter-notebook
+```
+
+Open the file `notebooks/demo_readNwb.ipynb` for a demo of reading data from nwb file.
+
 
 ### Manual spike sort:
 
