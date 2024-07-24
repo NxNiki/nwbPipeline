@@ -1,22 +1,20 @@
-% run spike detection and spike sorting to the unpacked data:
+% test spike detection and spike sorting to the unpacked data:
 clear
 
 % add parent directory to search path so we don't need to do it manually:
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-expIds = (3:6);
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
+expIds = 2;
+filePath = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/test/Screening/572_Screening';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = [1, 1, 0];
+skipExist = [0, 0, 0];
 
 [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
 
 %% spike detection:
-delete(gcp('nocreate'))
-% parpool(1); % each channel will take nearly 30GB memory for multi-exp analysis.
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
@@ -31,14 +29,3 @@ spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
 spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
 
 disp('Spike Clustering finished!')
-
-
-
-
-
-
-
-    
-
-
-

@@ -26,8 +26,8 @@ try % will fail on initial call, but not when data is being loaded?
 end
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 USER_DATA{1} = handles.par;
-set(handles.wave_clus_figure,'userdata', USER_DATA);
-set(handles.min_clus_edit,'string', num2str(handles.par.min_clus));
+set(handles.wave_clus_figure, 'userdata', USER_DATA);
+set(handles.min_clus_edit, 'string', num2str(handles.par.min_clus));
 % axes(handles.cont_data); EM: removed call to axes.
 cla(handles.cont_data);
 
@@ -59,8 +59,8 @@ end
 % clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
 % tree = load(fullfile(pathname, [fname '.dg_01']));
 
-handles.par.fnamespc  = fname;
-handles.par.fnamesave = fname;
+% handles.par.fnamespc  = fname;
+% handles.par.fnamesave = fname;
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 
