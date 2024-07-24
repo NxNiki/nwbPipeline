@@ -2,10 +2,14 @@ import neo
 import numpy as np
 
 # Load the .ns5 or .ns3 file
-in_file = ('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/Experiment4/Neural Data/'
-           '20240720-173300/20240720-173300-001.ns5')
+# in_file = ('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/Experiment4/Neural Data/'
+#            '20240720-173300/20240720-173300-001.ns5')
+# out_file = 'test/Screening/574_Screening/data_blackrock.ns5'
 
-out_file = 'test/Screening/574_Screening/data_blackrock.ns5'
+in_file = ('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/Experiment4/Neural Data/'
+           '20240720-173300/20240720-173300-001.ns3')
+out_file = 'test/Screening/574_Screening/data_blackrock.ns3'
+
 reader = neo.io.BlackrockIO(filename=in_file)
 block = reader.read_block()
 
@@ -13,6 +17,7 @@ block = reader.read_block()
 for seg, segment in enumerate(block.segments):
     print(f'seg: {seg}')
     for i, analog_signal in enumerate(segment.analogsignals):
+        print(i)
         signal = analog_signal.magnitude  # Get the signal data as a numpy array
         new_signal = signal[:, :3]  # Select the first three channels
 

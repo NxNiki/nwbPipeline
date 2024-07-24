@@ -60,24 +60,19 @@ if ~skipSplitting
     for i=startAt: num_chunks
         % DO NOT run this in parallel; the whole point of chunking is to
         % keep it below memory demands...
-        fprintf('Reading chunk #%d (of %d)...', i, num_chunks);
+        fprintf('Reading chunk #%d (of %d)...\n', i, num_chunks);
 
         [chunk_data, count] = fread(fid, [nchan, chunkSize], 'int16=>int16');
-        if (count./nchan < chunkSize)
+        if (count/nchan < chunkSize) && (i ~= num_chunks)
             % only the last chunk may be shorter than chunk_size:
-            if (i ~= num_chunks)
-                error('Chunk #%d short read (%d elems instead of %d)', i, count, ...
-                    chunkSize);
-            end
+            error('Chunk #%d short read (%d elems instead of %d)', i, count, chunkSize);
         end
 
-        fprintf('Done.  Splitting...');
-        if num_chunks>1
-            for ch=1:nchan
+        fprintf('Done.  Splitting...\n');
+        for ch=1:nchan
+            if num_chunks>1
                 saveChannel_split(chunk_data, ch, tempOutfile, enum, i);
-            end
-        else
-            for ch=1:nchan
+            else
                 saveChannel_notSplit(chunk_data, samplingInterval, ch, tempOutfile, enum);
             end
         end
@@ -87,40 +82,30 @@ if ~skipSplitting
     fclose(fid);
 
     clear chunk_data;
-    % data = zeros(1, num_samples ,'int16');
 end
+
 if num_chunks==1
     return
 end
-%% Merge channel-by-channel data into single files
-% if we skipped splitting, we need to check whether we had started merging
-% already...
-if skipSplitting
-    mergedAlready = dir([expFilePath, tempOutfile, '*.mat']);
-    mergedAlready = mergedAlready(arrayfun(@(x)~strcmp(x.name(1:length(tempOutfile)+1), [tempOutfile,'_']), mergedAlready));
-    mergedAlready = arrayfun(@(x)str2double(regexp(x.name, ['(?<=',tempOutfile,')\d*'], 'match', 'once')), mergedAlready);
-    mergedAlready(mergedAlready>=129) = [];
-    if isempty(mergedAlready)
-        startAt = 1;
-    else
-        startAt = max(mergedAlready) + 1;
-    end
-else
-    startAt = 1;
-end
 
+%% Merge channel-by-channel data into single files
 % paste together all chunks of each channel:
-parfor ch=startAt:nchan
-    outFiles{ch} = mergeLoop1(ch, nchan, num_chunks, chunkSize, tempOutfile, enum, samplingInterval);
+parfor ch = 1:nchan
+    outfile = sprintf('%s%d.mat', tempOutfile, enum(ch));
+    if exist(outfile, "file")
+        outFiles{ch} = outfile;
+    else
+        outFiles{ch} = mergeLoop1(ch, nchan, num_chunks, chunkSize, tempOutfile, enum(ch), samplingInterval);
+    end
 end
 
 % delete the piece-by-piece files
 parfor ch=1:nchan
-    fprintf('Deleting chunks for channel %d (of %d)...', ch, nchan);
+    fprintf('Deleting chunks for channel %d (of %d)...\n', ch, nchan);
     for i=1:num_chunks
         cur_chunk_file = sprintf('%s%d_%d.mat', tempOutfile, enum(ch), i);
-        if exist([expFilePath cur_chunk_file],'file')
-            delete([expFilePath cur_chunk_file]);
+        if exist(cur_chunk_file,'file')
+            delete(cur_chunk_file);
         end
     end
     fprintf('Done.\n');
@@ -131,25 +116,22 @@ function saveChannel_split(chunk_data, ch, base_outfile, enum, i)
 data1 = chunk_data(ch, :);
 outfile = sprintf('%s%d_%d.mat', base_outfile, enum(ch), i);
 save(outfile, 'data1');
-fprintf('.')
 end
 
 function saveChannel_notSplit(chunk_data, samplingInterval, ch, base_outfile, enum)
 data = chunk_data(ch, :);
 outfile = sprintf('%s%d.mat', base_outfile, enum(ch));
-waitForSaveDir(saveDir);
 save(outfile, 'data', 'samplingInterval', '-v7.3');
-fprintf('.')
 end
 
-function outfile = mergeLoop1(ch, nchan, num_chunks, chunk_size, base_outfile, enum, samplingInterval)
+function outfile = mergeLoop1(ch, nchan, num_chunks, chunk_size, base_outfile, enum_ch, samplingInterval)
 fprintf('Merging chunks for channel %d (of %d)...', ch, nchan);
 
 last_chunk_start_ind = 1;
 data = nan(1, num_chunks * chunk_size);
 
 for i=1:num_chunks
-    cur_chunk_file = sprintf('%s%d_%d.mat', base_outfile, enum(ch), i);
+    cur_chunk_file = sprintf('%s%d_%d.mat', base_outfile, enum_ch, i);
     d = load(cur_chunk_file);
     cur_chunk_sz = length(d.data1);
     data(1, last_chunk_start_ind:(last_chunk_start_ind + cur_chunk_sz-1)) = d.data1;
@@ -157,8 +139,7 @@ for i=1:num_chunks
 end
 
 data(last_chunk_start_ind:end) = [];
-outfile = sprintf('%s%d.mat', base_outfile, enum(ch));
-waitForSaveDir(saveDir);
+outfile = sprintf('%s%d.mat', base_outfile, enum_ch);
 save(outfile, 'data', 'samplingInterval', '-v7.3');
 
 fprintf('Done.\n');
