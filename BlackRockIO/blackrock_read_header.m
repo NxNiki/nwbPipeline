@@ -43,7 +43,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
                 error('Cannot fseek file %s.\n', inFile);
             end
             end_pos = ftell(fid);
-            num_samples = (end_pos - start_pos) ./ bytes_per_samp ./ nchan;  % #samples per channel.
+            num_samples = (end_pos - start_pos) / bytes_per_samp / nchan;  % #samples per channel.
             if (num_samples ~= fix(num_samples))
                 % num_samples is not natural - probably wrong calculation or file truncation:
                 error(['#samples per channel is not natural (num_samples=%g; start_pos=%d;', ...
@@ -84,7 +84,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
                 error('Cannot fseek file %s.\n', inFile);
             end
             end_pos = ftell(fid);
-            num_samples = (end_pos - start_pos) ./ bytes_per_samp ./ nchan;  % #samples per channel.
+            num_samples = (end_pos - start_pos) / bytes_per_samp / nchan;  % #samples per channel.
             if (num_samples ~= fix(num_samples))
                 % num_samples is not natural - probably wrong calculation or file truncation:
                 error(['#samples per channel is not natural (num_samples=%g; start_pos=%d;', 'end_pos=%d).\n'], num_samples, start_pos, end_pos);
@@ -111,7 +111,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
     save(tsFileName, 'timeStamps', 'time0', 'timeend', 'samplingInterval', '-v7.3');
     
     % save electrode_info:
-    num_chunks = ceil(num_samples ./ chunkSize);
+    num_chunks = ceil(num_samples / chunkSize);
     % save general info about the electrodes and recording times:
     save(electrodeInfoFileName, 'enum', 'nchan', 'period', 'inFile', ...
          'bytes_per_samp', 'num_samples', 'chunkSize', 'num_chunks');
