@@ -1,12 +1,13 @@
 # nwbPipeline
 Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
-- [**set montage:**](#set-montage) Set the montage information which maps the device channel to the brain region.
-- **unpack raw data:** Read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
-- **automatic spike sort:** Detect spikes and cluster spikes into units.
-- **extract LFP:** Remove spikes in the raw csc signals and downsample to 2k Hz.
-- **convert to NWB:** Export data to NWB (neural data without borders) format for data sharing.
-- **manual spike sort:** Select spike clusters by visual inspection.
+- [**Set montage**](#set-montage) Set the montage information which maps the device channel to the brain region.
+- [**Unpack data**](#unpack-data) Read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
+- [**Automatic spike sort**](#automatic-spike-sorting) Detect spikes and cluster spikes into units.
+- [**Extract LFP**](#extract-lfp) Remove spikes in the raw csc signals and downsample to 2k Hz.
+- [**Manual spike sort**](#manual-spike-sort) Select spike clusters by visual inspection.
+- [**Export to NWB**](#export-to-nwb) Export data to NWB (neural data without borders) format for data sharing.
+- [**Read NWB with Python**](#read-nwb-with-python) 
 
 ## How to use:
 
@@ -39,7 +40,7 @@ If there are no skipped ports, you only need to set `Port Start`, `Port End` wil
       
 After setting the montage, clicking `confirm` will save the configuration file (to set up the neuralynx device) and a JSON file, which saves the information in the UI and can be loaded.
 
-### Unpack data:
+### Unpack data
 
 Run in Matlab:
 ```
@@ -60,7 +61,7 @@ Otherwise, set it empty:
 montageConfigFile = [];
 ```
 
-### Automatic spike sorting:
+### Automatic spike sorting
 
 Define experiment ID and file path in `scripts/run_spikeSorting.m` to run spike sorting:
 
@@ -77,11 +78,12 @@ scripts/run_spikeSorting
 This will run spike detection using the minimal threshold across all selected experiments and combine spikes in a single .mat file for each channel.
 
 Or define `expIds` and `job_name` in `batch/runbatch_spikeSorting.m` and run on SGE (hoffman2):
+
 ```
 qsub batch/runbatch_spikeSorting.sh
 ```
 
-### Extract LFP:
+### Extract LFP
 
 Similar to spike sorting, define `expIds` and `filePath` in `scripts/run_extractLFP.m` and run in matlab:
 
@@ -95,7 +97,14 @@ Or define `expIds` and `job_name` in `batch/runbatch_extractLFP.m` and run on SG
 qsub batch/runbatch_extractLFP.sh
 ```
 
-### Export to NWB:
+### Manual spike sort:
+
+To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave_clus.m` and press the Run button. Press `Load Data` and select the `*_spike.mat` file created by automatic spike sorting.
+> You need to run all three steps of automatic spike sorting before the manual spike sort.
+
+![image](https://github.com/user-attachments/assets/a10ae600-e170-4388-a403-2fbb59c1052d)
+
+### Export to NWB
 
 To export data to .nwb file, you need to add [matnwb](https://github.com/NeurodataWithoutBorders/matnwb).
 Modify the code in:
@@ -110,28 +119,21 @@ When you update the code, run the test:
 test/test_exportToNwb.m
 ```
 
-### read NWB with Python
+### Read NWB with Python
 
 It is recommended that a virtual environment be started for this project. Then install dependencies for Python:
+
 ```
 pip install -r requirements.txt
 ```
 
 Start jupyter-notebook in a terminal:
+
 ```
 jupyter-notebook
 ```
 
 Open the file `notebooks/demo_readNwb.ipynb` for a demo of reading data from nwb file.
-
-
-### Manual spike sort:
-
-To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave_clus.m` and press the Run button. Press `Load Data` and select the `*_spike.mat` file created by automatic spike sorting.
-> You need to run all three steps of automatic spike sorting before the manual spike sort.
-
-![image](https://github.com/user-attachments/assets/a10ae600-e170-4388-a403-2fbb59c1052d)
-
 
 ## config.m
 
