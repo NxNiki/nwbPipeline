@@ -141,10 +141,9 @@ The scripts to unpack raw data, spike detection, spike clustering, and export da
 
 The scripts to run the pipeline on Hoffman (SGE).
 
-## matnwb:
+## test:
 
-Code to export data to nwb format. 
-https://github.com/NeurodataWithoutBorders/matnwb
+This folder contains example data and test code to test for debugging.
 
 ## troubleshooting:
 
