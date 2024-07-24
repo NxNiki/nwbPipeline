@@ -19,7 +19,7 @@ function handles = updateHandles(hObject, handles, fieldsTrue, fieldsFalse, clus
 
     if ~isempty(clusterIdx)
         USER_DATA = get(handles.wave_clus_figure, 'userdata');
-        cluster_results = USER_DATA{clusterIdx};
+        cluster_results = USER_DATA{clusterIdx}; % this is typically 10 or 11.
         handles.minclus = cluster_results(1, 5);
     elseif ~isempty(minclus)
         handles.minclus = minclus;
