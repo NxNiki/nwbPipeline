@@ -1,4 +1,4 @@
-function nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, Label)
+function nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, electrode_table_region, Label)
 lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
 lfpFiles = fullfile(lfpFilePath, {lfpFiles.name});
 
