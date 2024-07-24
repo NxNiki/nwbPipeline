@@ -1,7 +1,7 @@
 # nwbPipeline
 Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
-- [**set montage:**](subsection-111) Set the montage information which maps the device channel to the brain region.
+- [**set montage:**](subsection-11) Set the montage information which maps the device channel to the brain region.
 - **unpack raw data:** Read binary data and save CSC (Continuously Sample Channel) signals and timestamps to .mat files.
 - **automatic spike sort:** Detect spikes and cluster spikes into units.
 - **extract LFP:** Remove spikes in the raw csc signals and downsample to 2k Hz.
