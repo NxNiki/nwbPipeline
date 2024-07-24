@@ -218,9 +218,10 @@ USER_DATA{8} = temp(end);
 USER_DATA{9} = saved_classes(:)';                                     % backup for non-forced classes.
 
 %% definition of clustering_results
+classes = rejectPositiveSpikes(spikes, classes');
 clustering_results      = [];
 clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
-clustering_results(:,2) = rejectPositiveSpikes(spikes, classes'); % GUI classes
+clustering_results(:,2) = classes; % GUI classes
 clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
 clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
@@ -275,6 +276,10 @@ USER_DATA{8} = temp;
 USER_DATA{9} = classes(:)';                                     %backup for non-forced classes.
 handles.par.num_temp = min(handles.par.num_temp, size(clu, 1));
 
+clustering_results = USER_DATA{10};
+clustering_results(:, 2) = classes;
+USER_DATA{10} = clustering_results;
+
 handles.minclus = min_clus;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 temperature = handles.par.mintemp + temp * handles.par.tempstep;
@@ -304,7 +309,7 @@ handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'und
 plot_spikes(handles);
 
 % USER_DATA = get(handles.wave_clus_figure, 'userdata');
-clustering_results = USER_DATA{10};
+% clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
 % set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
