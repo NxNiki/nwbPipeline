@@ -97,11 +97,22 @@ qsub batch/runbatch_extractLFP.sh
 
 ### Export to NWB:
 
-<WIP>
+To export data to .nwb file, you need to add [matnwb](https://github.com/NeurodataWithoutBorders/matnwb).
+Modify the code in:
+
+```
+script/run_exportToNwb.m
+```
+
+When you update the code, run the test:
+
+```
+test/test_exportToNwb.m
+```
 
 ### Manual spike sort:
 
-To do manual spike sort, run `wave_clus` in matlab command window, or open `wave_clus.m` and press Run button. Press `Load Data` and select the *_spike.mat file created by automatic spike sorting.
+To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave_clus.m` and press the Run button. Press `Load Data` and select the `*_spike.mat` file created by automatic spike sorting.
 > You need to run all three steps of automatic spike sorting before the manual spike sort.
 
 ![image](https://github.com/user-attachments/assets/a10ae600-e170-4388-a403-2fbb59c1052d)
