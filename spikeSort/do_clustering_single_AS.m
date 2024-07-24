@@ -171,7 +171,7 @@ cluster_class(:, 2) = spikeTimestamps;
 outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
 outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
 
-cluster_class = rejectPositiveSpikes(spikes, cluster_class, par);
+cluster_class(:, 1) = rejectPositiveSpikes(spikes, cluster_class(:, 1), par);
 save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', 'inspk', 'clu', 'tree', '-v7.3');
 
 if exist('ipermut','var')
