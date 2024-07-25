@@ -46,8 +46,8 @@ expName="MovieParadigm"
 patientId="573"
 
 ## Set MATLAB parameters
-expIds="[3:7]"  # MATLAB array format
-skipExist="[0, 1]"  # MATLAB logical array
+expIds="[3:11]"  # MATLAB array format
+skipExist="[0, 0]"  # [micro LFP, macro LFP]
 codePath="/u/home/x/xinniu/nwbPipeline/"
 
 ## load the job environment:
