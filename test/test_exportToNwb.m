@@ -36,7 +36,7 @@ expFilePath = fullfile(filePath, sprintf('/Experiment-%d/', expIds));
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
-% generateCore('2.6.0');
+generateCore('2.6.0');
 
 nwb = NwbFile( ...
     'session_description', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName],...

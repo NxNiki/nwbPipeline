@@ -32,7 +32,8 @@ electrical_series = types.core.ElectricalSeries( ...
     'starting_time_rate', samplingRate, ... % Hz
     'data', lfpSignal, ...
     'electrodes', electrode_table_region, ...
-    'data_unit', 'micro-volts');
+    'data_unit', 'volts', ...
+    'data_conversion', 1e6);
  
 lfp = types.core.LFP('ElectricalSeries', electrical_series);
  
@@ -40,7 +41,8 @@ lfp = types.core.LFP('ElectricalSeries', electrical_series);
 if ismember('ecephys', nwb.processing.keys)
     ecephys_module = nwb.processing.get('ecephys');
 else
-    ecephys_module = types.core.ProcessingModule('description', 'extracellular electrophysiology');
+    ecephys_module = types.core.ProcessingModule( ...
+        'description', 'extracellular electrophysiology');
 end
 
 ecephys_module.nwbdatainterface.set(Label, lfp);
