@@ -103,7 +103,6 @@ nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrod
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
 lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
 lfpFilesMacro = fullfile(lfpFilePath, {lfpFiles.name});
-% lfpFiles = [lfpFilesMicro, fullfile(lfpFilePath, {lfpFiles.name})];
 
 lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
 nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
@@ -142,6 +141,8 @@ nwb.units = types.core.Units( ...
 
 outFile = fullfile(outFilePath, 'ecephys.nwb');
 if exist(outFile, "file")
+    % writing to existing .nwb file will cause error when reading it from
+    % python.
     delete(outFile);
 end
 nwbExport(nwb, outFile);
