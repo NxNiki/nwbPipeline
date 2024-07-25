@@ -57,23 +57,18 @@ subject = types.core.Subject( ...
 );
 nwb.general_subject = subject;
 
-%% Electrodes Table for micros:
 Device = types.core.Device(...
     'description', Device, ...
     'manufacturer', 'Neuralynx' ...
 );
 
-microLFPFilePath = fullfile(expFilePath, '/LFP_micro');
-lfpFiles = dir(fullfile(microLFPFilePath, 'G*_lfp.mat'));
-lfpFiles = arrayfun(@(x)fullfile(x.folder, x.name), lfpFiles, UniformOutput=false);
+%% Electrodes Table:
 
-[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFiles, Device);
+lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
+lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
+lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
 
-
-%% Electrodes Table for macros:
-% in most cases the table for macros are same for micro so we just use that
-% of the micros to save macro LFP.
-
+[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
 
 %%  Electrical Series:
 % we don't save raw signals to save storage space:
@@ -96,16 +91,22 @@ lfpFiles = arrayfun(@(x)fullfile(x.folder, x.name), lfpFiles, UniformOutput=fals
 % 
 % nwb.acquisition.set('ElectricalSeries', electrical_series);
 
-%% LFP:
+%% micro and macro LFP:
 samplingRate = 2000;
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
-lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro/lfpTimestamps.mat', expIds));
-nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
+lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
+lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
+lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
+nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
+lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
+lfpFilesMacro = fullfile(lfpFilePath, {lfpFiles.name});
+% lfpFiles = [lfpFilesMicro, fullfile(lfpFilePath, {lfpFiles.name})];
+
 lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
-nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
+nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
 
 %% spikes:
 
@@ -121,7 +122,7 @@ timesFileNames = fullfile(spikeFilePath, {timesFileNames.name});
 
 [spike_times_vector, spike_times_index] = util.create_indexed_column(spikeTimestamps);
 [electrodes, electrodes_index] = util.create_indexed_column(spikeElectrodesIdx, [], '/general/extracellular_ephys/electrodes' );
- 
+
 nwb.units = types.core.Units( ...
     'colnames', {'spike_times', 'electrodes', 'waveform_mean'}, ... 
     'description', 'units table', ...
@@ -139,5 +140,9 @@ nwb.units = types.core.Units( ...
 
 %% 
 
-nwbExport(nwb, fullfile(outFilePath, 'ecephys.nwb'));
+outFile = fullfile(outFilePath, 'ecephys.nwb');
+if exist(outFile, "file")
+    delete(outFile);
+end
+nwbExport(nwb, outFile);
 
