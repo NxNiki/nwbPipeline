@@ -107,6 +107,7 @@ To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave
 ### Export to NWB
 
 To export data to .nwb file, you need to add [matnwb](https://github.com/NeurodataWithoutBorders/matnwb).
+
 Modify the code in:
 
 ```
@@ -118,6 +119,13 @@ When you update the code, run the test:
 ```
 test/test_exportToNwb.m
 ```
+
+Tutorials for matnwb:
+
+https://neurodatawithoutborders.github.io/matnwb/tutorials/html/intro.html
+https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
+https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertTrials.m
+https://github.com/rutishauserlab/recogmem-release-NWB/blob/master/RutishauserLabtoNWB/events/newolddelay/matlab/export/NWBexport_demo.m
 
 ### Read NWB with Python
 
