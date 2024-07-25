@@ -1,14 +1,8 @@
-% export csc, spikes, lfp, etc to .nwb file.
-
-% https://neurodatawithoutborders.github.io/matnwb/tutorials/html/intro.html#H_FF8B1A2D
-% https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
-% https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertTrials.m
-% https://github.com/rutishauserlab/recogmem-release-NWB/blob/master/RutishauserLabtoNWB/events/newolddelay/matlab/export/NWBexport_demo.m
-
 clear
 
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
+cd(scriptDir)
 
 Device = 'Neuralynx Pegasus';
 manufacturer = 'Neuralynx';
@@ -35,7 +29,7 @@ expFilePath = fullfile(filePath, sprintf('/Experiment-%d/', expIds));
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
-% generateCore('2.6.0');
+generateCore('2.6.0');
 
 nwb = NwbFile( ...
     'session_description', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName],...
@@ -56,54 +50,18 @@ subject = types.core.Subject( ...
 );
 nwb.general_subject = subject;
 
-%% Electrodes Table:
-
-
-ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
-    'colnames', {'x', 'y', 'z', 'location', 'group', 'group_name', 'label'}, ...
-    'description', 'all electrodes');
- 
 Device = types.core.Device(...
     'description', Device, ...
-    'manufacturer', manufacturer ...
+    'manufacturer', 'Neuralynx' ...
 );
 
-shankLabel = {'GA1', 'GA2', 'GA3'};
-electrodeLabel = {'RA1', 'REC1', 'RAH1'};
-numShanks = length(shankLabel);
-numChannelsPerShank = 1;
+%% Electrodes Table:
 
-nwb.general_devices.set('array', Device);
-for iShank = 1:numShanks
-    shankGroupName = shankLabel{iShank};
-    EGroup = types.core.ElectrodeGroup( ...
-        'description', sprintf('electrode group for %s', shankGroupName), ...
-        'location', electrodeLabel{iShank}, ...
-        'device', types.untyped.SoftLink(Device) ...
-    );
-    
-    nwb.general_extracellular_ephys.set(shankGroupName, EGroup);
-    for iElectrode = 1:numChannelsPerShank
-        location = sprintf(['%s-', electrodeLabel{iShank}, '%d'], shankGroupName, iElectrode);
-        ElectrodesDynamicTable.addRow( ...
-            'x', 111, ...
-            'y', 111, ...
-            'z', 111, ...
-            'location', location, ...
-            'group', types.untyped.ObjectView(EGroup), ...
-            'group_name', shankGroupName, ...
-            'label', location);
-    end
-end
+lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
+lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
+lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
 
-ElectrodesDynamicTable.toTable()
-nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
-
-electrode_table_region = types.hdmf_common.DynamicTableRegion( ...
-    'table', types.untyped.ObjectView(ElectrodesDynamicTable), ...
-    'description', 'all electrodes', ...
-    'data', (0:length(ElectrodesDynamicTable.id.data)-1)');
-
+[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
 
 %%  Electrical Series:
 % we don't save raw signals to save storage space:
@@ -126,18 +84,21 @@ electrode_table_region = types.hdmf_common.DynamicTableRegion( ...
 % 
 % nwb.acquisition.set('ElectricalSeries', electrical_series);
 
-%% LFP:
+%% micro and macro LFP:
 samplingRate = 2000;
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
 lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
 lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
-lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro/lfpTimestamps.mat', expIds));
+lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
 nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
 
 lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
+lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
+lfpFilesMacro = fullfile(lfpFilePath, {lfpFiles.name});
+
 lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
-% nwb = saveLFPToNwb(nwb, lfpFilePath, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
+nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
 
 %% spikes:
 
@@ -153,7 +114,7 @@ timesFileNames = fullfile(spikeFilePath, {timesFileNames.name});
 
 [spike_times_vector, spike_times_index] = util.create_indexed_column(spikeTimestamps);
 [electrodes, electrodes_index] = util.create_indexed_column(spikeElectrodesIdx, [], '/general/extracellular_ephys/electrodes' );
- 
+
 nwb.units = types.core.Units( ...
     'colnames', {'spike_times', 'electrodes', 'waveform_mean'}, ... 
     'description', 'units table', ...
@@ -171,5 +132,10 @@ nwb.units = types.core.Units( ...
 
 %% 
 
-nwbExport(nwb, fullfile(outFilePath, 'ecephys_572.nwb'));
-
+outFile = fullfile(outFilePath, 'ecephys.nwb');
+if exist(outFile, "file")
+    % writing to existing .nwb file will cause error when reading it from
+    % python.
+    delete(outFile);
+end
+nwbExport(nwb, outFile);
