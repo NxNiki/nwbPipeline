@@ -98,7 +98,7 @@ nwb.units = types.core.Units( ...
 
 %% 
 
-outFile = fullfile(outFilePath, 'ecephys_test.nwb');
+outFile = fullfile(outFilePath, 'ecephys.nwb');
 if exist(outFile, "file")
     % writing to existing .nwb file will cause error when reading it from
     % python.
