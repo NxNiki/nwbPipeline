@@ -15,6 +15,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParad
 
 expFilePath = fullfile(filePath, ['/Experiment', sprintf('-%d', expIds)]);
 outFilePath = fullfile(expFilePath, 'nwb');
+outFile = fullfile(outFilePath, 'ecephys.nwb');
 
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);
@@ -56,52 +57,34 @@ Device = types.core.Device(...
     'manufacturer', 'Neuralynx' ...
 );
 
-%% Electrodes Table:
-
-lfpFilePath = fullfile(expFilePath, 'LFP_micro');
-lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
-
-[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
-
-%%  Electrical Series:
-% we don't save raw signals to save storage space:
-
-% microFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro', expId));
-% microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
-% 
-% voltageSignals = cell(1, length(microFiles));
-% for i = 1: length(microFiles)
-%     [voltageSignals{i}, ~, samplingInterval] = combineCSC(microFiles(i,:), timestampFiles);
-% end
-% voltageSignal = vertcat(voltageSignals{:});
-% 
-% electrical_series = types.core.ElectricalSeries( ...
-%     'starting_time', 0.0, ... % seconds
-%     'starting_time_rate', 1/seconds(samplingInterval), ... % Hz
-%     'data', voltageSignal, ...
-%     'electrodes', electrode_table_region, ...
-%     'data_unit', 'volts');
-% 
-% nwb.acquisition.set('ElectricalSeries', electrical_series);
 
 %% micro and macro LFP:
 samplingRate = 2000;
 
+tic
 lfpFilePath = fullfile(expFilePath, 'LFP_micro');
+lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
 lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
+
+[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
 nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
+toc
 
+tic
 lfpFilePath = fullfile(expFilePath, 'LFP_macro');
-lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
+lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\._');
 lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
-nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
 
+[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMacro, Device);
+nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
+toc
 %% spikes:
 
 spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-spikeFileNames = listFile(spikeFilePath, '*_spikes.mat', '^\._');
-timesFileNames = listFile(spikeFilePath, 'times*.mat', '^\._');
+spikeFileNames = listFiles(spikeFilePath, '*_spikes.mat', '^\._');
+timesFileNames = listFiles(spikeFilePath, 'times*.mat', '^\._');
 
+tic
 % load spikes for all channels:
 [spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames, timesFileNames);
 
@@ -121,11 +104,10 @@ nwb.units = types.core.Units( ...
 
 % save wave forms:
 % nwb.units.vectordata.set('waveform_mean', types.hdmf_common.VectorData('data', spikeWaveFormMean', 'description', 'Mean Spike Waveforms'));
-
+toc
 
 %% 
 
-outFile = fullfile(outFilePath, 'ecephys.nwb');
 if exist(outFile, "file")
     % writing to existing .nwb file will cause error when reading it from
     % python.
