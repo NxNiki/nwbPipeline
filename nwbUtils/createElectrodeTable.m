@@ -7,6 +7,7 @@ function [nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFiles, Dev
     if isempty(lfpFiles)
         error('no LFP files detected!');
     end
+    fprintf('createElectrodeTable: total of %d LFP file detected\n', length(lfpFiles));
 
     ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
         'colnames', {'x', 'y', 'z', 'location', 'group', 'group_name', 'label'}, ...
