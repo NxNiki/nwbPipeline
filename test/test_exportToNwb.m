@@ -1,10 +1,3 @@
-% export csc, spikes, lfp, etc to .nwb file.
-
-% https://neurodatawithoutborders.github.io/matnwb/tutorials/html/intro.html#H_FF8B1A2D
-% https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
-% https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertTrials.m
-% https://github.com/rutishauserlab/recogmem-release-NWB/blob/master/RutishauserLabtoNWB/events/newolddelay/matlab/export/NWBexport_demo.m
-
 clear
 
 scriptDir = fileparts(mfilename('fullpath'));
@@ -19,19 +12,14 @@ expName = 'Screening';
 patientId = 572;
 filePath = 'Screening/572_Screening';
 
-outFilePath = [filePath, sprintf('/Experiment-%d/nwb', expIds)];
+expFilePath = fullfile(filePath, ['/Experiment', sprintf('-%d', expIds)]);
+outFilePath = fullfile(expFilePath, 'nwb');
 
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);
 end
 
-expFilePath = fullfile(filePath, sprintf('/Experiment-%d/', expIds));
 %% read timestamp files and init nwb:
-
-% timestampFiles = dir(fullfile(microFilePath, '/CSC_micro/lfpTimeStamps*.mat'));
-% timestampFiles = fullfile(microFilePath, {timestampFiles.name});
-% tsObj = matfile(timestampFiles{1});
-% sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
@@ -64,57 +52,28 @@ Device = types.core.Device(...
 
 %% Electrodes Table:
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
+lfpFilePath = fullfile(expFilePath, 'LFP_micro');
+lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
 
 [nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
-
-%%  Electrical Series:
-% we don't save raw signals to save storage space:
-
-% microFilePath = fullfile(filePath, sprintf('/Experiment%d/CSC_micro', expId));
-% microFiles = readcell(fullfile(microFilePath, 'outFileNames.csv'), Delimiter=",");
-% 
-% voltageSignals = cell(1, length(microFiles));
-% for i = 1: length(microFiles)
-%     [voltageSignals{i}, ~, samplingInterval] = combineCSC(microFiles(i,:), timestampFiles);
-% end
-% voltageSignal = vertcat(voltageSignals{:});
-% 
-% electrical_series = types.core.ElectricalSeries( ...
-%     'starting_time', 0.0, ... % seconds
-%     'starting_time_rate', 1/seconds(samplingInterval), ... % Hz
-%     'data', voltageSignal, ...
-%     'electrodes', electrode_table_region, ...
-%     'data_unit', 'volts');
-% 
-% nwb.acquisition.set('ElectricalSeries', electrical_series);
 
 %% micro and macro LFP:
 samplingRate = 2000;
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
-lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
+lfpFilePath = fullfile(expFilePath, 'LFP_micro');
+lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFilesMacro = fullfile(lfpFilePath, {lfpFiles.name});
-
-lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
+lfpFilePath = fullfile(expFilePath, 'LFP_macro');
+lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
+lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
 
 %% spikes:
 
-spikeFilePath = fullfile(filePath, sprintf('/Experiment-%d/CSC_micro_spikes', expIds));
-spikeFileNames = dir(fullfile(spikeFilePath, '*_spikes.mat'));
-spikeFileNames = fullfile(spikeFilePath, {spikeFileNames.name});
-
-timesFileNames = dir(fullfile(spikeFilePath, 'times*.mat'));
-timesFileNames = fullfile(spikeFilePath, {timesFileNames.name});
+spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
+spikeFileNames = listFile(spikeFilePath, '*_spikes.mat', '^\._');
+timesFileNames = listFile(spikeFilePath, 'times*.mat', '^\._');
 
 % load spikes for all channels:
 [spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames, timesFileNames);
@@ -139,7 +98,7 @@ nwb.units = types.core.Units( ...
 
 %% 
 
-outFile = fullfile(outFilePath, 'ecephys.nwb');
+outFile = fullfile(outFilePath, 'ecephys_test.nwb');
 if exist(outFile, "file")
     % writing to existing .nwb file will cause error when reading it from
     % python.
