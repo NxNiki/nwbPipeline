@@ -64,19 +64,15 @@ samplingRate = 2000;
 tic
 lfpFilePath = fullfile(expFilePath, 'LFP_micro');
 lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
-lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
+lfpTimestampsFileMicro = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 
-[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
-nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
-toc
-
-tic
 lfpFilePath = fullfile(expFilePath, 'LFP_macro');
 lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\._');
-lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
+lfpTimestampsFileMacro = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 
-[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMacro, Device);
-nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
+[nwb, electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(nwb, lfpFilesMicro, lfpFilesMacro, Device);
+nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFileMicro, samplingRate, electrode_table_region_micro, 'microLFP');
+nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFileMacro, samplingRate, electrode_table_region_macro, 'macroLFP');
 toc
 %% spikes:
 
