@@ -22,6 +22,11 @@ end
 
 %% read timestamp files and init nwb:
 
+% timestampFiles = dir(fullfile(microFilePath, '/CSC_micro/lfpTimeStamps*.mat'));
+% timestampFiles = fullfile(microFilePath, {timestampFiles.name});
+% tsObj = matfile(timestampFiles{1});
+% sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
+
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
@@ -51,27 +56,23 @@ Device = types.core.Device(...
     'manufacturer', 'Neuralynx' ...
 );
 
+
 %% micro and macro LFP:
 samplingRate = 2000;
 
 tic
-lfpFilePath = fullfile(expFilePath, 'LFP_macro');
-lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\._');
-lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
-
-[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMacro, Device);
-nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
-toc
-
-tic
 lfpFilePath = fullfile(expFilePath, 'LFP_micro');
 lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
-lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
+lfpTimestampsFileMicro = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 
-[nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
-nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
+lfpFilePath = fullfile(expFilePath, 'LFP_macro');
+lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\._');
+lfpTimestampsFileMacro = fullfile(lfpFilePath, 'lfpTimestamps.mat');
+
+[nwb, electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(nwb, lfpFilesMicro, lfpFilesMacro, Device);
+nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFileMicro, samplingRate, electrode_table_region_micro, 'microLFP');
+nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFileMacro, samplingRate, electrode_table_region_macro, 'macroLFP');
 toc
-
 %% spikes:
 
 spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
