@@ -5,7 +5,7 @@ function [nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFiles, Dev
 
 
     if isempty(lfpFiles)
-        error('no LFP files detected!')
+        error('no LFP files detected!');
     end
 
     ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
