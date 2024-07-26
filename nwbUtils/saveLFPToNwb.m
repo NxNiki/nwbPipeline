@@ -9,21 +9,24 @@ lfpTimestampsFileObj = matfile(lfpTimestampsFile);
 timestampsStart = lfpTimestampsFileObj.timestampsStart;
 
 lfpSignals = cell(1, length(lfpFiles));
-lfpLength = inf;
+lfpLength = 0;
 
 for i = 1: length(lfpFiles)
     fprintf('saveLFPToNwb: %s\n', lfpFiles{i});
 
     lfpObj = matfile(lfpFiles{i});
     lfpSignals{i} = lfpObj.lfp;
-    lfpLength = min(lfpLength, length(lfpSignals{i}));
+    lfpLength = max(lfpLength, length(lfpSignals{i}));
 end
 
 for i = 1: length(lfpFiles)
     lfp = lfpSignals{i};
     if length(lfp) > lfpLength
-        warning('lfp length not same across channels');
-        lfpSignals{i} = lfp(1: lfpLength);
+        warning('lfp length not same across channels, fill short signals with NaNs');
+        fprintf('LFP file: %s\n', lfpFiles{i});
+        lfpSignals{i} = [lfp(:)', nan(1, lfpLength - length(lfp))];
+    else
+        lfpSignals{i} = lfp(:)';
     end
 end
 
@@ -37,8 +40,10 @@ electrical_series = types.core.ElectricalSeries( ...
     'data_unit', 'volts', ...
     'data_conversion', 1e-6);
  
-lfp = types.core.LFP('ElectricalSeries', electrical_series);
- 
+% LFP is for unfiltered local field potential data:
+% lfp = types.core.LFP('ElectricalSeries', electrical_series);
+
+lfp = types.core.FilteredEphys('ElectricalSeries', electrical_series);
 
 if ismember('ecephys', nwb.processing.keys)
     ecephys_module = nwb.processing.get('ecephys');
