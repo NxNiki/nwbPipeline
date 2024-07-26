@@ -12,6 +12,8 @@ lfpSignals = cell(1, length(lfpFiles));
 lfpLength = inf;
 
 for i = 1: length(lfpFiles)
+    fprintf('saveLFPToNwb: %s\n', lfpFiles{i});
+
     lfpObj = matfile(lfpFiles{i});
     lfpSignals{i} = lfpObj.lfp;
     lfpLength = min(lfpLength, length(lfpSignals{i}));
@@ -33,7 +35,7 @@ electrical_series = types.core.ElectricalSeries( ...
     'data', lfpSignal, ...
     'electrodes', electrode_table_region, ...
     'data_unit', 'volts', ...
-    'data_conversion', 1e6);
+    'data_conversion', 1e-6);
  
 lfp = types.core.LFP('ElectricalSeries', electrical_series);
  

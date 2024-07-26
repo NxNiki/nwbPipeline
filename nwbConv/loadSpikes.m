@@ -12,6 +12,8 @@ electrodeIndex = cell(numFiles, 1);
 
 for i = 1:numFiles
 
+    fprintf('loadSpikes: %s\n', timesFiles{i});
+
     timesFileObj = matfile(timesFiles{i});
     spikeClass = timesFileObj.cluster_class(:, 1);
     spikeTimestamps = timesFileObj.cluster_class(:, 2)';

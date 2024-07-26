@@ -7,18 +7,19 @@ cd(scriptDir)
 Device = 'Neuralynx Pegasus';
 manufacturer = 'Neuralynx';
 
-expIds = 2;
-expName = 'Screening';
-patientId = 572;
-filePath = 'Screening/572_Screening';
+expIds = (3:11);
+expName = 'MovieParadigm';
+patientId = 573;
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
 
-outFilePath = [filePath, sprintf('/Experiment-%d/nwb', expIds)];
+
+expFilePath = fullfile(filePath, ['/Experiment', sprintf('-%d', expIds)]);
+outFilePath = fullfile(expFilePath, 'nwb');
 
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);
 end
 
-expFilePath = fullfile(filePath, sprintf('/Experiment-%d/', expIds));
 %% read timestamp files and init nwb:
 
 % timestampFiles = dir(fullfile(microFilePath, '/CSC_micro/lfpTimeStamps*.mat'));
@@ -57,9 +58,8 @@ Device = types.core.Device(...
 
 %% Electrodes Table:
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
+lfpFilePath = fullfile(expFilePath, 'LFP_micro');
+lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
 
 [nwb, electrode_table_region] = createElectrodeTable(nwb, lfpFilesMicro, Device);
 
@@ -87,27 +87,20 @@ lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
 %% micro and macro LFP:
 samplingRate = 2000;
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_micro', expIds));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFilesMicro = fullfile(lfpFilePath, {lfpFiles.name});
-lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
+lfpFilePath = fullfile(expFilePath, 'LFP_micro');
+lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFile, samplingRate, electrode_table_region, 'microLFP');
 
-lfpFilePath = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro', expIds));
-lfpFiles = dir(fullfile(lfpFilePath, '*_lfp.mat'));
-lfpFilesMacro = fullfile(lfpFilePath, {lfpFiles.name});
-
-lfpTimestampsFile = fullfile(filePath, sprintf('/Experiment-%d/LFP_macro/lfpTimestamps.mat', expIds));
+lfpFilePath = fullfile(expFilePath, 'LFP_macro');
+lfpFilesMacro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
+lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFile, samplingRate, electrode_table_region, 'macroLFP');
 
 %% spikes:
 
-spikeFilePath = fullfile(filePath, sprintf('/Experiment-%d/CSC_micro_spikes', expIds));
-spikeFileNames = dir(fullfile(spikeFilePath, '*_spikes.mat'));
-spikeFileNames = fullfile(spikeFilePath, {spikeFileNames.name});
-
-timesFileNames = dir(fullfile(spikeFilePath, 'times*.mat'));
-timesFileNames = fullfile(spikeFilePath, {timesFileNames.name});
+spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
+spikeFileNames = listFile(spikeFilePath, '*_spikes.mat', '^\._');
+timesFileNames = listFile(spikeFilePath, 'times*.mat', '^\._');
 
 % load spikes for all channels:
 [spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames, timesFileNames);
