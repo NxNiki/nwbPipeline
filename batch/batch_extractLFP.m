@@ -38,34 +38,40 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
     if isempty(jobIds)
         disp("No job assigned to batch! This is due to more workers than number of micro files.")
-        return
+    else
+        disp(['micro jobIds: ', sprintf('%d ', jobIds)]);
+        microFiles = microFiles(jobIds, :);
+        fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
+    
+        spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
+        [spikeDetectFiles, spikeClusterFiles] = createSpikeFileName(microFiles(:, 1));
+        spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
+        spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
+    
+        lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist(1), saveRaw);
+        writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
+    
+        disp('micro lfp extraction finished!');
     end
-
-    disp(['jobIds: ', sprintf('%d ', jobIds)]);
-    microFiles = microFiles(jobIds, :);
-    fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
-
-    spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-    [spikeDetectFiles, spikeClusterFiles] = createSpikeFileName(microFiles(:, 1));
-    spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
-    spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
-
-    lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist(1), saveRaw);
-    writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
-
-    disp('micro lfp extraction finished!');
 
     %% macro electrodes:
     macroLFPPath = fullfile(expFilePath, 'LFP_macro');
     [macroFiles, timestampFiles] = readFilePath(expIds, filePath, 'macro');
 
-    macroFiles = macroFiles(jobIds, :);
-    fprintf(['macroFiles: \n', sprintf('%s\n', macroFiles{:})]);
+    jobIds = splitJobs(size(macroFiles, 1), totalWorkers, workerId);
+    if isempty(jobIds)
+        disp("No job assigned to batch! This is due to more workers than number of macro files.")
+    else
+        disp(['macro jobIds: ', sprintf('%d ', jobIds)]);
+        macroFiles = macroFiles(jobIds, :);
+        fprintf(['macroFiles: \n', sprintf('%s\n', macroFiles{:})]);
+    
+        lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
+        writecell(lfpFiles, fullfile(macroLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
+    
+        disp('macro lfp extraction finished!');
+    end
 
-    lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
-    writecell(lfpFiles, fullfile(macroLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
-
-    disp('macro lfp extraction finished!');
 
 end
 
