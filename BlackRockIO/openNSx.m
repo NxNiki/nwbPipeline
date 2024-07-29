@@ -751,6 +751,9 @@ try
         % Parse DateTime
         NSx.MetaTags.DateTimeRaw = t.';
         NSx.MetaTags.DateTime = char(datetime(t(1), t(2), t(4), t(5), t(6), t(7)));
+        dt = datetime(t(1), t(2), t(4), t(5), t(6), t(7), 'Format', 'yyyy-MM-dd HH:mm:ss.SSSSSS');
+        dt = dt + milliseconds(t(8));
+        NSx.MetaTags.startTime = posixtime(dt);
     else
         error('Unsupported file spec %s', NSx.MetaTags.FileSpec);
     end
