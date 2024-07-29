@@ -15,6 +15,8 @@ if length(skipExist) == 1
     skipExist = [skipExist, skipExist];
 end
 
+%% read header and create timestamps file:
+
 tic
 [~, electrodeInfoFile] = blackrock_read_header(inFile, expFilePath, [], skipExist(1));
 toc
