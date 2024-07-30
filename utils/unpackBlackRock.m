@@ -18,16 +18,16 @@ end
 %% read header and create timestamps file:
 
 tic
-[~, electrodeInfoFile] = blackrock_read_header(inFile, expFilePath, [], skipExist(1));
+[~, electrodeInfoFile] = blackrock_read_header(inFile, expFilePath, skipExist(1));
 toc
 
 %% Read data in in chunks and split by channel
 
 tic
-tempOutFiles = blackrock_read_channel(inFile, expFilePath, electrodeInfoFile, skipExist(2));
+tempOutFiles = blackrock_read_channel(inFile, electrodeInfoFile, skipExist(2));
 
 if length(channelNames) == length(tempOutFiles)
-    for i = 1: length(tempOutFiles)
+    parfor i = 1: length(tempOutFiles)
         path = fileparts(tempOutFiles{i});
         movefile(tempOutFiles{i}, fullfile(path, channelNames{i}));
     end
