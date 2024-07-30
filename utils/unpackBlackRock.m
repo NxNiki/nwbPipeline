@@ -21,7 +21,7 @@ tic
 [~, electrodeInfoFile] = blackrock_read_header(inFile, expFilePath, skipExist(1));
 toc
 
-%% Read data in in chunks and split by channel
+%% Read data by channel
 
 tic
 outFiles = blackrock_read_channel(inFile, electrodeInfoFile, skipExist(2), channelNames);
