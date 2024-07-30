@@ -43,3 +43,4 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
     save(electrodeInfoFileName, 'NSx');
 
 end
+
