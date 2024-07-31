@@ -1,1 +1,2 @@
 test/* export-ignore
+test/data/*.mat filter=lfs diff=lfs merge=lfs -text
