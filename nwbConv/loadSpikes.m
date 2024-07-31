@@ -10,7 +10,7 @@ unitsWaveForm = cell(numFiles, 1);
 unitsWaveFormMean = cell(numFiles, 1);
 electrodeIndex = cell(numFiles, 1);
 
-for i = 1:numFiles
+parfor i = 1:numFiles
 
     fprintf('loadSpikes: %s\n', timesFiles{i});
 
@@ -35,14 +35,16 @@ for i = 1:numFiles
     % [~, spikeFileName] = fileparts(spikeFiles{i});
     % unitsLabeli(:) = {regexp(spikeFileName, 'G[A-D]\d-.*', 'match', 'once')};
     unitsLabeli(:) = {i - 1};
-
+    
+    fprintf('unit:');
     for u = 1:length(units)
-        fprintf('load spike: %s, unit %d...\n', timesFiles{i}, units(u));
+        fprintf(' %d...', units(u));
     
         unitsTimeStampi{u} = spikeTimestamps(spikeClass==units(u));
         unitsWaveFormi{u} = spikes(spikeClass==units(u), :);
         unitsWaveFormMeani{u} = mean(spikes(spikeClass==units(u), :))';
     end
+    fprintf('\n');
 
     unitsTimeStamp{i} = unitsTimeStampi;
     unitsWaveForm{i} = unitsWaveFormi;
