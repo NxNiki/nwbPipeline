@@ -31,7 +31,7 @@ end
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
-generateCore('2.6.0');
+% generateCore('2.6.0');
 
 nwb = NwbFile( ...
     'session_description', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName],...
@@ -62,6 +62,7 @@ Device = types.core.Device(...
 samplingRate = 2000;
 
 tic
+
 lfpFilePath = fullfile(expFilePath, 'LFP_micro');
 lfpFilesMicro = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
 lfpTimestampsFileMicro = fullfile(lfpFilePath, 'lfpTimestamps.mat');
@@ -73,6 +74,7 @@ lfpTimestampsFileMacro = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 [nwb, electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(nwb, lfpFilesMicro, lfpFilesMacro, Device);
 nwb = saveLFPToNwb(nwb, lfpFilesMicro, lfpTimestampsFileMicro, samplingRate, electrode_table_region_micro, 'microLFP');
 nwb = saveLFPToNwb(nwb, lfpFilesMacro, lfpTimestampsFileMacro, samplingRate, electrode_table_region_macro, 'macroLFP');
+
 toc
 %% spikes:
 

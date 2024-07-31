@@ -11,7 +11,7 @@ timestampsStart = lfpTimestampsFileObj.timestampsStart;
 lfpSignals = cell(1, length(lfpFiles));
 lfpLength = 0;
 
-for i = 1: length(lfpFiles)
+parfor i = 1: length(lfpFiles)
     fprintf('saveLFPToNwb: %s\n', lfpFiles{i});
 
     lfpObj = matfile(lfpFiles{i});
@@ -30,12 +30,12 @@ for i = 1: length(lfpFiles)
     end
 end
 
-lfpSignal = vertcat(lfpSignals{:});
+lfpSignals = vertcat(lfpSignals{:});
 
 electrical_series = types.core.ElectricalSeries( ...
     'starting_time', timestampsStart, ... % seconds
     'starting_time_rate', samplingRate, ... % Hz
-    'data', lfpSignal, ...
+    'data', lfpSignals, ...
     'electrodes', electrode_table_region, ...
     'data_unit', 'volts', ...
     'data_conversion', 1e-6);
