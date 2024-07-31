@@ -6,7 +6,6 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-%%% ----------- UCLA Data: --------- %%%
 skipExist = 1;
 expIds = 4;
 filePath = {...
