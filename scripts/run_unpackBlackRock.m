@@ -7,7 +7,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 %%% ----------- UCLA Data: --------- %%%
-skipExist = 0;
+skipExist = 1;
 expIds = 4;
 filePath = {...
     '/Volumes/DATA/NLData/D574/EXP4_Screening2/20240720-173300/',...
