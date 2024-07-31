@@ -30,6 +30,7 @@ else
     % to indicate the end of the string but can be problematic in MATLAB.
     outFiles = cellfun(@(x)fullfile(outputFilePath, [x(double(x) ~= 0), '.mat']), {NSx.ElectrodesInfo(channelIdx).Label}, 'UniformOutput', false);
 end
+
 nchan = length(outFiles);
 
 parfor i = 1: nchan
