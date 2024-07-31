@@ -4,15 +4,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 cd(scriptDir)
 
-Device = 'Neuralynx Pegasus';
-manufacturer = 'Neuralynx';
-
-expIds = 2;
-expName = 'Screening';
-patientId = 572;
-filePath = 'Screening/572_Screening';
-
-expFilePath = fullfile(filePath, ['/Experiment', sprintf('-%d', expIds)]);
+expFilePath = 'neuralynx';
 outFilePath = fullfile(expFilePath, 'nwb');
 outFile = fullfile(outFilePath, 'ecephys.nwb');
 
@@ -22,28 +14,19 @@ end
 
 %% read timestamp files and init nwb:
 
-% timestampFiles = dir(fullfile(microFilePath, '/CSC_micro/lfpTimeStamps*.mat'));
-% timestampFiles = fullfile(microFilePath, {timestampFiles.name});
-% tsObj = matfile(timestampFiles{1});
-% sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
-
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
-generateCore('2.6.0');
+% generateCore('2.6.0');
 
 nwb = NwbFile( ...
-    'session_description', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName],...
-    'identifier', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName], ...
+    'session_description', ['sub-001', '_exp-01', '_' 'test'],...
+    'identifier', ['sub-001', '_exp-01', '_' 'test'], ...
     'session_start_time', sessionStartTime, ...
-    'timestamps_reference_time', sessionStartTime, ...
-    'general_experimenter', 'My Name', ... % optional
-    'general_session_id', '', ... % optional
-    'general_institution', 'UCLA', ... % optional
-    'general_related_publications', ''); % optional
+    'timestamps_reference_time', sessionStartTime);
 
 subject = types.core.Subject( ...
-    'subject_id', num2str(patientId), ...
+    'subject_id', '001', ...
     'age', '', ...
     'description', '', ...
     'species', 'human', ...
@@ -52,10 +35,9 @@ subject = types.core.Subject( ...
 nwb.general_subject = subject;
 
 Device = types.core.Device(...
-    'description', Device, ...
+    'description', 'Neuralynx', ...
     'manufacturer', 'Neuralynx' ...
 );
-
 
 %% micro and macro LFP:
 samplingRate = 2000;
@@ -96,9 +78,6 @@ nwb.units = types.core.Units( ...
     'electrodes_index', electrodes_index, ...
     'waveform_mean', types.hdmf_common.VectorData('data', spikeWaveFormMean', 'description', 'Mean Spike Waveforms') ...
 );
-
-% save wave forms:
-% nwb.units.vectordata.set('waveform_mean', types.hdmf_common.VectorData('data', spikeWaveFormMean', 'description', 'Mean Spike Waveforms'));
 toc
 
 %% 
@@ -108,5 +87,6 @@ if exist(outFile, "file")
     % python.
     delete(outFile);
 end
+fprintf('save data to nwb: %s\n', outFile);
 nwbExport(nwb, outFile);
 
