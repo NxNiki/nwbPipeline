@@ -42,7 +42,7 @@ parfor i = 1:numFiles
     
         unitsTimeStampi{u} = spikeTimestamps(spikeClass==units(u));
         unitsWaveFormi{u} = spikes(spikeClass==units(u), :);
-        unitsWaveFormMeani{u} = mean(spikes(spikeClass==units(u), :))';
+        unitsWaveFormMeani{u} = mean(spikes(spikeClass==units(u), :), 1)';
     end
     fprintf('\n');
 
