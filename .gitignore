@@ -23,8 +23,6 @@ batch/runbatch_spikeSorting_*.sh
 batch/runbatch_extractLFP_*.sh
 batch/jobs_*
 
-*/unpackConfigs/*
-*/Patient-*.json
 scripts/*.csv
 scripts/*.png
 scripts/*.jpg
@@ -37,8 +35,6 @@ test/Screening/572_Screening/Experiment-2/*/temp_*.mat
 
 .idea/*
 
-*.cfg
-*montage_*.json
 
 batch/sedDLFclD
 
