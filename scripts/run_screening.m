@@ -4,18 +4,18 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 571;
-expId = 2;
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/571_Screening';
+patient = 574;
+expId = 16;
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/Screening/573_Screening';
 
-expFilePath = [filePath, '/Experiment', sprintf('%d', expId)];
+expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 
 % In mose case we only have 1 ttlLog file. If the experiment is paused by
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    fullfile(expFilePath, "571-17-Jul-2024-13-4-14/from laptop/ttlLog571-17-Jul-2024-13-4-14.mat");
+    "/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/Screening 3/574-25-Jul-2024-17-42-48/from laptop/ttlLog574-25-Jul-2024-17-42-48.mat";
     %fullfile(expFilePath, "573-screening Log/573-02-May-2024-15-23-30/from laptop/TTLs573-02-May-2024-15-23-30_room1.mat")
     };
 
@@ -24,7 +24,7 @@ imageDirectory = fullfile(expFilePath, '/trial1');
 
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
-expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
+% expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file")
     eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
 

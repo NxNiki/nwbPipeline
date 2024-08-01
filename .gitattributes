@@ -1,1 +1,13 @@
 test/* export-ignore
+test/data/lfpTimeStamps_macro_exp001.mat filter=lfs diff=lfs merge=lfs -text
+test/data/lfpTimeStamps_macro_exp002.mat filter=lfs diff=lfs merge=lfs -text
+test/data/lfpTimeStamps_macro_seg004.mat filter=lfs diff=lfs merge=lfs -text
+test/data/lfpTimeStamps_macro_seg005.mat filter=lfs diff=lfs merge=lfs -text
+test/data/*.mat filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/*.mat filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/CSC_micro filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/CSC_micro_spikes filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/LFP_macro filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/LFP_micro filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/nwb filter=lfs diff=lfs merge=lfs -text
+test/neuralynx/CSC_macro filter=lfs diff=lfs merge=lfs -text
