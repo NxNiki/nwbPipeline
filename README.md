@@ -108,14 +108,13 @@ To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave
 
 To export data to .nwb file, you need to add [matnwb](https://github.com/NeurodataWithoutBorders/matnwb).
 
-Modify the code in:
+This script will export LFP for all micro and macro channels, spike times, and mean spike waveform (for each unit) to .nwb file:
 
 ```
 script/run_exportToNwb.m
 ```
 
-When you update the code, run the test:
-
+NWB export has a test module for developers:
 ```
 test/test_exportToNwb.m
 ```
