@@ -1,15 +1,27 @@
-function [nwb, electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(nwb, microLfpFiles, macroLfpFiles, Device)
+function [electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(nwbFile, expFilePath)
 % create electrode table based on file names of micro and macro channels.
 % micro channels have pattern: G[A-D][1-8]_[A-Z]+[1-8]_lfp.mat
 % macro channels have pattern: [A-Z]+[1-8]_lfp.mat
 
+
+    lfpFilePath = fullfile(expFilePath, 'LFP_micro');
+    microLfpFiles = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
+    
+    lfpFilePath = fullfile(expFilePath, 'LFP_macro');
+    macroLfpFiles = listFiles(lfpFilePath, '*_lfp.mat', '^\._');
 
     if isempty(microLfpFiles) && isempty(macroLfpFiles)
         error('no LFP files detected!');
     end
     fprintf('createElectrodeTable: total of %d micro LFP file detected\n', length(microLfpFiles));
     fprintf('createElectrodeTable: total of %d macro LFP file detected\n', length(macroLfpFiles));
-    
+
+    Device = types.core.Device(...
+    'description', 'Neuralynx', ...
+    'manufacturer', 'Neuralynx' ...
+    );
+
+    nwb = nwbRead(nwbFile);
     nwb.general_devices.set('array', Device);
 
     lfpFiles = [microLfpFiles(:); macroLfpFiles(:)];
@@ -76,4 +88,7 @@ function [nwb, electrode_table_region_micro, electrode_table_region_macro] = cre
         electrode_table_region_macro = [];
     end
 
+    % export nwb to save memory usage:
+    saveNWB(nwb, nwbFile)
+    
 end
