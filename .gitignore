@@ -30,11 +30,6 @@ scripts/*.png
 scripts/*.jpg
 scripts/*.mat
 
-test/Screening/572_Screening/Experiment-2/LFP_micro/*
-test/Screening/572_Screening/Experiment-2/LFP_macro/
-test/Screening/572_Screening/Experiment-2/*/*_log.txt
-test/Screening/572_Screening/Experiment-2/*/temp_*.mat
-
 .idea/*
 
 *.cfg

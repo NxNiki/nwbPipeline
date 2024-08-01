@@ -22,11 +22,11 @@ Run `MontageConfigUI.m` to open the UI to set the montage:
 ![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/18fa6b1b-3a34-4f07-a18d-1bb9c57869bb)
 
 
-#### Micro channels:
+#### Micro channels
 - Select `Custom` to input the channel label if it is not in the popup menu.
 - To skip a channel, set `Micros` to 0.
 
-#### Macro channels:
+#### Macro channels
 
 - Select channels with checkboxes, move them up/down, and remove or add new channels below.
 - Use `shift` to select/unselect multiple channels.
@@ -97,7 +97,7 @@ Or define `expIds` and `job_name` in `batch/runbatch_extractLFP.m` and run on SG
 qsub batch/runbatch_extractLFP.sh
 ```
 
-### Manual spike sort:
+### Manual spike sort
 
 To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave_clus.m` and press the Run button. Press `Load Data` and select the `*_spike.mat` file created by automatic spike sorting.
 > You need to run all three steps of automatic spike sorting before the manual spike sort.
@@ -108,14 +108,13 @@ To do manual spike sort, run `wave_clus` in Matlab command window, or open `wave
 
 To export data to .nwb file, you need to add [matnwb](https://github.com/NeurodataWithoutBorders/matnwb).
 
-Modify the code in:
+This script will export LFP for all micro and macro channels, spike times, and mean spike waveform (for each unit) to .nwb file:
 
 ```
 script/run_exportToNwb.m
 ```
 
-When you update the code, run the test:
-
+NWB export has a test module for developers:
 ```
 test/test_exportToNwb.m
 ```
@@ -127,7 +126,7 @@ https://neurodatawithoutborders.github.io/matnwb/tutorials/html/ecephys.html
 https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertTrials.m
 https://github.com/rutishauserlab/recogmem-release-NWB/blob/master/RutishauserLabtoNWB/events/newolddelay/matlab/export/NWBexport_demo.m
 
-### Read NWB with Python
+#### Read NWB with Python
 
 It is recommended that a virtual environment be started for this project. Then install dependencies for Python:
 
@@ -143,36 +142,78 @@ jupyter-notebook
 
 Open the file `notebooks/demo_readNwb.ipynb` for a demo of reading data from nwb file.
 
-## config.m
+## Structure of repo
 
-This script contains the global parameters for the pipeline. Including name patterns for micro and macro files, files that are ignored when unpacking, etc.
+### utils
 
-## Nlx2Mat
+General tools to support the analysis pipeline, including file organization, data manipulation, and configurations.
+
+#### config.m
+This script contains the global parameters for the pipeline. 
+
+### ttlUtils
+Functions to align TTLs from recording device and experiment PC.
+
+Including name patterns for micro and macro files, files that are ignored when unpacking, etc.
+
+### nwbUtils
+
+functions to write data to NWB files.
+
+### Nlx2Mat
 
 This is the code to read raw neuralynx files. 
 https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html
 
 Note: this part needs a Matlab version earlier than 2023b on Apple silicon.
 
-## spikeSort
+### NlxIO
 
-The code for spike sorting, modified from PDM (by Emily) and Multi-Exp Analysis (by Chris Dao)
+classes and functions for Neuralynx IO interface (WIP)
 
-## scripts
+### BlackRockIO
+
+WIP
+
+### montageConfig
+
+UI tools to configure montage settings for neuralynx and BlackRock(wip).
+
+### spikeSort
+
+The code for automatic and manual spike sorting, modified from PDM (by Emily) and Multi-Exp Analysis (by Chris Dao)
+
+#### wave_clus
+
+UI for manual spike sorting, adapted from: [wave_clus](https://github.com/csn-le/wave_clus)
+
+### analysis
+
+functions for screening analysis and raster plots.
+
+### scripts
 
 The scripts to unpack raw data, spike detection, spike clustering, and export data to nwb format.
 
-## batch
+### batch
 
 The scripts to run the pipeline on Hoffman (SGE).
 
-## test:
+### notebooks
 
-This folder contains example data and test code to test for debugging.
+Jupyter-notebooks to read nwb data in python.
 
-## troubleshooting:
+### test
 
-### Eqw on SGE:
+This folder contains example data and test modules for developers to debug the code.
+
+### qsub
+
+functions to qsub jobs to SGE (not used so far)
+
+## Troubleshooting
+
+### Eqw on SGE
 
 Use `qstat -j <job_id>` to get detailed information about the job and why it failed.
 
