@@ -171,7 +171,7 @@ The scripts to run the pipeline on Hoffman (SGE).
 
 ## test:
 
-This folder contains example data and test code to test for debugging.
+This folder contains example data and test modules for developers to debug the code.
 
 ## troubleshooting:
 
