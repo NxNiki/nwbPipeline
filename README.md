@@ -155,7 +155,11 @@ Note: this part needs a Matlab version earlier than 2023b on Apple silicon.
 
 ## spikeSort
 
-The code for spike sorting, modified from PDM (by Emily) and Multi-Exp Analysis (by Chris Dao)
+The code for automatic and manual spike sorting, modified from PDM (by Emily) and Multi-Exp Analysis (by Chris Dao)
+
+### wave_clus
+
+UI for manual spike sorting, adapted from: (wave_clus)[https://github.com/csn-le/wave_clus]
 
 ## scripts
 
