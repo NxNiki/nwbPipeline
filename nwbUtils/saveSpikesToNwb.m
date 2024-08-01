@@ -22,4 +22,5 @@ nwb.units = types.core.Units( ...
     'waveform_mean', types.hdmf_common.VectorData('data', spikeWaveFormMean', 'description', 'Mean Spike Waveforms') ...
 );
 
-saveNWB(nwb, nwbFile);
+% export nwb to save memory usage:
+saveNWB(nwb, nwbFile)
