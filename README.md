@@ -159,7 +159,7 @@ The code for automatic and manual spike sorting, modified from PDM (by Emily) an
 
 ### wave_clus
 
-UI for manual spike sorting, adapted from: (wave_clus)[https://github.com/csn-le/wave_clus]
+UI for manual spike sorting, adapted from: [wave_clus](https://github.com/csn-le/wave_clus)
 
 ## scripts
 
