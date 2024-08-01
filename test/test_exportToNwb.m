@@ -34,7 +34,7 @@ subject = types.core.Subject( ...
 );
 nwb.general_subject = subject;
 
-saveNWB(nwb, outNwbFile, 1)
+saveNWB(nwb, outNwbFile, 0)
 
 %% micro and macro LFP:
 samplingRate = 2000;
@@ -48,7 +48,10 @@ toc
 %% spikes:
 
 tic
-saveSpikesToNwb(outNwbFile, expFilePath)
+saveSpikesToNwb(outNwbFile, expFilePath);
 toc
+
+%% finish writing to nwb:
+saveNWB([], outNwbFile, 2);
 
 
