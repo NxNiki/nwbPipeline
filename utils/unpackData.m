@@ -1,4 +1,4 @@
-function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
+function outFileNames = unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % unpackData(inFileNames, outFilePath, verbose): read neuralynx file and
 % save to .mat files.
 
@@ -92,5 +92,6 @@ parfor i = 1:length(inFileNames)
     end
 
     movefile(outFileNameTemp, outFileName);
+    outFileNames{i} = outFileName;
 end
 

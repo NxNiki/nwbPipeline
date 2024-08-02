@@ -35,6 +35,10 @@ if ~exist('logPath','var') || isempty(logPath)
     logPath = '';
 end
 
+if ~exist(fileName, "file")
+    error("file not exist: %s", fileName);
+end
+
 % 1. Timestamps   
 % 2. Sc Numbers
 % 3. Cell Numbers
