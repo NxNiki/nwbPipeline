@@ -27,6 +27,8 @@ for i = 1:length(files)
     files(i).name
     factor
     cluster_class(:, 2) = cluster_class(:, 2) / factor;
+    mean(diff(cluster_class(:, 2)))
+    max(cluster_class(:, 2)) - min(cluster_class(:, 2))
 
     save(fullfile(path, files(i).name), 'cluster_class', '-append');
 end
