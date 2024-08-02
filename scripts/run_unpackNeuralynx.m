@@ -34,8 +34,8 @@ eventPattern = 'Events*';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
-montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1721_exp-92_2024-08-01_14-59-54.json';
-% montageConfigFile = [];
+% montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1721_exp-92_2024-08-01_14-59-54.json';
+montageConfigFile = [];
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
