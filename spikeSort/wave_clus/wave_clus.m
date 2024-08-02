@@ -218,7 +218,7 @@ USER_DATA{8} = temp(end);
 USER_DATA{9} = saved_classes(:)';                                     % backup for non-forced classes.
 
 %% definition of clustering_results
-classes = rejectPositiveSpikes(spikes, classes');
+classes = rejectPositiveSpikes(spikes, classes', handles.par);
 clustering_results      = [];
 clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
 clustering_results(:,2) = classes; % GUI classes
@@ -367,7 +367,7 @@ end
 % Saves clusters
 cluster_class=zeros(size(spikes,1),2);
 cluster_class(:,1) = classes(:);
-cluster_class(:,2) = USER_DATA{3}';
+cluster_class(:,2) = USER_DATA{3}' / 1000;
 
 [pathname, fn] = fileparts(get(handles.file_name, 'String'));
 outFileName = strrep(['times_' fn], '_spikes', '');
