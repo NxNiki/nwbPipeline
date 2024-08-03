@@ -4,8 +4,8 @@ function [signal, samplingIntervalSeconds] = readCSC(filename)
 matObj = matfile(filename, 'Writable', false);
 signal = matObj.data;
 
-if isfield(matObj.ADBitVolts) && ~isnan(matObj.ADBitVolts)
-    signal = signal(:) * matObj.ADBitVolts * 1e6; % convert signal to micro volt
+if ismember('ADBitVolts', who('-file', filename)) && ~isnan(matObj.ADBitVolts)
+    signal = single(signal(:)) * matObj.ADBitVolts * 1e6; % convert signal to micro volt
 else
     message = 'ADBitVolts is NaN; your CSC data will not be scaled';
     warning(message);
