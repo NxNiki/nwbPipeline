@@ -173,7 +173,7 @@ classes and functions for Neuralynx IO interface (WIP)
 
 ### BlackRockIO
 
-WIP
+Functions to unpack black rock data.
 
 ### montageConfig
 
