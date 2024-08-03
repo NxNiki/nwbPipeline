@@ -23,6 +23,7 @@ for i = 1: size(cscFiles, 1)
     channelFiles = cscFiles(i,:);
 
     if all(cellfun(@(x)~exist(x, "file"), cscFiles(i, :)))
+        warning('csc file not exist %s\n', cscFiles{i, :});
         continue
     end
 
