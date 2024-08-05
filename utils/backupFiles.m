@@ -1,5 +1,6 @@
 function backupFiles(sourceFiles, backupPath, removeSource)
 
+
 if nargin < 3
     removeSource = true;
 end
@@ -26,6 +27,7 @@ function moveFile(source, dest, removeSource)
     % also copy IO record so that we can rerun analysis directly from LTS:
     IOLogFileOut = fullfile(destDir, 'outFileNames.csv');
     IOLogFileIn = fullfile(sourceDir, 'outFileNames.csv');
+    
     if ~exist(IOLogFileOut, "file") && exist(IOLogFileIn, "file")
         IOLogIn = readcell(IOLogFileIn);
         IOLogOut = cellfun(@(x)strrep(x, sourceDir, destDir), IOLogIn);
