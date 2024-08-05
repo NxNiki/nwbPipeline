@@ -5,21 +5,25 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-expIds = 2;
-filePath = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/test/Screening/572_Screening';
+filePath = [scriptDir, '/neuralynx'];
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = [0, 0, 0];
 
-[microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
-
+microFiles = {
+    [filePath, '/CSC_micro/GA1-RA1_001.mat']
+    [filePath, '/CSC_micro/GB2-RAH1_001.mat']
+    [filePath, '/CSC_micro/GD4-LEC1_001.mat']
+    };
+timestampFiles = {
+    [filePath, '/CSC_micro/lfpTimeStamps_001.mat']
+    };
 %% spike detection:
 
-expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
-outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
+outputPath = fullfile(filePath, 'CSC_micro_spikes');
 
-spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1));
+spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, [], skipExist(1));
 disp('Spike Detection Finished!')
 
 %% spike clustering:

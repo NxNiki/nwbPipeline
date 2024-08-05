@@ -1,4 +1,4 @@
-function [signal, computedTimeStamps, samplingInterval, channelNumber] = Nlx_readCSC(fileName, computeTS, logPath)
+function [signal, ADBitVolts, computedTimeStamps, samplingInterval, channelNumber] = Nlx_readCSC(fileName, computeTS, logPath)
 
 % SYNTAX: [data,timeStamps,samplingInterval,chNum] = Nlx_readCSC(fileName,computeTS)
 %
@@ -33,6 +33,10 @@ end
 
 if ~exist('logPath','var') || isempty(logPath)
     logPath = '';
+end
+
+if ~exist(fileName, "file")
+    error("file not exist: %s", fileName);
 end
 
 % 1. Timestamps   
@@ -71,10 +75,10 @@ end
 
 sampleFrequency = sampleFrequency(1) * 1e-3; % converts to nSamples per millisecond to be consistent with how we store data for Black Rock
 
+InputInverted = 1;
 if isempty(header)
     % log this.
     ADBitVolts = NaN;
-    InputInverted = -1;
     message = 'Empty header info.';
     logMessage(logFile, message);
 else
@@ -89,15 +93,12 @@ else
     end
 
     findInputInverted = cellfun(@(x)~isempty(regexp(x, 'InputInverted', 'once')), header);
-    InputInverted = regexp(header{findInputInverted}, '(?<=InputInverted\s)[a-zA-Z]+', 'match');
+    InputInvertedText = regexp(header{findInputInverted}, '(?<=InputInverted\s)[a-zA-Z]+', 'match');
 
-    if isempty(InputInverted)
+    if isempty(InputInvertedText)
         message = 'Cannot extract header info: InputInverted';
         logMessage(logFile, message);
-        InputInverted = 1;
-    elseif strcmpi(InputInverted{1}, 'false')
-        InputInverted = 1;
-    elseif strcmpi(InputInverted{1}, 'true')
+    elseif strcmpi(InputInvertedText{1}, 'true')
         InputInverted = -1;
     else
         message = 'Unrecognized header info: InputInverted';
@@ -107,13 +108,7 @@ end
 
 signal = reshape(signal,[],1);
 signal(isnan(signal)) = [];
-
-if ~isnan(ADBitVolts)
-    signal = InputInverted * signal * ADBitVolts * 1e6; % convert signal to micro volt (need to confirm)
-else
-    message = 'ADBitVolts is NaN; your CSC data will not be scaled';
-    logMessage(logFile, message);
-end
+signal = int16(signal * InputInverted);
 
 timeStamps = timeStamps * 1e-6; % ts now in seconds
 samplingInterval = milliseconds(1/sampleFrequency); 
