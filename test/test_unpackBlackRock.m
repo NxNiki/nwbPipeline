@@ -11,10 +11,10 @@ addpath(genpath(fileparts(scriptDir)));
 skipExist = 0;
 expIds = 4;
 filePath = {...
-    'Screening/574_Screening/',...
+    'BlackRock/',...
     };
 
-outFilePath = 'Screening/574_Screening/';
+outFilePath = 'BlackRock';
 
 % montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1702_exp-46_2024-06-10_16-52-31.json';
 montageConfigFile = [];
@@ -42,6 +42,5 @@ for i = 1: length(filePath)
     end
     inFile = fullfile(filePath{i}, macroFile.name);
     unpackBlackRock(inFile, expFilePath, renameMacroChannels, skipExist);
-
 
 end
