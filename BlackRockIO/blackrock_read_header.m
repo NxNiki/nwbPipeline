@@ -5,10 +5,11 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
 
     if nargin < 3 || isempty(skipExist)
         skipExist = 1;
+
     end
 
     NSx = openNSx(inFile, 'noread');
-    
+
     if NSx.MetaTags.SamplingFreq > 29999
         outputFilePath = fullfile(expFilePath, 'CSC_micro');
     else
@@ -17,7 +18,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
 
     tsFileName = fullfile(outputFilePath, 'lfpTimeStamps_001.mat');
     electrodeInfoFileName = fullfile(outputFilePath, 'electrode_info.mat');
-    
+
     if skipExist && exist(tsFileName, "file") && exist(electrodeInfoFileName, "file")
         return
     end
@@ -26,6 +27,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
     samplingInterval = seconds(1) / NSx.MetaTags.SamplingFreq;
     samplingIntervalSeconds = seconds(samplingInterval);
     timeStamps = colonByLength(NSx.MetaTags.startTime, samplingIntervalSeconds, NSx.MetaTags.DataPoints);
+
     time0 = 0; 
     timeendSeconds = timeStamps(end);
     timeend = seconds(timeStamps(end));

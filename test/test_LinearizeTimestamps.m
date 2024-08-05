@@ -24,8 +24,8 @@ ts2k = linearizeTimestamps(ts32k, Fs);
 df2 = unique(diff(ts2k))
 
 %% load timestamps for different experiments:
-tsObj1 = matfile('lfpTimeStamps_macro_exp001.mat');
-tsObj2 = matfile('lfpTimeStamps_macro_exp002.mat');
+tsObj1 = matfile('data/lfpTimeStamps_macro_exp001.mat');
+tsObj2 = matfile('data/lfpTimeStamps_macro_exp002.mat');
 tsMacro = [tsObj1.timeStamps, tsObj2.timeStamps];
 % downsample ts at 20k hz
 Fs = 2000;
@@ -36,8 +36,8 @@ df3 = unique(diff(ts2k))
 
 %% load timestamps with multiple segments:
 
-tsObj1 = matfile('lfpTimeStamps_macro_seg004.mat');
-tsObj2 = matfile('lfpTimeStamps_macro_seg005.mat');
+tsObj1 = matfile('data/lfpTimeStamps_macro_seg004.mat');
+tsObj2 = matfile('data/lfpTimeStamps_macro_seg005.mat');
 tsMacro = [tsObj1.timeStamps, tsObj2.timeStamps];
 % downsample ts at 20k hz
 Fs = 2000;

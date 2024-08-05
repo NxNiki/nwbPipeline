@@ -11,12 +11,15 @@ if size(spikes, 1) ~= length(cluster_class)
 end
 
 % calcualte the number of pos and neg spikes:
-if ~isempty(par)
+if ~isempty(par) && length(par.w_pre) == 1
     peakWindow = par.w_pre - 5: par.w_pre + 5;
 else
     [~, spikePeakIdx] = max(abs(mean(spikes, 1)));
     peakWindow = spikePeakIdx - 5: spikePeakIdx + 5;
 end
+peakWindow(peakWindow > size(spikes, 2)) = [];
+peakWindow(peakWindow < 1) = [];
+
 spikePeakMean = mean(spikes(:, peakWindow), 2);
 posSpikes = spikePeakMean > 0;
 negSpikes = spikePeakMean <= 0;

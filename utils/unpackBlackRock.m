@@ -29,3 +29,4 @@ tic
 
 writetable(inFile, fullfile(fileparts(outFiles{1}), 'inFileNames.csv'));
 writetable(outFiles, fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
+

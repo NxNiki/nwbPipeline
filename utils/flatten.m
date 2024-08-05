@@ -8,15 +8,21 @@ function res = flatten(cellArray)
 %
 %   Example:
 %{
-      cellArray = {[1,2], {2, 3}, 'a', {'b'}, {{4}, 5}};
+      cellArray = {[1,2], {2; 3}, 'a', {'b'}, {{4}, 5}};
+      res = flatten(cellArray)
+
+      cellArray = {[1,2], {2, 3}, 'a', {}, {{4}, 5}};
+      res = flatten(cellArray)
+
+      cellArray = {[], {2, 3}, '', [], {{4}, 5}};
       res = flatten(cellArray)
 %}
 
+res = [];
 if ~iscell(cellArray)
     res = {cellArray};
     return
 else
-    res = [];
     for i = 1:length(cellArray)
         res = [res, flatten(cellArray{i})];
     end

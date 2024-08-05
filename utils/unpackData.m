@@ -1,4 +1,4 @@
-function unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
+function outFileNames = unpackData(inFileNames, outFileNames, outFilePath, verbose, skipExist)
 % unpackData(inFileNames, outFilePath, verbose): read neuralynx file and
 % save to .mat files.
 
@@ -55,7 +55,7 @@ parfor i = 1:length(inFileNames)
     timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);
 
     if strcmp(ext, '.ncs')
-        [signal, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
+        [signal, ADBitVolts, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
         num_samples = length(signal);
         timeend = (num_samples-1) * samplingInterval;
     
@@ -66,6 +66,7 @@ parfor i = 1:length(inFileNames)
         matobj.time0 = 0;
         matobj.timeend = timeend;
         matobj.timeendSeconds = seconds(timeend);
+        matobj.ADBitVolts = ADBitVolts;
     
         if computeTS(i)
             matobj = matfile(timestampFullFile, Writable=true);
@@ -91,5 +92,6 @@ parfor i = 1:length(inFileNames)
     end
 
     movefile(outFileNameTemp, outFileName);
+    outFileNames{i} = outFileName;
 end
 
