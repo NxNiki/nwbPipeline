@@ -11,7 +11,7 @@ Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 
 ## How to use:
 
-It is recommended to download the latest release version, which has a smaller size (does not contain the test data).
+It is recommended to download the latest release version, which has a smaller size (does not contain the test data), instead of the main branch.
 
 `scripts`: Pipelines to run on the local machine.
 
