@@ -1,0 +1,57 @@
+----------
+SPC result of file: /Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/test/Screening/572_Screening/Experiment-2/CSC_micro_spikes/GA2-REC1_spikes.mat
+
+SPC v2.1 (14/2/2000) -- efficient KNN and mstree
+SPC v2.0.1 (1/12/2000) -- StopRunAtBreak option 
+SPC v2.0 (1/11/1999) -- new param file + revised data structures 
+-------------------------------------------------------------------
+AverageInteraction	0.092419
+ClustersReported	12
+CharDist	10.153634
+DataFile	tmp_data_wc_GA2-REC1
+Dimensions	21
+DirectedGrowth	
+KNearestNeighbours	11
+MinTemp	0
+MaxTemp	0.251
+MSTree	
+NumberOfPoints	350
+NumberOfEdges	1156
+NearestNeighbrs	6.605714
+OutFile	data_wc_GA2-REC1
+PottsSpins	20
+RandomSeed	1721425782
+SusceptColors	4
+SaveSuscept	
+SWCycles	100
+SWFraction	0.800000
+ThresholdTheta	0.500000
+TempStep	0.01
+WriteLables	
+WriteLabels	
+.dg_01:  0.00000        1      350       0       0       0       0       0       0       0       0       0       0       0   
+.dg_01:  0.01000        2      244     106       0       0       0       0       0       0       0       0       0       0   
+.dg_01:  0.02000        2      244     106       0       0       0       0       0       0       0       0       0       0   
+.dg_01:  0.03000        7      239     102       3       2       2       1       1       0       0       0       0       0   
+.dg_01:  0.04000       13      231     100       3       3       2       2       2       2       1       1       1       1   
+.dg_01:  0.05000       17      226      96       4       4       3       2       2       2       2       2       1       1   
+.dg_01:  0.06000       23      223      94       4       3       3       2       2       2       2       2       1       1   
+.dg_01:  0.07000       30      222      88       3       3       2       2       2       2       2       2       2       2   
+.dg_01:  0.08000       43      214      85       3       3       2       2       2       2       2       2       1       1   
+.dg_01:  0.09000       57      202      81       6       2       2       2       2       2       2       2       1       1   
+.dg_01:  0.10000       72      194      74       4       3       3       2       2       2       2       2       1       1   
+.dg_01:  0.11000       94      182      63       4       3       3       2       2       2       2       2       2       1   
+.dg_01:  0.12000      115      174      54       2       2       2       2       2       2       2       2       2       1   
+.dg_01:  0.13000      135      148      49       7       4       3       2       2       2       2       2       2       2   
+.dg_01:  0.14000      162      133      21       9       5       5       4       3       2       2       2       2       2   
+.dg_01:  0.15000      199      122      13       3       3       3       3       3       2       2       2       2       2   
+.dg_01:  0.16000      253       22       9       8       8       7       6       6       5       5       4       4       3   
+.dg_01:  0.17000      310       10       5       5       3       3       2       2       2       2       2       2       2   
+.dg_01:  0.18000      335        7       3       2       2       2       2       2       2       2       1       1       1   
+.dg_01:  0.19000      348        3       1       1       1       1       1       1       1       1       1       1       1   
+.dg_01:  0.20000      349        2       1       1       1       1       1       1       1       1       1       1       1   
+.dg_01:  0.21000      349        2       1       1       1       1       1       1       1       1       1       1       1   
+.dg_01:  0.22000      350        1       1       1       1       1       1       1       1       1       1       1       1   
+.dg_01:  0.23000      350        1       1       1       1       1       1       1       1       1       1       1       1   
+.dg_01:  0.24000      350        1       1       1       1       1       1       1       1       1       1       1       1   
+.dg_01:  0.25000      350        1       1       1       1       1       1       1       1       1       1       1       1   

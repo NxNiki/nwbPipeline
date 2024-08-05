@@ -8,7 +8,7 @@ function [xf_detect, xf, noise_std_detect, noise_std_sorted, thr, thrmax] = high
     fmax_detect = param.detect_fmax;
     fmin_sort = param.sort_fmin;
     fmax_sort = param.sort_fmax;
-    
+    x = double(x);
     %HIGH-PASS FILTER OF THE DATA
     if exist('ellip', 'file')                               % Checks for the signal processing toolbox
         [b_detect,a_detect] = ellip(param.detect_order, 0.1, 40, [fmin_detect fmax_detect]*2/sr);
