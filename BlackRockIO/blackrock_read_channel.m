@@ -33,7 +33,7 @@ end
 
 nchan = length(outFiles);
 
-parfor i = 1: nchan
+for i = 1: nchan
     if skipExist && exist(outFiles{i}, 'file') 
         continue
     end
@@ -43,7 +43,7 @@ parfor i = 1: nchan
     end
 
     fprintf('writing data to: %s\n', outFiles{i});
-    NSx = openNSx('report','read', inFile, 'channels', i, 'uV', 'precision', 'double');
+    NSx = openNSx('report','read', inFile, 'channels', i, 'precision', 'int16');
 
     data = NSx.Data;
     samplingInterval = seconds(1) / NSx.MetaTags.SamplingFreq;
@@ -55,6 +55,7 @@ parfor i = 1: nchan
     outFileObj = matfile(tmpOutFile);
     outFileObj.data = data;
     outFileObj.samplingInterval = samplingInterval;
+    outFileObj.BlackRockUnits = 1/4;
     movefile(tmpOutFile, outFiles{i});
 end
 
