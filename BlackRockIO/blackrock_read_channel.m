@@ -33,7 +33,7 @@ end
 
 nchan = length(outFiles);
 
-for i = 1: nchan
+parfor i = 1: nchan
     if skipExist && exist(outFiles{i}, 'file') 
         continue
     end
