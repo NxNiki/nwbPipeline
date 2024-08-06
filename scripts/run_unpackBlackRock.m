@@ -6,7 +6,7 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-skipExist = 1;
+skipExist = 0;
 expIds = 4;
 filePath = {...
     '/Volumes/DATA/NLData/D574/EXP4_Screening2/20240720-173300/',...
