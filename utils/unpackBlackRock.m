@@ -27,6 +27,6 @@ tic
 outFiles = blackrock_read_channel(inFile, electrodeInfoFile, skipExist(2), channelNames);
 tic
 
-writetable(inFile, fullfile(fileparts(outFiles{1}), 'inFileNames.csv'));
-writetable(outFiles, fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
+writecell({inFile}, fullfile(fileparts(outFiles{1}), 'inFileNames.csv'));
+writecell(outFiles, fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
 

@@ -5,7 +5,6 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
 
     if nargin < 3 || isempty(skipExist)
         skipExist = 1;
-
     end
 
     NSx = openNSx(inFile, 'noread');
