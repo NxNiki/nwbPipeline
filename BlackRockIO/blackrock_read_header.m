@@ -26,18 +26,20 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
     samplingInterval = seconds(1) / NSx.MetaTags.SamplingFreq;
     samplingIntervalSeconds = seconds(samplingInterval);
     timeStamps = colonByLength(NSx.MetaTags.startTime, samplingIntervalSeconds, NSx.MetaTags.DataPoints);
-    time0 = 0;
+
+    time0 = 0; 
     timeendSeconds = timeStamps(end);
     timeend = seconds(timeStamps(end));
 
     if ~exist(outputFilePath, "dir")
         mkdir(outputFilePath)
     end
-
+    
     save(tsFileName, 'timeStamps', 'time0', 'timeendSeconds', 'timeend', 'samplingInterval', 'samplingIntervalSeconds', '-v7.3');
-
+    
     % save electrode_info:
     % save general info about the electrodes and recording times:
     save(electrodeInfoFileName, 'NSx');
 
 end
+
