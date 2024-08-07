@@ -6,7 +6,7 @@ cd(scriptDir)
 
 expFilePath = 'neuralynx';
 outFilePath = fullfile(scriptDir, expFilePath, 'nwb');
-outNwbFile = fullfile(outFilePath, 'ecephys1.nwb');
+outNwbFile = fullfile(outFilePath, 'ecephys.nwb');
 
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);

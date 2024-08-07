@@ -65,7 +65,7 @@ toc
 %% spikes:
 
 tic
-saveSpikesToNwb(outNwbFileTemp, expFilePath)
+saveSpikesToNwb(outNwbFileTemp, expFilePath);
 toc
 
-saveNWB([], outNwbFile, 2)
+saveNWB([], outNwbFile, 2);
