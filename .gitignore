@@ -42,3 +42,4 @@ batch/sedDLFclD
 
 test/neuralynx/CSC_micro_spikes/*.mat
 test/neuralynx/CSC_micro_spikes/*.txt
+test/neuralynx/LFP_micro/*.png
