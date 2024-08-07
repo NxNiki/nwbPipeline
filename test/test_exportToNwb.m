@@ -6,7 +6,7 @@ cd(scriptDir)
 
 expFilePath = 'neuralynx';
 outFilePath = fullfile(scriptDir, expFilePath, 'nwb');
-outNwbFile = fullfile(outFilePath, 'ecephys.nwb');
+outNwbFile = fullfile(outFilePath, 'ecephys1.nwb');
 
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);
@@ -34,21 +34,21 @@ subject = types.core.Subject( ...
 );
 nwb.general_subject = subject;
 
-saveNWB(nwb, outNwbFile, 0)
+outNwbFileTemp = saveNWB(nwb, outNwbFile, 0);
 
 %% micro and macro LFP:
 samplingRate = 2000;
 
 tic
-[electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(outNwbFile, expFilePath);
-saveLFPToNwb(outNwbFile, expFilePath, samplingRate, electrode_table_region_micro, 'LFP_micro');
-saveLFPToNwb(outNwbFile, expFilePath, samplingRate, electrode_table_region_macro, 'LFP_macro');
+[electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(outNwbFileTemp, expFilePath);
+saveLFPToNwb(outNwbFileTemp, expFilePath, samplingRate, electrode_table_region_micro, 'LFP_micro');
+saveLFPToNwb(outNwbFileTemp, expFilePath, samplingRate, electrode_table_region_macro, 'LFP_macro');
 toc
 
 %% spikes:
 
 tic
-saveSpikesToNwb(outNwbFile, expFilePath);
+saveSpikesToNwb(outNwbFileTemp, expFilePath);
 toc
 
 %% finish writing to nwb:
