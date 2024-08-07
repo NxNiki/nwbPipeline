@@ -53,7 +53,18 @@ for i = 1: numFiles
     Fs = seconds(1) / samplingInterval;
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
+
+    % check if spike exists for current channel:
+    spikeExist = false;
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
+        spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
+        spikes = spikeFileObj.spikes;
+        if ~isempty(spikes)
+            spikeExist = true;
+        end
+    end
+
+    if spikeExist
         spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
         spikes = spikeFileObj.spikes;
         spikeTimestamps = spikeFileObj.spikeTimestamps;
