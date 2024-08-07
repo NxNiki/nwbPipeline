@@ -70,7 +70,7 @@ for i = 2: length(lfpFiles)
 
     if length(lfp) < lfpLength
         warning('lfp length not same across channels, fill short signals with NaNs');
-        fprintf('LFP file: %s\n', lfpFiles{i});
+        warning('LFP file: %s\n', lfpFiles{i});
         lfp = [lfp(:)', nan(1, lfpLength - length(lfp))];
     end
     nwb.processing.get('ecephys').nwbdatainterface.get(channel).electricalseries.get('ElectricalSeries').data.append(lfp);
