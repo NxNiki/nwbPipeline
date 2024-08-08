@@ -24,8 +24,9 @@ outputFiles = cell(numFiles, 1);
 for i = 1: numFiles
     channelFiles = cscFiles(i,:);
     [~, channelFilename] = fileparts(channelFiles{1});
-    lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
-    lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
+    channelName = extractChannelName(channelFilename, '.*(?=_\d+)');
+    lfpFilename = fullfile(outputPath, [channelName, '_lfp.mat']);
+    lfpFilenameTemp = fullfile(outputPath, [channelName, '_lfp_temp.mat']);
     lfpTimestampFileName = fullfile(outputPath, 'lfpTimestamps.mat');
     
     if exist(lfpFilename, "file") && skipExist
