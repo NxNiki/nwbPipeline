@@ -12,12 +12,12 @@ filePath = [scriptDir, '/neuralynx'];
 skipExist = [0, 0, 0];
 
 microFiles = {
-    [filePath, '/CSC_micro/GA1-RA1_001.mat']
-    [filePath, '/CSC_micro/GB2-RAH1_001.mat']
-    [filePath, '/CSC_micro/GD4-LEC1_001.mat']
+    [filePath, '/CSC_micro/GA1-RAH1_001.mat']
+    [filePath, '/CSC_micro/GA2-RAC4.mat']
+    [filePath, '/CSC_micro/GA4-ROF2.mat']
     };
 timestampFiles = {
-    [filePath, '/CSC_micro/lfpTimeStamps_001.mat']
+    [filePath, '/CSC_micro/lfpTimeStamps_.mat']
     };
 %% spike detection:
 
