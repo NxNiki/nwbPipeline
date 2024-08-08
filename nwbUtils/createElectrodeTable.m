@@ -89,6 +89,6 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
     end
 
     % export nwb to save memory usage:
-    saveNWB(nwb, nwbFile)
+    saveNWB(nwb, nwbFile);
     
 end
