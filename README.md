@@ -167,7 +167,7 @@ functions to write data to NWB files.
 This is the code to read raw neuralynx files. 
 https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html
 
-> Note: If using Apple silicon, needs a Matlab intel version running on Roseenta.
+> Note: For Apple Silicon users, run the Intel version of MATLAB using Rosetta.
 
 ### NlxIO
 
