@@ -24,8 +24,9 @@ outputFiles = cell(numFiles, 1);
 for i = 1: numFiles
     channelFiles = cscFiles(i,:);
     [~, channelFilename] = fileparts(channelFiles{1});
-    lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
-    lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
+    channelName = extractChannelName(channelFilename, '.*(?=_\d+)');
+    lfpFilename = fullfile(outputPath, [channelName, '_lfp.mat']);
+    lfpFilenameTemp = fullfile(outputPath, [channelName, '_lfp_temp.mat']);
     lfpTimestampFileName = fullfile(outputPath, 'lfpTimestamps.mat');
     
     if exist(lfpFilename, "file") && skipExist
@@ -53,7 +54,18 @@ for i = 1: numFiles
     Fs = seconds(1) / samplingInterval;
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
+
+    % check if spike exists for current channel:
+    spikeExist = false;
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
+        spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
+        spikes = spikeFileObj.spikes;
+        if ~isempty(spikes)
+            spikeExist = true;
+        end
+    end
+
+    if spikeExist
         spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
         spikes = spikeFileObj.spikes;
         spikeTimestamps = spikeFileObj.spikeTimestamps;
