@@ -18,7 +18,7 @@ end
 function fname1 = makeSpikeDetectionFileName(fname)
 
 [~, fname] = fileparts(fname);
-channelName = extractChannelName(fname);
+channelName = extractChannelName(fname, '.*(?=_\d+)');
 fname1 = [channelName, '_spikes.mat'];
 
 end
@@ -26,17 +26,10 @@ end
 function fname1 = makeSpikeClusteringFileName(fname)
 
 [~, fname] = fileparts(fname);
-channelName = extractChannelName(fname);
+channelName = extractChannelName(fname, '.*(?=_\d+)');
 fname1 = ['times_', channelName, '.mat'];
 
 end
 
-function channelName = extractChannelName(fname)
 
-% remove digit suffix in file name:
-channelName = regexp(fname, '.*(?=_\d+)', 'match', 'once');
-if isempty(channelName)
-    channelName = fname;
-end
-end
 
