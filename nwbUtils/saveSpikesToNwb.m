@@ -1,11 +1,9 @@
 function saveSpikesToNwb(nwbFile, expFilePath)
 
 spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-spikeFileNames = listFiles(spikeFilePath, '*_spikes.mat', '^\._');
-timesFileNames = listFiles(spikeFilePath, 'times*.mat', '^\._');
 
 % load spikes for all channels:
-[spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames, timesFileNames);
+[spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFilePath);
 
 if isempty(spikeTimestamps)
     warning('no spikes detected in: %s\n', spikeFileNames);
