@@ -7,9 +7,9 @@ cd(scriptDir)
 Device = 'Neuralynx Pegasus';
 manufacturer = 'Neuralynx';
 
-expIds = (3:11);
+expIds = (8:14);
 expName = 'MovieParadigm';
-patientId = 573;
+patientId = 572;
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
 
 
@@ -29,7 +29,7 @@ end
 % sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
-sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
+sessionStartTime = datetime(date, 'Format', 'yyyy-MM-dd', 'TimeZone', 'local');
 
 % generateCore('2.6.0');
 
