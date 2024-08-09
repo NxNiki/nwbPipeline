@@ -44,8 +44,6 @@
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
 patientId="573"
-
-## Set MATLAB parameters
 expIds="[3:11]"  # MATLAB array format
 skipExist="[0, 0]"  # [micro LFP, macro LFP]
 codePath="/u/home/x/xinniu/nwbPipeline/"
@@ -77,14 +75,14 @@ backupScript="jobs_${expName}/runbatch_extractLFP_${expName}${patientId}_$JOB_ID
 if [ ! -f $backupScript ]; then
     echo "backup job script: $backupScript"
     cp runbatch_extractLFP.sh $backupScript
+    sed -i '67,82d' $backupScript
     sed -i '13i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' $backupScript
     sed -i '14i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' $backupScript
-    sed -i '69,83d' $backupScript
 fi
 
 ## run matlab function:
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    addpath(genpath(${codePath}));
+    addpath(genpath('${codePath})');
     expIds = ${expIds};
     skipExist = ${skipExist};
     workingDir = getDirectory();
