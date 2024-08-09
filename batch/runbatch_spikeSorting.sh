@@ -36,24 +36,22 @@
 # #$ -m bea
 # Uncomment to receive email notifications at the beginning (b), end (e), and if the job is aborted (a)
 
-#$ -t 1:10:1
+#$ -t 1:30:1
 # Array job specification: run tasks with IDs from 1 to 10, with a step of 1 (i.e., 1, 2, 3, ..., 10)
 # Each task will have a unique $TASK_ID
 
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="565"
-
-## Set MATLAB parameters
-expIds="[6:9]" 
+patientId="1728"
+expIds="[43:47, 50]" 
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
 # To see which versions of matlab are available use: module av matlab
 module load matlab/R2023b
-SCRIPT_DIR="/u/home/x/xinniu/nwbPipeline/batch"
+codePath="/u/home/x/xinniu/nwbPipeline"
 
 
 #### DO NOT EDIT THINGS BELOW
@@ -70,7 +68,7 @@ echo "run spike sorting, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
 ## make a copy of batch script:
 # Get the directory containing the currently executing script
-cd $SCRIPT_DIR
+cd ${codePath}/batch
 if [ ! -d jobs_${expName} ]; then
     mkdir jobs_${expName}
 fi
@@ -80,14 +78,14 @@ backupScript="jobs_${expName}/runbatch_spikeSorting_${expName}${patientId}_$JOB_
 if [ ! -f $backupScript ]; then
     echo "backup job script: $backupScript"
     cp runbatch_spikeSorting.sh $backupScript
+    sed -i '69,85d' $backupScript
     sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' $backupScript
     sed -i '44i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' $backupScript
-    sed -i '69,87d' $backupScript
 fi
 
 ## run matlab function:
 matlab  -nosplash -nodisplay -singleCompThread <<EOF
-    addpath(genpath('/u/home/x/xinniu/nwbPipeline'));
+    addpath(genpath('${codePath}'));
     expIds = ${expIds};
     skipExist = ${skipExist};
     workingDir = getDirectory();
