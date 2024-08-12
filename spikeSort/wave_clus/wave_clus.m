@@ -307,11 +307,7 @@ ylabel('Clusters size');
 
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
-
-% USER_DATA = get(handles.wave_clus_figure, 'userdata');
-% clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
-% set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(handles.fix1_button,'value', 1);
 updateFixButtonHandle(hObject, handles)
@@ -338,9 +334,6 @@ mark_clusters_temperature_diagram(handles, tree, clustering_results)
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'}, [], par.min_clus);
 
 plot_spikes(handles);
-% USER_DATA = get(handles.wave_clus_figure, 'userdata');
-% clustering_results = USER_DATA{10};
-% set(handles.wave_clus_figure, 'userdata', USER_DATA);
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 
 set(handles.force_button, 'value', 0);
@@ -389,11 +382,6 @@ outFileObj.par = par;
 % outFileObj.spikes = spikes;
 outFileObj.ipermut = USER_DATA{12};
 outFileObj.inspk = USER_DATA{7};
-
-% if(~strcmp(handles.par.fnamespc, handles.par.fnamesave))
-%     copyfile([handles.par.fnamespc '.dg_01.lab'], [handles.par.fnamesave '.dg_01.lab']);
-%     copyfile([handles.par.fnamespc '.dg_01'], [handles.par.fnamesave '.dg_01']);
-% end
 
 %Save figures
 nClusts = max(cluster_class(:,1));
