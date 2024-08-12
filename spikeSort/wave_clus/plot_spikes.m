@@ -66,35 +66,8 @@ for i=1:par.max_clus
 end
 
 % Classes should be consecutive numbers
-% i=1;
-% while i<=min(max(classes),par.max_clus)
-%     if isempty(classes(classes==i))
-%         % This code can get stuck in an infinite loop if there are no
-%         % clusters between i and par.max_clus... So I replace it with the
-%         % code below:
-%         %         for k=i+1:par.max_clus
-%         %             classes(classes==k)=k-1;
-%         %         end
-%         classes(classes>=i) = classes(classes>=i)-1;
-%     else
-%         i=i+1;
-%     end
-% end
-
 classes(classes > par.max_clus) = 0;
 classes = shrinkClassIndex(classes);
-
-% i=1;
-% while i<=min(max(class_bkup),par.max_clus)
-%     if isempty(class_bkup(class_bkup==i))
-% %         for k=i+1:par.max_clus
-% %             class_bkup(class_bkup==k)=k-1;
-% %         end
-%         class_bkup(class_bkup>=i) = class_bkup(class_bkup>=i)-1;
-%     else
-%         i=i+1;
-%     end
-% end
 
 class_bkup(class_bkup > par.max_clus) = 0;
 class_bkup = shrinkClassIndex(class_bkup);
@@ -270,7 +243,6 @@ nclusters = max(classes);
 % Updates clustering_results and clustering_results_bk in USER_DATA
 USER_DATA{10} = clustering_results;
 USER_DATA{11} = clustering_results_bk;
-% set(handles.wave_clus_figure,'userdata',USER_DATA)
 
 for i=20:55
     USER_DATA{i} = [];
