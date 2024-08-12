@@ -52,10 +52,10 @@ clu = timesFileObj.clu;
 tree = timesFileObj.tree;
 
 %Load clustering results
-fname = [handles.par.fname '_' filename(1:end-4)];              % filename for interaction with SPC
-if ~exist([fname '.dg_01.lab'], 'file')
-    fname = strrep(fname, 'CSC', 'ch');
-end
+% fname = [handles.par.fname '_' filename(1:end-4)];              % filename for interaction with SPC
+% if ~exist([fname '.dg_01.lab'], 'file')
+%     fname = strrep(fname, 'CSC', 'ch');
+% end
 % clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
 % tree = load(fullfile(pathname, [fname '.dg_01']));
 
