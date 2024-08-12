@@ -368,7 +368,7 @@ outfile = fullfile(pathname, outFileName);
 
 outFileObj = matfile(outfile, "Writable", true);
 
-if ~ismember('sortedBy', who(outFileObj))
+if ~ismember('sortedBy', who(outFileObj)) || ~iscell(outFileObj.sortedBy)
     sortedByPrev = [];
 else
     sortedByPrev = outFileObj.sortedBy;
