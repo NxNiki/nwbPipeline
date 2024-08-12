@@ -43,8 +43,9 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="1728"
-expIds="[43:47, 50]" 
+patientId="574"
+expIds="[5,6,9:11,15:17]" 
+# if expIds is updated, do not skipExist any steps so that threshodold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
 
 ## load the job environment:
