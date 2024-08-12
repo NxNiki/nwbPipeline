@@ -51,17 +51,6 @@ spikeTimestamps=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line 
 clu = timesFileObj.clu;
 tree = timesFileObj.tree;
 
-%Load clustering results
-% fname = [handles.par.fname '_' filename(1:end-4)];              % filename for interaction with SPC
-% if ~exist([fname '.dg_01.lab'], 'file')
-%     fname = strrep(fname, 'CSC', 'ch');
-% end
-% clu  = load(fullfile(pathname, [fname '.dg_01.lab']));
-% tree = load(fullfile(pathname, [fname '.dg_01']));
-
-% handles.par.fnamespc  = fname;
-% handles.par.fnamesave = fname;
-
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 
 if exist('ipermut', 'var')
