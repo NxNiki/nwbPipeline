@@ -374,10 +374,19 @@ outFileName = strrep(['times_' fn], '_spikes', '');
 outfile = fullfile(pathname, outFileName);
 
 outFileObj = matfile(outfile, "Writable", true);
-outFileObj.sortedBy = sortedBy;
+
+if ~ismember('sortedBy', who(outFileObj))
+    sortedByPrev = [];
+else
+    sortedByPrev = outFileObj.sortedBy;
+end
+
+sortedByPrev = [sortedByPrev; {sortedBy, char(datetime("now"))}];
+
+outFileObj.sortedBy = sortedByPrev;
 outFileObj.cluster_class = cluster_class;
 outFileObj.par = par;
-outFileObj.spikes = spikes;
+% outFileObj.spikes = spikes;
 outFileObj.ipermut = USER_DATA{12};
 outFileObj.inspk = USER_DATA{7};
 
