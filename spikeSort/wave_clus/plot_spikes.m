@@ -49,8 +49,8 @@ for m=1:length(aux_figs)
 end
 
 % Extract spike features if needed
-if get(handles.spike_shapes_button,'value') ==0
-    if isempty(inspk) || (length(inspk)~=size(spikes,1))
+if get(handles.spike_shapes_button,'value') == 0
+    if isempty(inspk) || (length(inspk)~=size(spikes, 1))
         [inspk] = wave_features_wc(spikes, handles);
         USER_DATA{7} = inspk;
     end
@@ -164,13 +164,13 @@ for i = 1:nclusters%+1 EM, don't need the +1 because we don't need to start at 0
     % eval(['classes(class' num2str(i-1) ') = ' num2str(i-1) ';']);
     % end
 end
-classDefs = [{class0};classDefs];
+classDefs = [{class0}; classDefs];
 % Saves new classes
 USER_DATA{6} = classes;
 USER_DATA{9} = class_bkup;
 
 % updates 'clustering_results_bk'
-clustering_results = [clustering_results; zeros(size(classes,1)-size(clustering_results,1),5)];
+clustering_results = [clustering_results; zeros(size(classes, 1) - size(clustering_results, 1), 5)];
 clustering_results_bk = clustering_results;
 
 % Forcing
@@ -226,13 +226,13 @@ if length(USER_DATA)>=19 && ~isempty(USER_DATA{19})
     rejectInds = f(ts);
     classes(rejectInds) = 0;
     USER_DATA{6} = classes;
-    classDefs = arrayfun(@(x)find(classes==x),0:(length(classDefs)-1), 'uniformoutput', 0);
-    nowEmpty = cellfun(@(x)isempty(x),classDefs);
+    classDefs = arrayfun(@(x)find(classes==x), 0:(length(classDefs)-1), 'uniformoutput', 0);
+    nowEmpty = cellfun(@(x)isempty(x), classDefs);
     oldClusterNums = 0:length(classDefs)-1;
     classDefs(nowEmpty) = [];
     oldClusterNums(nowEmpty) = [];
     newClusterNums = 0:length(classDefs)-1;
-    if ~isequal(oldClusterNums,newClusterNums)
+    if ~isequal(oldClusterNums, newClusterNums)
         for jj = 1:length(oldClusterNums)
             classes(classes==oldClusterNums(jj)) = newClusterNums(jj);
         end
@@ -247,15 +247,14 @@ USER_DATA{11} = clustering_results_bk;
 for i=20:55
     USER_DATA{i} = [];
 end
-set(handles.wave_clus_figure,'userdata',USER_DATA)
+set(handles.wave_clus_figure, 'userdata', USER_DATA)
 
 % Clear plots
 for i=1:4
-    cla(handles.(['spikes',num2str(i-1)]),'reset');
-    cla(handles.(['isi',num2str(i-1)]),'reset');
+    cla(handles.(['spikes', num2str(i-1)]), 'reset');
+    cla(handles.(['isi', num2str(i-1)]), 'reset');
 end
-cla(handles.projections,'reset');
-
+cla(handles.projections, 'reset');
 
 % Plot clusters
 ylimit = [];
@@ -265,7 +264,7 @@ for i = 1:nclusters+1
     if ~ (isempty(class0) && i==1)
         %PLOTS SPIKES OR PROJECTIONS
         
-        hold(handles.projections,'on')
+        hold(handles.projections, 'on')
         max_spikes=min(length(classDefs{i}), par.max_spikes);
         sup_spikes=length(classDefs{i});
         permut = randperm(sup_spikes); permut = permut(1:max_spikes);
@@ -287,23 +286,23 @@ for i = 1:nclusters+1
             hold(ax,'on');
             
             av = mean(spikes(classDefs{i},:));
-            avup = av + par.to_plot_std * std(spikes(classDefs{i},:));
-            avdw = av - par.to_plot_std * std(spikes(classDefs{i},:));
+            avup = av + par.to_plot_std * std(spikes(classDefs{i}, :));
+            avdw = av - par.to_plot_std * std(spikes(classDefs{i}, :));
             
             if get(handles.plot_all_button,'value') ==1
                 
-                plot(ax,spikes(classDefs{i}(permut),:)','color',colors(i) );
+                plot(ax,spikes(classDefs{i}(permut), :)','color', colors(i) );
                 if i==1
                     plot(ax,1:ls,av,'c','linewidth',2)
                     plot(ax,1:ls,avup,'c','linewidth',.5)
                     plot(ax,1:ls,avdw,'c','linewidth',.5)
                 else
                     plot(ax,1:ls,av,'k','linewidth',2);
-                    plot(ax,1:ls,avup,1:ls,avdw,'color',[.4 .4 .4],'linewidth',.5)
+                    plot(ax,1:ls,avup,1:ls,avdw,'color', [.4 .4 .4], 'linewidth', .5)
                 end
             else
                 plot(ax,1:ls,av,'color',colors(i),'linewidth',2)
-                plot(ax,1:ls,avup,1:ls,avdw,'color',[.65 .65 .65],'linewidth',.5)
+                plot(ax,1:ls,avup,1:ls,avdw,'color', [.65 .65 .65], 'linewidth', .5)
             end
             xlim(ax,[1 ls])
             
@@ -363,5 +362,4 @@ if ~strcmp(char(handles.datatype), 'Sc data') && ~strcmp(char(handles.datatype),
 end
 
 peakPlot(handles)
-% sound(sin(4400*(1:30000)),15000)
 
