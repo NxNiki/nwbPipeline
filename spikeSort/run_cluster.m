@@ -1,4 +1,4 @@
-function [clu, tree] = run_cluster(par, multi_files)
+function [clu, tree] = run_cluster(par)
 % cluster_*.exe cannot handle long input file. So we copy it to the working
 % directory and run the command without path of the input file name.
 
@@ -14,6 +14,7 @@ currentDir = pwd;
 [workingDir, fileName] = fileparts(fname);
 
 % cluster*.exe needs to work in the directory of the input file.
+% do not use absolute path.
 cd(workingDir);
 
 [~, fileNameIn] = fileparts(fname_in);
@@ -47,8 +48,6 @@ end
 fclose(fid);
 
 system_type = computer;
-
-
 switch system_type
     % window not tested.
     case {'PCWIN'}    
@@ -76,18 +75,11 @@ if status ~= 0
     disp(result)
 end
 
-if exist('multi_files', 'var') && multi_files==true
-	log_name = [par.filename 'spc_log.txt'];
-	f = fopen(log_name, 'w');
-	fprintf(f, ['----------\nSPC result of file: ' par.filename '\n']);
-	fprintf(f, result);
-	fclose(f);
-else
-	log_name = 'spc_log.txt';
-	f = fopen(log_name, 'w');
-	fprintf(f, result);
-	fclose(f);
-end
+log_name = [par.filename 'spc_log.txt'];
+f = fopen(log_name, 'w');
+fprintf(f, ['----------\nSPC result of file: ' par.filename '\n']);
+fprintf(f, result);
+fclose(f);
 
 clu = load([fname '.dg_01.lab'], '-ascii');
 tree = load([fname '.dg_01'], '-ascii'); 
