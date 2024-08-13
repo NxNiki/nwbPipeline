@@ -12,7 +12,7 @@ par = set_parameters;
 par = update_parameters(par, param, 'clus');
 par = update_parameters(par, param, 'batch_plot');
 
-par.filename = spikeFile;
+% par.filename = spikeFile;
 par.reset_results = true;
 
 check_WC_params(par)
@@ -21,13 +21,15 @@ check_WC_params(par)
 %   par.max_inputs = par.max_inputs * par.channels;
 % end
 
-[~, fileName, ~] = fileparts(spikeFile);
-channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
-par.channel = channel;
+% [~, fileName, ~] = fileparts(spikeFile);
+% channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
+% par.channel = channel;
+% 
+% par.fname_in = fullfile(outputPath, ['tmp_data_wc_' channel]);
+% par.fname = fullfile(outputPath, ['data_' channel]);
+% par.fnamespc = fullfile(outputPath, ['data_wc_' channel]);
 
-par.fname_in = fullfile(outputPath, ['tmp_data_wc_' channel]);
-par.fname = fullfile(outputPath, ['data_' channel]);
-par.fnamespc = fullfile(outputPath, ['data_wc_' channel]);
+par = updateParamForCluster(par, spikeFile);
 
 % REJECT SPIKES
 % SPK quantity check 1
@@ -47,36 +49,10 @@ end
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
 inspk = wave_features(spikes, par);     % takes wavelet coefficients.
 par.inputs = size(inspk, 2);            % number of inputs to the clustering
-naux = min(par.max_spk, size(spikes, 1));
+getInspkAux(par, inspk)
 
-if par.permut == 'n'
-    % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
-    if size(spikes,1) > par.max_spk
-        % take first 'par.max_spk' spikes as an input for SPC
-        inspk_aux = inspk(1:naux,:);
-    else
-        inspk_aux = inspk;
-    end
-else
-    % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
-    if size(spikes,1) > par.max_spk
-        % random selection of spikes for SPC
-        ipermut = randperm(length(inspk));
-        ipermut(naux+1:end) = [];
-        inspk_aux = inspk(ipermut,:);
-    else
-        ipermut = randperm(size(inspk,1));
-        inspk_aux = inspk(ipermut,:);
-    end
-end
-%INTERACTION WITH SPC
-save(par.fname_in, 'inspk_aux', '-ascii');
 try
-    [clu, tree] = run_cluster(par, true);
-    % if exist([par.fnamespc '.dg_01.lab'],'file')
-    %     movefile([par.fnamespc '.dg_01.lab'], [par.fname '.dg_01.lab'], 'f');
-    %     movefile([par.fnamespc '.dg_01'], [par.fname '.dg_01'], 'f');
-    % end
+    [clu, tree] = run_cluster(par);
 catch err
     warning('MyComponent:ERROR_SPC', 'Error in SPC');
     disp(err);
