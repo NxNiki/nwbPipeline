@@ -218,7 +218,7 @@ USER_DATA{8} = temp(end);
 USER_DATA{9} = saved_classes(:)';                                     % backup for non-forced classes.
 
 %% definition of clustering_results
-classes = rejectPositiveSpikes(spikes, classes', handles.par);
+classes = rejectPositiveSpikes(spikes, classes(:), handles.par);
 clustering_results      = [];
 clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
 clustering_results(:,2) = classes; % GUI classes

@@ -32,7 +32,8 @@ set(handles.min_clus_edit, 'string', num2str(handles.par.min_clus));
 cla(handles.cont_data);
 
 %Load spikes and parameters
-spikeFileObj = matfile(fullfile(pathname, filename));
+spikeFile = fullfile(pathname, filename);
+spikeFileObj = matfile(spikeFile, "Writable", true);
 
 filename = strrep(filename, '_spikes','');
 timesFile = fullfile(pathname, ['times_', filename]);
@@ -42,6 +43,7 @@ if ~exist(timesFile, 'file')
 end
 
 timesFileObj = matfile(timesFile);
+cluster_class = timesFileObj.cluster_class;
 manualTimesFile = fullfile(pathname, ['times_manual_' filename]);
 if exist(manualTimesFile, 'file')
     message = 'This spike file has been manually sorted, do you want to load the previous result?';
@@ -54,12 +56,10 @@ if exist(manualTimesFile, 'file')
     if strcmp(choice, option1)
         manualTimesFileObj = matfile(manualTimesFile);
         cluster_class = manualTimesFileObj.cluster_class;
-    else
-        cluster_class = timesFileObj.cluster_class;
     end
 end
 
-spikeTimestamps=cluster_class(:,2)'; % timestamps of spikes; gets loaded in line above.
+spikeTimestamps=cluster_class(:, 2)'; % timestamps of spikes; gets loaded in line above.
 
 spikeFileVars = who(spikeFileObj);
 if ismember('clu', spikeFileVars) && ismember('tree', spikeFileVars)
@@ -67,7 +67,11 @@ if ismember('clu', spikeFileVars) && ismember('tree', spikeFileVars)
     tree = spikeFileObj.tree;
 else
     par = timesFileObj.par;
-    [clu, tree] = run_cluster(par, true);
+    par = updateParamForCluster(par, spikeFile);
+    par.inputs = size(timesFileObj.inspk, 2);
+
+    getInspkAux(par, timesFileObj.inspk)
+    [clu, tree] = run_cluster(par);
     spikeFileObj.clu = clu;
     spikeFileObj.tree = tree;
 end
