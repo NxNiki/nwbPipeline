@@ -358,12 +358,12 @@ if isempty(sortedBy) || strcmp(sortedBy, 'Enter your name')
 end
 
 % Saves clusters
-cluster_class=zeros(size(spikes,1),2);
+cluster_class = zeros(size(spikes, 1), 2);
 cluster_class(:,1) = classes(:);
 cluster_class(:,2) = USER_DATA{3}' / 1000;
 
 [pathname, fn] = fileparts(get(handles.file_name, 'String'));
-outFileName = strrep(['times_' fn], '_spikes', '');
+outFileName = strrep(['times_manual_' fn], '_spikes', '');
 outfile = fullfile(pathname, outFileName);
 
 outFileObj = matfile(outfile, "Writable", true);
@@ -378,10 +378,10 @@ sortedByPrev = [sortedByPrev; {sortedBy, char(datetime("now"))}];
 
 outFileObj.sortedBy = sortedByPrev;
 outFileObj.cluster_class = cluster_class;
-outFileObj.par = par;
+% outFileObj.par = par;
 % outFileObj.spikes = spikes;
-outFileObj.ipermut = USER_DATA{12};
-outFileObj.inspk = USER_DATA{7};
+% outFileObj.ipermut = USER_DATA{12};
+% outFileObj.inspk = USER_DATA{7};
 
 %Save figures
 nClusts = max(cluster_class(:,1));
@@ -893,12 +893,12 @@ for i=1:max(classes)
     inCluster = classes == i;
     nSpikes = sum(inCluster);
     newNSpikes = 0;
-    nFeatures = size(inspk,2);
+    nFeatures = size(inspk, 2);
     while nSpikes > nFeatures && nSpikes>newNSpikes
         inCluster = classes == i;
         nSpikes = sum(inCluster);
-        M = mahal(inspk,inspk(inCluster,:));
-        Lspk = 1-chi2cdf(M,nFeatures);
+        M = mahal(inspk,inspk(inCluster, :));
+        Lspk = 1-chi2cdf(M, nFeatures);
         removeFromClust = inCluster(:) & Lspk(:) < 5e-4;
         classes(removeFromClust) = 0;
         newNSpikes = sum(classes == i);
