@@ -2,6 +2,10 @@ function [clu, tree] = run_cluster(par, multi_files)
 % cluster_*.exe cannot handle long input file. So we copy it to the working
 % directory and run the command without path of the input file name.
 
+fprintf('run_cluster...\n');
+
+% TO DO: check running time if fast we can avoid saving clu and tree...
+tic
 dim = par.inputs;
 fname = par.fnamespc;
 fname_in = par.fname_in;
@@ -15,10 +19,10 @@ cd(workingDir);
 [~, fileNameIn] = fileparts(fname_in);
 
 % DELETE PREVIOUS FILES
-% if exist([fname '.dg_01.lab'], 'file')
-%     delete([fname '.dg_01.lab']);
-%     delete([fname '.dg_01']);
-% end
+if exist([fname '.dg_01.lab'], 'file')
+    delete([fname '.dg_01.lab']);
+    delete([fname '.dg_01']);
+end
 
 dat = load(fname_in, '-ascii');
 n = length(dat);
@@ -88,6 +92,9 @@ end
 clu = load([fname '.dg_01.lab'], '-ascii');
 tree = load([fname '.dg_01'], '-ascii'); 
 
+clu = single(clu);
+tree = single(tree);
+
 fprintf('delete temp files for spike clustering\n %s', fname);
 delete(sprintf('%s.run', fname));    
 delete([fname '*.mag']);
@@ -98,5 +105,6 @@ delete(fname_in);
 delete([fname '.dg_01.lab']);
 delete([fname '.dg_01']);
 disp('delete files done!')
+toc
 
 cd(currentDir);

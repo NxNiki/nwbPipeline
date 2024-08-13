@@ -34,10 +34,7 @@ cla(handles.cont_data);
 %Load spikes and parameters
 spikeFileObj = matfile(fullfile(pathname, filename));
 
-% we want to make it possible to choose the _spikes file but still
-% load the times_ file. So we just remove _spikes from the filename
-% first.
-filename = strrep(filename,'_spikes','');
+filename = strrep(filename, '_spikes','');
 timesFile = fullfile(pathname, ['times_', filename]);
 if ~exist(timesFile, 'file')
     warning([timesFile, ' does not exist. Move on...'])
@@ -45,31 +42,57 @@ if ~exist(timesFile, 'file')
 end
 
 timesFileObj = matfile(timesFile);
-cluster_class = timesFileObj.cluster_class;
-spikeTimestamps=cluster_class(:,2)'; %timestamps of spikes; gets loaded in line above.
-
-clu = timesFileObj.clu;
-tree = timesFileObj.tree;
-
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-
-if exist('ipermut', 'var')
-    clu_aux = zeros(size(clu,1), length(spikeTimestamps)) + 1000;
-    for i=1:length(ipermut)
-        clu_aux(:,ipermut(i)+2) = clu(:,i+2);
+manualTimesFile = fullfile(pathname, ['times_manual_' filename]);
+if exist(manualTimesFile, 'file')
+    message = 'This spike file has been manually sorted, do you want to load the previous result?';
+    title = 'Spikes manually sorted already!';
+    option1 = 'Yes';
+    option2 = 'No';
+    
+    % Create the dialog box
+    choice = questdlg(message, title, option1, option2, option1);
+    if strcmp(choice, option1)
+        manualTimesFileObj = matfile(manualTimesFile);
+        cluster_class = manualTimesFileObj.cluster_class;
+    else
+        cluster_class = timesFileObj.cluster_class;
     end
-    clu_aux(:,1:2) = clu(:,1:2);
-    clu = clu_aux; clear clu_aux
-    USER_DATA{12} = ipermut;
 end
 
+spikeTimestamps=cluster_class(:,2)'; % timestamps of spikes; gets loaded in line above.
+
+spikeFileVars = who(spikeFileObj);
+if ismember('clu', spikeFileVars) && ismember('tree', spikeFileVars)
+    clu = spikeFileObj.clu;
+    tree = spikeFileObj.tree;
+else
+    par = timesFileObj.par;
+    [clu, tree] = run_cluster(par, true);
+    spikeFileObj.clu = clu;
+    spikeFileObj.tree = tree;
+end
+
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
+if ismember('ipermut', who(timesFileObj))
+    clu = permuteClu(clu, timesFileObj.ipermut);
+    USER_DATA{12} = timesFileObj.ipermut;
+end
+
+% This might never run (and may be wrong, should not + 1000).
+% if exist('ipermut', 'var')
+%     clu_aux = zeros(size(clu,1), length(spikeTimestamps)) + 1000;
+%     for i=1:length(ipermut)
+%         clu_aux(:,ipermut(i)+2) = clu(:,i+2);
+%     end
+%     clu_aux(:,1:2) = clu(:,1:2);
+%     clu = clu_aux; clear clu_aux
+%     USER_DATA{12} = ipermut;
+% end
+
+spikes = spikeFileObj.spikes;
 if ismember("spikeIdxRejected", who(timesFileObj))
     % times_* file created by automatic clustering:
-    spikes = spikeFileObj.spikes;
     spikes(timesFileObj.spikeIdxRejected, :) = [];
-else
-    % time_* file created by wave_clus:
-    spikes = timesFileObj.spikes;
 end
 
 USER_DATA{2} = spikes;

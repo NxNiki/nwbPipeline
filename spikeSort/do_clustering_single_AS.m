@@ -83,14 +83,14 @@ catch err
     return
 end
 
+% save spc results to spike file:
+spikeFileObj.clu = clu;
+spikeFileObj.tree = tree;
+
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
 
 if par.permut == 'y'
-    clu_aux = zeros(size(clu,1),2 + size(spikes,1)) -1;  %when update classes from clu, not selected elements go to cluster 0
-    clu_aux(:,ipermut+2) = clu(:,(1:length(ipermut))+2);
-    clu_aux(:,1:2) = clu(:,1:2);
-    clu = clu_aux;
-    clear clu_aux
+    clu = permuteClu(clu, ipermut);
 end
 
 classes = zeros(1, size(clu,2)-2);
@@ -172,9 +172,9 @@ outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
 outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
 
 cluster_class(:, 1) = rejectPositiveSpikes(spikes, cluster_class(:, 1), par);
-save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', 'inspk', 'clu', 'tree', '-v7.3');
+save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', 'inspk', '-v7.3');
 
-if exist('ipermut','var')
+if exist('ipermut', 'var')
     save(outFileNameTemp, 'ipermut', '-append');
 end
 
