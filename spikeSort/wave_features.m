@@ -124,3 +124,5 @@ for i=1:nspk
         inspk(i,j)=cc(i,coeff(j));
     end
 end
+
+inspk = single(inspk);
