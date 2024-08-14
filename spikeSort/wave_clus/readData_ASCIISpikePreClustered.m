@@ -35,7 +35,7 @@ cla(handles.cont_data);
 spikeFile = fullfile(pathname, filename);
 spikeFileObj = matfile(spikeFile, "Writable", true);
 
-filename = strrep(filename, '_spikes','');
+filename = strrep(filename, '_spikes', '');
 timesFile = fullfile(pathname, ['times_', filename]);
 if ~exist(timesFile, 'file')
     warning([timesFile, ' does not exist. Move on...'])
@@ -77,14 +77,21 @@ else
 end
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
+
 if ismember('ipermut', who(timesFileObj))
     clu = permuteClu(clu, timesFileObj.ipermut);
     USER_DATA{12} = timesFileObj.ipermut;
 end
 
-% This might never run (and may be wrong, should not + 1000).
+
+numSpikes = length(spikeTimestamps);
+if size(clu, 2) - 2 < numSpikes
+    clu = [clu, zeros(size(clu, 1), numSpikes - size(clu, 2) + 2)];
+end
+
+spikes = spikeFileObj.spikes;
 % if exist('ipermut', 'var')
-%     clu_aux = zeros(size(clu,1), length(spikeTimestamps)) + 1000;
+%     clu_aux = zeros(size(clu,1), length(spikeTimestamps)) + 1000; % why +1000?
 %     for i=1:length(ipermut)
 %         clu_aux(:,ipermut(i)+2) = clu(:,i+2);
 %     end
@@ -93,7 +100,7 @@ end
 %     USER_DATA{12} = ipermut;
 % end
 
-spikes = spikeFileObj.spikes;
+
 if ismember("spikeIdxRejected", who(timesFileObj))
     % times_* file created by automatic clustering:
     spikes(timesFileObj.spikeIdxRejected, :) = [];

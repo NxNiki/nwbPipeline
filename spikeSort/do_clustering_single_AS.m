@@ -1,7 +1,7 @@
 function do_clustering_single_AS(spikeFile, spikeCodeFile, outputPath, min_spikes4SPC)
 
 % load spikes and spike codes:
-spikeFileObj = matfile(spikeFile);
+spikeFileObj = matfile(spikeFile, "Writable", true);
 spikes = spikeFileObj.spikes;
 param = spikeFileObj.param;
 
@@ -49,7 +49,7 @@ end
 % CALCULATES INPUTS TO THE CLUSTERING ALGORITHM.
 inspk = wave_features(spikes, par);     % takes wavelet coefficients.
 par.inputs = size(inspk, 2);            % number of inputs to the clustering
-getInspkAux(par, inspk)
+ipermut = getInspkAux(par, inspk);
 
 try
     [clu, tree] = run_cluster(par);
@@ -65,12 +65,12 @@ spikeFileObj.tree = tree;
 
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
 
-if par.permut == 'y'
+if ~isempty(ipermut)
     clu = permuteClu(clu, ipermut);
 end
 
-classes = zeros(1, size(clu,2)-2);
-for c =1: length(clust_num)
+classes = zeros(1, size(clu, 2)-2);
+for c = 1: length(clust_num)
     aux = clu(temp(c), 3:end) + 1 == clust_num(c);
     classes(aux) = c;
 end
@@ -91,8 +91,7 @@ for i= 1:length(classes_names)
 end
 
 % IF TEMPLATE MATCHING WAS DONE, THEN FORCE
-if (size(spikes,1)> par.max_spk || ...
-        (par.force_auto))
+if (size(spikes,1)> par.max_spk || (par.force_auto))
     f_in  = spikes(classes~=0,:);
     f_out = spikes(classes==0,:);
     class_in = classes(classes~=0);
@@ -144,13 +143,13 @@ timestampsStart = spikeFileObj.timestampsStart;
 cluster_class(:, 1) = classes;
 cluster_class(:, 2) = spikeTimestamps;
 
-outFileName = fullfile(outputPath, ['times_', channel, '.mat']);
-outFileNameTemp = fullfile(outputPath, ['times_', channel, 'temp.mat']);
+outFileName = fullfile(outputPath, ['times_', current_par.channel, '.mat']);
+outFileNameTemp = fullfile(outputPath, ['times_', current_par.channel, 'temp.mat']);
 
 cluster_class(:, 1) = rejectPositiveSpikes(spikes, cluster_class(:, 1), par);
 save(outFileNameTemp, 'cluster_class', 'timestampsStart', 'spikeIdxRejected', 'par', 'forced', 'Temp', 'gui_status', 'inspk', '-v7.3');
 
-if exist('ipermut', 'var')
+if ~isempty(ipermut)
     save(outFileNameTemp, 'ipermut', '-append');
 end
 
