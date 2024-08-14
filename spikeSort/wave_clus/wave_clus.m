@@ -190,7 +190,7 @@ switch char(handles.datatype)
                 return
             end
         end
-        [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
+        [cluster_class, tree, ~, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
 temp=find_temp2(tree, handles);                                  % Selects temperature.
@@ -203,15 +203,17 @@ set(handles.file_name, 'string', fullfile(pathname, filename));
 guidata(hObject, handles);
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 spikes = USER_DATA{2};
-if size(clu,2)-2 < size(spikes, 1)
-    classes = clu(temp(end), 3:end)+1;
-    if ~exist('ipermut', 'var')
-        classes = [classes(:)' zeros(1, size(spikes, 1) - handles.par.max_spk)];
-    end
-else
-    classes = clu(temp(end), 3:end)+1;
-end
 
+% if size(clu,2)-2 < size(spikes, 1)
+%     classes = clu(temp(end), 3:end)+1;
+%     if ~exist('ipermut', 'var')
+%         classes = [classes(:)' zeros(1, size(spikes, 1) - handles.par.max_spk)];
+%     end
+% else
+%     classes = clu(temp(end), 3:end)+1;
+% end
+
+classes = cluster_class(:, 1);
 saved_classes = cluster_class(:,1);
 USER_DATA{6} = saved_classes(:)';
 USER_DATA{8} = temp(end);

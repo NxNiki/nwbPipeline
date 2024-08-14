@@ -1,7 +1,7 @@
-function getInspkAux(par, inspk)
+function ipermut = getInspkAux(par, inspk)
 
     naux = min(par.max_spk, size(inspk,1));
-    
+    ipermut = [];
     if par.permut == 'n'
         % GOES FOR TEMPLATE MATCHING IF TOO MANY SPIKES.
         if size(inspk,1) > par.max_spk
