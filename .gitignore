@@ -46,3 +46,6 @@ test/neuralynx/LFP_micro/*.png
 test/neuralynx/nwb/*_tmp.nwb
 
 notebooks/*.nwb
+
+test/wave_clus/*_spikes.matspc_log.txt
+test/wave_clus/fig2print_manual_*_wave_clus_figure.jpg
