@@ -1,0 +1,125 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Form elements */
+label {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="date"], select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Experiment section */
+#experiments {
+    margin-bottom: 20px;
+}
+
+.experiment {
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.experiment label {
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.experiment select {
+    width: auto;
+}
+
+.remove-experiment {
+    background-color: #dc3545;
+    margin-left: 10px;
+}
+
+.remove-experiment:hover {
+    background-color: #c82333;
+}
+
+/* Button styles */
+#add-experiment, #add-patient {
+    display: block;
+    width: auto;
+    margin-top: 20px;
+}
+
+#add-patient {
+    background-color: #28a745;
+}
+
+#add-patient:hover {
+    background-color: #218838;
+}
+
+/* Layout styles */
+div {
+    margin-bottom: 20px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    input[type="text"], input[type="date"], select {
+        width: 100%;
+    }
+}
+
+.container {
+    display: flex; /* Use flexbox to align items horizontally */
+    gap: 20px; /* Space between the divs */
+}
+
+.box {
+    flex: 1; /* Each div takes up equal space */
+    padding: 20px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.box:nth-child(2) {
+    background-color: #28a745; /* Different background for the second div */
+}
