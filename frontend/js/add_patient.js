@@ -1,6 +1,7 @@
 $(document).ready(function() {
-    let experimentCount = 1;
+    $('#navbar-placeholder').load('nav.html');
 
+    let experimentCount = 1;
     // Function to add a new experiment field
     $('#add-experiment').on('click', function() {
         experimentCount++;
@@ -22,4 +23,11 @@ $(document).ready(function() {
     $('#experiments').on('click', '.remove-experiment', function() {
         $(this).parent('.experiment').remove();
     });
+
+    // Function to confirm add patient.
+    $('#confirm').on('click', function (){
+        const path = localStorage.getItem('dataPath');
+
+        patientInfo = getPatientInfo();
+    })
 });

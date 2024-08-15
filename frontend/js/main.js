@@ -1,8 +1,33 @@
 $(document).ready(function() {
-    $('#add-patient').on('click', function() {
-        // Open a new window for adding patient information
-        // window.open('add_patient.html', 'Add Patient', 'width=600,height=400');
-        // Redirect to the add_patient.html page instead of opening a new window
-        window.location.href = 'add_patient.html';
+    $('#navbar-placeholder').load('nav.html');
+
+    const labName = localStorage.getItem('lab');
+    const userName = localStorage.getItem('userName');
+    const dataPath = localStorage.getItem('dataPath');
+
+    if (labName || userName || dataPath) {
+        document.getElementById('lab').value = labName;
+        document.getElementById('name').value = userName;
+        document.getElementById('path').value = dataPath;
+        console.log('Data loaded from Local Storage');
+    } else {
+        console.log('No data found in Local Storage');
+    }
+
+    $('#confirm').on('click', function() {
+        let labName = $('#lab').val();
+        let experimenterName = $('#name').val();
+        let savePath = $('#path').val();
+        if (labName && experimenterName && savePath) {
+            // Process or save the experimenterName and savePath
+            localStorage.setItem('lab', labName);
+            localStorage.setItem('userName', experimenterName);
+            localStorage.setItem('dataPath', savePath);
+
+            window.location.href = 'patients.html';
+        } else {
+            alert("Please enter all required information.");
+        }
     });
+
 });

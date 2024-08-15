@@ -6,36 +6,25 @@
     <title>Add Patient</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <div id="navbar-placeholder"></div>
 
-    <h2>Add Patient Information</h2>
+    <h1>Experiments List</h1>
 
-    <div class="container">
-        <div class="box">
-            <label for="patient-name">Patient Name:</label>
-            <input type="text" id="patient-name" name="patient-name">
-        </div>
-        <div class="box">
-            <label for="patient-id">Patient ID:</label>
-            <input type="text" id="patient-id" name="patient-id">
-        </div>
-    </div>
-    
-    <div>
-        <label for="patient-sex">Sex:</label>
-        <select id="patient-sex" name="patient-sex">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-        </select>
-    </div>
-    <div>
-        <label for="patient-birthdate">Birth Date:</label>
-        <input type="date" id="patient-birthdate" name="patient-birthdate">
-    </div>
+    <table id="experiments-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Patient rows will be inserted here dynamically -->
+        </tbody>
+    </table>
 
-    <h3>Experiments</h3>
     <div id="experiments">
         <div class="experiment">
             <label for="experiment-name-1">Experiment Name:</label>
@@ -52,6 +41,6 @@
     <button id="confirm">Confirm</button>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/add_patient.js"></script>
+    <script src="js/patients.js"></script>
 </body>
 </html>

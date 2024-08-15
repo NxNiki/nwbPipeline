@@ -6,6 +6,38 @@ body {
     padding: 20px;
 }
 
+/* Navigation Bar Styles */
+.navbar {
+    background-color: #0095ff;
+    overflow: hidden;
+}
+
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.navbar ul li {
+    flex: 1;
+    text-align: center;
+}
+
+.navbar ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.navbar ul li a:hover {
+    background-color: #8bcfffcc;
+    color: white;
+}
+
 h1, h2, h3 {
     color: #333;
     margin-bottom: 20px;
@@ -122,4 +154,33 @@ div {
 
 .box:nth-child(2) {
     background-color: #28a745; /* Different background for the second div */
+}
+
+
+/* experimenter name and path in the home page */
+
+.form-row {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.form-row label, 
+.form-row input[type="text"] {
+    margin-bottom: 10px; /* Remove any default margin at the bottom */
+}
+
+.form-row label {
+    min-width: 150px; /* Set a fixed width for labels */
+    margin-right: 10px;
+    width: 10%;
+}
+
+.form-row input[type="text"] {
+    /* flex: 1; /* Make the input fields flexible to take up available space */
+    padding: 10px;
+    margin-right: 10px; /* Add space between input and button */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 50%;
 }

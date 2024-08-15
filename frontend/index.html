@@ -7,22 +7,27 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Your content goes here -->
-    <h1>Welcome to Your Project</h1>
+    <div id="navbar-placeholder"></div>
 
     <!-- User input for name and path -->
-    <div>
-        <label for="name">Name:</label>
+
+    <div class="form-row">
+        <label for="lab">Lab:</label>
+        <input type="text" id="lab" name="lab">
+    </div>
+
+    <div class="form-row">
+        <label for="name">Experimenter:</label>
         <input type="text" id="name" name="name">
     </div>
 
-    <div>
+    <div class="form-row">
         <label for="path">Path to Save Data:</label>
         <input type="text" id="path" name="path">
     </div>
 
-    <!-- Button to add a new patient -->
-    <button id="add-patient">Add Patient</button>
+    <!-- Button to confirm setting -->
+    <button id="confirm"> Confirm</button>
 
     <div id="data-display"></div>
 
