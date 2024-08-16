@@ -22,12 +22,12 @@
 #$ -j y
 # Merge standard error with the job log (standard output)
 
-#$ -l h_rt=24:00:00,h_data=100G
-# Request resources: 24 hours of runtime (h_rt) and 100GB of memory (h_data)
+#$ -l h_rt=10:00:00,h_data=50G
+# Request resources: hours of runtime (h_rt) and memory (h_data)
 # Data limit applies to each task individually, no need to change if submit more tasks.
 
-#$ -pe shared 1
-# Request 1 core in a shared parallel environment
+#$ -pe shared 8
+# Request N core in a shared parallel environment
 
 # Email address to notify
 #$ -M $USER@mail
@@ -36,15 +36,15 @@
 # #$ -m bea
 # Uncomment to receive email notifications at the beginning (b), end (e), and if the job is aborted (a)
 
-#$ -t 1:30:1
-# Array job specification: run tasks with IDs from 1 to 10, with a step of 1 (i.e., 1, 2, 3, ..., 10)
+#$ -t 1:15:1
+# Array job specification: run tasks with IDs from 1 to N, with a step of 1 (i.e., 1, 2, 3, ..., N)
 # Each task will have a unique $TASK_ID
 
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="574"
-expIds="[5,6,9:11,15:17]" 
+patientId="1764"
+expIds="[35, 36, 39, 40]" 
 # if expIds is updated, do not skipExist any steps so that threshodold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
 
@@ -85,7 +85,7 @@ if [ ! -f $backupScript ]; then
 fi
 
 ## run matlab function:
-matlab  -nosplash -nodisplay -singleCompThread <<EOF
+matlab  -nosplash -nodisplay <<EOF
     addpath(genpath('${codePath}'));
     expIds = ${expIds};
     skipExist = ${skipExist};
