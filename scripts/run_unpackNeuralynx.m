@@ -23,19 +23,19 @@ addpath(genpath(fileparts(scriptDir)));
 skipExist = 1;
 
 % patterns should not include file extension such as .ncs or .nev
-macroPattern = '^[RL].*[0-9]';
+% macroPattern = '^[RL].*[0-9]';
 % macroPattern = []; % do not need to unpack macro in screening analysis.
-microPattern = '^G[A-D].*[0-9]';
+% microPattern = '^G[A-D].*[0-9]';
 
-% macroPattern = '^LFPx*';
-% microPattern = '^PDes*';
+macroPattern = '^LFPx*';
+microPattern = '^PDes*';
 
 eventPattern = 'Events*';
 
 %%% read montage setting to rename output file names
 % this is used on IOWA data on which .ncs files are named differently.
-% montageConfigFile = '/Users/XinNiuAdmin/Documents/MATLAB/nwbPipeline/montageConfig/montage_Patient-1721_exp-92_2024-08-01_14-59-54.json';
-montageConfigFile = [];
+montageConfigFile = '/Volumes/DATA/NLData/i764/montage_Patient-1764_exp-1_2024-08-16_11-00-26.json';
+% montageConfigFile = [];
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
