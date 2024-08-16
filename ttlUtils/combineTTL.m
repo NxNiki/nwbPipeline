@@ -27,4 +27,7 @@ function TTLCombined = combineTTL(filePath, expIds)
 
     TTLCombined = removeEmptyFields(TTLCombined, {'NA'}, {'trialStartTimeMat', 'trialEndTimeMat'});
 
+    % Rename fields for start and stop times to ensure compatibility with the NWB Trial object.
+    TTLCombined = renameStructField(TTLCombined, {'trialStartTime', 'trialEndTime'}, {'start_time', 'stop_time'});
+
 end
