@@ -7,12 +7,12 @@ cd(scriptDir)
 Device = 'Neuralynx Pegasus';
 manufacturer = 'Neuralynx';
 
-expIds = (8:14);
+expIds = (3:11);
 expName = 'MovieParadigm';
-patientId = 572;
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
+patientId = 573;
 
 
+filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/%s/%d_%s', expName, patientId, expName);
 expFilePath = fullfile(filePath, ['/Experiment', sprintf('-%d', expIds)]);
 outFilePath = fullfile(expFilePath, 'nwb');
 outNwbFile = fullfile(outFilePath, 'ecephys.nwb');
@@ -20,6 +20,7 @@ outNwbFile = fullfile(outFilePath, 'ecephys.nwb');
 if ~exist(outFilePath, "dir")
     mkdir(outFilePath);
 end
+% generateCore('2.6.0');
 
 %% read timestamp files and init nwb:
 
@@ -30,8 +31,6 @@ end
 
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
 sessionStartTime = datetime(date, 'Format', 'yyyy-MM-dd', 'TimeZone', 'local');
-
-% generateCore('2.6.0');
 
 nwb = NwbFile( ...
     'session_description', ['sub-' num2str(patientId), '_exp', sprintf('-%d', expIds), '_' expName],...
@@ -53,6 +52,11 @@ nwb.general_subject = types.core.Subject( ...
 
 outNwbFileTemp = saveNWB(nwb, outNwbFile, 0);
 
+%% save trials:
+
+trials = combineTTL(filePath, expIds);
+saveTTLToNwb(outNwbFileTemp, trials);
+
 %% micro and macro LFP:
 samplingRate = 2000;
 
@@ -68,4 +72,9 @@ tic
 saveSpikesToNwb(outNwbFileTemp, expFilePath);
 toc
 
+%% finished writing NWB file:
+
 saveNWB([], outNwbFile, 2);
+
+
+
