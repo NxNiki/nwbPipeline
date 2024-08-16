@@ -65,11 +65,11 @@ end
 logFile = fullfile(logPath, 'unpack.log');
 
 if length(unique(sampleFrequency))~=1
-    message = [fname, 'Sampling Frequency is not uniform across data set, please proceed with caution...'];
+    message = [fname, ': Sampling Frequency is not uniform across data set, please proceed with caution...'];
     logMessage(logFile, message);
 end
 if length(unique(channelNumber))~=1
-    message = [fname, 'You appear to be reading data from more than one channel. This code is not equipped for that...'];
+    message = [fname, ': More than one channel found. This code is not equipped for that...'];
     logMessage(logFile, message);
 end
 
@@ -86,7 +86,7 @@ else
     ADBitVolts = regexp(header{findADBitVolts},'(?<=ADBitVolts\s)[\d\.e\-]+', 'match');
     if isempty(ADBitVolts)
         ADBitVolts = NaN;
-        message = [fname, 'Cannot extract header info: ADBitVolts'];
+        message = [fname, ': Cannot extract header info: ADBitVolts'];
         logMessage(logFile, message);
     else
         ADBitVolts = str2double(ADBitVolts{1});
@@ -96,12 +96,12 @@ else
     InputInvertedText = regexp(header{findInputInverted}, '(?<=InputInverted\s)[a-zA-Z]+', 'match');
 
     if isempty(InputInvertedText)
-        message = [fname, 'Cannot extract header info: InputInverted'];
+        message = [fname, ': Cannot extract header info: InputInverted'];
         logMessage(logFile, message);
     elseif strcmpi(InputInvertedText{1}, 'true') || strcmpi(InputInvertedText{1}, 'True')
         InputInverted = -1;
     else
-        message = [fname, 'InputInverted not true'];
+        message = [fname, ': InputInverted not true'];
         logMessage(logFile, message);
     end
 end
