@@ -6,36 +6,12 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-% define filePath, experiment id and outFilePath here or comment it will trigger a UI to
-% select paths and experiment id:
-%%% ----------- UCLA Data: --------- %%%
-% expIds = [3: 5];
-% filePath = {...
-%     '/Volumes/DATA/NLData/D573/EXP3_PreSleep_Movie24_Control_1_Home_Improvement/2024-05-03_20-54-34',...
-%     '/Volumes/DATA/NLData/D573/EXP4_PreSleep_Movie24_Control_2_Top_Gun/2024-05-03_21-30-59', ...
-%     '/Volumes/DATA/NLData/D573/EXP5_PreSleep_Movie24_Control_3_Lion_King/2024-05-03_21-56-23', ...
-%     };
-% 
-% outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
+% define unpack config fie, or comment it will trigger a UI to
 
-% TO DO: read unpack config file to skip UI.
+unpackConfigFile = [];
 
-skipExist = 1;
-
-% patterns should not include file extension such as .ncs or .nev
-% macroPattern = '^[RL].*[0-9]';
-% macroPattern = []; % do not need to unpack macro in screening analysis.
-% microPattern = '^G[A-D].*[0-9]';
-
-macroPattern = '^LFPx*';
-microPattern = '^PDes*';
-
-eventPattern = 'Events*';
-
-%%% read montage setting to rename output file names
-% this is used on IOWA data on which .ncs files are named differently.
-montageConfigFile = '/Volumes/DATA/NLData/i764/montage_Patient-1764_exp-1_2024-08-16_11-00-26.json';
-% montageConfigFile = [];
+%%% skip already unpacked files:
+skipExist = 0;
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
@@ -44,8 +20,8 @@ numParallelTasks = 8;
 % numParallelTasks = [];
 
 %%
-if ~exist("filePath", "var") || isempty(filePath)
-    [filePath, expIds, outFilePath] = folderSelectionUI();
+if ~exist("filePath", "var") || isempty(unpackConfigFile)
+    [filePath, expIds, outFilePath, macroPattern, microPattern, eventPattern, montageConfigFile] = unpackNeuralynxUI();
 end
 
 if ~isempty(numParallelTasks)
