@@ -1,15 +1,15 @@
-function s = renameStructField(s, oldFieldNames, newFieldNames)
-    % renameStructFields Renames multiple fields in a structure.
+function s = renameStructFields(s, oldFieldNames, newFieldNames)
+    % renameStructFields Renames multiple fields in a structure or structure array.
     % 
     % s = renameStructFields(s, oldFieldNames, newFieldNames)
     %
     % Inputs:
-    %   s             - The structure containing the fields to be renamed.
+    %   s             - The structure or structure array containing the fields to be renamed.
     %   oldFieldNames - A character array or a cell array of the current names of the fields to rename.
     %   newFieldNames - A character array or a cell array of the new names for the fields.
     %
     % Output:
-    %   s - The structure with the renamed fields.
+    %   s - The structure or structure array with the renamed fields.
     %
     % Example:
     %   s = renameStructFields(s, {'oldField1', 'oldField2'}, {'newField1', 'newField2'});
@@ -28,20 +28,24 @@ function s = renameStructField(s, oldFieldNames, newFieldNames)
         error('The number of old field names must match the number of new field names.');
     end
 
-    % Loop through each pair of old and new field names
-    for i = 1:length(oldFieldNames)
-        oldFieldName = oldFieldNames{i};
-        newFieldName = newFieldNames{i};
+    % Define an anonymous function to rename fields in a single structure
+    renameFields = @(x) renameFieldsInStruct(x, oldFieldNames, newFieldNames);
 
-        % Check if the old field name exists
-        if isfield(s, oldFieldName)
-            % Add the new field with the same data as the old field
-            s.(newFieldName) = s.(oldFieldName);
+    % Use arrayfun to apply the renaming function to each element in the structure array
+    s = arrayfun(renameFields, s);
 
-            % Remove the old field
-            s = rmfield(s, oldFieldName);
-        else
-            warning('The field "%s" does not exist in the structure.', oldFieldName);
+    function x = renameFieldsInStruct(x, oldNames, newNames)
+        % Nested function to rename fields in a single structure
+        for i = 1:length(oldNames)
+            oldName = oldNames{i};
+            newName = newNames{i};
+
+            if isfield(x, oldName)
+                x.(newName) = x.(oldName);
+                x = rmfield(x, oldName);
+            else
+                warning('The field "%s" does not exist in the structure.', oldName);
+            end
         end
     end
 end
