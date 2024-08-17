@@ -22,6 +22,15 @@ numParallelTasks = 8;
 %%
 if ~exist("filePath", "var") || isempty(unpackConfigFile)
     [filePath, expIds, outFilePath, macroPattern, microPattern, eventPattern, montageConfigFile] = unpackNeuralynxUI();
+else
+    data = readJson(unpackConfigFile);
+    filePath = data.SelectedFolders;
+    expIds = data.ExperimentIds;
+    outFilePath = data.OutputFilePath;
+    macroPattern = data.macroPattern;
+    microPattern = data.microPattern;
+    eventPattern = data.eventPattern;
+    montageConfigFile = data.montageConfigFile;
 end
 
 if ~isempty(numParallelTasks)
