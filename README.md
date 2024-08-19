@@ -51,7 +51,7 @@ scripts/run_unpackNeuralynx
 
 You can either define the I/O path in the script or use the UI to select the file path by removing the path definition in the above script:
 
-![image](https://github.com/user-attachments/assets/762a63b0-cdb7-456e-8432-cb61db014e05)
+![image](https://github.com/user-attachments/assets/ad5a6c20-acfc-49a9-afdc-4aca135a00fe)
 
 
 If you want to rename the channels, set the montage config file (created by `MontageConfigUI.m`) in the script.
