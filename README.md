@@ -51,7 +51,8 @@ scripts/run_unpackNeuralynx
 
 You can either define the I/O path in the script or use the UI to select the file path by removing the path definition in the above script:
 
-![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/d84a562c-816c-4a61-ba5e-4da2062eaabe)
+![image](https://github.com/user-attachments/assets/762a63b0-cdb7-456e-8432-cb61db014e05)
+
 
 If you want to rename the channels, set the montage config file (created by `MontageConfigUI.m`) in the script.
 
