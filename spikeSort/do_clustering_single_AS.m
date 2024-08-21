@@ -66,7 +66,7 @@ spikeFileObj.tree = tree;
 [clust_num, temp, auto_sort] = find_temp(tree, clu, par);
 
 if ~isempty(ipermut)
-    clu = permuteClu(clu, ipermut);
+    clu = permuteClu(clu, ipermut, nspk);
 end
 
 classes = zeros(1, size(clu, 2)-2);
