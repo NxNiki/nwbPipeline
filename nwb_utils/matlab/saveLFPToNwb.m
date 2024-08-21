@@ -1,12 +1,12 @@
-function saveLFPToNwb(nwbFile, expFilePath, samplingRate, electrode_table_region, channel)
-% channel: 'LFP_micro' or 'LFP_macro'.
+function saveLFPToNwb(nwbFile, expFilePath, samplingRate, electrode_table_region, channelType)
+% channelType: 'LFP_micro' or 'LFP_macro'.
 
 
 if nargin < 5
-    channel = 'LFP_micro';
+    channelType = 'LFP_micro';
 end
 
-lfpFilePath = fullfile(expFilePath, channel);
+lfpFilePath = fullfile(expFilePath, channelType);
 lfpFiles = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
 lfpTimestampsFile = fullfile(lfpFilePath, 'lfpTimestamps.mat');
 
@@ -43,7 +43,7 @@ electrical_series = types.core.ElectricalSeries( ...
     'electrodes', electrode_table_region, ...
     'data_unit', 'volts', ...
     'data_conversion', 1e-6);
- 
+
 % LFP is for unfiltered local field potential data:
 % lfp = types.core.LFP('ElectricalSeries', electrical_series);
 lfpEphys = types.core.FilteredEphys('ElectricalSeries', electrical_series);
@@ -56,12 +56,12 @@ else
     ecephys_module = types.core.ProcessingModule( ...
         'description', 'extracellular electrophysiology');
 end
-ecephys_module.nwbdatainterface.set(channel, lfpEphys);
+ecephys_module.nwbdatainterface.set(channelType, lfpEphys);
 
 nwb.processing.set('ecephys', ecephys_module);
 saveNWB(nwb, nwbFile);
 
-nwb = nwbRead(nwbFile, 'ignorecache'); 
+nwb = nwbRead(nwbFile, 'ignorecache');
 % iteratively adding remaining channels:
 for i = 2: length(lfpFiles)
     fprintf('saveLFPToNwb: %s\n', lfpFiles{i});
@@ -73,7 +73,7 @@ for i = 2: length(lfpFiles)
         warning('LFP file: %s\n', lfpFiles{i});
         lfp = [lfp(:)', nan(1, lfpLength - length(lfp))];
     end
-    nwb.processing.get('ecephys').nwbdatainterface.get(channel).electricalseries.get('ElectricalSeries').data.append(lfp);
+    nwb.processing.get('ecephys').nwbdatainterface.get(channelType).electricalseries.get('ElectricalSeries').data.append(lfp);
 end
 
 

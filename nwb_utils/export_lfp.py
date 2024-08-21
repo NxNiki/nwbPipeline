@@ -18,6 +18,7 @@ from nwb_utils.nwb_exporter import NWBExporter
 def save_lfp_to_nwb(
     nwb_file: str,
     exp_file_path: Union[Path, str],
+    sampling_rate: Union[float, int],
     electrode_table_region: DynamicTableRegion,
     channel_type: str = "LFP_micro",
 ) -> None:

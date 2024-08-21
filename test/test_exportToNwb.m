@@ -14,7 +14,7 @@ end
 
 %% read timestamp files and init nwb:
 
-date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
+date = '1900-01-01'; % Provide default DEFULT_DATA to protect PHI. Note: This DEFULT_DATA is not the ACTUAL DEFULT_DATA of the experiment
 sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
 
 % generateCore('2.6.0');
@@ -53,5 +53,3 @@ toc
 
 %% finish writing to nwb:
 saveNWB([], outNwbFile, 2);
-
-

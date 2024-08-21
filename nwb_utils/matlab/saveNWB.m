@@ -1,5 +1,5 @@
 function fileNameTmp = saveNWB(nwb, fileName, stage, removeExist)
-% removeExist is used to avoid conflicting with previous saved data. It 
+% removeExist is used to avoid conflicting with previous saved data. It
 % takes effects only when you save a new nwb file (stage 0).
 % Otherwise, deleting existing nwb file will cause error in nwbExport due
 % to lazy loading.
@@ -7,7 +7,7 @@ function fileNameTmp = saveNWB(nwb, fileName, stage, removeExist)
 %   0: create a new file
 %   1: add data to existing file
 %   2: finish data export. (if nwb is empty, will only rename the file).
-    
+
 
     if nargin < 3
         if ~exist(fileName, "file")
@@ -22,7 +22,7 @@ function fileNameTmp = saveNWB(nwb, fileName, stage, removeExist)
     if nargin < 4
         removeExist = 1;
     end
-    
+
     switch stage
         case 0
             fileNameTmp = strrep(fileName, '.nwb', '_tmp.nwb');

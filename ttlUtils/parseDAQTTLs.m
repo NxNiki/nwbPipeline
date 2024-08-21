@@ -1,13 +1,13 @@
 function TTLs = parseDAQTTLs(eventsFile, ttlLogFiles, ttlSavePath)
 % timestamps in event file should be converted to seconds.
 % ttlCode is the TTL neuralyn received
-% ttlLog is the TTL experiment device send.
+% ttlLog is the TTL experiment DEVICE send.
 
 if nargin < 3
     ttlSavePath = ['TTLLog-', datetime('now', 'Format', 'yyyy-MM-dd_HH:mm:ss')];
 end
 
-if ~iscell(ttlLogFiles) 
+if ~iscell(ttlLogFiles)
     ttlLogFiles = {ttlLogFiles};
 end
 eventsFileObj = matfile(eventsFile, "Writable", false);
@@ -115,7 +115,7 @@ function [ttlCode, ts] = cleanTTLCode(ttlCode, ts)
     nlx_code = ttlCode;
     % log_ts = cell2mat(ttlLog(:,1))-ttlLog{1};
     % log_code = cell2mat(ttlLog(:,3));
-    
+
     counter = 1;
     while counter < length(nlx_ts)
         if (nlx_code(counter+1)-nlx_code(counter) ~= 1) && ...
@@ -126,7 +126,7 @@ function [ttlCode, ts] = cleanTTLCode(ttlCode, ts)
             counter = counter+1;
         end
     end
-    
+
     ts = nlx_ts+ts(1);
     ttlCode = nlx_code;
 end
@@ -134,15 +134,15 @@ end
 function bad_indices = findBadIndices(arr)
     % Initialize an empty array to store the indices of bad elements
     bad_indices = [];
-    
+
     % Initialize the last correct value as the first element in the array
     last_correct_value = arr(1);
-    
+
     % Iterate through the array starting from the second element
     for i = 2:length(arr)
         % Calculate expected next value (wrap around from 100 to 1)
         expected_next_value = mod(last_correct_value, 100) + 1;
-        
+
         % Check if current element matches the expected next value
         if arr(i) == expected_next_value
             % Update the last correct value
@@ -176,11 +176,8 @@ function [ttlCode, ts, ttlLog] = fillMissingCode(ttlCode, ts, ttlLog)
     if numMissing > 0 && all(ttlLogCode(numMissing+1:end) == ttlCode)
         ttlCode = [ttlLogCode(1:numMissing); ttlCode];
         ts = [repmat(ts(1), numMissing, 1); ts];
-        
+
         tsDiff = ttlLogTs(numMissing+1) - ttlLogTs(1:numMissing);
         ts(1:numMissing) = ts(1:numMissing) - tsDiff;
     end
 end
-
-
-

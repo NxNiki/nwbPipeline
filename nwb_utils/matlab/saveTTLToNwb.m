@@ -9,7 +9,7 @@ function saveTTLToNwb(nwbFile, TTLTable, TTLFields)
     trials = types.core.TimeIntervals( ...
     'colnames', TTLFields, ...
     'description', 'trial data and properties');
-    
+
     for i = 1: size(TTLTable, 2)
         rowValue = cell(1, length(TTLFields));
         for j = 1: length(TTLFields)
@@ -24,7 +24,7 @@ function saveTTLToNwb(nwbFile, TTLTable, TTLFields)
         % rowArgs = [rowArgs(:)]';
         trials.addRow(rowArgs{:});
     end
-     
+
     % trials.toTable();
     nwb.intervals_trials = trials;
 

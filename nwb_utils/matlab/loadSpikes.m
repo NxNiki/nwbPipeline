@@ -22,13 +22,13 @@ parfor i = 1:numFiles
     spikes = spikesFilesObj.spikes;
 
     if exist(timesFile, "file")
-        
+
         timesFileObj = matfile(timesFile);
         spikeClass = timesFileObj.cluster_class(:, 1);
         spikeTimestamps = timesFileObj.cluster_class(:, 2)';
 
         spikes(timesFileObj.spikeIdxRejected, :) = [];
-        
+
         % remove un-clustered spikes:
         spikes = spikes(spikeClass ~= 0,:);
         spikeClass = spikeClass(spikeClass ~= 0);
@@ -44,15 +44,15 @@ parfor i = 1:numFiles
     unitsWaveFormi = cell(length(units), 1);
     unitsWaveFormMeani = cell(length(units), 1);
     unitsLabeli = cell(length(units), 1);
-    
+
     % [~, spikeFileName] = fileparts(spikeFiles{i});
     % unitsLabeli(:) = {regexp(spikeFileName, 'G[A-D]\d-.*', 'match', 'once')};
     unitsLabeli(:) = {i - 1};
-    
+
     fprintf('unit:');
     for u = 1:length(units)
         fprintf(' %d...', units(u));
-    
+
         unitsTimeStampi{u} = spikeTimestamps(spikeClass==units(u));
         unitsWaveFormi{u} = spikes(spikeClass==units(u), :);
         unitsWaveFormMeani{u} = mean(spikes(spikeClass==units(u), :), 1)';
@@ -70,5 +70,3 @@ unitsTimeStamp = flatten(unitsTimeStamp);
 unitsWaveForm = flatten(unitsWaveForm);
 electrodeIndex = flatten(electrodeIndex);
 unitsWaveFormMean = cell2mat(flatten(unitsWaveFormMean))';
-
-
