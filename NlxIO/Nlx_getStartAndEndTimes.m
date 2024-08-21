@@ -1,9 +1,9 @@
 function [startTime, endTime, createdTime, closedTime] = Nlx_getStartAndEndTimes(filename)
 
 % Emily originally wrote this function to just look at headers, but it turns
-% out that the time of file creation can often be quite far off from the 
+% out that the time of file creation can often be quite far off from the
 % actual start of recording. So instead, we have to get the actual start
-% and stop timestamps and then convert them to a date.
+% and stop timestamps and then convert them to a DEFULT_DATA.
 
 % Xin use datetime to convert posixtime to dt object.
 
@@ -26,7 +26,7 @@ switch ext
             Nlx2MatEV_v3( filename, [1 0 0 0 1], 1,1, []);
         startEvent = cellfun(@(x)strcmp(x,'Starting Recording'), EventStrings);
         startTime = datetime(timeStamps(startEvent), 'ConvertFrom', 'posixtime');
-        
+
         endEvent = cellfun(@(x)strcmp(x,'Stopping Recording'), EventStrings);
         endTime = datetime(timeStamps(endEvent), 'ConvertFrom', 'posixtime');
     otherwise

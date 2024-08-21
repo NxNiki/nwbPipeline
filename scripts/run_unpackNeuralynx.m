@@ -7,7 +7,6 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 % define unpack config fie, or comment it will trigger a UI to
-
 unpackConfigFile = [];
 
 %%% skip already unpacked files:
@@ -15,7 +14,7 @@ skipExist = 0;
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
-% files are combined for sleep experiments. 
+% files are combined for sleep experiments.
 numParallelTasks = 8;
 % numParallelTasks = [];
 
@@ -68,7 +67,7 @@ for i = 1:length(expIds)
     %% unpack Event Files:
     eventOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_events', expId)];
     [inEventFiles, outEventFiles] = createIOFiles(eventOutFilePath, expOutFilePath, eventPattern);
-    
+
     tic
     unpackData(inEventFiles, outEventFiles, eventOutFilePath, 1, skipExist);
     toc
@@ -79,7 +78,7 @@ for i = 1:length(expIds)
     if ~isempty(macroPattern)
         macroOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_macro/', expId)];
         [inMacroFiles, outMacroFiles] = createIOFiles(macroOutFilePath, expOutFilePath, macroPattern, renameMacroChannels);
-    
+
         tic
         unpackData(inMacroFiles, outMacroFiles, macroOutFilePath, 1, skipExist);
         toc
@@ -91,7 +90,7 @@ for i = 1:length(expIds)
     if ~isempty(microPattern)
         microOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_micro/', expId)];
         [inMicroFiles, outMicroFiles] = createIOFiles(microOutFilePath, expOutFilePath, microPattern, renameMicroChannels);
-    
+
         tic
         unpackData(inMicroFiles, outMicroFiles, microOutFilePath, 1, skipExist);
         toc
@@ -99,8 +98,3 @@ for i = 1:length(expIds)
     end
 
 end
-
-
-
-
-

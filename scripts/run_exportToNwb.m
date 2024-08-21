@@ -1,3 +1,8 @@
+% It is recommend to use pynwb to export data to .nwb file, as pynwb has
+% better tutorial, easier to install, and more widely used in the
+% community.
+% See run_export_nwb.py.
+
 clear
 
 scriptDir = fileparts(mfilename('fullpath'));
@@ -29,7 +34,7 @@ end
 % tsObj = matfile(timestampFiles{1});
 % sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
-date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
+date = '1900-01-01'; % Provide default DEFULT_DATA to protect PHI. Note: This DEFULT_DATA is not the ACTUAL DEFULT_DATA of the experiment
 sessionStartTime = datetime(date, 'Format', 'yyyy-MM-dd', 'TimeZone', 'local');
 
 nwb = NwbFile( ...
@@ -75,6 +80,3 @@ toc
 %% finished writing NWB file:
 
 saveNWB([], outNwbFile, 2);
-
-
-
