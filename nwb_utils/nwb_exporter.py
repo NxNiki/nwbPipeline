@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from uuid import uuid4
 
+from create_nwb import create_nwb
 from dateutil import tz
 from pynwb import NWBHDF5IO, NWBFile
 from requests import session
@@ -54,6 +55,16 @@ class NWBExporter(NWBFile):  # type: ignore
         )
 
         self.data_file_path = data_file_path
+        self.out_file_path = os.path.join(data_file_path, "nwb")
+        self.out_nwb_file = os.path.join(self.out_file_path, "ecephys.nwb")
+
+        if not os.path.exists(self.out_file_path):
+            os.makedirs(self.out_file_path)
+
+        nwb = create_nwb(self.data_file_path)
+        # Save the NWB file
+        with NWBHDF5IO(self.out_nwb_file, "w") as nwb_io:
+            nwb_io.write(nwb)
 
     @property
     def spike_file_path(self) -> str:

@@ -1,6 +1,8 @@
 import os
 import re
-from typing import List, Tuple
+from datetime import datetime
+from pathlib import Path
+from typing import List, Tuple, Union
 
 from hdmf.common import DynamicTable, DynamicTableRegion
 from hdmf.utils import docval, get_docval, popargs
@@ -10,6 +12,23 @@ from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
 
 from nwb_utils.nwb_exporter import NWBExporter
+
+DEFAULT_DATE = "1900-01-01"
+
+
+def create_nwb(data_path: Union[Path, str]) -> NWBFile:
+    session_start_time = datetime.strptime(DEFAULT_DATE, "%Y-%m-%d")
+    nwb = NWBFile(
+        session_description=str(data_path),
+        identifier=str(data_path),
+        session_start_time=session_start_time,
+        timestamps_reference_time=session_start_time,
+        experimenter="My Name",  # optional
+        institution="UCLA",  # optional
+        related_publications="",  # optional
+    )
+
+    return nwb
 
 
 def create_electrode_table(
