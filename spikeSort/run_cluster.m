@@ -42,7 +42,7 @@ fprintf(fid, 'DirectedGrowth|\n');
 fprintf(fid, 'SaveSuscept|\n');
 fprintf(fid, 'WriteLables|\n');
 fprintf(fid, 'WriteCorFile~\n');
-if par.randomseed ~= 0
+if isfield(par, 'randomseed') && par.randomseed ~= 0
     fprintf(fid, 'ForceRandomSeed: %s\n', num2str(par.randomseed));
 end    
 fclose(fid);
