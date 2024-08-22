@@ -24,18 +24,8 @@ def save_lfp_to_nwb(
 ) -> None:
     # Step 1: Set up file paths and load LFP data
     lfp_file_path = os.path.join(exp_file_path, channel_type)
-    lfp_files = NWBExporter.list_files(lfp_file_path, "_lfp.mat", "._")
-    lfp_timestamps_file = os.path.join(lfp_file_path, "lfpTimestamps.mat")
-
-    # Load timestamps
-    timestamps_start, sampling_rate = get_timestamps(lfp_timestamps_file)
-
-
-    # Determine the maximum LFP length across files
-    lfp_length = 0
-    for lfp_file in lfp_files:
-        lfp_data = loadmat(os.path.join(lfp_file_path, lfp_file))
-        lfp_length = max(lfp_length, len(lfp_data["lfp"]))
+    timestamps_start, sampling_rate = get_timestamps(lfp_file_path)
+    lfp_files, lfp_length = get_lfp_files(lfp_file_path)
 
     # Step 2: Load LFP data from the first file
     lfp = get_lfp(os.path.join(lfp_file_path, lfp_files[0]), lfp_length)
@@ -85,17 +75,39 @@ def save_lfp_to_nwb(
 
         nbw_io.write(nwb)
 
-def get_timestamps(timestampsFile: str) -> Tuple[float, float]:
+
+def get_timestamps(file_path: Union[Path, str]) -> Tuple[float, float]:
+    lfp_timestamps_file = os.path.join(file_path, "lfpTimestamps.mat")
+
+    # Load timestamps
+    lfp_timestamps_data = loadmat(lfp_timestamps_file)
+    timestamps_start = lfp_timestamps_data["timestampsStart"].flatten()[0]
+    sampling_rate = lfp_timestamps_data["samplingRate"].flatten()[0]
+
+    return timestamps_start, sampling_rate
+
+
+def get_lfp_files(file_path: Union[Path, str]) -> Tuple[List[str], int]:
+    lfp_files = NWBExporter.list_files(file_path, "_lfp.mat", "._")
+    # Determine the maximum LFP length across files
+    lfp_length = 0
+    for lfp_file in lfp_files:
+        lfp_data = loadmat(os.path.join(file_path, lfp_file))
+        lfp_length = max(lfp_length, len(lfp_data["lfp"]))
+
+    return lfp_files, lfp_length
+
 
 def get_lfp(lfp_file: str, lfp_length: int) -> np.ndarray[float, Any]:
-    print(f"save LFP to nwb: {lfp_file}")
+    print(f"save_lfp_to_nwb: {lfp_file}")
     lfp_data = loadmat(lfp_file)
-    lfp = np.array(lfp_data["lfp"].flatten())
+    lfp = lfp_data["lfp"].flatten()  # type: ignore
 
     if len(lfp) < lfp_length:
         warning(
             "LFP length not the same across channels, filling short signals with NaNs."
         )
+        print(f"LFP file: {lfp_file}")
         lfp = np.concatenate((lfp, np.full(lfp_length - len(lfp), np.nan)))  # type: ignore
 
     return lfp
