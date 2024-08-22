@@ -7,13 +7,13 @@ import scipy.io as sio
 from pynwb import NWBHDF5IO
 
 
-def save_spikes_to_nwb(nwb_file_path: str, exp_file_path: str) -> None:
+def save_spikes_to_nwb(nwb_file: str, exp_file_path: Union[Path, str]) -> None:
     spike_file_path = os.path.join(exp_file_path, "CSC_micro_spikes")
 
     # Load spikes for all channels:
     (
         spike_timestamps,
-        spike_waveform,
+        _,
         spike_waveform_mean,
         spike_electrodes_idx,
     ) = load_spikes(spike_file_path)
@@ -22,7 +22,7 @@ def save_spikes_to_nwb(nwb_file_path: str, exp_file_path: str) -> None:
         print(f"Warning: no spikes detected in: {spike_file_path}")
         return
 
-    with NWBHDF5IO(nwb_file_path, "r+") as nwb_io:
+    with NWBHDF5IO(nwb_file, "r+") as nwb_io:
         nwb = nwb_io.read()
 
         nwb.add_unit_column(name="waveform_mean", description="Mean Spike Waveforms")
@@ -30,11 +30,14 @@ def save_spikes_to_nwb(nwb_file_path: str, exp_file_path: str) -> None:
             nwb.add_unit(
                 spike_times=spike_timestamp,
                 electrodes=spike_electrodes_idx[i],
-                waveform_mean=spike_waveform_mean,
+                waveform_mean=spike_waveform_mean[i],
             )
 
         nwb_io.write(nwb)
-        print(f"NWB file saved successfully to {nwb_file_path}")
+        print(f"NWB file saved successfully to {nwb_file}")
+
+    with NWBHDF5IO(nwb_file, "w") as nwb_io:
+        nwb_io.write(nwb)
 
 
 def load_spikes(
@@ -42,7 +45,7 @@ def load_spikes(
 ) -> Tuple[
     List[np.ndarray[np.float64, Any]],
     List[np.ndarray[np.float64, Any]],
-    np.ndarray[np.float64, Any],
+    List[np.ndarray[np.float64, Any]],
     List[int],
 ]:
     """
@@ -79,13 +82,13 @@ def load_spikes(
     return (
         units_timestamp,
         units_waveform,
-        np.array(units_waveform_mean).T,
+        units_waveform_mean,
         electrode_index,
     )
 
 
 def get_spikes(
-    spike_file_name: str, spike_file_path: str
+    spike_file_name: str, spike_file_path: Union[Path, str]
 ) -> Tuple[np.ndarray[float, Any], np.ndarray[float, Any], np.ndarray[float, Any]]:
     """
     read spikes and remove noise ones (cluster class 0)
