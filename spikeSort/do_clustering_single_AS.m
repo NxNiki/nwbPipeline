@@ -9,7 +9,7 @@ spikeCodeFileObj = matfile(spikeCodeFile);
 spikeCodes = spikeCodeFileObj.spikeCodes;
 
 par = set_parameters;
-par = update_parameters(par, param, 'clus');
+par = update_parameters(par, param, 'clus'); 
 par = update_parameters(par, param, 'batch_plot');
 
 % par.filename = spikeFile;
@@ -20,14 +20,6 @@ check_WC_params(par)
 % if isfield(par,'channels') && ~isnan(par.channels)
 %   par.max_inputs = par.max_inputs * par.channels;
 % end
-
-% [~, fileName, ~] = fileparts(spikeFile);
-% channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
-% par.channel = channel;
-% 
-% par.fname_in = fullfile(outputPath, ['tmp_data_wc_' channel]);
-% par.fname = fullfile(outputPath, ['data_' channel]);
-% par.fnamespc = fullfile(outputPath, ['data_wc_' channel]);
 
 par = updateParamForCluster(par, spikeFile);
 
@@ -121,7 +113,7 @@ for i=1:max(classes)
     if nSpikes > nFeatures
         M = mahal(inspk, inspk(inCluster, :));
         Lspk = 1-gammainc(M/2, nFeatures/2);
-        % Lspk = 1-chi2cdf(M,nFeatures);
+        % Lspk = 1-chi2cdf(M, nFeatures);
         removeFromClust = inCluster & Lspk' < 5e-3;
         classes(removeFromClust) = 0;
     end
