@@ -60,17 +60,22 @@ if exist(manualTimesFile, 'file')
 end
 
 spikeTimestamps=cluster_class(:, 2)'; % timestamps of spikes; gets loaded in line above.
+numSpikes = length(spikeTimestamps);
 
 spikeFileVars = who(spikeFileObj);
+timesFileVars = who(timesFileObj);
 if ismember('clu', spikeFileVars) && ismember('tree', spikeFileVars)
     clu = spikeFileObj.clu;
     tree = spikeFileObj.tree;
+    if ismember('ipermut', timesFileVars)
+        ipermut = timesFileObj.ipermut;
+    end
 else
     par = timesFileObj.par;
     par = updateParamForCluster(par, spikeFile);
     par.inputs = size(timesFileObj.inspk, 2);
 
-    getInspkAux(par, timesFileObj.inspk)
+    ipermut = getInspkAux(par, timesFileObj.inspk);
     [clu, tree] = run_cluster(par);
     spikeFileObj.clu = clu;
     spikeFileObj.tree = tree;
@@ -78,28 +83,15 @@ end
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 
-if ismember('ipermut', who(timesFileObj))
-    clu = permuteClu(clu, timesFileObj.ipermut);
-    USER_DATA{12} = timesFileObj.ipermut;
-end
-
-
-numSpikes = length(spikeTimestamps);
 if size(clu, 2) - 2 < numSpikes
     clu = [clu, zeros(size(clu, 1), numSpikes - size(clu, 2) + 2)];
 end
 
 spikes = spikeFileObj.spikes;
-% if exist('ipermut', 'var')
-%     clu_aux = zeros(size(clu,1), length(spikeTimestamps)) + 1000; % why +1000?
-%     for i=1:length(ipermut)
-%         clu_aux(:,ipermut(i)+2) = clu(:,i+2);
-%     end
-%     clu_aux(:,1:2) = clu(:,1:2);
-%     clu = clu_aux; clear clu_aux
-%     USER_DATA{12} = ipermut;
-% end
-
+if exist('ipermut', 'var') && ~isempty(ipermut)
+    clu = permuteClu(clu, ipermut, numSpikes);
+    USER_DATA{12} = ipermut;
+end
 
 if ismember("spikeIdxRejected", who(timesFileObj))
     % times_* file created by automatic clustering:
