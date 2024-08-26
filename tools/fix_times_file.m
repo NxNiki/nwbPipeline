@@ -45,7 +45,9 @@ for i = 1:length(files)
     fprintf("mean diff on timestamps: %f\n", mean(diff(cluster_class(:, 2))));
     fprintf("duration of experiment (sec): %f\n", exp_duration);
 
-    save(fullfile(path, files(i).name), 'cluster_class', '-append');
+    if factor ~= 1
+        save(fullfile(path, files(i).name), 'cluster_class', '-append');
+    end
 
     sortBy = {'Ben', char(datetime("now"))};
     save(outFile, 'cluster_class', 'sortBy');
