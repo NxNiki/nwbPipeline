@@ -26,7 +26,7 @@ for i = 1: length(channels)
     new_file = fullfile(out_file_path, out_file_name);
 
     copyfile(old_file, new_file);
-    new_files = [new_files, {new_file}];
+    new_files = [new_files; {new_file}];
 end
 
 writecell(new_files, fullfile(out_file_path, 'outFileNames.csv'));
