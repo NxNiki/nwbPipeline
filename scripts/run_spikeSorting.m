@@ -10,7 +10,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/FaceRecogn
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = [1, 1, 0];
+skipExist = [0, 0, 0];
 runRemovePLI = true;
 
 [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
