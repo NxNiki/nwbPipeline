@@ -1,5 +1,9 @@
-function [signal, samplingIntervalSeconds] = readCSC(filename)
+function [signal, samplingIntervalSeconds] = readCSC(filename, runRemovePLI)
 % samplingInterval will be converted to double type in seconds.
+
+if nargin < 2
+    runRemovePLI = false;
+end
 
 matObj = matfile(filename, 'Writable', false);
 signal = matObj.data;
@@ -22,6 +26,10 @@ else
         warning("scale samplingIntervalSeconds down by 1000")
         samplingIntervalSeconds = samplingIntervalSeconds/1000;
     end
+end
+
+if runRemovePLI
+    signal = removePLI(double(signal), 1/samplingIntervalSeconds, numel(60:60:3060), [50 .2 1], [.1 4 1], 2, 60);
 end
 
 end
