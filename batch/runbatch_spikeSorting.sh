@@ -43,11 +43,11 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="570"
-expIds="[4, 5, 6, 7]" 
+patientId="574"
+expIds="[4:7]" 
 # if expIds is updated, do not skipExist any steps so that threshodold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
-runRemovePLI = true
+runRemovePLI="true"
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
@@ -90,9 +90,10 @@ matlab  -nosplash -nodisplay <<EOF
     addpath(genpath('${codePath}'));
     expIds = ${expIds};
     skipExist = ${skipExist};
+    runRemovePLI = ${runRemovePLI};
     workingDir = getDirectory();
     filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}');
-    batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
+    batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist, runRemovePLI);
     system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;']);
     exit
 EOF
