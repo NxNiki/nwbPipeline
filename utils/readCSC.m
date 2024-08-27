@@ -16,6 +16,12 @@ if isa(matObj.samplingInterval, "duration")
     samplingIntervalSeconds = seconds(matObj.samplingInterval);
 else
     samplingIntervalSeconds = matObj.samplingInterval;
+
+    % check units of sampling intervals:
+    while 1/samplingIntervalSeconds < 500
+        warning("scale samplingIntervalSeconds down by 1000")
+        samplingIntervalSeconds = samplingIntervalSeconds/1000;
+    end
 end
 
 end

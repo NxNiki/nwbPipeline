@@ -10,7 +10,9 @@ else
     duration = tsFileObj.timeend - tsFileObj.time0;
 end
 
-if isa(tsFileObj.samplingInterval, "duration")
+if ~ismember("samplingInterval", who(tsFileObj))
+    samplingIntervalSeconds = NaN;
+elseif isa(tsFileObj.samplingInterval, "duration")
     samplingIntervalSeconds = seconds(tsFileObj.samplingInterval);
 else
     samplingIntervalSeconds = tsFileObj.samplingInterval;
