@@ -43,10 +43,11 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="1764"
-expIds="[35, 36, 39, 40]" 
+patientId="570"
+expIds="[4, 5, 6, 7]" 
 # if expIds is updated, do not skipExist any steps so that threshodold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
+runRemovePLI = true
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
