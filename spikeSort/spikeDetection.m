@@ -1,4 +1,4 @@
-function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist)
+function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist, runRemovePLI)
 %spikeDetection Summary of this function goes here
 %   cscFiles cell(m, n). m: number of channels. n: number of files in each
 %   channel. spikes detected from file in each row will be combined.
@@ -10,6 +10,10 @@ end
 
 if nargin < 5
     skipExist = true;
+end
+
+if nargin < 6
+    runRemovePLI = false;
 end
 
 saveXfDetect = false;
@@ -51,7 +55,7 @@ parfor i = 1: size(cscFiles, 1)
     spikeTimestamps = cell(nSegments, 1);
     duration = 0;
 
-    [outputStruct, param] = getDetectionThresh(channelFiles);
+    [outputStruct, param] = getDetectionThresh(channelFiles, runRemovePLI);
 
     for j = 1: nSegments
         if ~exist(channelFiles{j}, "file")
@@ -59,7 +63,7 @@ parfor i = 1: size(cscFiles, 1)
             continue
         end
 
-        signal = readCSC(channelFiles{j});
+        signal = readCSC(channelFiles{j}, runRemovePLI);
         [timestamps, dur] = readTimestamps(timestampFiles{j});
         duration = duration + dur;
 

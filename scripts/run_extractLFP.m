@@ -1,10 +1,10 @@
 % run_extractLFP
 clear
 
-expIds = (3:11);
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
+expIds = [4];
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/FaceRecognition/486_FaceRecognition';
 
-% 0: will remove all previous unpack files.
+% 0: will remove all previous extracted files.
 % 1: skip existing files.
 skipExist = [0, 1];
 saveRaw = false;

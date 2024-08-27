@@ -11,6 +11,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/FaceRecogn
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = [1, 1, 0];
+runRemovePLI = true;
 
 [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
 
@@ -21,7 +22,7 @@ delete(gcp('nocreate'))
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
-spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1));
+spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI);
 disp('Spike Detection Finished!')
 
 %% spike clustering:

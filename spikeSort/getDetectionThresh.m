@@ -1,8 +1,12 @@
-function [outputStruct, param] = getDetectionThresh(channelFiles)
+function [outputStruct, param] = getDetectionThresh(channelFiles, runRemovePLI)
 % Does the first few steps of spike detection to find the threshold. This
 % allows for using the same threshold across multiple sessions. Returns
 % thr, as well as a struct with other variables created so that these steps
 % can be skipped in spikeDetect if the struct is passed in.
+
+    if nargin < 2
+        runRemovePLI = false;
+    end
 
     param = set_parameters();
     thr = nan(length(channelFiles), 1);
@@ -15,7 +19,7 @@ function [outputStruct, param] = getDetectionThresh(channelFiles)
             warning("file not exist: %s", channelFiles{i})
             continue
         end
-        [x, samplingInterval] = readCSC(channelFiles{i});
+        [x, samplingInterval] = readCSC(channelFiles{i}, runRemovePLI);
         % assume same sampling interval across channels.
         fprintf("sampling frequency: %d\n", 1/samplingInterval)
         param.sr = 1/samplingInterval;
