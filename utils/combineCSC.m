@@ -28,7 +28,10 @@ for i = 1: numFiles
     [timestampsCombined{i}, ~, samplingInterval(i)] = readTimestamps(timestampsFiles{i});
     if exist(signalFiles{i}, "file")
         fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
-        signalCombined{i} = readCSC(signalFiles{i});
+        [signalCombined{i}, samplingIntervalCSC] = readCSC(signalFiles{i});
+        if isnan(samplingInterval(i))
+            samplingInterval(i) = samplingIntervalCSC;
+        end
     else
         warning("CSC file not exist: \n%s.\n Data will be filled with NaNs\n", signalFiles{i});
         signalCombined{i} = nan(numel(timestampsCombined{i}), 1);
