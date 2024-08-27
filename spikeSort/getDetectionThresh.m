@@ -17,6 +17,7 @@ function [outputStruct, param] = getDetectionThresh(channelFiles)
         end
         [x, samplingInterval] = readCSC(channelFiles{i});
         % assume same sampling interval across channels.
+        fprintf("sampling frequency: %d\n", 1/samplingInterval)
         param.sr = 1/samplingInterval;
 
         [~, ~, noise_std_detect(i), noise_std_sorted(i), thr(i), thrmax(i)] = highPassFilter(x, param);
