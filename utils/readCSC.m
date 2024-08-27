@@ -8,7 +8,10 @@ end
 matObj = matfile(filename, 'Writable', false);
 signal = matObj.data;
 
-if ismember('ADBitVolts', who('-file', filename)) && ~isnan(matObj.ADBitVolts)
+if runRemovePLI && ismember('signalRemovePLI', who('-file', filename))
+    signal = matObj.signalRemovePLI;
+    runRemovePLI = false;
+elseif ismember('ADBitVolts', who('-file', filename)) && ~isnan(matObj.ADBitVolts)
     signal = single(signal(:)) * matObj.ADBitVolts * 1e6; % convert signal to micro volt
 else
     message = 'ADBitVolts is NaN; your CSC data will not be scaled';
@@ -29,7 +32,10 @@ else
 end
 
 if runRemovePLI
-    signal = removePLI(double(signal), 1/samplingIntervalSeconds, numel(60:60:3060), [50 .2 1], [.1 4 1], 2, 60);
+    signalRemovePLI = removePLI(double(signal), 1/samplingIntervalSeconds, numel(60:60:3060), [50 .2 1], [.1 4 1], 2, 60);
+    matObj = matfile(filename, 'Writable', true);
+    matObj.signalRemovePLI = signalRemovePLI;
+    signal = signalRemovePLI;
 end
 
 end
