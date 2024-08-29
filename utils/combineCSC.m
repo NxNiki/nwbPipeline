@@ -4,9 +4,13 @@ function [signal ,timestamps, samplingIntervalDuration, timestampsStart] = combi
 
 % signalFiles: cell(n, 1)
 % timestampFiles: cell(n, 1)
+% maxGapDuration: the max duration of gaps filled between experiments or
+%   segments caused by experiment pause. 
+
 
 if nargin < 3 || isempty(maxGapDuration)
-    maxGapDuration = milliseconds(2);
+    % maxGapDuration = milliseconds(2); 
+    maxGapDuration = inf;
 end
 
 if nargin < 4

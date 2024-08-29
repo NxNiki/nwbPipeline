@@ -140,7 +140,7 @@ for i = 1: numFiles
     % save timestamps:
     if ~exist(lfpTimestampFileName, "file")
         lfpTimestampFileObj = matfile(lfpTimestampFileName, "Writable", true);
-        lfpTimestampFileObj.lfpTimestamps = downsampleTs;
+        lfpTimestampFileObj.lfpTimestamps = compressTimestamps(downsampleTs);
         lfpTimestampFileObj.experimentName = experimentName;
         lfpTimestampFileObj.timestampsStart = timestampsStart;
     end
