@@ -43,11 +43,11 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="574"
-expIds="[4:7]" 
+patientId="555"
+expIds="[3, 4, 5]" 
+runRemovePLI="false"
 # if expIds is updated, do not skipExist any steps so that threshodold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
-runRemovePLI="true"
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
@@ -102,6 +102,9 @@ EOF
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
 echo " "
+
+mkdir -p $HOME/sgelog/$expName-$patientId
+mv $HOME/sgelog/job-spikeSort-$JOB_ID/task_$TASK_ID.txt $HOME/sgelog/$expName-$patientId/job-spikeSort-$JOB_ID/task_$TASK_ID.txt
 
 # this site shows how to do array jobs: https://info.hpc.sussex.ac.uk/hpc-guide/how-to/array.html
 # (better than the Hoffman site https://www.hoffman2.idre.ucla.edu/Using-H2/Computing/Computing.html#how-to-build-a-submission-script)
