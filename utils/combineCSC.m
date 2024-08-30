@@ -1,6 +1,7 @@
-function [signal ,timestamps, samplingIntervalDuration, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
-% combineCSC Combine CSC signals. filling gaps with NaNs if gap between
-% segments larger than threshold.
+function [signal, timestamps, samplingIntervalDuration, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
+% combineCSC: Combine CSC signals. filling gaps with NaNs if gap between
+% segments larger than threshold. Set signalFiles empty to only process
+% timestampsFiles.
 
 % signalFiles: cell(n, 1)
 % timestampFiles: cell(n, 1)
@@ -19,21 +20,32 @@ end
 
 GAP_THRESHOLD = 2;
 
-
-numFiles = length(signalFiles);
-if numFiles ~= length(timestampsFiles)
-    error('signalFiles and timeStampFiles should have same length!');
+processSignal = true;
+if isempty(timestampsFiles)
+    error('combineCSC: timeStampFiles cannot be empty!');
+elseif isempty(signalFiles)
+    processSignal = false;
+    warning('combineCSC: no signal files');
+elseif length(timestampsFiles) ~= length(signalFiles)
+    error('combineCSC: length of timesstampsFiles and signalFiles not match!')
 end
+
+numFiles = max(length(signalFiles), length(timestampsFiles));
+
 signalCombined = cell(1, numFiles);
 timestampsCombined = cell(1, numFiles);
 samplingInterval = nan(numFiles, 1);
 
 for i = 1: numFiles
     [timestampsCombined{i}, ~, samplingInterval(i)] = readTimestamps(timestampsFiles{i});
-    if exist(signalFiles{i}, "file")
+    if ~processSignal
+        continue
+    elseif exist(signalFiles{i}, "file")
         fprintf('reading csc (order %d): \n%s \n', i, signalFiles{i});
         [signalCombined{i}, samplingIntervalCSC] = readCSC(signalFiles{i});
         if isnan(samplingInterval(i))
+            % samplingInterval may not exist in older version of timestamps
+            % file and will return as NaN:
             samplingInterval(i) = samplingIntervalCSC;
         end
     else
@@ -46,9 +58,10 @@ end
 timestampLength = cellfun("length", timestampsCombined);
 signalLength = cellfun("length", signalCombined);
 
-if any(timestampLength ~= signalLength)
+if any(signalLength ~= 0 ) && any(timestampLength ~= signalLength)
     error(["missmatched length of signal and timestamps: \n", sprintf('%s \n', signalFiles{timestampLength ~= signalLength})])
 end
+
 samplingInterval = unique(samplingInterval(~isnan(samplingInterval)));
 if length(samplingInterval) > 1
     error('sampling Interval not match across files!');
@@ -67,12 +80,18 @@ for i = 2: numFiles
         timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + (0: samplingInterval: samplingInterval * (gapLength - 1));
     end
 end
-signalCombined = [signalCombined(:), signalGap(:)]';
-signal = [signalCombined{:}];
+
 timestampsCombined = [timestampsCombined(:), timestampsGap(:)]';
 timestamps = [timestampsCombined{:}];
 
-if isempty(signal) || isempty(timestamps)
+if processSignal
+    signalCombined = [signalCombined(:), signalGap(:)]';
+    signal = [signalCombined{:}];
+else
+    signal = [];
+end
+
+if isempty(timestamps)
     timestampsStart = [];
     return
 end
