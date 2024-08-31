@@ -1,18 +1,14 @@
-function outputFiles = extractLFP(cscFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, outputPath, experimentName, skipExist, saveRaw)
+function outputFiles = extractLFP(cscFiles, timestampFiles, lfpTimestamps, spikeDetectFiles, spikeClusterFiles, outputPath, skipExist, saveRaw)
 % remove spikes and downsample csc signal to 2000k hz.
 % for macros or micro with no spikes detected remove spikes will be
 % skipped.
 
-if nargin < 6 || isempty(experimentName)
-    experimentName = '';
-end
-
-if nargin < 7 || isempty(skipExist)
+if nargin < 6 || isempty(skipExist)
     skipExist = true;
 end
 
 % save Raw signals to check spikes are removed correctly (see run_plotLFP.m).
-if nargin < 8
+if nargin < 7
     saveRaw = false;
 end
 
@@ -27,7 +23,6 @@ for i = 1: numFiles
     channelName = extractChannelName(channelFilename, '.*(?=_\d+)');
     lfpFilename = fullfile(outputPath, [channelName, '_lfp.mat']);
     lfpFilenameTemp = fullfile(outputPath, [channelName, '_lfp_temp.mat']);
-    lfpTimestampFileName = fullfile(outputPath, 'lfpTimestamps.mat');
     
     if exist(lfpFilename, "file") && skipExist
         continue
@@ -43,7 +38,7 @@ for i = 1: numFiles
     % to reduce edge effects - especially for the sleep data 
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
-    [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
+    [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
     if isempty(cscSignal) || all(isnan(cscSignal))
         return
@@ -117,7 +112,7 @@ for i = 1: numFiles
         warning('deviated sampling frequency: %f', Fs);
     end
 
-    [lfpSignal, downsampleTs] = antiAliasing(cscSignalSpikeInterpolated, timestamps, Fs);
+    lfpSignal = antiAliasing(cscSignalSpikeInterpolated, timestamps, Fs, lfpTimestamps);
 
     % save LFP:
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
@@ -137,13 +132,6 @@ for i = 1: numFiles
     end
     movefile(lfpFilenameTemp, lfpFilename);
 
-    % save timestamps:
-    if ~exist(lfpTimestampFileName, "file")
-        lfpTimestampFileObj = matfile(lfpTimestampFileName, "Writable", true);
-        lfpTimestampFileObj.lfpTimestamps = compressTimestamps(downsampleTs);
-        lfpTimestampFileObj.experimentName = experimentName;
-        lfpTimestampFileObj.timestampsStart = timestampsStart;
-    end
 end
 end
 

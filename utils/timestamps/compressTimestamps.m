@@ -12,14 +12,18 @@ function compressedTs = compressTimestamps(timestamps)
     ts = [1:1:10, 20:1:30, 40:1:60];
     cts = compressTimestamps(ts)
     unts = uncompressTimestamps(cts)
+
+    ts = [1:1:10, 20:2:30, 40:3:60];
+    cts = compressTimestamps(ts)
+    unts = uncompressTimestamps(cts)
 %}
 
 % see also linearizeTimestamps.m, uncompressTimestamps.m
 
 
-timestamps_diff = diff(timestamps);
-sampling_interval = min(timestamps_diff);
-gap_index = find(timestamps_diff > sampling_interval);
+max_sampling_interval = getMaxSamplingInterval(timestamps, 10);
+
+[gap_index, ~] = getTimestampGap(timestamps, max_sampling_interval);
 
 compressedTs = nan(length(gap_index) + 1, 3);
 gap_index = [0, gap_index(:)', length(timestamps)];
