@@ -29,8 +29,6 @@ scripts/*.mat
 
 .idea/*
 
-*.cfg
-*montage_*.json
 
 batch/sedDLFclD
 

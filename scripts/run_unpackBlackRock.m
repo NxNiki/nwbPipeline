@@ -6,11 +6,10 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-%%% ----------- UCLA Data: --------- %%%
 skipExist = 0;
 expIds = 4;
 filePath = {...
-    '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/Experiment4/Neural Data/20240720-173300/',...
+    '/Volumes/DATA/NLData/D574/EXP4_Screening2/20240720-173300/',...
     };
 
 outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/';
