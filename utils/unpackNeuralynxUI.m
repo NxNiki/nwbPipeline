@@ -201,6 +201,12 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
         end
     end
 
+%% Function to add channel pattern label:
+    function value = addChannelPattern(newPattern, existPatterns)
+        existPatterns = [existPatterns(:); {newPattern}];
+        value = length(existPatterns);
+    end
+
 %% Confirm Selection Function (also saves to JSON)
     function confirmSelection(~, ~)
         rawIds = get(expIdInput, 'String');
@@ -292,11 +298,19 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
         end
 
         if isfield(data, 'macroPattern') && ischar(data.macroPattern)
-            set(macroPatternInput, 'String', data.macroPattern);
+            value = find(ismember(data.macroPattern, macroPatternLabel));
+            if isempty(value)
+                [value, macroPatternLabel] = addChannelPattern(data.macroPattern, macroPatternLabel);
+            end
+            set(macroPatternInput, 'Value', value);
         end
 
         if isfield(data, 'microPattern') && ischar(data.microPattern)
-            set(microPatternInput, 'String', data.microPattern);
+            value = find(ismember(data.microPattern, microPatternLabel));
+            if isempty(value)
+                [value, microPatternLabel] = addChannelPattern(data.microPattern, microPatternLabel);
+            end
+            set(microPatternInput, 'Value', value);
         end
 
         if isfield(data, 'eventPattern') && ischar(data.eventPattern)
