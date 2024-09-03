@@ -69,24 +69,6 @@ echo " "
 echo "Start Matlab"
 echo "run $mode, task id: $SGE_TASK_ID, total tasks: $total_tasks"
 
-
-## make a copy of batch script:
-# Get the directory containing the currently executing script
-cd ${codePath}/batch
-if [ ! -d jobs_${expName} ]; then
-    mkdir jobs_${expName}
-fi
-
-backupScript="jobs_${expName}/runbatch_spikeSorting_${expName}${patientId}_$JOB_ID.sh"
-# check if backup script is already saved by previous task:
-if [ ! -f $backupScript ]; then
-    echo "backup job script: $backupScript"
-    cp runbatch_spikeSorting.sh $backupScript
-    sed -i '72,89d' $backupScript
-    sed -i '43i# THIS IS AUTOMATICALLY GENERATED SCRIPT.' $backupScript
-    sed -i '44i# YOU CAN SUBMIT THIS SCRIPT TO RERUN THIS JOB' $backupScript
-fi
-
 ## run matlab function:
 matlab  -nosplash -nodisplay <<EOF
     addpath(genpath('${codePath}'));
