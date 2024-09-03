@@ -47,3 +47,5 @@ test/wave_clus/fig2print_manual_*_wave_clus_figure.jpg
 test/neuralynx/lfpTimestamps.mat
 test/neuralynx/LFP_macro/
 test/neuralynx/LFP_micro/
+
+montageConfig/configFiles/
