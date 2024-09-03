@@ -79,12 +79,14 @@ matlab  -nosplash -nodisplay <<EOF
     filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}');
 
     if strcmp('${mode}', 'spikeSorting')
+        disp("run spike sorting");
         batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist, runRemovePLI);
     elseif strcmp('${mode}', 'extractLFP')
+        disp("run extract LFP");
         batch_extractLFP($SGE_TASK_ID, $total_tasks, expIds, filePath);
     else
         error('Unknown mode: ${mode}');
-    fi
+    end
 
     system(['find ', filePath, ' -user $USER -exec chmod 775 {} \;']);
     exit
