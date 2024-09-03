@@ -7,9 +7,9 @@ cd(scriptDir)
 Device = 'Neuralynx Pegasus';
 manufacturer = 'Neuralynx';
 
-expIds = (3:11);
+expIds = (8:14);
 expName = 'MovieParadigm';
-patientId = 573;
+patientId = 572;
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/573_MovieParadigm';
 
 
@@ -29,7 +29,7 @@ end
 % sessionStartTime = datetime(tsObj.timeStamps(1,1), 'convertfrom','posixtime', 'Format','dd-MMM-yyyy HH:mm:ss.SSS');
 
 date = '1900-01-01'; % Provide default date to protect PHI. Note: This date is not the ACTUAL date of the experiment 
-sessionStartTime = datetime(date,'Format','yyyy-MM-dd', 'TimeZone', 'local');
+sessionStartTime = datetime(date, 'Format', 'yyyy-MM-dd', 'TimeZone', 'local');
 
 % generateCore('2.6.0');
 
@@ -51,19 +51,21 @@ nwb.general_subject = types.core.Subject( ...
     'sex', 'M' ...
 );
 
-saveNWB(nwb, outNwbFile, 1)
+outNwbFileTemp = saveNWB(nwb, outNwbFile, 0);
 
 %% micro and macro LFP:
 samplingRate = 2000;
 
 tic
-[electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(outNwbFile, expFilePath);
-saveLFPToNwb(outNwbFile, expFilePath, samplingRate, electrode_table_region_micro, 'LFP_micro');
-saveLFPToNwb(outNwbFile, expFilePath, samplingRate, electrode_table_region_macro, 'LFP_macro');
+[electrode_table_region_micro, electrode_table_region_macro] = createElectrodeTable(outNwbFileTemp, expFilePath);
+saveLFPToNwb(outNwbFileTemp, expFilePath, samplingRate, electrode_table_region_micro, 'LFP_micro');
+saveLFPToNwb(outNwbFileTemp, expFilePath, samplingRate, electrode_table_region_macro, 'LFP_macro');
 toc
 
 %% spikes:
 
 tic
-saveSpikesToNwb(outNwbFile, expFilePath)
+saveSpikesToNwb(outNwbFileTemp, expFilePath);
 toc
+
+saveNWB([], outNwbFile, 2);

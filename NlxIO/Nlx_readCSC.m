@@ -62,14 +62,14 @@ for i = 1:length(incompleteBlocks)
 end
 
 [~, fname] = fileparts(fileName);
-logFile = fullfile(logPath, [fname, '.log']);
+logFile = fullfile(logPath, 'unpack.log');
 
 if length(unique(sampleFrequency))~=1
-    message = 'Sampling Frequency is not uniform across data set, please proceed with caution...';
+    message = [fname, ': Sampling Frequency is not uniform across data set, please proceed with caution...'];
     logMessage(logFile, message);
 end
 if length(unique(channelNumber))~=1
-    message = 'You appear to be reading data from more than one channel. This code is not equipped for that...';
+    message = [fname, ': More than one channel found. This code is not equipped for that...'];
     logMessage(logFile, message);
 end
 
@@ -79,14 +79,14 @@ InputInverted = 1;
 if isempty(header)
     % log this.
     ADBitVolts = NaN;
-    message = 'Empty header info.';
+    message = [fname, ': Empty header info.'];
     logMessage(logFile, message);
 else
     findADBitVolts = cellfun(@(x)~isempty(regexp(x, 'ADBitVolts', 'once')), header);
     ADBitVolts = regexp(header{findADBitVolts},'(?<=ADBitVolts\s)[\d\.e\-]+', 'match');
     if isempty(ADBitVolts)
         ADBitVolts = NaN;
-        message = 'Cannot extract header info: ADBitVolts';
+        message = [fname, ': Cannot extract header info: ADBitVolts'];
         logMessage(logFile, message);
     else
         ADBitVolts = str2double(ADBitVolts{1});
@@ -96,12 +96,12 @@ else
     InputInvertedText = regexp(header{findInputInverted}, '(?<=InputInverted\s)[a-zA-Z]+', 'match');
 
     if isempty(InputInvertedText)
-        message = 'Cannot extract header info: InputInverted';
+        message = [fname, ': Cannot extract header info: InputInverted'];
         logMessage(logFile, message);
-    elseif strcmpi(InputInvertedText{1}, 'true')
+    elseif strcmpi(InputInvertedText{1}, 'true') || strcmpi(InputInvertedText{1}, 'True')
         InputInverted = -1;
     else
-        message = 'Unrecognized header info: InputInverted';
+        message = [fname, ': InputInverted not true'];
         logMessage(logFile, message);
     end
 end

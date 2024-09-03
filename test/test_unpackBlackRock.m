@@ -40,6 +40,7 @@ for i = 1: length(filePath)
         warning('zero or multiple .ns3 files detected!\n unpack macro for %s is skipped.', filePath{i});
         continue
     end
+    
     inFile = fullfile(filePath{i}, macroFile.name);
     unpackBlackRock(inFile, expFilePath, renameMacroChannels, skipExist);
 

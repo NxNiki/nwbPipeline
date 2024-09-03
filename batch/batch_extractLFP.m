@@ -1,9 +1,7 @@
 function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     % extract LFP after spike detection and clustering (spike sorting).
-    % run can modify this script and run on different patients/exp when
-    % at least one previous job is running (a temporary job script is created).
 
-    if nargin < 1
+    if isempty(workerId) || isempty(totalWorkers)
         % run script without queue:
         workerId = 1;
         totalWorkers = 1;
@@ -14,27 +12,25 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
         return
     end
 
-    if nargin < 3
-        addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
-        workingDir = getDirectory();
-
-        expIds = (4:7);
-        filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
-
-        skipExist = [0, 0];
-    end
-
     if length(skipExist) == 1
         skipExist = [skipExist, skipExist];
     end
+    
     saveRaw = false;
+    lfpFs = 2000; % Hz;
 
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
 
-    %% micro electrodes:
+    %% save down sampled timestamps for micro and macro channels:
     microLFPPath = fullfile(expFilePath, 'LFP_micro');
-    [microFiles, timestampFiles] = readFilePath(expIds, filePath);
+    macroLFPPath = fullfile(expFilePath, 'LFP_macro');
 
+    [microFiles, microTimestampFiles] = readFilePath(expIds, filePath, 'micro');
+    [macroFiles, macroTimestampFiles] = readFilePath(expIds, filePath, 'macro');
+
+    lfpTimestamps = downsampleTimestamps(microTimestampFiles, macroTimestampFiles, lfpFs, expFilePath);
+
+    %% micro electrodes:
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
     if isempty(jobIds)
         disp("No job assigned to batch! This is due to more workers than number of micro files.")
@@ -48,16 +44,13 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
         spikeDetectFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeDetectFiles, UniformOutput=false);
         spikeClusterFiles = cellfun(@(x) fullfile(spikeFilePath, x), spikeClusterFiles, UniformOutput=false);
     
-        lfpFiles = extractLFP(microFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, microLFPPath, '', skipExist(1), saveRaw);
-        writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
+        lfpFiles = extractLFP(microFiles, microTimestampFiles, lfpTimestamps, spikeDetectFiles, spikeClusterFiles, microLFPPath, skipExist(1), saveRaw);
+        writecell(lfpFiles, fullfile(microLFPPath, sprintf('lfpFiles_job%d.csv', workerId)));
     
         disp('micro lfp extraction finished!');
     end
 
     %% macro electrodes:
-    macroLFPPath = fullfile(expFilePath, 'LFP_macro');
-    [macroFiles, timestampFiles] = readFilePath(expIds, filePath, 'macro');
-
     jobIds = splitJobs(size(macroFiles, 1), totalWorkers, workerId);
     if isempty(jobIds)
         disp("No job assigned to batch! This is due to more workers than number of macro files.")
@@ -66,12 +59,11 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
         macroFiles = macroFiles(jobIds, :);
         fprintf(['macroFiles: \n', sprintf('%s\n', macroFiles{:})]);
     
-        lfpFiles = extractLFP(macroFiles, timestampFiles, '', '', macroLFPPath, '', skipExist(2), saveRaw);
-        writecell(lfpFiles, fullfile(macroLFPPath, sprintf('lfpFiles_%d.csv', workerId)));
+        lfpFiles = extractLFP(macroFiles, macroTimestampFiles, lfpTimestamps, '', '', macroLFPPath, skipExist(2), saveRaw);
+        writecell(lfpFiles, fullfile(macroLFPPath, sprintf('lfpFiles_job%d.csv', workerId)));
     
         disp('macro lfp extraction finished!');
     end
-
 
 end
 

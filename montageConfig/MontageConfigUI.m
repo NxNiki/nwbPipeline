@@ -362,6 +362,11 @@ function MontageConfigUI()
         channelData = get(channelTable, 'Data');
         incompleteRows = any(cellfun(@isempty, channelData(:, 2)), 2);
         channelData = channelData(~incompleteRows, :);
+
+        % check for duplicated channel names:
+        if hasDuplicates(channelData(:, 2))
+            error('channel should not have duplicated names');
+        end
         
         rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
         channelData(rowsWithPortStart, :) = sortrows(channelData(rowsWithPortStart, :), 3);

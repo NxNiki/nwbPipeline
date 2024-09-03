@@ -190,7 +190,7 @@ switch char(handles.datatype)
                 return
             end
         end
-        [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
+        [cluster_class, tree, ~, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
 temp=find_temp2(tree, handles);                                  % Selects temperature.
@@ -203,22 +203,24 @@ set(handles.file_name, 'string', fullfile(pathname, filename));
 guidata(hObject, handles);
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 spikes = USER_DATA{2};
-if size(clu,2)-2 < size(spikes, 1)
-    classes = clu(temp(end), 3:end)+1;
-    if ~exist('ipermut', 'var')
-        classes = [classes(:)' zeros(1, size(spikes, 1) - handles.par.max_spk)];
-    end
-else
-    classes = clu(temp(end), 3:end)+1;
-end
 
+% if size(clu,2)-2 < size(spikes, 1)
+%     classes = clu(temp(end), 3:end)+1;
+%     if ~exist('ipermut', 'var')
+%         classes = [classes(:)' zeros(1, size(spikes, 1) - handles.par.max_spk)];
+%     end
+% else
+%     classes = clu(temp(end), 3:end)+1;
+% end
+
+classes = cluster_class(:, 1);
 saved_classes = cluster_class(:,1);
 USER_DATA{6} = saved_classes(:)';
 USER_DATA{8} = temp(end);
 USER_DATA{9} = saved_classes(:)';                                     % backup for non-forced classes.
 
 %% definition of clustering_results
-classes = rejectPositiveSpikes(spikes, classes', handles.par);
+classes = rejectPositiveSpikes(spikes, classes(:), handles.par);
 clustering_results      = [];
 clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
 clustering_results(:,2) = classes; % GUI classes
@@ -307,11 +309,7 @@ ylabel('Clusters size');
 
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
-
-% USER_DATA = get(handles.wave_clus_figure, 'userdata');
-% clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
-% set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(handles.fix1_button,'value', 1);
 updateFixButtonHandle(hObject, handles)
@@ -338,9 +336,6 @@ mark_clusters_temperature_diagram(handles, tree, clustering_results)
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'}, [], par.min_clus);
 
 plot_spikes(handles);
-% USER_DATA = get(handles.wave_clus_figure, 'userdata');
-% clustering_results = USER_DATA{10};
-% set(handles.wave_clus_figure, 'userdata', USER_DATA);
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 
 set(handles.force_button, 'value', 0);
@@ -365,26 +360,30 @@ if isempty(sortedBy) || strcmp(sortedBy, 'Enter your name')
 end
 
 % Saves clusters
-cluster_class=zeros(size(spikes,1),2);
+cluster_class = zeros(size(spikes, 1), 2);
 cluster_class(:,1) = classes(:);
 cluster_class(:,2) = USER_DATA{3}' / 1000;
 
 [pathname, fn] = fileparts(get(handles.file_name, 'String'));
-outFileName = strrep(['times_' fn], '_spikes', '');
+outFileName = strrep(['times_manual_' fn], '_spikes', '');
 outfile = fullfile(pathname, outFileName);
 
 outFileObj = matfile(outfile, "Writable", true);
-outFileObj.sortedBy = sortedBy;
-outFileObj.cluster_class = cluster_class;
-outFileObj.par = par;
-outFileObj.spikes = spikes;
-outFileObj.ipermut = USER_DATA{12};
-outFileObj.inspk = USER_DATA{7};
 
-% if(~strcmp(handles.par.fnamespc, handles.par.fnamesave))
-%     copyfile([handles.par.fnamespc '.dg_01.lab'], [handles.par.fnamesave '.dg_01.lab']);
-%     copyfile([handles.par.fnamespc '.dg_01'], [handles.par.fnamesave '.dg_01']);
-% end
+if ~ismember('sortedBy', who(outFileObj)) || ~iscell(outFileObj.sortedBy)
+    sortedByPrev = [];
+else
+    sortedByPrev = outFileObj.sortedBy;
+end
+
+sortedByPrev = [sortedByPrev; {sortedBy, char(datetime("now"))}];
+
+outFileObj.sortedBy = sortedByPrev;
+outFileObj.cluster_class = cluster_class;
+% outFileObj.par = par;
+% outFileObj.spikes = spikes;
+% outFileObj.ipermut = USER_DATA{12};
+% outFileObj.inspk = USER_DATA{7};
 
 %Save figures
 nClusts = max(cluster_class(:,1));
@@ -896,12 +895,12 @@ for i=1:max(classes)
     inCluster = classes == i;
     nSpikes = sum(inCluster);
     newNSpikes = 0;
-    nFeatures = size(inspk,2);
+    nFeatures = size(inspk, 2);
     while nSpikes > nFeatures && nSpikes>newNSpikes
         inCluster = classes == i;
         nSpikes = sum(inCluster);
-        M = mahal(inspk,inspk(inCluster,:));
-        Lspk = 1-chi2cdf(M,nFeatures);
+        M = mahal(inspk,inspk(inCluster, :));
+        Lspk = 1-chi2cdf(M, nFeatures);
         removeFromClust = inCluster(:) & Lspk(:) < 5e-4;
         classes(removeFromClust) = 0;
         newNSpikes = sum(classes == i);

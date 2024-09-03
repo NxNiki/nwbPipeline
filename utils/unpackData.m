@@ -45,6 +45,7 @@ parfor i = 1:length(inFileNames)
     end
 
     if exist(outFileNameTemp, "file")
+        warning('delete temp file: %s\n', outFileNameTemp);
         delete(outFileNameTemp);
     end
 
