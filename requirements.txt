@@ -11,3 +11,4 @@ statsmodels
 nilearn
 mne
 neo
+hdmf

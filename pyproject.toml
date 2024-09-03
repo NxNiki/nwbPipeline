@@ -1,0 +1,9 @@
+[tool.isort]
+profile = "black"
+line_length = 120
+known_first_party = "nwbPipeline"
+known_third_party = "django,flask"
+sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+
+[tool.mypy]
+python_executable = "/opt/miniconda3/envs/nwbPipeline/bin/python3.8"
