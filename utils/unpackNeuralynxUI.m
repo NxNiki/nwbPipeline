@@ -1,41 +1,108 @@
-function [selectedFolders, experimentIds, outputFilePath] = folderSelectionUI()
+function [selectedFolders, experimentIds, outputFilePath, macroPattern, microPattern, eventPattern, montageConfigFile, numParallelTasks] = unpackNeuralynxUI()
 % set variables (folders, IDs, and paths) to unpack raw .ncs file to .mat.
 % see run_unpackNeuralynx.m
 
+close all
 
 selectedFolders = {};
 experimentIds = [];
 outputFilePath = '';
+macroPattern = '*';
+microPattern = '*';
+eventPattern = 'Events*';
+montageConfigFile = [];
+numParallelTasks = 8;
 
 defaultBasePath = '/Volumes/DATA/NLData/';
 defaultOutputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm';
 defaultSaveFile = 'Patient-xx_Exp-xx.json';
 
+
+% add more patterns for future use:
+macroPatternLabel = {
+    '^[RL].*[0-9]';         % UCLA data
+    '^LFPx*';               % IOWA data
+    };
+
+microPatternLabel = {
+    '^G[A-D].*[0-9]';         % UCLA data
+    '^PDes*';               % IOWA data
+    };
+
+eventPatternLabel = {
+    'Events*';
+    };
+
+
 % Create a figure for the GUI
-f = figure('Position', [300 300 600 650], 'Name', 'Folder Selector', ...
+f = figure('Position', [300 300 900 1150], 'Name', 'Folder Selector', ...
     'NumberTitle', 'off', 'Resize', 'on');
 
-%% Experiment ID Panel
-experimentIDPanel = uipanel('Title', 'Experiment Ids', 'FontSize', 15, ...
-    'Units', 'normalized', 'Position', [0.05 0.85 0.9 0.1]);
+%% Unpack Config Panel:
+experimentIDPanel = uipanel('Title', 'Unpack Config', 'FontSize', 15, ...
+    'Units', 'normalized', 'Position', [0.05 0.73 0.9 0.24]);
 
-% Text box to input the array of experiment IDs
-expIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
-    'Position', [0.05 0.2 0.9 0.6], 'String', '', 'FontSize', 15, ...
+right = .02;
+height = 0.15;
+width = 0.15;
+widthEdit = .78;
+bottom = 0.75;
+expIdLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right bottom width height], 'String', 'Experiment ID:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
 
-%% Output File Path Panel
-outputPanel = uipanel('Title', 'Output File Path', 'FontSize', 15, ...
-    'Units', 'normalized', 'Position', [0.05 0.75 0.9 0.1]);
+expIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.17 bottom + 0.02 widthEdit height], 'String', '', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+bottom = .55;
+widthPopupMenu = 0.175;
+macroLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right bottom width height], 'String', 'Macro Pattern:', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+macroPatternInput = uicontrol('Parent', experimentIDPanel, 'Style', 'popupmenu', 'String', macroPatternLabel, ...
+    'Units', 'normalized', 'Position', [0.16 bottom widthPopupMenu height], 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+microLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [.345 bottom width height], 'String', 'Micro Pattern:', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+microPatternInput = uicontrol('Parent', experimentIDPanel, 'Style', 'popupmenu', 'String', microPatternLabel, ...
+    'Units', 'normalized', 'Position', [0.475 bottom widthPopupMenu height], 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+eventLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [.655 bottom width height], 'String', 'Event Pattern:', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+eventPatternInput = uicontrol('Parent', experimentIDPanel, 'Style', 'popupmenu', 'String', eventPatternLabel, ...
+    'Units', 'normalized', 'Position', [0.78 bottom widthPopupMenu height], 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+bottom = .25;
+montageLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right bottom width height], 'String', 'Montage File:', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+montageFileInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.17 bottom + 0.02 widthEdit height], 'String', '', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+bottom = .075;
+outputPathLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right bottom width height], 'String', 'Output Path:', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
 
 % Text box to input the output file path with a default value
-outputFilePathInput = uicontrol('Parent', outputPanel, 'Style', 'edit', 'Units', 'normalized', ...
-    'Position', [0.05 0.2 0.9 0.6], 'String', defaultOutputPath, ...
+outputFilePathInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.17 bottom widthEdit height], 'String', defaultOutputPath, ...
     'FontSize', 15, 'HorizontalAlignment', 'left');
 
 %% Base Directory Panel
 basePanel = uipanel('Title', 'Base Directory', 'FontSize', 15, ...
-    'Units', 'normalized', 'Position', [0.05 0.65 0.9 0.1]);
+    'Units', 'normalized', 'Position', [0.05 0.65 0.9 0.08]);
 
 % Text box to input the base directory path with a default value
 baseDirInput = uicontrol('Parent', basePanel, 'Style', 'edit', 'Units', 'normalized', ...
@@ -87,7 +154,7 @@ savePanel = uipanel('Title', 'Save parameters', 'FontSize', 15, ...
 % Add a checkbox for enabling/disabling JSON saving
 saveCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units', 'normalized', ...
     'Position', [0.05 0.1 0.3 0.3], 'String', 'Save Parameters', ...
-    'FontSize', 10, 'Value', 1); % Default to checked
+    'FontSize', 12, 'Value', 1); % Default to checked
 
 % Add a text field for entering the JSON filename
 fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normalized', ...
@@ -150,6 +217,10 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
             outputFilePath = get(outputFilePathInput, 'String');
             experimentIds = tempIds;  % Update local variable
             fileNameInputString = get(fileNameInput, 'String');
+            macroPattern = macroPatternLabel{get(macroPatternInput, 'Value')};
+            microPattern = microPatternLabel{get(microPatternInput, 'Value')};
+            eventPattern = eventPatternLabel{get(eventPatternInput, 'Value')};
+            montageConfigFile = get(montageFileInput, 'String');
 
             % Construct the data structure
             data = struct();
@@ -158,6 +229,10 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
             data.OutputFilePath = outputFilePath;
             data.SelectedFolders = selectedFolders;  % Ensure this is updated
             data.fileNameInput = fileNameInputString;
+            data.macroPattern = macroPattern;
+            data.microPattern = microPattern;
+            data.eventPattern = eventPattern;
+            data.montageConfigFile = montageConfigFile;
 
             % Check if "Save to JSON" is enabled and process accordingly
             if get(saveCheckbox, 'Value') == 1
@@ -214,6 +289,22 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
 
         if isfield(data, 'fileNameInput') && ischar(data.fileNameInput)
             set(fileNameInput, 'String', data.fileNameInput);
+        end
+
+        if isfield(data, 'macroPattern') && ischar(data.macroPattern)
+            set(macroPatternInput, 'String', data.macroPattern);
+        end
+
+        if isfield(data, 'microPattern') && ischar(data.microPattern)
+            set(microPatternInput, 'String', data.microPattern);
+        end
+
+        if isfield(data, 'eventPattern') && ischar(data.eventPattern)
+            set(eventPatternInput, 'String', data.eventPattern);
+        end
+
+        if isfield(data, 'montageConfigFile') && ischar(data.montageConfigFile)
+            set(montageFileInput, 'String', data.montageConfigFile);
         end
     end
 

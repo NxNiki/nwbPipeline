@@ -6,7 +6,7 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
 
     lfpFilePath = fullfile(expFilePath, 'LFP_micro');
     microLfpFiles = listFiles(lfpFilePath, '*_lfp.mat', '^\.');
-    
+
     lfpFilePath = fullfile(expFilePath, 'LFP_macro');
     macroLfpFiles = listFiles(lfpFilePath, '*_lfp.mat', '^\._');
 
@@ -25,19 +25,19 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
     nwb.general_devices.set('array', Device);
 
     lfpFiles = [microLfpFiles(:); macroLfpFiles(:)];
-    
+
     ElectrodesDynamicTable = types.hdmf_common.DynamicTable(...
             'colnames', {'x', 'y', 'z', 'location', 'group', 'group_name', 'label'}, ...
             'description', 'all electrodes');
 
         pattern = '(G[A-D][1-8])|([A-Z]+[1-8])';
         shankLabelAdded = {};
-        
+
         for i = 1:length(lfpFiles)
-            
+
             [~, lfpFileName] = fileparts(lfpFiles{i});
             matches = regexp(lfpFileName, pattern, 'match');
-    
+
             if length(matches) == 2
                 shankLabel = matches{1};
                 electrodeLabel = matches{2};
@@ -46,7 +46,7 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
                 electrodeLabel = matches{1};
             end
             location = regexp(electrodeLabel, '[A-Z]+', 'match');
-            
+
             if ~ismember(shankLabel, shankLabelAdded) || isempty(shankLabelAdded)
                 EGroup = types.core.ElectrodeGroup( ...
                     'description', sprintf('electrode group for %s', shankLabel), ...
@@ -56,7 +56,7 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
                 nwb.general_extracellular_ephys.set(shankLabel, EGroup);
                 shankLabelAdded = [shankLabelAdded, {shankLabel}];
             end
-    
+
             ElectrodesDynamicTable.addRow( ...
                 'x', 111, ...
                 'y', 111, ...
@@ -66,7 +66,7 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
                 'group_name', shankLabel, ...
                 'label', electrodeLabel);
         end
-        
+
     ElectrodesDynamicTable.toTable()
     nwb.general_extracellular_ephys_electrodes = ElectrodesDynamicTable;
 
@@ -90,5 +90,5 @@ function [electrode_table_region_micro, electrode_table_region_macro] = createEl
 
     % export nwb to save memory usage:
     saveNWB(nwb, nwbFile);
-    
+
 end

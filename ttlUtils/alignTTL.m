@@ -8,9 +8,9 @@ function [ttlLogAlign, ttlCodeAlign, tsAlign] = alignTTL(ttlLog, ttlCode, ts)
 % if there are multiple ttlLog files, concantenate them vertically.
 
 % TTL is a signal that marks the events during the experiment.
-% It is sent from the Mac/PC to the recording device.
+% It is sent from the Mac/PC to the recording DEVICE.
 % If the experiment pauses on the Mac/PC, A new TTL log is created.
-% So we have multiple TTL logs on the Mac/PC (ttlLog), 
+% So we have multiple TTL logs on the Mac/PC (ttlLog),
 % but only one on the recording machine (ttlCode)
 % testing TTLs are also not saved on ttlCode at the beginning. But it can
 % be save if a new experiment start. So far we only remove the testing TTLs
@@ -29,7 +29,7 @@ tsAlign = ts(ttlCodeIdx);
 
     function helper(logStartIdx, codeStartIdx)
         RemainingLength = min(length(ttlLogCode) - logStartIdx, length(ttlCode) - codeStartIdx) + 1;
-        
+
         if RemainingLength <= 0
             return
         end
@@ -53,7 +53,3 @@ tsAlign = ts(ttlCodeIdx);
     end
 
 end
-
-
-
-
