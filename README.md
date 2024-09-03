@@ -51,7 +51,8 @@ scripts/run_unpackNeuralynx
 
 You can either define the I/O path in the script or use the UI to select the file path by removing the path definition in the above script:
 
-![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/d84a562c-816c-4a61-ba5e-4da2062eaabe)
+![image](https://github.com/user-attachments/assets/ad5a6c20-acfc-49a9-afdc-4aca135a00fe)
+
 
 If you want to rename the channels, set the montage config file (created by `MontageConfigUI.m`) in the script.
 
@@ -167,7 +168,7 @@ functions to write data to NWB files.
 This is the code to read raw neuralynx files. 
 https://www.urut.ch/new/serendipity/index.php?/pages/nlxtomatlab.html
 
-Note: this part needs a Matlab version earlier than 2023b on Apple silicon.
+> Note: For Apple Silicon users, run the Intel version of MATLAB using Rosetta.
 
 ### NlxIO
 

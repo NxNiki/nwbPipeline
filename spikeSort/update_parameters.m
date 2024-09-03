@@ -68,7 +68,7 @@ if strcmp(type, 'none')
     end
 end
 
-if isfield(par, 'ref')
+if isfield(par, 'ref') && isfield(par, 'sr')
     new_par.ref_ms = par.ref /par.sr * 1000;
 end
 

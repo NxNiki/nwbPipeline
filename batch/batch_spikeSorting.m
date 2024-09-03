@@ -1,4 +1,4 @@
-function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist)
+function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist, runRemovePLI)
     % run spike detection and spike sorting to the unpacked data:
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
@@ -21,6 +21,10 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist)
         expIds = (4: 7);
         filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
         skipExist = [1, 1, 0];
+    end
+
+    if nargin < 6
+        runRemovePLI = false;
     end
 
     %% load file names micro data:
@@ -48,7 +52,7 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist)
     %     parpool('local', 1);  % Adjust the number of workers as needed
     % end
 
-    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1));
+    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI);
     disp('Spike Detection Finished!')
 
     %% spike clustering:

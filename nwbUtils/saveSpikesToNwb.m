@@ -1,16 +1,18 @@
 function saveSpikesToNwb(nwbFile, expFilePath)
 
 spikeFilePath = fullfile(expFilePath, 'CSC_micro_spikes');
-spikeFileNames = listFiles(spikeFilePath, '*_spikes.mat', '^\._');
-timesFileNames = listFiles(spikeFilePath, 'times*.mat', '^\._');
 
 % load spikes for all channels:
-[spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFileNames, timesFileNames);
+[spikeTimestamps, spikeWaveForm, spikeWaveFormMean, spikeElectrodesIdx] = loadSpikes(spikeFilePath);
+
+if isempty(spikeTimestamps)
+    warning('no spikes detected in: %s\n', spikeFileNames);
+end
 
 [spike_times_vector, spike_times_index] = util.create_indexed_column(spikeTimestamps);
 [electrodes, electrodes_index] = util.create_indexed_column(spikeElectrodesIdx, [], '/general/extracellular_ephys/electrodes' );
 
-nwb = nwbRead(nwbFile);
+nwb = nwbRead(nwbFile, 'ignorecache');
 nwb.units = types.core.Units( ...
     'colnames', {'spike_times', 'electrodes', 'waveform_mean'}, ... 
     'description', 'units table', ...
@@ -23,4 +25,4 @@ nwb.units = types.core.Units( ...
 );
 
 % export nwb to save memory usage:
-saveNWB(nwb, nwbFile)
+saveNWB(nwb, nwbFile, 1);

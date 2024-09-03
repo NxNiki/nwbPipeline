@@ -19,10 +19,9 @@ Nlx2Mat/.DS_Store
 
 scripts/Rasters*.pdf
 
-batch/runbatch_spikeSorting_*.sh
-batch/runbatch_extractLFP_*.sh
-batch/jobs_*
-
+*/unpackConfigs/*
+*/Patient-*.json
+Patient-*_Exp-*.json
 scripts/*.csv
 scripts/*.png
 scripts/*.jpg
@@ -34,3 +33,17 @@ scripts/*.mat
 batch/sedDLFclD
 
 *_old.m
+
+test/neuralynx/CSC_micro_spikes/*.mat
+test/neuralynx/CSC_micro_spikes/*.txt
+test/neuralynx/LFP_micro/*.png
+test/neuralynx/nwb/*_tmp.nwb
+
+notebooks/*.nwb
+
+test/wave_clus/*_spikes.matspc_log.txt
+test/wave_clus/fig2print_manual_*_wave_clus_figure.jpg
+
+test/neuralynx/lfpTimestamps.mat
+test/neuralynx/LFP_macro/
+test/neuralynx/LFP_micro/

@@ -1,18 +1,14 @@
-function outputFiles = extractLFP(cscFiles, timestampFiles, spikeDetectFiles, spikeClusterFiles, outputPath, experimentName, skipExist, saveRaw)
+function outputFiles = extractLFP(cscFiles, timestampFiles, lfpTimestamps, spikeDetectFiles, spikeClusterFiles, outputPath, skipExist, saveRaw)
 % remove spikes and downsample csc signal to 2000k hz.
 % for macros or micro with no spikes detected remove spikes will be
 % skipped.
 
-if nargin < 6 || isempty(experimentName)
-    experimentName = '';
-end
-
-if nargin < 7 || isempty(skipExist)
+if nargin < 6 || isempty(skipExist)
     skipExist = true;
 end
 
 % save Raw signals to check spikes are removed correctly (see run_plotLFP.m).
-if nargin < 8
+if nargin < 7
     saveRaw = false;
 end
 
@@ -24,9 +20,9 @@ outputFiles = cell(numFiles, 1);
 for i = 1: numFiles
     channelFiles = cscFiles(i,:);
     [~, channelFilename] = fileparts(channelFiles{1});
-    lfpFilename = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp.mat']);
-    lfpFilenameTemp = fullfile(outputPath, [regexp(channelFilename, '.*(?=_\d+)', 'match', 'once'), '_lfp_temp.mat']);
-    lfpTimestampFileName = fullfile(outputPath, 'lfpTimestamps.mat');
+    channelName = extractChannelName(channelFilename, '.*(?=_\d+)');
+    lfpFilename = fullfile(outputPath, [channelName, '_lfp.mat']);
+    lfpFilenameTemp = fullfile(outputPath, [channelName, '_lfp_temp.mat']);
     
     if exist(lfpFilename, "file") && skipExist
         continue
@@ -42,7 +38,7 @@ for i = 1: numFiles
     % to reduce edge effects - especially for the sleep data 
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
-    [cscSignal, timestamps, samplingInterval, timestampsStart] = combineCSC(channelFiles, timestampFiles);
+    [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
 
     if isempty(cscSignal) || all(isnan(cscSignal))
         return
@@ -53,7 +49,18 @@ for i = 1: numFiles
     Fs = seconds(1) / samplingInterval;
 
     fprintf('length of csc signal: %d\n', length(cscSignal));
+
+    % check if spike exists for current channel:
+    spikeExist = false;
     if ~isempty(spikeDetectFiles) && exist(spikeDetectFiles{i}, "file")
+        spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
+        spikes = spikeFileObj.spikes;
+        if ~isempty(spikes)
+            spikeExist = true;
+        end
+    end
+
+    if spikeExist
         spikeFileObj = matfile(spikeDetectFiles{i}, 'Writable', false);
         spikes = spikeFileObj.spikes;
         spikeTimestamps = spikeFileObj.spikeTimestamps;
@@ -105,7 +112,7 @@ for i = 1: numFiles
         warning('deviated sampling frequency: %f', Fs);
     end
 
-    [lfpSignal, downsampleTs] = antiAliasing(cscSignalSpikeInterpolated, timestamps, Fs);
+    lfpSignal = antiAliasing(cscSignalSpikeInterpolated, timestamps, Fs, lfpTimestamps);
 
     % save LFP:
     lfpFileObj = matfile(lfpFilenameTemp, "Writable", true);
@@ -125,13 +132,6 @@ for i = 1: numFiles
     end
     movefile(lfpFilenameTemp, lfpFilename);
 
-    % save timestamps:
-    if ~exist(lfpTimestampFileName, "file")
-        lfpTimestampFileObj = matfile(lfpTimestampFileName, "Writable", true);
-        lfpTimestampFileObj.lfpTimestamps = downsampleTs;
-        lfpTimestampFileObj.experimentName = experimentName;
-        lfpTimestampFileObj.timestampsStart = timestampsStart;
-    end
 end
 end
 
