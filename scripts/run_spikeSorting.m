@@ -5,43 +5,14 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-expIds = [4];
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/FaceRecognition/486_FaceRecognition';
+expIds = [11,12,13];
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/557_MovieParadigm';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
 skipExist = [0, 0, 0];
 
 % remove noises caused by power line interference:
-runRemovePLI = true;
+runRemovePLI = false;
 
-[microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
-
-%% spike detection:
-delete(gcp('nocreate'))
-% parpool(1); % each channel will take nearly 30GB memory for multi-exp analysis.
-
-expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
-outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
-
-spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI);
-disp('Spike Detection Finished!')
-
-%% spike clustering:
-
-spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
-
-spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
-
-disp('Spike Clustering finished!')
-
-
-
-
-
-
-
-    
-
-
-
+batch_spikeSorting(1, 1, expIds, filePath, skipExist, runRemovePLI);
