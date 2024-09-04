@@ -250,7 +250,8 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
                     jsonFilename = ensureJsonExtension(jsonFilename);
                 end
 
-                writeJson(data, jsonFilename)
+                baseDir = getBaseDir();
+                writeJson(data, fullfile(baseDir, 'scripts/unpackConfigs', jsonFilename));
             end
 
             delete(f);  % Close the window
