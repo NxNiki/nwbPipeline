@@ -17,9 +17,9 @@ end
 channelFileNames = readtable(fullfile(expOutFilePath, 'channelFileNames.csv'), Delimiter=',');
 channelFileNames = table2cell(channelFileNames);
 
-% select macro/micro files and rename output file names so that alphabetic order 
-% is consistent with temporal order. 
-% For UCLA data, the macro files always start with 'R' or 'L' in the file 
+% select macro/micro files and rename output file names so that alphabetic order
+% is consistent with temporal order.
+% For UCLA data, the macro files always start with 'R' or 'L' in the file
 % name. The micro files always start with 'G[A-D]'.
 % For Iowa data, macro files have pattern: LFPx*.ncs
 % micro files have pattern: PDes*.ncs
@@ -35,7 +35,8 @@ inFileNames = inFileNames(sortOrder, :);
 
 if ~isempty(renameChannels)
     if length(renameChannels) > size(inFileNames, 1)
-        error('renamed channels longer than original channels')
+        warning('renamed channels longer than original channels')
+        renameChannels = renameChannels(1:size(inFileNames, 1));
     end
     nonEmptyChannels = find(~cellfun(@isempty, renameChannels));
     channels = renameChannels(nonEmptyChannels);
