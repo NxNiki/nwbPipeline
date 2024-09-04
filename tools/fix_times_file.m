@@ -1,10 +1,21 @@
 % fix time units in times_*.mat
 % select cluster_class and sortBy and create a new times file.
 
+% In previous versions of wave_clus, timestamps were erroneously multiplied
+% by 1000 each time the results were saved, leading to inflated timestamp
+% units. This script corrects the timestamps in the times_*.mat files and
+% creates corresponding times_manual_*.mat files, containing
+% 'cluster_class' and 'sortBy' variables. Future manual curation in
+% wave_clus will modify the times_manual files, appending the user's name
+% and the date to 'sortBy' to track changes.
+
 clear
-searth_path = '/Users/XinNiuAdmin/HoffmanMount/bfalken/MICROS/566 Experiment';
-files = dir(fullfile(searth_path, '**/times_G[A-D]*.mat'));
+searth_path = '/Users/XinNiuAdmin/Downloads/GA4-RAH SERIES';
+files = dir(fullfile(searth_path, 'times_G*.mat'));
+
+% set the approximate duration of experiment (in seconds):
 ExpDurationSeconds = 2e+04;
+
 skipExists = false;
 
 for i = 1:length(files)
@@ -17,7 +28,7 @@ for i = 1:length(files)
         continue
     end
 
-    load(fullfile(path, files(i).name), 'cluster_class');
+    load(fullfile(path, files(i).name), 'cluster_class', 'sortedBy');
 
     min_spike_time = min(cluster_class(:, 2));
     max_spike_time = max(cluster_class(:, 2));
@@ -49,7 +60,7 @@ for i = 1:length(files)
         save(fullfile(path, files(i).name), 'cluster_class', '-append');
     end
 
-    sortBy = {'Ben', char(datetime("now"))};
+    sortBy = {sortedBy, char(datetime("now"))};
     save(outFile, 'cluster_class', 'sortBy');
 end
 
