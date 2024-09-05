@@ -26,14 +26,17 @@ function varargout = wave_clus(varargin)
 % JMG101208
 % USER_DATA DEFINITIONS
 % USER_DATA{1} = par;
-% USER_DATA{2} = spikes;
-% USER_DATA{3} = index; EM: This is not in time! This is in index, so if
+% USER_DATA{2} = spikes;    % n * 74 spike waveform
+% USER_DATA{3} = index;
+% Xin: This is timestamps in milliseconds. See readData_ASCIISpikePreClustered.m
+% Maybe it is updated?
+% EM: This is not in time! This is in index, so if
 %                           sampling rate is N, you must subtract 1 and
 %                           divide by N to convert to time in seconds since
 %                           recording start. Will save this value in USER_DATA{18}
 % USER_DATA{4} = clu;
 % USER_DATA{5} = tree;
-% USER_DATA{7} = inspk;
+% USER_DATA{7} = inspk;     % spike feature return by wave_features_wc.
 % USER_DATA{6} = classes(:)'
 % USER_DATA{8} = temp
 % USER_DATA{9} = classes(:)', backup for non-forced classes
@@ -185,7 +188,7 @@ switch char(handles.datatype)
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
         if isempty(filename)
-            [filename, pathname] = uigetfile('*_spikes.mat','Select file'); 
+            [filename, pathname] = uigetfile('*_spikes.mat','Select file');
             if ~filename
                 return
             end
@@ -311,7 +314,7 @@ handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'und
 plot_spikes(handles);
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
 
-set(handles.fix1_button,'value', 1);
+set(handles.fix1_button, 'value', 1);
 updateFixButtonHandle(hObject, handles)
 
 % --- Change min_clus_edit
@@ -348,7 +351,7 @@ fprintf('Saving...')
 reorderSpikeRasters('reset')
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 spikes = USER_DATA{2};
-par = USER_DATA{1}; 
+par = USER_DATA{1};
 classes = shrinkClassIndex(USER_DATA{6});
 
 % get user name:
@@ -489,7 +492,7 @@ USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 
 if strcmp(par.filename(1:4),'poly')
-    % do this need this part? Xin.
+    % do we need this part? Xin.
     Plot_amplitudes(handles)
 else
     Plot_all_features(handles)
