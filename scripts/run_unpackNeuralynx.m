@@ -10,7 +10,7 @@ addpath(genpath(fileparts(scriptDir)));
 unpackConfigFile = [];
 
 %%% skip already unpacked files:
-skipExist = 1;
+skipExist = 0;
 
 %%% define number of task in parfor:
 % generally we won't have memory issue in unpacking unless the raw ncs
