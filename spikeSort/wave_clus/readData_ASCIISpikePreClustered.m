@@ -20,10 +20,12 @@ end
 for i=4:handles.par.max_clus
     handles.par.(['fix' num2str(i)]) = 0;
 end
+
 try % will fail on initial call, but not when data is being loaded?
     handles.par.filename = filename;
     handles.par.pathname = pathname;
 end
+
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 USER_DATA{1} = handles.par;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
@@ -50,12 +52,15 @@ if exist(manualTimesFile, 'file')
     title = 'Spikes manually sorted already!';
     option1 = 'Yes';
     option2 = 'No';
-    
+
     % Create the dialog box
     choice = questdlg(message, title, option1, option2, option1);
     if strcmp(choice, option1)
         manualTimesFileObj = matfile(manualTimesFile);
         cluster_class = manualTimesFileObj.cluster_class;
+        if ismember('temp', whos(manualTimesFileObj))
+            USER_DATA{8} = manualTimesFileObj.temp;
+        end
     end
 end
 
@@ -80,8 +85,6 @@ else
     spikeFileObj.clu = clu;
     spikeFileObj.tree = tree;
 end
-
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
 
 if size(clu, 2) - 2 < numSpikes
     clu = [clu, zeros(size(clu, 1), numSpikes - size(clu, 2) + 2)];
