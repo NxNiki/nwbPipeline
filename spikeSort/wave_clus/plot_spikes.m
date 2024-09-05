@@ -4,6 +4,7 @@ par = USER_DATA{1};
 if isempty(par)
     par = handles.par;
 end
+
 spikes = USER_DATA{2};
 spk_times = USER_DATA{3};
 % clu = USER_DATA{4};
@@ -115,7 +116,7 @@ for i=4:par.max_clus
             end
             classes(fix_class)  = nclusters;
             ifixflag(nclusters) = 1;
-            
+
             fix_class2 = [fix_class2 fix_class];
             nfix_class = [nfix_class i];
         end
@@ -221,7 +222,7 @@ end
 ts = USER_DATA{3}*1e-3; %ts now in seconds
 
 if length(USER_DATA)>=19 && ~isempty(USER_DATA{19})
-    
+
     f = eval(USER_DATA{19});
     rejectInds = f(ts);
     classes(rejectInds) = 0;
@@ -263,7 +264,7 @@ colors = ['k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g
 for i = 1:nclusters+1
     if ~ (isempty(class0) && i==1)
         %PLOTS SPIKES OR PROJECTIONS
-        
+
         hold(handles.projections, 'on')
         max_spikes=min(length(classDefs{i}), par.max_spikes);
         sup_spikes=length(classDefs{i});
@@ -280,17 +281,17 @@ for i = 1:nclusters+1
         else
             plot(inspk(classDefs{i}, 1), inspk(classDefs{i}, 2), '.', 'color', colors(i) , 'markersize', .5);
         end
-        
+
         if i < 5
             ax = handles.(['spikes', num2str(i-1)]);
             hold(ax,'on');
-            
+
             av = mean(spikes(classDefs{i},:));
             avup = av + par.to_plot_std * std(spikes(classDefs{i}, :));
             avdw = av - par.to_plot_std * std(spikes(classDefs{i}, :));
-            
+
             if get(handles.plot_all_button,'value') ==1
-                
+
                 plot(ax,spikes(classDefs{i}(permut), :)','color', colors(i) );
                 if i==1
                     plot(ax,1:ls,av,'c','linewidth',2)
@@ -305,11 +306,11 @@ for i = 1:nclusters+1
                 plot(ax,1:ls,avup,1:ls,avdw,'color', [.65 .65 .65], 'linewidth', .5)
             end
             xlim(ax,[1 ls])
-            
+
             if i>1; ylimit = [ylimit; get(ax, 'ylim')]; end
             nSpikes = length(classDefs{i});
             title(ax, ['Cluster ' num2str(i-1) ':  nSpikes = ' num2str(nSpikes)], 'Fontweight', 'bold');
-            
+
             isiAx = handles.(['isi' num2str(i-1)]);
             % times{i} = diff(spk_times(classDefs{i})); % Xin
             spkTimeDiff = diff(spk_times(classDefs{i}));
@@ -362,4 +363,3 @@ if ~strcmp(char(handles.datatype), 'Sc data') && ~strcmp(char(handles.datatype),
 end
 
 peakPlot(handles)
-
