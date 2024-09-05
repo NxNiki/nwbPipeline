@@ -312,6 +312,9 @@ ylabel('Clusters size');
 
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
+
+USER_DATA = get(handles.wave_clus_figure,'userdata');
+clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
 
 set(handles.fix1_button, 'value', 1);
@@ -353,6 +356,7 @@ USER_DATA = get(handles.wave_clus_figure, 'userdata');
 spikes = USER_DATA{2};
 par = USER_DATA{1};
 classes = shrinkClassIndex(USER_DATA{6});
+temp = USER_DATA{8};
 
 % get user name:
 sortedBy = handles.sorterName.String;
@@ -383,6 +387,7 @@ sortedByPrev = [sortedByPrev; {sortedBy, char(datetime("now"))}];
 
 outFileObj.sortedBy = sortedByPrev;
 outFileObj.cluster_class = cluster_class;
+outFileObj.temp = temp;
 % outFileObj.par = par;
 % outFileObj.spikes = spikes;
 % outFileObj.ipermut = USER_DATA{12};
