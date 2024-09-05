@@ -22,6 +22,8 @@ makeOutputPath(cscFiles, outputPath, skipExist);
 nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
+fprintf('run spike detection in parallel on %d threads...\n', maxNumCompThreads);
+
 parfor i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);

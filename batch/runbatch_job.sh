@@ -19,6 +19,8 @@
 #$ -o $HOME/sgelog/job-$JOB_ID/task_$TASK_ID.txt
 # Redirect the standard output and standard error to a specific file
 # $JOB_ID and $TASK_ID are environment variables provided by the scheduler
+# created before job execution (in submission).
+# It will be same as $SGE_TASK_ID, which is created in job execution
 
 #$ -j y
 # Merge standard error with the job log (standard output)
@@ -39,14 +41,14 @@
 
 #$ -t 1:15:1
 # Array job specification: run tasks with IDs from 1 to N, with a step of 1 (i.e., 1, 2, 3, ..., N)
-# Each task will have a unique $TASK_ID
+# Each task will have a unique $SGE_TASK_ID
 
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="557"
-expIds="[11, 12, 13]" 
-runRemovePLI="false"
+patientId="573"
+expIds="[3:8]" 
+runRemovePLI="true"
 # if expIds is updated, do not skipExist any steps so that threshold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
 mode="spikeSorting"  # Change to "extractLFP" to run extractLFP
@@ -98,4 +100,4 @@ echo "Job $JOB_ID ended on:   " `date `
 echo " "
 
 mkdir -p $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID
-mv $HOME/sgelog/job-$JOB_ID/task_$TASK_ID.txt $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID/task_$TASK_ID.txt
+mv $HOME/sgelog/job-$JOB_ID/task_$SGE_TASK_ID.txt $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID/task_$SGE_TASK_ID.txt
