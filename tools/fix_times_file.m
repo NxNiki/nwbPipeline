@@ -9,14 +9,17 @@
 % wave_clus will modify the times_manual files, appending the user's name
 % and the date to 'sortBy' to track changes.
 
+% also copy timestampsStart to times_manual_* files.
+
 clear
-searth_path = '/Users/XinNiuAdmin/Downloads/GA4-RAH SERIES';
-files = dir(fullfile(searth_path, 'times_G*.mat'));
+searth_path = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/555_MovieParadigm';
+files = dir(fullfile(searth_path, '**/times_G*.mat'));
 
 % set the approximate duration of experiment (in seconds):
 ExpDurationSeconds = 2e+04;
 
 skipExists = false;
+fix_timestamp_unit = false;
 
 for i = 1:length(files)
     path = files(i).folder;
@@ -28,10 +31,9 @@ for i = 1:length(files)
         continue
     end
 
-    load(fullfile(path, files(i).name), 'cluster_class', 'sortedBy');
+    % load(fullfile(path, files(i).name), 'cluster_class');
+    load(outFile, 'cluster_class', 'sortedBy');
 
-    min_spike_time = min(cluster_class(:, 2));
-    max_spike_time = max(cluster_class(:, 2));
     exp_duration = get_experiment_duration(cluster_class);
 
     factor = 1;
@@ -48,7 +50,9 @@ for i = 1:length(files)
         end
     end
 
-    cluster_class(:, 2) = cluster_class(:, 2) / factor;
+    if factor ~= 1 && fix_timestamp_unit
+        cluster_class(:, 2) = cluster_class(:, 2) / factor;
+    end
     exp_duration = get_experiment_duration(cluster_class);
 
     fprintf("file: %s\n", outFile);
@@ -56,12 +60,13 @@ for i = 1:length(files)
     fprintf("mean diff on timestamps: %f\n", mean(diff(cluster_class(:, 2))));
     fprintf("duration of experiment (sec): %f\n", exp_duration);
 
-    if factor ~= 1
+    if factor ~= 1 && fix_timestamp_unit
+        fprintf('overwrite cluster_class in times file: %s\n', fullfile(path, files(i).name));
         save(fullfile(path, files(i).name), 'cluster_class', '-append');
     end
 
     sortBy = {sortedBy, char(datetime("now"))};
-    save(outFile, 'cluster_class', 'sortBy');
+    save(outFile, 'cluster_class', 'sortBy', 'timestampsStart');
 end
 
 function exp_duration = get_experiment_duration(cluster_class)
