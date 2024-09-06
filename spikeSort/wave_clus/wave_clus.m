@@ -287,35 +287,35 @@ USER_DATA{10} = clustering_results;
 
 handles.minclus = min_clus;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
-temperature = handles.par.mintemp + temp * handles.par.tempstep;
 
-switch par.temp_plot
-    case 'lin'
-        plot([handles.par.mintemp handles.par.maxtemp-handles.par.tempstep],[par.min_clus par.min_clus],'k:',...
-            handles.par.mintemp+(1:handles.par.num_temp)*handles.par.tempstep, ...
-            tree(1:handles.par.num_temp,5:size(tree,2)),[temperature temperature],[1 tree(1,5)],'k:')
-    case 'log'
-        handles.par.num_temp = min(size(tree,1),handles.par.num_temp);
-        semilogy([handles.par.mintemp handles.par.maxtemp-handles.par.tempstep], ...
-            [par.min_clus par.min_clus],'k:',...
-            handles.par.mintemp+(1:handles.par.num_temp)*handles.par.tempstep, ...
-            tree(1:handles.par.num_temp,5:size(tree,2)),[temperature temperature],[1 tree(1,5)],'k:')
-end
-xlim([0 handles.par.maxtemp])
-xlabel('Temperature');
-if strcmp(par.temp_plot, 'log')
-    set(get(gca,'ylabel'), 'vertical', 'Cap');
-else
-    set(get(gca,'ylabel'), 'vertical', 'Baseline');
-end
-ylabel('Clusters size');
+% temperature = handles.par.mintemp + temp * handles.par.tempstep;
+% switch par.temp_plot
+%     case 'lin'
+%         plot([handles.par.mintemp handles.par.maxtemp-handles.par.tempstep],[par.min_clus par.min_clus],'k:',...
+%             handles.par.mintemp+(1:handles.par.num_temp)*handles.par.tempstep, ...
+%             tree(1:handles.par.num_temp,5:size(tree,2)),[temperature temperature],[1 tree(1,5)],'k:')
+%     case 'log'
+%         handles.par.num_temp = min(size(tree,1),handles.par.num_temp);
+%         semilogy([handles.par.mintemp handles.par.maxtemp-handles.par.tempstep], ...
+%             [par.min_clus par.min_clus],'k:',...
+%             handles.par.mintemp+(1:handles.par.num_temp)*handles.par.tempstep, ...
+%             tree(1:handles.par.num_temp,5:size(tree,2)),[temperature temperature],[1 tree(1,5)],'k:')
+% end
+% xlim([0 handles.par.maxtemp])
+% xlabel('Temperature');
+% if strcmp(par.temp_plot, 'log')
+%     set(get(gca,'ylabel'), 'vertical', 'Cap');
+% else
+%     set(get(gca,'ylabel'), 'vertical', 'Baseline');
+% end
+% ylabel('Clusters size');
 
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
 
 USER_DATA = get(handles.wave_clus_figure,'userdata');
 clustering_results = USER_DATA{10};
-mark_clusters_temperature_diagram(handles, tree, clustering_results, 0)
+mark_clusters_temperature_diagram(handles, tree, clustering_results, 1)
 
 set(handles.fix1_button, 'value', 1);
 updateFixButtonHandle(hObject, handles)

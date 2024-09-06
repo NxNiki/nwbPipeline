@@ -64,6 +64,7 @@ switch handles.par.temp_plot
             plot(handles.temperature_plot,tree_temp,tree_clus,'.','color',num2str(colors(classgui_plot(i))),'MarkerSize',20);
             % text(tree_temp,tree_clus,num2str(classgui_plot(i)));
         end
+        hold off
 
     case 'log'
         if newData
@@ -86,6 +87,7 @@ switch handles.par.temp_plot
             % text(tree_temp,tree_clus,num2str(classgui_plot(i)));
             end
         end
+        hold off
 end
 xlim(handles.temperature_plot,[0 handles.par.maxtemp])
 xlabel('Temperature');
