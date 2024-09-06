@@ -25,12 +25,13 @@
 #$ -j y
 # Merge standard error with the job log (standard output)
 
-#$ -l h_rt=10:00:00,h_data=50G
+#$ -l h_rt=10:00:00,h_data=200G
 # Request resources: hours of runtime (h_rt) and memory (h_data)
 # Data limit applies to each task individually, no need to change if submit more tasks.
 
 #$ -pe shared 8
-# Request N core in a shared parallel environment
+# Request N core in a shared parallel environment. Adjust memory request (h_data) and change
+# maxThreads (at line 56) if you require more cores.
 
 # Email address to notify
 #$ -M $USER@mail
@@ -46,12 +47,13 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="573"
-expIds="[3:8]" 
+patientId="1717"
+expIds="[49:52,54]" 
 runRemovePLI="true"
 # if expIds is updated, do not skipExist any steps so that threshold for spike detection is same across experiments
 skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
 mode="spikeSorting"  # Change to "extractLFP" to run extractLFP
+maxThreads="8"
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
@@ -80,6 +82,7 @@ matlab  -nosplash -nodisplay <<EOF
     workingDir = getDirectory();
     filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}');
 
+    maxNumCompThreads($maxThreads);
     if strcmp('${mode}', 'spikeSorting')
         disp("run spike sorting");
         batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist, runRemovePLI);
