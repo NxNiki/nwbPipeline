@@ -22,6 +22,11 @@ makeOutputPath(cscFiles, outputPath, skipExist);
 nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
+% Check if a parallel pool exists
+pool = gcp('nocreate');  % Get current parallel pool without creating a new one
+if ~isempty(pool)
+    delete(pool);  
+end
 parJobs = min(maxNumCompThreads, size(cscFiles, 1));
 parpool('local', parJobs);
 fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs);
