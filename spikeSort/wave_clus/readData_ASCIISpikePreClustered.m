@@ -58,7 +58,7 @@ if exist(manualTimesFile, 'file')
     if strcmp(choice, option1)
         manualTimesFileObj = matfile(manualTimesFile);
         cluster_class = manualTimesFileObj.cluster_class;
-        if ismember('temp', whos(manualTimesFileObj))
+        if ismember('temp', who(manualTimesFileObj))
             USER_DATA{8} = manualTimesFileObj.temp;
         end
     end

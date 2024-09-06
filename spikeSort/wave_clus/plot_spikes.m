@@ -326,6 +326,7 @@ for i = 1:nclusters+1
             %eval(['set(get(gca,''children''),''FaceColor'',''' colors(i) ''',''EdgeColor'',''' colors(i) ''',''Linewidth'',0.01);']);
             title(isiAx, [num2str(multi_isi) ' in < 3ms (', num2str(pct_violations*100), '%)'])
             xlabel(isiAx,'ISI (ms)');
+            hold(ax,'off');
         else
             par.axes_nr = i;
             par.ylimit = ylimit;
@@ -348,6 +349,8 @@ for i = 1:nclusters+1
             end
             %--------------------------------------------------------------
         end
+
+        hold(handles.projections, 'off')
     end
 end
 
