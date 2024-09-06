@@ -29,7 +29,7 @@ if ~isempty(pool)
 end
 parJobs = min(maxNumCompThreads, size(cscFiles, 1));
 parpool('local', parJobs);
-fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs);
+fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
 
 parfor i = 1: size(cscFiles, 1)
 
