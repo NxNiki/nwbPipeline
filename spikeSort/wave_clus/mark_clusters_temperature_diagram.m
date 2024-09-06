@@ -12,35 +12,39 @@ if ~exist('newData','var')||isempty(newData)
 end
 
 % creates cluster-temperature vector to plot in the temperature diagram
-nclasses = max(clustering_results(clustering_results(:,2)<1000,2));
+nclasses = max(clustering_results(clustering_results(:,2)<1000, 2));
 if nclasses == 0
     return
 end
 
-if length(unique(clustering_results(:,2))) < nclasses
-i=1; 
-while i<= nclasses
-    if sum(clustering_results(:,2)==i)==0
-        indsToSubtract = clustering_results(:,2)>i; 
-        clustering_results(indsToSubtract,[2 4]) = clustering_results(indsToSubtract,[2 4]) - 1;
-        nclasses = nclasses-1;
-    else
-        i=i+1;
-    end
-end
-end
+clustering_results(:, 2) = shrinkClassIndex(clustering_results(:, 2));
+clustering_results(:, 4) = shrinkClassIndex(clustering_results(:, 4));
+
+% if length(unique(clustering_results(:,2))) < nclasses
+% i=1;
+% while i<= nclasses
+%     if sum(clustering_results(:,2)==i)==0
+%         indsToSubtract = clustering_results(:,2)>i;
+%         clustering_results(indsToSubtract,[2 4]) = clustering_results(indsToSubtract,[2 4]) - 1;
+%         nclasses = nclasses-1;
+%     else
+%         i=i+1;
+%     end
+% end
+% end
 
 for i=1:nclasses
     ind = find(clustering_results(:,2)==i);
     classgui_plot(i) = clustering_results(ind(1),2);
-    class_plot(i) = clustering_results(ind(1),4);  
-    temp_plot(i) = clustering_results(ind(1),3);  
+    class_plot(i) = clustering_results(ind(1),4);
+    temp_plot(i) = clustering_results(ind(1),3);
 end
 
 
+% colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 
-% draw temperature diagram and mark clusters 
+% draw temperature diagram and mark clusters
 handles.par.num_temp = min(handles.par.num_temp,size(tree,1));
 if newData
 cla(handles.temperature_plot);
@@ -60,7 +64,8 @@ switch handles.par.temp_plot
             plot(handles.temperature_plot,tree_temp,tree_clus,'.','color',num2str(colors(classgui_plot(i))),'MarkerSize',20);
             % text(tree_temp,tree_clus,num2str(classgui_plot(i)));
         end
-        
+        hold off
+
     case 'log'
         if newData
         % draw diagram
@@ -82,24 +87,14 @@ switch handles.par.temp_plot
             % text(tree_temp,tree_clus,num2str(classgui_plot(i)));
             end
         end
+        hold off
 end
 xlim(handles.temperature_plot,[0 handles.par.maxtemp])
-xlabel('Temperature'); 
-if strcmp(handles.par.temp_plot, 'log') 
+xlabel('Temperature');
+if strcmp(handles.par.temp_plot, 'log')
     set(get(handles.temperature_plot,'ylabel'),'vertical','Cap');
 else
     set(get(handles.temperature_plot,'ylabel'),'vertical','Baseline');
 end
 ylabel('Clusters size');
 handles.setclus = 0;
-
-
- 
-
-
-
-
-
-
-
-
