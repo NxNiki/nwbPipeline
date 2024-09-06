@@ -44,29 +44,29 @@ fprintf(fid, 'WriteLables|\n');
 fprintf(fid, 'WriteCorFile~\n');
 if isfield(par, 'randomseed') && par.randomseed ~= 0
     fprintf(fid, 'ForceRandomSeed: %s\n', num2str(par.randomseed));
-end    
+end
 fclose(fid);
 
 system_type = computer;
 switch system_type
     % window not tested.
-    case {'PCWIN'}    
+    case {'PCWIN'}
         [status, result] = dos(sprintf('"%s" %s.run', which('cluster.exe'), fname));
-    case {'PCWIN64'}    
+    case {'PCWIN64'}
         [status, result] = dos(sprintf('"%s" %s.run', which('cluster_64.exe'), fname));
     case {'MAC'}
         cluster_file = which('cluster_mac.exe');
         [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
-    case {'MACI', 'MACI64'}
+    case {'MACI', 'MACI64', 'MACA64'}
         cluster_file = which('cluster_maci.exe');
         [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
-    case {'GLNX86'}  
+    case {'GLNX86'}
         cluster_file = which('cluster_linux.exe');
         [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
     case {'GLNXA64', 'GLNXI64'}
         cluster_file = which('cluster_linux64.exe');
         [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
-    otherwise 
+    otherwise
     	ME = MException('MyComponent:NotSupportedArq', '%s type of computer not supported.', system_type);
     	throw(ME)
 end
@@ -82,18 +82,18 @@ fprintf(f, result);
 fclose(f);
 
 clu = load([fname '.dg_01.lab'], '-ascii');
-tree = load([fname '.dg_01'], '-ascii'); 
+tree = load([fname '.dg_01'], '-ascii');
 
 clu = single(clu);
 tree = single(tree);
 
 fprintf('delete temp files for spike clustering\n %s', fname);
-delete(sprintf('%s.run', fname));    
+delete(sprintf('%s.run', fname));
 delete([fname '*.mag']);
 delete([fname '*.edges']);
 delete([fname '*.param']);
 % delete([fname '.knn']);
-delete(fname_in); 
+delete(fname_in);
 delete([fname '.dg_01.lab']);
 delete([fname '.dg_01']);
 disp('delete files done!')
