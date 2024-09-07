@@ -3,6 +3,24 @@ function logMessage(logFile, logMessage)
     maxWaitTime = 10;
     startTime = tic; % Start the timer
 
+    % Check if the log file's directory exists, if not, create it
+    logDir = fileparts(logFile);
+    if ~exist(logDir, 'dir')
+        mkdir(logDir); % Create the directory if it does not exist
+    end
+
+    % Check if the log file exists; if not, create it
+    if ~exist(logFile, "file")
+        % Create and open the log file
+        fid = fopen(logFile, 'w'); % Use 'w' to create the file
+        if fid == -1
+            warning('Failed to create log file: %s\n', logFile);
+            return;
+        end
+        fclose(fid); % Close the file after creation
+    end
+
+    % Wait until the file becomes available
     while true
         % Attempt to open the log file with exclusive access to check if it's free
         isFileAvailable = checkFileAvailability(logFile);
@@ -23,23 +41,24 @@ function logMessage(logFile, logMessage)
     end
 
     % Open the log file for writing in append mode
-    logFile = fopen(logFile, 'a');
+    fid = fopen(logFile, 'a');
 
-    if logFile == -1
+    if fid == -1
         warning('Failed to open log file: %s\n', logFile);
+        return;
     end
 
-    % Get the current DEFULT_DATA and time
+    % Get the current date and time
     currentTime = datetime('now', 'Format', 'yyyy-MM-dd HH:mm:ss.SSS');
 
     % Create the log message with timestamp
     formattedMessage = sprintf('[%s] %s\n', char(currentTime), logMessage);
 
     % Write the log message to the file
-    fprintf(logFile, formattedMessage);
+    fprintf(fid, formattedMessage);
 
     % Close the log file
-    fclose(logFile);
+    fclose(fid);
 end
 
 function fileIsAvailable = checkFileAvailability(logFile)

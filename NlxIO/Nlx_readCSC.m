@@ -62,7 +62,7 @@ for i = 1:length(incompleteBlocks)
 end
 
 [~, fname] = fileparts(fileName);
-logFile = fullfile(logPath, 'unpack.log');
+logFile = fullfile(logPath, 'unpack_log', [fname, '.log']);
 
 if length(unique(sampleFrequency))~=1
     message = [fname, ': Sampling Frequency is not uniform across data set, please proceed with caution...'];
