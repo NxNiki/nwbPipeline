@@ -7,7 +7,8 @@ Data processing pipeline for iEEG (Neuralynx and Blackrock) recordings.
 - [**Extract LFP**](#extract-lfp) Remove spikes in the raw csc signals and downsample to 2k Hz.
 - [**Manual spike sort**](#manual-spike-sort) Select spike clusters by visual inspection.
 - [**Export to NWB**](#export-to-nwb) Export data to NWB (neural data without borders) format for data sharing.
-- [**Read NWB with Python**](#read-nwb-with-python) 
+- [**Read NWB with Python**](#read-nwb-with-python)
+- [**Tools**](#Tools) Scripts to do data hotfix.
 
 ## How to use:
 
@@ -205,6 +206,11 @@ The scripts to run the pipeline on Hoffman (SGE).
 ### notebooks
 
 Jupyter-notebooks to read nwb data in python.
+
+### tools
+
+scripts to do hotfix on data such as rename file names, migrate variables across files, editing variables, and check corrupted .mat files.
+
 
 ### test
 
