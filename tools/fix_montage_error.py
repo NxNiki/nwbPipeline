@@ -36,62 +36,99 @@ def generate_file_name(montage: List[Tuple[str, int]]) -> List[str]:
 
 def rename_directory(directory: str) -> str:
     directory_split = directory.split("/")
-    directory_split[-2] = directory_split[-2] + "_renamed"
+
+    pattern = r"^EXP.*"
+    # Find the first index of the string that matches the pattern
+    first_match_index = next(
+        (i for i, s in enumerate(directory_split) if re.match(pattern, s)), -1
+    )
+    directory_split[first_match_index] = directory_split[first_match_index] + "_renamed"
 
     directory_rename = "/".join(directory_split)
     return directory_rename
 
 
+def copy_files(directory: str, file_pattern: str, dest_directory: str) -> None:
+    """
+    copy files that match pattern in directory to dest_directory.
+    :param directory:
+    :param file_pattern:
+    :param dest_directory:
+    :return:
+    """
+
+    files = glob.glob(os.path.join(directory, file_pattern))
+    for file_name in files:
+        base_name = os.path.basename(file_name)
+        shutil.copyfile(file_name, os.path.join(dest_directory, base_name))
+        logging.info(
+            "copy file: %s \nfrom: %s \nto: %s\n", file_name, directory, dest_directory
+        )
+
+
+def list_sub_dirs_with_files(folder_path: str, file_ext: str) -> List[str]:
+    sub_dirs = []
+
+    # Loop through all subdirectories
+    for root, _, _ in os.walk(folder_path):
+        if re.match(r".*_renamed", root):
+            continue
+        # Check if any files exist in the current directory
+        ncs_files = glob.glob(os.path.join(root, f"*{file_ext}"))
+        if ncs_files:
+            sub_dirs.append(root)
+
+    return sub_dirs
+
+
 def rename_files(
-    sub_dir: str,
+    directory: str,
     file_name_correct: List[str],
     file_name_error: List[str],
 ) -> None:
-    sub_dir_renamed = rename_directory(sub_dir)
+    """
+    copy files to a new directory and correct file names.
+
+    :param directory:
+    :param file_name_correct:
+    :param file_name_error:
+    :return:
+    """
+    dir_renamed = rename_directory(directory)
 
     for file_error, file_correct in zip(file_name_error, file_name_correct):
-        # skip file if already copied:
-        if SKIP_EXISTING_FILES and os.path.exists(
-            f"{sub_dir_renamed}/{file_correct}.ncs"
-        ):
-            continue
-
-        files_error = glob.glob(f"{sub_dir}/{file_error}*")
+        files_error = glob.glob(f"{directory}/{file_error}*")
         # skip if file does not exist in source:
         if len(files_error) == 0:
-            logging.info("missing file: %s/%s.ncs", sub_dir, file_error)
+            logging.warning("missing file: %s/%s.ncs", directory, file_error)
             continue
 
-        if len(files_error) > 1:
-            logging.warning(
-                "multiple files found with pattern: %s/%s. Only first one is copied",
-                sub_dir,
-                file_error,
-            )
-        file_error_full_path = files_error[0]
-        try:
-            shutil.copyfile(
-                file_error_full_path, f"{sub_dir_renamed}/{file_correct}.ncs"
-            )
-            if file_error != file_correct:
+        for file_name in files_error:
+            suffix = re.match(file_name, "_[d+].ncs")
+            if suffix:
+                file_correct = file_correct.replace(".ncs", suffix[0])
+
+            # skip file if already copied:
+            if SKIP_EXISTING_FILES and os.path.exists(
+                f"{dir_renamed}/{file_correct}.ncs"
+            ):
                 logging.info(
-                    "rename: %s to %s/%s.ncs on dir: %s",
-                    file_error_full_path,
-                    sub_dir_renamed,
-                    file_correct,
-                    sub_dir,
+                    "skip existing file: %s", f"{dir_renamed}/{file_correct}.ncs"
                 )
-            else:
+                continue
+
+            try:
+                shutil.copyfile(file_name, f"{dir_renamed}/{file_correct}.ncs")
                 logging.info(
                     "copy: %s to %s/%s.ncs on dir: %s",
-                    file_error_full_path,
-                    sub_dir_renamed,
+                    file_name,
+                    dir_renamed,
                     file_correct,
-                    sub_dir,
+                    directory,
                 )
-        except OSError as err:
-            print(f"Error copying {file_error_full_path}: {err}")
-            logging.error("Error copying %s: %s", file_error_full_path, err)
+            except OSError as err:
+                print(f"Error copying {file_name}: {err}")
+                logging.error("Error copying %s: %s", file_name, err)
 
 
 def correct_file_name(
@@ -109,8 +146,12 @@ def correct_file_name(
     file_name_correct = generate_file_name(montage_correct)
     file_name_error = generate_file_name(montage_error)
 
-    sub_directories = glob.glob(file_directory + "*")
+    sub_directories = list_sub_dirs_with_files(file_directory, ".ncs")
     for sub_dir in sub_directories:
+        logging.info(
+            "sub_dir: %s",
+            sub_dir,
+        )
         sub_dir_renamed = rename_directory(sub_dir)
 
         # create directory if not exists and not a file (end with .xxx).
@@ -119,9 +160,11 @@ def correct_file_name(
         ):
             os.makedirs(sub_dir_renamed)
 
-        if re.match(r"" + file_directory + "EXP*", sub_dir):
+        if re.match(r"" + file_directory + "*EXP*", sub_dir):
             # copy files in the directory with file names corrected:
             rename_files(sub_dir, file_name_correct, file_name_error)
+            copy_files(sub_dir, "G[A-D]*.ncs", sub_dir_renamed)
+            copy_files(sub_dir, "*.nev", sub_dir_renamed)
         else:
             # try to copy all files without correcting file names:
             try:
@@ -138,7 +181,7 @@ def correct_file_name(
 
 if __name__ == "__main__":
     # file_directory = r'/Users/xinniu/Library/CloudStorage/Box-Box/Vwani_Movie/568/'
-    FILE_DIRECTORY = "/Volumes/DATA/NLData/D568_fix_channel_name"
+    FILE_DIRECTORY = "/Volumes/DATA/NLData/D568_fix_name/"
 
     # Putting 'PZ' at top so that files for this channel is not renamed.
     MONTAGE_ERROR = [
