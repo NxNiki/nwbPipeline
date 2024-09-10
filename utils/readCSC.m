@@ -33,7 +33,9 @@ end
 
 if runRemovePLI
     fprintf("run removePLI on: %s\n", filename);
+    tic
     signalRemovePLI = removePLI(double(signal), 1/samplingIntervalSeconds, numel(60:60:3060), [50 .2 1], [.1 4 1], 2, 60);
+    toc
     signalRemovePLI = single(signalRemovePLI);
     matObj = matfile(filename, 'Writable', true);
     matObj.signalRemovePLI = signalRemovePLI;

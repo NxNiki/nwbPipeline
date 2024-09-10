@@ -28,6 +28,16 @@ if ~isempty(pool)
     delete(pool);  
 end
 parJobs = min(maxNumCompThreads, size(cscFiles, 1));
+
+% Check if the parallel pool is running
+poolobj = gcp('nocreate'); % If no pool, do not create a new one
+
+% If the pool is running, delete it
+if ~isempty(poolobj)
+    delete(poolobj);
+    disp('Existing parallel pool deleted.');
+end
+
 parpool('local', parJobs);
 fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
 
@@ -110,7 +120,7 @@ parfor i = 1: size(cscFiles, 1)
         matobj.outputStruct = outputStruct;
         matobj.spikeTimestamps = [spikeTimestamps{:}];
         matobj.duration = duration;
-    
+
         if saveXfDetect
             matobj.xfDetect = [xfDetect{:}];
         end
@@ -131,6 +141,3 @@ end
 outputFiles = outputFiles(cellfun(@(x)~isempty(x), outputFiles));
 
 end
-
-
-
