@@ -42,6 +42,8 @@ def rename_directory(directory: str) -> str:
     first_match_index = next(
         (i for i, s in enumerate(directory_split) if re.match(pattern, s)), -1
     )
+    # add suffix to the parent folder of folder with pattern "^EXP.*':
+    first_match_index = first_match_index - 1
     directory_split[first_match_index] = directory_split[first_match_index] + "_renamed"
 
     directory_rename = "/".join(directory_split)
@@ -60,7 +62,12 @@ def copy_files(directory: str, file_pattern: str, dest_directory: str) -> None:
     files = glob.glob(os.path.join(directory, file_pattern))
     for file_name in files:
         base_name = os.path.basename(file_name)
-        shutil.copyfile(file_name, os.path.join(dest_directory, base_name))
+        dest_file = os.path.join(dest_directory, base_name)
+        if SKIP_EXISTING_FILES and os.path.exists(dest_file):
+            logging.info("skip existing file: %s\n", dest_file)
+            continue
+
+        shutil.copyfile(file_name, dest_file)
         logging.info(
             "copy file: %s \nfrom: %s \nto: %s\n", file_name, directory, dest_directory
         )
@@ -71,6 +78,7 @@ def list_sub_dirs_with_files(folder_path: str, file_ext: str) -> List[str]:
 
     # Loop through all subdirectories
     for root, _, _ in os.walk(folder_path):
+        # do not list files in renamed folder
         if re.match(r".*_renamed", root):
             continue
         # Check if any files exist in the current directory
@@ -104,9 +112,10 @@ def rename_files(
             continue
 
         for file_name in files_error:
-            suffix = re.match(file_name, "_[d+].ncs")
-            if suffix:
-                file_correct = file_correct.replace(".ncs", suffix[0])
+            match = re.search(r"_\d{3,5}.ncs", file_name)
+            if match:
+                suffix = match.group()
+                file_correct = file_correct + suffix
 
             # skip file if already copied:
             if SKIP_EXISTING_FILES and os.path.exists(
@@ -137,8 +146,11 @@ def correct_file_name(
     montage_error: List[Tuple[str, int]],
 ) -> None:
     current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
+    log_file = os.path.join(
+        file_directory, f"log_fix_montage_error_{current_datetime}.log"
+    )
     logging.basicConfig(
-        filename=f"log_fix_montage_error_{current_datetime}.log",
+        filename=log_file,
         level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
@@ -161,10 +173,14 @@ def correct_file_name(
             os.makedirs(sub_dir_renamed)
 
         if re.match(r"" + file_directory + "*EXP*", sub_dir):
-            # copy files in the directory with file names corrected:
+            # copy macro files in the directory with file names corrected:
             rename_files(sub_dir, file_name_correct, file_name_error)
-            copy_files(sub_dir, "G[A-D]*.ncs", sub_dir_renamed)
-            copy_files(sub_dir, "*.nev", sub_dir_renamed)
+
+            # copy micro channels:
+            # copy_files(sub_dir, "G[A-D]*.ncs", sub_dir_renamed)
+
+            # copy event files:
+            # copy_files(sub_dir, "*.nev", sub_dir_renamed)
         else:
             # try to copy all files without correcting file names:
             try:
