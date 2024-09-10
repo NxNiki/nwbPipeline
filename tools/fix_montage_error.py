@@ -44,10 +44,11 @@ def rename_directory(directory: str) -> str:
 
 def rename_files(
     sub_dir: str,
-    sub_dir_renamed: str,
     file_name_correct: List[str],
     file_name_error: List[str],
 ) -> None:
+    sub_dir_renamed = rename_directory(sub_dir)
+
     for file_error, file_correct in zip(file_name_error, file_name_correct):
         # skip file if already copied:
         if SKIP_EXISTING_FILES and os.path.exists(
@@ -119,8 +120,10 @@ def correct_file_name(
             os.makedirs(sub_dir_renamed)
 
         if re.match(r"" + file_directory + "EXP*", sub_dir):
-            rename_files(sub_dir, sub_dir_renamed, file_name_correct, file_name_error)
+            # copy files in the directory with file names corrected:
+            rename_files(sub_dir, file_name_correct, file_name_error)
         else:
+            # try to copy all files without correcting file names:
             try:
                 if os.path.isdir(sub_dir):
                     shutil.copytree(sub_dir, sub_dir_renamed, dirs_exist_ok=True)
@@ -135,10 +138,7 @@ def correct_file_name(
 
 if __name__ == "__main__":
     # file_directory = r'/Users/xinniu/Library/CloudStorage/Box-Box/Vwani_Movie/568/'
-    FILE_DIRECTORY = (
-        r"/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/568_MovieParadigm/"
-        r"Experiment-4/CSC_macro"
-    )
+    FILE_DIRECTORY = "/Volumes/DATA/NLData/D568_fix_channel_name"
 
     # Putting 'PZ' at top so that files for this channel is not renamed.
     MONTAGE_ERROR = [
