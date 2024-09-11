@@ -6,31 +6,26 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-% define unpack config fie, or comment it will trigger a UI to
+% set unpack config fie, or let it empty to set up with unpackNeuralynxUI:
 unpackConfigFile = [];
 
-%%% skip already unpacked files:
-skipExist = 1;
-
-%%% define number of task in parfor:
-% generally we won't have memory issue in unpacking unless the raw ncs
-% files are combined for sleep experiments.
-numParallelTasks = 8;
-% numParallelTasks = [];
 
 %%
-if ~exist("filePath", "var") || isempty(unpackConfigFile)
-    [filePath, expIds, outFilePath, macroPattern, microPattern, eventPattern, montageConfigFile] = unpackNeuralynxUI();
+if ~exist("unpackConfigFile", "var") || isempty(unpackConfigFile)
+    unpackConfig = unpackNeuralynxUI();
 else
-    data = readJson(unpackConfigFile);
-    filePath = data.SelectedFolders;
-    expIds = data.ExperimentIds;
-    outFilePath = data.OutputFilePath;
-    macroPattern = data.macroPattern;
-    microPattern = data.microPattern;
-    eventPattern = data.eventPattern;
-    montageConfigFile = data.montageConfigFile;
+    unpackConfig = readJson(unpackConfigFile);
 end
+
+filePath = unpackConfig.SelectedFolders;
+expIds = unpackConfig.ExperimentIds;
+outFilePath = unpackConfig.OutputFilePath;
+macroPattern = unpackConfig.macroPattern;
+microPattern = unpackConfig.microPattern;
+eventPattern = unpackConfig.eventPattern;
+montageConfigFile = unpackConfig.montageConfigFile;
+skipExist = unpackConfig.skipExist;
+numParallelTasks = unpackConfig.numParallelTasks;
 
 if ~isempty(numParallelTasks)
     delete(gcp('nocreate'))

@@ -16,7 +16,7 @@ filenames = {d.name};
 
 if nargin == 3
     filesizes = [d.bytes];
-    filenames = filenames(filesizes > ignoreFilesWithSizeBelow + 1);  
+    filenames = filenames(filesizes > ignoreFilesWithSizeBelow + 1);
 end
 
 filenames = filenames(:);
@@ -25,9 +25,9 @@ keep = cellfun(@(x) ~any(cellfun(@(p) ~isempty(regexp(x, p, 'once')), IGNORE_FIL
 filenames = filenames(keep);
 
 if isempty(filenames)
-    error(["No Neuralynx files detected in folder: %s\n"...
-            "Make sure the directory you selected has .ncs files"...
-            " or change IGNORE_FILES in config.m"], directory);
+    warning(['No Neuralynx files detected in folder: %s\n', ...
+            'Make sure the directory you selected has .ncs files', ...
+            ' or change IGNORE_FILES in config.m'], directory);
 end
 
 end

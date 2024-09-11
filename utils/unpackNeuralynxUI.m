@@ -1,4 +1,4 @@
-function [selectedFolders, experimentIds, outputFilePath, macroPattern, microPattern, eventPattern, montageConfigFile, numParallelTasks] = unpackNeuralynxUI()
+function unpackConfig = unpackNeuralynxUI()
 % set variables (folders, IDs, and paths) to unpack raw .ncs file to .mat.
 % see run_unpackNeuralynx.m
 
@@ -11,7 +11,11 @@ macroPattern = '*';
 microPattern = '*';
 eventPattern = 'Events*';
 montageConfigFile = [];
-numParallelTasks = 8;
+
+unpackConfig = struct();
+% generally we won't have memory issue in unpacking unless the raw ncs
+% files are combined for sleep experiments.
+unpackConfig.numParallelTasks = 8;
 
 defaultBasePath = '/Volumes/DATA/NLData/';
 defaultOutputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm';
@@ -161,6 +165,12 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
     'Position', [0.05 0.4 0.8 0.5], 'String', defaultSaveFile, ...
     'FontSize', 15, 'HorizontalAlignment', 'left');
 
+% Add a checkbox for enabling/disabling skipExist
+skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units', 'normalized', ...
+    'Position', [0.4 0.1 0.3 0.3], 'String', 'Skip Exist', ...
+    'FontSize', 12, 'Value', 1); % Default to checked
+
+
 %% Function to add paths to the list
     function addPaths(~, ~)
         baseDir = get(baseDirInput, 'String');
@@ -229,16 +239,17 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
             montageConfigFile = get(montageFileInput, 'String');
 
             % Construct the data structure
-            data = struct();
-            data.BaseDirectory = get(baseDirInput, 'String');
-            data.ExperimentIds = experimentIds;
-            data.OutputFilePath = outputFilePath;
-            data.SelectedFolders = selectedFolders;  % Ensure this is updated
-            data.fileNameInput = fileNameInputString;
-            data.macroPattern = macroPattern;
-            data.microPattern = microPattern;
-            data.eventPattern = eventPattern;
-            data.montageConfigFile = montageConfigFile;
+
+            unpackConfig.BaseDirectory = get(baseDirInput, 'String');
+            unpackConfig.ExperimentIds = experimentIds;
+            unpackConfig.OutputFilePath = outputFilePath;
+            unpackConfig.SelectedFolders = selectedFolders;  % Ensure this is updated
+            unpackConfig.fileNameInput = fileNameInputString;
+            unpackConfig.macroPattern = macroPattern;
+            unpackConfig.microPattern = microPattern;
+            unpackConfig.eventPattern = eventPattern;
+            unpackConfig.montageConfigFile = montageConfigFile;
+            unpackConfig.skipExist = get(skipExistCheckbox, 'Value');
 
             % Check if "Save to JSON" is enabled and process accordingly
             if get(saveCheckbox, 'Value') == 1
@@ -250,8 +261,9 @@ fileNameInput = uicontrol('Parent', savePanel, 'Style', 'edit', 'Units', 'normal
                     jsonFilename = ensureJsonExtension(jsonFilename);
                 end
 
-                baseDir = getBaseDir();
-                writeJson(data, fullfile(baseDir, 'scripts/unpackConfigs', jsonFilename));
+                % baseDir = getBaseDir();
+                % writeJson(data, fullfile(baseDir, 'scripts/unpackConfigs', jsonFilename));
+                writeJson(unpackConfig, fullfile(outputFilePath, jsonFilename));
             end
 
             delete(f);  % Close the window
