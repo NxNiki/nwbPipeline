@@ -1,7 +1,7 @@
 function spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist)
 
 % spikeFiles: cell(n, 1). the fullpath of spike files.
-% outputPath: str. 
+% outputPath: str.
 % skipExist: bool.
 
 
@@ -9,7 +9,7 @@ makeOutputPath(spikeFiles, outputPath, skipExist)
 
 min_spikes4SPC = 16;
 
-for fnum = 1:length(spikeFiles)
+parfor fnum = 1:length(spikeFiles)
 
     spikeFile = spikeFiles{fnum};
     [~, filename, ext] = fileparts(spikeFile);
@@ -18,7 +18,7 @@ for fnum = 1:length(spikeFiles)
         continue
     end
     fprintf('clustering spikes:\n %s\n%s\n', spikeFile, spikeCodeFiles{fnum});
-    
+
     % run spike clustering
     do_clustering_single_AS(spikeFile, spikeCodeFiles{fnum}, outputPath, min_spikes4SPC);
 
