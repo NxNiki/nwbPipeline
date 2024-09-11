@@ -12,3 +12,4 @@ nilearn
 mne
 neo
 hdmf
+mat73

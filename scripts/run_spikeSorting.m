@@ -5,16 +5,16 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-expIds = [11:13];
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/557_MovieParadigm';
+expIds = [2];
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/577_Screening';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = [0, 0, 0];
+skipExist = [1, 0, 0];
 
 % remove noises caused by power line interference:
-runRemovePLI = true;
+runRemovePLI = false;
 
-maxNumCompThreads(4);
+maxNumCompThreads(8);
 
 batch_spikeSorting(1, 1, expIds, filePath, skipExist, runRemovePLI);

@@ -261,9 +261,9 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
                     jsonFilename = ensureJsonExtension(jsonFilename);
                 end
 
-                % baseDir = getBaseDir();
-                % writeJson(data, fullfile(baseDir, 'scripts/unpackConfigs', jsonFilename));
-                writeJson(unpackConfig, fullfile(outputFilePath, jsonFilename));
+                baseDir = getBaseDir();
+                writeJson(unpackConfig, fullfile(baseDir, 'scripts/unpackConfigs', jsonFilename));
+                % writeJson(unpackConfig, fullfile(outputFilePath, jsonFilename));
             end
 
             delete(f);  % Close the window

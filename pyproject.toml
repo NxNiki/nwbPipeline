@@ -1,3 +1,40 @@
+[tool.poetry]
+name = "nwbPipeline"
+version = "0.1.0"
+description = ""
+authors = ["NxNiki <michaelniki1988@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+packages = [
+    { include = "utils", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.2"
+statsmodels = "^0.14.2"
+matplotlib = "^3.9.1"
+seaborn = "^0.13.2"
+pyarrow = "^17.0.0"
+pynwb = "^2.3.3"
+h5py = "^3.2.1"
+numpy = "^1.19.5"
+scipy = "^1.14.1"
+mat73 = "^0.65"
+jupyter = "^1.1.1"
+scikit-learn = "^1.5.2"
+nilearn = "^0.10.4"
+mne = "^1.8.0"
+neo = "^0.13.3"
+hdmf = "^3.14.4"
+
+[tool.poetry.dev-dependencies]
+black = "^23.0"
+isort = "^5.10.1"
+mypy = "^1.4.1"
+pre-commit = "^3.7.1"
+
 [tool.isort]
 profile = "black"
 line_length = 120
@@ -7,3 +44,5 @@ sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 
 [tool.mypy]
 python_executable = "/opt/miniconda3/envs/nwbPipeline/bin/python3.8"
+
+

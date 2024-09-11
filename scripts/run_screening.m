@@ -4,9 +4,9 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 574;
-expId = 16;
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening';
+patient = 577;
+expId = 2;
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/577_Screening';
 % filePath = '/Users/XinNiuAdmin/HoffmanMount/xinniu/xin_test/PIPELINE_vc/ANALYSIS/Screening/573_Screening';
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
@@ -15,7 +15,7 @@ expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    "/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/574_Screening/Screening 3/574-25-Jul-2024-17-42-48/from laptop/ttlLog574-25-Jul-2024-17-42-48.mat";
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D577/Screening 1/577-10-Sep-2024-17-8-26/from laptop/ttlLog577-10-Sep-2024-17-8-26.mat';
     %fullfile(expFilePath, "573-screening Log/573-02-May-2024-15-23-30/from laptop/TTLs573-02-May-2024-15-23-30_room1.mat")
     };
 
