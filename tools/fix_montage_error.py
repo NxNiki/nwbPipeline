@@ -108,33 +108,26 @@ def rename_files(
         files_error = glob.glob(f"{directory}/{file_error}*")
         # skip if file does not exist in source:
         if len(files_error) == 0:
-            logging.warning("missing file: %s/%s.ncs", directory, file_error)
+            logging.warning("missing file:%s in directory: %s", file_error, directory)
             continue
 
         for file_name in files_error:
             match = re.search(r"_\d{3,5}.ncs", file_name)
             if match:
                 suffix = match.group()
-                file_correct = file_correct + suffix
+                file_correct_suffix = file_correct + suffix
+            else:
+                file_correct_suffix = file_correct + ".ncs"
 
+            dest_file = os.path.join(dir_renamed, file_correct_suffix)
             # skip file if already copied:
-            if SKIP_EXISTING_FILES and os.path.exists(
-                f"{dir_renamed}/{file_correct}.ncs"
-            ):
-                logging.info(
-                    "skip existing file: %s", f"{dir_renamed}/{file_correct}.ncs"
-                )
+            if SKIP_EXISTING_FILES and os.path.exists(dest_file):
+                logging.info("skip existing file: %s", dest_file)
                 continue
 
             try:
-                shutil.copyfile(file_name, f"{dir_renamed}/{file_correct}.ncs")
-                logging.info(
-                    "copy: %s to %s/%s.ncs on dir: %s",
-                    file_name,
-                    dir_renamed,
-                    file_correct,
-                    directory,
-                )
+                shutil.copyfile(file_name, dest_file)
+                logging.info("copy: %s \nto: %s", file_name, dest_file)
             except OSError as err:
                 print(f"Error copying {file_name}: {err}")
                 logging.error("Error copying %s: %s", file_name, err)
