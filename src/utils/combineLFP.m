@@ -9,10 +9,3 @@ function [lfp, regularTimestamps] = combineLFP(lfps, timestamps, fs)
 if length(lfps) ~= length(timestamps)
     error('input length not match!')
 end
-
-
-
-
-
-
-

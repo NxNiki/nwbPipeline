@@ -13,6 +13,8 @@ if runRemovePLI && ismember('signalRemovePLI', who('-file', filename))
     runRemovePLI = false;
 elseif ismember('ADBitVolts', who('-file', filename)) && ~isnan(matObj.ADBitVolts)
     signal = single(signal(:)) * matObj.ADBitVolts * 1e6; % convert signal to micro volt
+elseif ismember('BlackRockUnits', who('-file', filename))
+    signal = single(signal(:)) * matObj.BlackRockUnits;
 else
     message = 'ADBitVolts is NaN; your CSC data will not be scaled';
     warning(message);
@@ -26,7 +28,7 @@ else
 
     % check units of sampling intervals:
     while 1/samplingIntervalSeconds < 500
-        warning("scale samplingIntervalSeconds down by 1000")
+        warning("scale samplingInterval down from: %d to %d.", samplingIntervalSeconds, samplingIntervalSeconds/1000)
         samplingIntervalSeconds = samplingIntervalSeconds/1000;
     end
 end

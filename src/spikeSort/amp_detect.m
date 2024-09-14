@@ -102,7 +102,7 @@ excludedSpikes = spikes;
 excludedIndex = index;
 xf=[xf zeros(1,w_post)];
 for i=1:nspk                            % Eliminates artifacts
-    if max(abs( xf(index(i)-w_pre:index(i)+w_post) )) < thrmax               
+    if max(abs( xf(index(i)-w_pre:index(i)+w_post) )) < thrmax
         spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
     else
         excludedSpikes(i,:) = xf(index(i)-w_pre-1:index(i)+w_post+2);
@@ -116,14 +116,12 @@ excludedIndex(~aux, :) = [];
 detectionParams.excludedSpikes = excludedSpikes;
 detectionParams.excludedIndex = excludedIndex;
 
-        
+
 switch param.interpolation
     case 'n'
-        spikes(:,end-1:end)=[];         % eliminates borders that were introduced for interpolation 
+        spikes(:,end-1:end)=[];         % eliminates borders that were introduced for interpolation
         spikes(:,1:2)=[];
     case 'y'
         %Does interpolation
-        spikes = int_spikes(spikes,handles);   
+        spikes = int_spikes(spikes,handles);
 end
-
-

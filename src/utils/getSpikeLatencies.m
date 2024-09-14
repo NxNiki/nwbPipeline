@@ -28,9 +28,9 @@ if nargin < 3
 end
 % Binary search for index
 while sup - inf > 1
-    med = floor((sup + inf)/2);    
+    med = floor((sup + inf)/2);
     % Replace >= here with > to obtain the last index instead of the first.
-    if arr(med) > val 
+    if arr(med) > val
         sup = med;
     elseif arr(med) == val
         sup = med; inf = med;

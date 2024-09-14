@@ -35,7 +35,7 @@ else
         [y i] = sort(distances(conforming)); % k-nearest neighbors
         i = i(1:min(length(i),k));
     else
-        [y i] = min(distances(conforming));   
+        [y i] = min(distances(conforming));
     end
     index = conforming(i);
 end

@@ -2,7 +2,7 @@ function lfpTimestamps = downsampleTimestamps(microTimestampFiles, macroTimestam
 
     [~, microTimestamps, ~, microTimestampStart] = combineCSC([], microTimestampFiles, inf);
     [~, macroTimestamps, ~, macroTimestampStart] = combineCSC([], macroTimestampFiles, inf);
-    
+
     if microTimestampStart ~= macroTimestampStart
         warning("micro and macro channels have different start time!");
     end
@@ -17,5 +17,5 @@ function lfpTimestamps = downsampleTimestamps(microTimestampFiles, macroTimestam
     lfpTimestampsFileObj.macroTimestampStart = macroTimestampStart;
 
     lfpTimestamps = microTimestamps(1): 1/lfpFs: microTimestamps(end);
-    
+
 end

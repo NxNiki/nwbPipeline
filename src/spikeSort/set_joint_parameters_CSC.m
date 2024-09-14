@@ -87,4 +87,3 @@ par.min_freq = 0.5;                 % frequency below which the channel is
 %par.max_spikes = 100000;           % max. # of spikes to be plotted
 % was:
 par.max_spikes = 1000;              % max. # of spikes to be plotted
-

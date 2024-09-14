@@ -25,4 +25,3 @@ end
 result = [startIndices', stopIndices'];
 
 end
-

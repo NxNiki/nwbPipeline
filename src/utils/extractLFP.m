@@ -23,7 +23,7 @@ for i = 1: numFiles
     channelName = extractChannelName(channelFilename, '.*(?=_\d+)');
     lfpFilename = fullfile(outputPath, [channelName, '_lfp.mat']);
     lfpFilenameTemp = fullfile(outputPath, [channelName, '_lfp_temp.mat']);
-    
+
     if exist(lfpFilename, "file") && skipExist
         continue
     end
@@ -35,7 +35,7 @@ for i = 1: numFiles
     end
 
     % it is better if we can combine the data at 32kHz then filter,
-    % to reduce edge effects - especially for the sleep data 
+    % to reduce edge effects - especially for the sleep data
     % (for data that is separated in time there will be edge effects either way)
     % but this will take a lot of memory
     [cscSignal, timestamps, samplingInterval] = combineCSC(channelFiles, timestampFiles);
@@ -140,14 +140,12 @@ function gapLength = findGapLength(index)
     % signal, 0: non-spike intervals.
 
     index = logical(index);
-    
+
     indexStart = [0, index(1:end-1)];
     diff = index - indexStart;
-    
+
     startIdx = find(diff == 1);
     endIdx = find(diff == -1);
-    
+
     gapLength = endIdx - startIdx;
 end
-
-

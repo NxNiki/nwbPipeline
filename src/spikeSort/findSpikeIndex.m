@@ -15,4 +15,3 @@ end
 
 spikeStartIndex = searchRange(1) + spikeStartIndex - 1;
 spikeEndIndex = spikeStartIndex + length(spike) - 1;
-

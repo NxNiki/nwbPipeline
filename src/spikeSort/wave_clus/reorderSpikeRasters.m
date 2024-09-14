@@ -17,7 +17,7 @@ if nargin==0
     end
     return
 end
-                
+
 
 % make sure newOrder is a row vector:
 newOrder = newOrder(:)';
@@ -53,7 +53,7 @@ end
 
 
 % Get newOrder into the proper form:
-if ischar(newOrder) 
+if ischar(newOrder)
     switch newOrder
         case 'reset'
             newOrder = nUnits:-1:1;
@@ -70,7 +70,7 @@ if ischar(newOrder)
         otherwise
             error('newOrder must be a vector of cluster numbers OR the word ''reset'', ''random'', or ''reverse''');
     end
-    
+
 else
     % make sure all els are in the newOrder
     missingFromNew = find(~ismember(1:nUnits,newOrder));

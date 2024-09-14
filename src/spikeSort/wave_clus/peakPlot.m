@@ -36,13 +36,13 @@ set(ax,'xlim',[0 max([maxTime 1])]);
 if 0; % plot spike widths over time? % isempty(get(handles.cont_data,'children'))
     % if cont_data has data in it, the xlim should already be scaled to be
     % the same. If not, set it to the max time of spikes.
-    
-    
+
+
     % and, might as well take advantage of that empty space. Plot spike
     % width vs time.
     ax2 = handles.cont_data; hold(ax2,'on');
     cellfun(@(t,p,c)plot(ax2,t,p,'.','color',c,'markersize',12),ts,widths,colors(1:length(ts)));
-    
+
     maxWidth = max(cell2mat(widths));
     set(ax2,'ylim',[0 1.2*maxWidth])
     linkaxes([ax ax2],'x')
@@ -73,13 +73,13 @@ function w = getWidths(spikes,peakIndex)
 %     ratio instead of just half width. But now we just reject spikes with
 %     high height to width ratio before clustering, so no need to
 %     compute/plot here.
-    f = figure; subplot(421); histogram(w); 
+    f = figure; subplot(421); histogram(w);
     subplot(422); inds = find(w>2 & w<10); if length(inds)>500,inds = randsample(inds,500);end; plot(spikes(inds,:)'); title('2-10')
     subplot(423); plot(spikes(w<20 & w>10,:)'); title('10-20')
     subplot(424); plot(spikes(w>20,:)'); title('>20');
     subplot(425); plot(spikes(w<0,:)');title('<0')
     subplot(426); plot(spikes(w<2 & w>0,:)'); title('0-2')
-    
+
 [n, c] = histcounts(w);
 zeroSets = continuousRunsOfTrue(n<.02*max(n));
 inds = zeroSets(:,2)-zeroSets(:,1) < 3; zeroSets(inds,:) = [];

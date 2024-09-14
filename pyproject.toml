@@ -43,6 +43,4 @@ known_third_party = "django,flask"
 sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 
 [tool.mypy]
-python_executable = "/opt/miniconda3/envs/nwbPipeline/bin/python3.8"
-
-
+python_executable = "/opt/miniconda3/envs/nwbPipeline/bin/python3.10"

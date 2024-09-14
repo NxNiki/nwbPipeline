@@ -8,7 +8,3 @@ for i=1:N,
     mu(i,:) = mean(x(class==i,:));
     inv_sigma(:,:,i) = inv(cov(x(class==i,:)));
 end
-
-
-    
-

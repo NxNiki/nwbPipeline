@@ -1,5 +1,5 @@
 function [KSmax] = test_ks(x)
-% 
+%
 % Calculates the CDF (expcdf)
 %[y_expcdf,x_expcdf]=cdfcalc(x);
 
@@ -16,14 +16,14 @@ x_expcdf = x(notdup);
 y_expcdf = [0; yCDF(notdup)];
 
 %
-% The theoretical CDF (theocdf) is assumed to be normal  
+% The theoretical CDF (theocdf) is assumed to be normal
 % with unknown mean and sigma
 
 zScores  =  (x_expcdf - mean(x))./std(x);
 
 %theocdf  =  normcdf(zScores , 0 , 1);
-mu = 0; 
-sigma = 1; 
+mu = 0;
+sigma = 1;
 theocdf = 0.5 * erfc(-(zScores-mu)./(sqrt(2)*sigma));
 
 

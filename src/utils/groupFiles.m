@@ -159,5 +159,3 @@ if reverse
     order = order(length(files):-1:1);
 end
 end
-
-

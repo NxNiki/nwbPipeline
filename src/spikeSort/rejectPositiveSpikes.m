@@ -31,9 +31,9 @@ for i = 1:length(clusterIndices)
     if sum(spikeIdx) < 100
         continue
     end
-    
+
     if sum(posSpikes(spikeIdx)) > sum(negSpikes(spikeIdx)) * 10
-        % keep positive spikes if their number is larger than 10 times of 
+        % keep positive spikes if their number is larger than 10 times of
         % the negative ones:
         cluster_class(negSpikes(:) & spikeIdx(:)) = 0;
     else

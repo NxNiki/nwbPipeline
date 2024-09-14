@@ -22,7 +22,7 @@ sup_spikes = length(class_to_plot);
 
 % Plot clusters
 colors = ['k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
-eval(['axes(handles.spikes' num2str(axes_nr-1) ');']); 
+eval(['axes(handles.spikes' num2str(axes_nr-1) ');']);
 cla reset
 hold on
 av   = mean(spikes(class_to_plot,:));
@@ -40,17 +40,17 @@ end
 xlim([1 ls])
 aux = num2str(length(class_to_plot));
 eval(['title([''Cluster ' num2str(axes_nr-1) ':  # ' aux '''],''Fontweight'',''bold'')']);
-eval(['axes(handles.isi' num2str(axes_nr-1) ');']); 
+eval(['axes(handles.isi' num2str(axes_nr-1) ');']);
 times = diff(spk_times(class_to_plot));
-% Calculates # ISIs < 3ms  
+% Calculates # ISIs < 3ms
 bin_step_temp = 1;
 eval(['[N,X]=hist(times,0:bin_step_temp:par.nbins' num2str(axes_nr-1) ');']);
-multi_isi= sum(N(1:3)); 
+multi_isi= sum(N(1:3));
 % Builds and plots the histogram
 eval(['[N,X]=hist(times,0:par.bin_step' num2str(axes_nr-1) ':par.nbins' num2str(axes_nr-1) ');']);
 bar(X(1:end-1),N(1:end-1))
 eval(['xlim([0 par.nbins' num2str(axes_nr-1) ']);']);
-%eval(['set(get(gca,''children''),''facecolor'',''' colors(axes_nr) ''',''edgecolor'',''' colors(axes_nr) ''',''linewidth'',0.01);']);    
+%eval(['set(get(gca,''children''),''facecolor'',''' colors(axes_nr) ''',''edgecolor'',''' colors(axes_nr) ''',''linewidth'',0.01);']);
 title([num2str(multi_isi) ' in < 3ms'])
 xlabel('ISI (ms)');
 

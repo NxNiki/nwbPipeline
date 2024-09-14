@@ -27,7 +27,7 @@ function moveFile(source, dest, removeSource)
     % also copy IO record so that we can rerun analysis directly from LTS:
     IOLogFileOut = fullfile(destDir, 'outFileNames.csv');
     IOLogFileIn = fullfile(sourceDir, 'outFileNames.csv');
-    
+
     if ~exist(IOLogFileOut, "file") && exist(IOLogFileIn, "file")
         IOLogIn = readcell(IOLogFileIn);
         IOLogOut = cellfun(@(x)strrep(x, sourceDir, destDir), IOLogIn);
@@ -40,12 +40,12 @@ function moveFile(source, dest, removeSource)
 
         % Copy the file to the destination
         copyStatus = copyfile(source, dest, 'f');
-        
+
         if copyStatus && removeSource
             % Get information about the source and destination files
             sourceInfo = dir(source);
             destInfo = dir(dest);
-    
+
             % Check if the destination file exists and is not corrupted
             if exist(dest, 'file') && sourceInfo.bytes == destInfo.bytes
                 delete(source);
@@ -58,4 +58,3 @@ function moveFile(source, dest, removeSource)
         end
     end
 end
-

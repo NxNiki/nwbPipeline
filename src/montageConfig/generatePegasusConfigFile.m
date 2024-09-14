@@ -32,17 +32,19 @@ for i=1:length(microList)
     end
 end
 
-% startsAt = [0 cumsum(nChannels(1:end-1))]+96; % removed the +96 because
-% we are moving macros to sources 1-4:
-startsAt = [0 cumsum(macroNumChannels(1:end-1))];
-for i=1:length(macroList)
-    addMacrosToConfig(fid, startsAt(i), macroList{i}, macroNumChannels(i));
-    addMacrosToConfig(fid2, startsAt(i), macroList{i}, macroNumChannels(i));
-end
+if ~isempty(macroList)
+    % startsAt = [0 cumsum(nChannels(1:end-1))]+96; % removed the +96 because
+    % we are moving macros to sources 1-4:
+    startsAt = [0 cumsum(macroNumChannels(1:end-1))];
+    for i=1:length(macroList)
+        addMacrosToConfig(fid, startsAt(i), macroList{i}, macroNumChannels(i));
+        addMacrosToConfig(fid2, startsAt(i), macroList{i}, macroNumChannels(i));
+    end
 
-miscStart = startsAt(end)+macroNumChannels(end);
-for i=1:length(miscMacros)
-    addMiscToConfig(fid, miscStart+i-1, miscMacros{i});
+    miscStart = startsAt(end)+macroNumChannels(end);
+    for i=1:length(miscMacros)
+        addMiscToConfig(fid, miscStart+i-1, miscMacros{i});
+    end
 end
 
 % if ~ismember('MICROPHONE',miscMacros)
@@ -296,11 +298,11 @@ switch miscName
     otherwise
         fprintf(fid,'-SetAcqEntReference "%s" 320000%02d\n',miscName,thisRef);
 end
-        
-if ismember(miscName,{'MICROPHONE','GlobalMicroRef'})    
+
+if ismember(miscName,{'MICROPHONE','GlobalMicroRef'})
     fprintf(fid,'-SetInputRange "%s" 5000\n',miscName);
     fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
-elseif ismember(miscName,{'Analogue1','Analogue2'})  
+elseif ismember(miscName,{'Analogue1','Analogue2'})
     fprintf(fid,'-SetInputRange "%s" 1500\n',miscName);
     fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
 else
@@ -437,7 +439,7 @@ switch part
         fprintf(fid,'-SetDialogPosition Subject 133 175\n');
         fprintf(fid,'-SetDialogVisible Subject False\n');
         fprintf(fid,'\n');
-        
+
 end
 
 
@@ -469,7 +471,7 @@ for i=1:maxCh
     if addSuffix
     thisStr = sprintf('%s%s%d',extraInfo,microName,i);
     else
-      thisStr = sprintf('%s%s',extraInfo,microName);  
+      thisStr = sprintf('%s%s',extraInfo,microName);
     end
     fprintf(fid,'-AddPlot "%s" "%s"\n',whichWindow,thisStr);
     fprintf(fid,'-SetPlotEnabled "%s" "%s" True\n',whichWindow,thisStr);

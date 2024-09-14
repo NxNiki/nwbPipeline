@@ -5,8 +5,8 @@ function y = fix_filter(x)
 a = [1.0000 -2.3930  2.0859 -0.9413 0.2502];
 b = [0.1966 -0.0167 -0.3598 -0.0167 0.1966];
 
-x = x(:);  
-len = size(x,1);  
+x = x(:);
+len = size(x,1);
 b = b(:).';
 a = a(:).';
 nb = length(b);
@@ -40,4 +40,4 @@ y = y(length(y):-1:1);
 
 y([1:nfact len+nfact+(1:nfact)]) = [];
 
-y = y.';   
+y = y.';

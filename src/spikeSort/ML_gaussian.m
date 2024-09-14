@@ -3,7 +3,7 @@ function index = ML_gaussian(x,mu,inv_sigma)
 % x is a vector drawn from some multivariate gaussian
 % mu(i,:) is the mean of the ith Gaussian
 % sigma(:,:,i) is the covariance of the ith Gaussian
-% 
+%
 % Returns the index of the Gaussian with the highest value of p(x).
 
 N = size(mu,1);  % number of Gaussians

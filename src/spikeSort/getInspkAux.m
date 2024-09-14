@@ -22,7 +22,7 @@ function ipermut = getInspkAux(par, inspk)
             inspk_aux = inspk(ipermut,:);
         end
     end
-    
+
     inspk_aux = double(inspk_aux);
     %INTERACTION WITH SPC
     save(par.fname_in, 'inspk_aux', '-ascii');

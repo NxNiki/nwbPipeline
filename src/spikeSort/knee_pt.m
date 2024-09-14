@@ -39,7 +39,7 @@ function [res_x, idx_of_result] = knee_pt(y, x, just_return)
 %
 %
 %Example: drawing the curve for the submission
-% x=.1:.1:3; y = exp(-x)./sqrt(x); [i,ix]=knee_pt(y,x); 
+% x=.1:.1:3; y = exp(-x)./sqrt(x); [i,ix]=knee_pt(y,x);
 % figure;plot(x,y);
 % rectangle('curvature',[1,1],'position',[x(ix)-.1,y(ix)-.1,.2,.2])
 % axis('square');
@@ -48,7 +48,7 @@ function [res_x, idx_of_result] = knee_pt(y, x, just_return)
 %be corrected with the confidence interval (i.e. a best-line fit to 2
 %points has a zero per-point fit error which is kind-a wrong).
 %Practially, I found that it doesn't make much difference.
-% 
+%
 %dk /2012
 %{
 % test vectors:
@@ -87,7 +87,7 @@ if (sum(size(y)==1)~=1)
     if (issue_errors_p)
         error('knee_pt: y must be a vector');
     end
-    
+
     return;
 end
 %make a vector

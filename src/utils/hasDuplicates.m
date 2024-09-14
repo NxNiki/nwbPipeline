@@ -3,14 +3,14 @@ function isDuplicate = hasDuplicates(C)
     % using the `unique` function.
     % Outputs:
     % isDuplicate - Returns true if duplicates are found, otherwise false.
-    
+
     % Get the unique values and the index arrays ia and ic
     [~, ia, ic] = unique(C);
-    
+
     % Check if the lengths of ia and ic are the same
     if length(ia) == length(ic)
-        isDuplicate = false; 
+        isDuplicate = false;
     else
-        isDuplicate = true;  
+        isDuplicate = true;
     end
 end

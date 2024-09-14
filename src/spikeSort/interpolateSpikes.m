@@ -31,7 +31,7 @@ for i = 1:length(spikeIndexInSignal)
     if signalPeakIdx ~= unitPeakIdx && peakMissMatchWarnning
         warning('miss match of peak index in unit: %d and signals: %d, index: %d', unitPeakIdx, signalPeakIdx, i)
     end
-    
+
     % on noisy data, the raw signal can be monotonic, then the peak index
     % will be at the edge of the spike interval.
     peakShift = signalPeakIdx - unitPeakIdx;
@@ -56,5 +56,3 @@ signalInterpolate = fillmissing(signalInterpolate, "linear", 'SamplePoints', sig
 spikeIntervalPercentage = spikeIntervalPercentage/length(signal);
 
 end
-
-

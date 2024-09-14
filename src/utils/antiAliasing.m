@@ -68,4 +68,3 @@ else
     % downsampled frequency:
     lfpSignal = flt_data_conc;
 end
-

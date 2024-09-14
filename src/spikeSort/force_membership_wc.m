@@ -6,7 +6,7 @@ function class_out = force_membership_wc(f_in, class_in, f_out, par)
 % class_in:      classification of those points
 % f_out:         features of points to be classified (nspk x n_features)
 % par        environment variables, of which the following are
-%                required: 
+%                required:
 %                    o par.template_sdnum - max radius of cluster,
 %                                                   in std devs.
 %                    o par.template_k     - # of nearest neighbors
@@ -34,14 +34,14 @@ switch par.template_type
                 class_out(i) = 0;
             end
         end
-      
+
     case 'center'
         [centers, sd, pd] = build_templates(class_in,f_in); % we are going to ignore pd
         sdnum = par.template_sdnum;
         for i=1:nspk
-            class_out(i) = nearest_neighbor(f_out(i,:),centers,sdnum*sd);        
+            class_out(i) = nearest_neighbor(f_out(i,:),centers,sdnum*sd);
         end
-        
+
     case 'ml'
         [mu, inv_sigma] = fit_gaussian(f_in,class_in);
         for i=1:nspk
@@ -64,8 +64,8 @@ switch par.template_type
                  class_out(i) = classes(winner);
              end
         end
-        
+
     otherwise
         sprintf('force_membership(): <%s> is not a known template type.\n',par.template_type);
-        
+
 end

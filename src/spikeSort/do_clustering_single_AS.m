@@ -9,7 +9,8 @@ spikeCodeFileObj = matfile(spikeCodeFile);
 spikeCodes = spikeCodeFileObj.spikeCodes;
 
 par = set_parameters;
-par = update_parameters(par, param, 'clus'); 
+par.sr = param.sr;
+par = update_parameters(par, param, 'clus');
 par = update_parameters(par, param, 'batch_plot');
 
 % par.filename = spikeFile;
@@ -162,4 +163,3 @@ ri = R'\(Y-M)';
 d = sum(ri.*ri, 1)'*(rx-1);
 
 end
-

@@ -4,10 +4,17 @@ if ~exist(outputPath, "dir")
     mkdir(outputPath)
 end
 
-sr = 32e3;
-
 clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
 allClusters = clusterFileObj.clusterCharacteristics;
+
+if ismember('samplingRate', who(clusterFileObj))
+    sr = clusterFileObj.samplingRate;
+    fprintf('rasters_by_unit: sampling rate: %d\n', sr);
+else
+    sr = 32e3;
+    warning('rasters_by_unit: set default sampling rate: %d', sr);
+end
+
 
 close all;
 plotsPerPage = 17;
@@ -36,20 +43,26 @@ allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)','match','once');
 allAudioDir = dir(fullfile(imageDirectory, '*.aiff'));
 allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 
-figNames = {};
+figNames = cell(1, numPages);
 
-parfor i = 1:numPages
+for i = 1:numPages
+
     figNames{i} = fullfile(outputPath, ['rasters_p' num2str(i) '.pdf']);
     figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
         'PaperUnits','inches','PaperPosition',[0 0 11 8.5],'PaperOrientation','landscape', 'Visible', 'off');
     set(gcf, 'Color', 'white');
+
     disp([num2str(i) ' of ' num2str(numPages)]);
+
     cumSumClusters = [0; cumsum(pagesPerCluster)];
     unitToPlot = find(i - cumSumClusters > 0, 1, 'last');
     posInPage = i - cumSumClusters(unitToPlot);
     nPagesInUnit = cumSumClusters(unitToPlot+1)-cumSumClusters(unitToPlot);
     clusterInfo = struct2table(clustersToPlot{unitToPlot, 'screeningInfo'}{1});
     clusterInfo = sortrows(clusterInfo,'score','descend');
+
+    % clusterInfoVideo = struct2table(clustersToPlot{unitToPlot, 'videoScreeningInfo'}{1});
+    % clusterInfoVideo = sortrows(clusterInfoVideo,'score','descend');
 
     axes1 = axes(gcf, 'Position', getAxisRect(0, 1));
     plot(axes1, (1:74)/sr*1000, clustersToPlot{unitToPlot, 'allWaveforms'}{1}', 'Color', 'blue');
@@ -81,24 +94,34 @@ parfor i = 1:numPages
     unitsToPlot = (posInPage-1)*plotsPerPage + [1:plotsPerPage];
     unitsToPlot(unitsToPlot > totalNumStimuli) = [];
 
-    imageLimits = [-500 1000]; 
-    audioLimits = [-500 2000]; 
+    imageLimits = [-500 1000];
+    audioLimits = [-500 2000];
     videoLimits = [-1000 10000];
     for j = 1:length(unitsToPlot)
 
         imageAxes = axes(gcf, 'Position', getAxisRect(j, 1));
         thisImageTrialTag = clusterInfo{unitsToPlot(j), 'imageName'}{1};
         imageLookupIdx = find(strcmp(allImageTrialTags, thisImageTrialTag), 1);
+
+        % thisVideoTrialTag = clusterInfoVideo{unitsToPlot(j), 'imageName'}{1};
         videoLookupIdx = find(strcmp(allVideoTrialTags, thisImageTrialTag), 1);
+
         audioLookupIdx = find(strcmp(allAudioTrialTags, thisImageTrialTag), 1);
         if ~isempty(imageLookupIdx)
-            image = imread(fullfile(imageDirectory, allImageDir(imageLookupIdx).name));
+            imageFile = fullfile(imageDirectory, allImageDir(imageLookupIdx).name);
+            fprintf('image: %s\n', allImageDir(imageLookupIdx).name)
+            image = imread(imageFile);
             image = imresize(image, .2);
             imshow(image, 'Parent', imageAxes);
         elseif ~isempty(videoLookupIdx)
             try
-                [y, Fs] = audioread(fullfile(imageDirectory, allVideoDir(videoLookupIdx).name));
+                videoFile = fullfile(imageDirectory, allVideoDir(videoLookupIdx).name);
+                fprintf('video: %s\n', allVideoDir(videoLookupIdx).name)
+                [y, Fs] = audioread(videoFile);
                 plot(imageAxes, 1000/Fs*(1:length(y)), y(:, 1));
+                xlim(imageAxes, videoLimits);
+            catch
+                warning('audio is not loaded successfully: %s', fullfile(imageDirectory, allVideoDir(videoLookupIdx).name))
                 xlim(imageAxes, videoLimits);
             end
         elseif ~isempty(audioLookupIdx)
@@ -189,7 +212,7 @@ parfor i = 1:numPages
             xlim(histAxes, [-500, 1000]);   xticks(histAxes, -500:500:1000);
         end
     end
-    
+
     thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
     annotation('textbox',[0 .9625 1 .025],'units','normalized', 'String',thisTitle,'EdgeColor','none', 'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold','Interpreter','tex');
     if useExportFig
@@ -201,6 +224,7 @@ parfor i = 1:numPages
     %exportgraphics(gcf,['Rasters_p' num2str(subject)'_ScreeningX_allUnits.pdf'],'Append',true) % takes too long
     close all;
 end
+
 if useExportFig
     append_pdfs(fullfile(outputPath, 'Rasters_all.pdf'), figNames);
 else
@@ -228,27 +252,27 @@ function [rect] = getAxisRect(pos, sub_pos)
     pos = pos + 1;
     vertNum = floor((pos-1)/6)+1;
     horzNum = mod(pos-1, 6) + 1;
-    
+
     nCols = 6; nRows = 3;
     top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
     verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
     verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
     horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
-    
+
     if sub_pos==1
         subpos_factor = verticalMinSize+verticalMajSize+2*verticalMin;
     elseif sub_pos == 2
         subpos_factor = verticalMinSize+verticalMin;
-    else 
+    else
         subpos_factor = 0;
     end
-    
+
     rect(1) = edge + (horzNum-1)*(horizSize+horiz);
     rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
     rect(3) = horizSize;
     if sub_pos == 1 || sub_pos == 2
-        rect(4) = verticalMajSize; 
-    else 
-        rect(4) = verticalMinSize; 
+        rect(4) = verticalMajSize;
+    else
+        rect(4) = verticalMinSize;
     end
 end
