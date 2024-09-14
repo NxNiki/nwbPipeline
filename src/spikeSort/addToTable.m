@@ -3,4 +3,3 @@ function [T] = addToTable(T, varVal, varName)
 %   Detailed explanation goes here
 T = addvars(T, varVal, 'NewVariableNames', varName);
 end
-

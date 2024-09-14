@@ -120,27 +120,27 @@ set(handles.isi12_bin_step,'string',par.bin_step12);
 set(handles.isi13_bin_step,'string',par.bin_step13);
 
 % That's for passing the fix button settings to plot_spikes.
-if get(handles.fix9_button,'value') ==1     
+if get(handles.fix9_button,'value') ==1
     par.fix9 = 1;
 else
     par.fix9 = 0;
 end
-if get(handles.fix10_button,'value') ==1     
+if get(handles.fix10_button,'value') ==1
     par.fix10 = 1;
 else
     par.fix10 = 0;
 end
-if get(handles.fix11_button,'value') ==1     
+if get(handles.fix11_button,'value') ==1
     par.fix11 = 1;
 else
     par.fix11 = 0;
 end
-if get(handles.fix12_button,'value') ==1     
+if get(handles.fix12_button,'value') ==1
     par.fix12 = 1;
 else
     par.fix12 = 0;
 end
-if get(handles.fix13_button,'value') ==1     
+if get(handles.fix13_button,'value') ==1
     par.fix13 = 1;
 else
     par.fix13 = 0;
@@ -309,9 +309,9 @@ set(h_fig,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes9); 
+axes(handles.spikes9);
 cla reset
-axes(handles.isi9); 
+axes(handles.isi9);
 cla reset
 set(gcbo,'value',0);
 set(handles.isi9_accept_button,'value',1);
@@ -339,9 +339,9 @@ set(h_fig,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes10); 
+axes(handles.spikes10);
 cla reset
-axes(handles.isi10); 
+axes(handles.isi10);
 cla reset
 set(gcbo,'value',0);
 set(handles.isi10_accept_button,'value',1);
@@ -369,9 +369,9 @@ set(h_fig,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes11); 
+axes(handles.spikes11);
 cla reset
-axes(handles.isi11); 
+axes(handles.isi11);
 cla reset
 set(gcbo,'value',0);
 set(handles.isi11_accept_button,'value',1);
@@ -399,9 +399,9 @@ set(h_fig,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes12); 
+axes(handles.spikes12);
 cla reset
-axes(handles.isi12); 
+axes(handles.isi12);
 cla reset
 set(gcbo,'value',0);
 set(handles.isi12_accept_button,'value',1);
@@ -429,9 +429,9 @@ set(h_fig,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes13); 
+axes(handles.spikes13);
 cla reset
-axes(handles.isi13); 
+axes(handles.isi13);
 cla reset
 set(gcbo,'value',0);
 set(handles.isi13_accept_button,'value',1);
@@ -564,7 +564,7 @@ set(h_fig3,'userdata',USER_DATA)
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
+%
 % --- Executes during object creation, after setting all properties.
 function isi9_nbins_CreateFcn(hObject, eventdata, handles)
 if ispc

@@ -27,7 +27,7 @@ for i = 1:nclusters
 end
 z = nclusters + 1;
 eval(['class' num2str(z) '= find( classes==' num2str(0) ');']);
- 
+
 for j=1:nchannels
     ylimit = [];
     h_figs = [];
@@ -151,9 +151,9 @@ for j=1:nchannels
                 end
             end
         end;
-        
+
   end
-  ymin = min(ylimit(:,1)); ymax = max(ylimit(:,2)); 
+  ymin = min(ylimit(:,1)); ymax = max(ylimit(:,2));
   for k=1:length(h_figs), set(h_figs(k),'Ylim',[ymin ymax]),end
 end
 
@@ -178,6 +178,3 @@ if ~isempty(h_fig4)
     set(gcf,'paperposition',[.25 .25 10.5 7.8])
     eval(['print(h_fig4,''-djpeg'',''fig2print_ch_' filename(1:end-4) 'd' ''')' ]);
 end
-
-
- 

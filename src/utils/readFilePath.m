@@ -32,4 +32,3 @@ for i = 1: length(expIds)
     expNames(expNamesId: length(timestampFiles)) = {sprintf('Exp%d', expIds(i))};
     expNamesId = length(timestampFiles) + 1;
 end
-

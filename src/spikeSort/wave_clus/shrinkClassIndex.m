@@ -6,7 +6,7 @@ function classValue = shrinkClassIndex(classValue)
     classValue = [1, 1, 1, 3, 3, 3, 5, 5, 5, 0, 0, 0, -1, -1, -1];
     classValue = shrinkClassIndex(classValue)
 %}
-    
+
     positiveIdx = classValue > 0;
     uniqueVals = unique(classValue(positiveIdx));
 

@@ -22,9 +22,9 @@ for i=1:nchannels
     aux=[];
     eval(['aux = spikes(1:length(classes) ,' num2str(i-1) '*lch + 1 : i*lch );']);
     eval(['amps(1:length(classes),i) = max(aux,[],2);']);
-end  
-         
-% PLOTS         
+end
+
+% PLOTS
 for i=1:inputs
     for j=i+1:inputs
         subplot(inputs,inputs,(i-1)*inputs+j)
@@ -45,5 +45,3 @@ set(gcf,'numbertitle','off','name',t5,'menubar','none')
 set(gcf,'papertype','usletter','paperorientation','portrait','paperunits','inches')
 set(gcf,'paperposition',[.25 .25 10.5 7.8])
 eval(['print(h_fig,''-djpeg'',''fig2print_amp_' filename(1:end-4) ''')' ]);
-
-

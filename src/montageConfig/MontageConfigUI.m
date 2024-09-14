@@ -1,6 +1,6 @@
 function MontageConfigUI()
 % create configure file for extracelluar recordings (Neuralynx and
-% Blackrock). 
+% Blackrock).
     scriptDir = fileparts(mfilename('fullpath'));
     addpath(genpath(fileparts(scriptDir)));
 
@@ -156,7 +156,7 @@ function MontageConfigUI()
     % Add listeners for mouse clicks and key presses
     set(channelTable, 'KeyPressFcn', @keyPressCallback);
     set(channelTable, 'KeyReleaseFcn', @keyReleaseCallback);
-    
+
     % Initialize last selected row and Shift key state
     setappdata(channelTable, 'lastSelectedRow', []);
     setappdata(channelTable, 'selectedCells', []);
@@ -367,7 +367,7 @@ function MontageConfigUI()
         if hasDuplicates(channelData(:, 2))
             error('channel should not have duplicated names');
         end
-        
+
         rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
         channelData(rowsWithPortStart, :) = sortrows(channelData(rowsWithPortStart, :), 3);
         channelData(:, 1) = {true};
@@ -409,7 +409,7 @@ function MontageConfigUI()
 
         % Save the montage information to a JSON file
         writeJson(config, montageFileNameStr)
-        
+
         % Save the configuration to .cfg file for neuralynx:
         microsToDuplicateList = [];
         generatePegasusConfigFile(str2double(patientID), ...
@@ -428,7 +428,7 @@ function MontageConfigUI()
     function showMessageBox(message, title, width, height)
         % Create a custom dialog box
         d = dialog('Position', [300, 300, width, height], 'Name', title);
-    
+
         % Create a text control to display the message
         uicontrol('Parent', d, ...
                   'Style', 'text', ...
@@ -436,7 +436,7 @@ function MontageConfigUI()
                   'String', message, ...
                   'HorizontalAlignment', 'left', ...
                   'FontSize', 15);
-    
+
         % Create a button to close the dialog
         uicontrol('Parent', d, ...
                   'Position', [width/2-60, 20, 120, 30], ...
@@ -468,7 +468,7 @@ function MontageConfigUI()
                 'Do you want to proceed?']), ...
                 'Confirmation', ...
                 'Yes', 'No', 'No');
-            
+
             % Handle response
             switch choice
                 case 'Yes'
@@ -499,11 +499,11 @@ function MontageConfigUI()
 
     function data = moveUpRows(data)
         selectedRows = cell2mat(data(:, 1));
-        
+
         if all(selectedRows) || all(~selectedRows)
             return
         end
-        
+
         selectedRowsDiff = diff([0, selectedRows(:)', 0]);
         startIdx = find(selectedRowsDiff == 1);
         endIdx = find(selectedRowsDiff == -1) - 1;
@@ -540,7 +540,7 @@ function MontageConfigUI()
         if strcmp(eventdata.Key, 'shift')
             setappdata(hObject, 'isShiftPressed', true);
         end
-        
+
         % Handle backspace or delete key to clear selected cells
         if strcmp(eventdata.Key, 'backspace') || strcmp(eventdata.Key, 'delete')
             selectedCells = getappdata(hObject, 'selectedCells');
@@ -588,10 +588,10 @@ function MontageConfigUI()
         % Handle cell selection with Shift key functionality
         isShiftPressed = getappdata(hObject, 'isShiftPressed');
         lastSelectedRow = getappdata(hObject, 'lastSelectedRow');
-        
+
         data = get(hObject, 'Data');
         newValue = ~data{selectedRows(end), 1};
-        
+
         if isShiftPressed
             % Determine the range of rows to select
             if isempty(lastSelectedRow)
@@ -600,14 +600,14 @@ function MontageConfigUI()
                 minRow = min([selectedRows(:)', lastSelectedRow]);
             end
             maxRow = max([selectedRows(:)', lastSelectedRow]);
-            
+
             % Update the selection state for the range of rows
             data(minRow:maxRow, 1) = {newValue};
         else
             % Update the selection state for the newly selected row
             data(selectedRows, 1) = {newValue};
         end
-        
+
         % Update the data and last selected row
         set(hObject, 'Data', data);
         setappdata(hObject, 'lastSelectedRow', selectedRows(end));

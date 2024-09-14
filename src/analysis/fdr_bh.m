@@ -1,15 +1,15 @@
 % fdr_bh() - Executes the Benjamini & Hochberg (1995) and the Benjamini &
-%            Yekutieli (2001) procedure for controlling the false discovery 
+%            Yekutieli (2001) procedure for controlling the false discovery
 %            rate (FDR) of a family of hypothesis tests. FDR is the expected
-%            proportion of rejected hypotheses that are mistakenly rejected 
-%            (i.e., the null hypothesis is actually true for those tests). 
-%            FDR is a somewhat less conservative/more powerful method for 
+%            proportion of rejected hypotheses that are mistakenly rejected
+%            (i.e., the null hypothesis is actually true for those tests).
+%            FDR is a somewhat less conservative/more powerful method for
 %            correcting for multiple comparisons than procedures like Bonferroni
 %            correction that provide strong control of the family-wise
 %            error rate (i.e., the probability that one or more null
 %            hypotheses are mistakenly rejected).
 %
-%            This function also returns the false coverage-statement rate 
+%            This function also returns the false coverage-statement rate
 %            (FCR)-adjusted selected confidence interval coverage (i.e.,
 %            the coverage needed to construct multiple comparison corrected
 %            confidence intervals that correspond to the FDR-adjusted p-values).
@@ -40,29 +40,29 @@
 %
 % Outputs:
 %   h       - A binary vector or matrix of the same size as the input "pvals."
-%             If the ith element of h is 1, then the test that produced the 
+%             If the ith element of h is 1, then the test that produced the
 %             ith p-value in pvals is significant (i.e., the null hypothesis
 %             of the test is rejected).
-%   crit_p  - All uncorrected p-values less than or equal to crit_p are 
-%             significant (i.e., their null hypotheses are rejected).  If 
+%   crit_p  - All uncorrected p-values less than or equal to crit_p are
+%             significant (i.e., their null hypotheses are rejected).  If
 %             no p-values are significant, crit_p=0.
-%   adj_ci_cvrg - The FCR-adjusted BH- or BY-selected 
-%             confidence interval coverage. For any p-values that 
+%   adj_ci_cvrg - The FCR-adjusted BH- or BY-selected
+%             confidence interval coverage. For any p-values that
 %             are significant after FDR adjustment, this gives you the
 %             proportion of coverage (e.g., 0.99) you should use when generating
 %             confidence intervals for those parameters. In other words,
 %             this allows you to correct your confidence intervals for
-%             multiple comparisons. You can NOT obtain confidence intervals 
+%             multiple comparisons. You can NOT obtain confidence intervals
 %             for non-significant p-values. The adjusted confidence intervals
 %             guarantee that the expected FCR is less than or equal to q
-%             if using the appropriate FDR control algorithm for the  
+%             if using the appropriate FDR control algorithm for the
 %             dependency structure of your data (Benjamini & Yekutieli, 2005).
-%             FCR (i.e., false coverage-statement rate) is the proportion 
+%             FCR (i.e., false coverage-statement rate) is the proportion
 %             of confidence intervals you construct
 %             that miss the true value of the parameter. adj_ci=NaN if no
 %             p-values are significant after adjustment.
 %   adj_p   - All adjusted p-values less than or equal to q are significant
-%             (i.e., their null hypotheses are rejected). Note, adjusted 
+%             (i.e., their null hypotheses are rejected). Note, adjusted
 %             p-values can be greater than 1.
 %
 %
@@ -76,8 +76,8 @@
 %     rate in multiple testing under dependency. The Annals of Statistics.
 %     29(4), 1165-1188.
 %
-%   Benjamini, Y., & Yekutieli, D. (2005). False discovery rate?adjusted 
-%     multiple confidence intervals for selected parameters. Journal of the 
+%   Benjamini, Y., & Yekutieli, D. (2005). False discovery rate?adjusted
+%     multiple confidence intervals for selected parameters. Journal of the
 %     American Statistical Association, 100(469), 71?81. doi:10.1198/016214504000001907
 %
 %
@@ -101,16 +101,16 @@
 % For a review of false discovery rate control and other contemporary
 % techniques for correcting for multiple comparisons see:
 %
-%   Groppe, D.M., Urbach, T.P., & Kutas, M. (2011) Mass univariate analysis 
-% of event-related brain potentials/fields I: A critical tutorial review. 
-% Psychophysiology, 48(12) pp. 1711-1725, DOI: 10.1111/j.1469-8986.2011.01273.x 
+%   Groppe, D.M., Urbach, T.P., & Kutas, M. (2011) Mass univariate analysis
+% of event-related brain potentials/fields I: A critical tutorial review.
+% Psychophysiology, 48(12) pp. 1711-1725, DOI: 10.1111/j.1469-8986.2011.01273.x
 % http://www.cogsci.ucsd.edu/~dgroppe/PUBLICATIONS/mass_uni_preprint1.pdf
 %
 %
-% For a review of FCR-adjusted confidence intervals (CIs) and other techniques 
+% For a review of FCR-adjusted confidence intervals (CIs) and other techniques
 % for adjusting CIs for multiple comparisons see:
 %
-%   Groppe, D.M. (in press) Combating the scientific decline effect with 
+%   Groppe, D.M. (in press) Combating the scientific decline effect with
 % confidence (intervals). Psychophysiology.
 % http://biorxiv.org/content/biorxiv/early/2015/12/10/034074.full.pdf
 %
@@ -166,7 +166,7 @@ if strcmpi(method,'pdep'),
     %BH procedure for independence or positive dependence
     thresh=(1:m)*q/m;
     wtd_p=m*p_sorted./(1:m);
-    
+
 elseif strcmpi(method,'dep')
     %BH procedure for any dependency structure
     denom=m*sum(1./(1:m));
@@ -220,7 +220,3 @@ if strcmpi(report,'yes'),
         fprintf('FDR/FCR procedure used is guaranteed valid for independent or dependent tests.\n');
     end
 end
-
-
-
-

@@ -25,10 +25,10 @@ spikeCodes.ampAsMultipleOfSTD = spikes(:, w_pre) / inputStruct.noise_std_detect;
 locMin = diff(sign(diff(spikes')))'>0;
 locMin = [ones(size(locMin,1),1), locMin, ones(size(locMin,1),1)];
 
-localMinInd_Pre = nan(size(spikeCodes.rawAmplitude)); 
+localMinInd_Pre = nan(size(spikeCodes.rawAmplitude));
 localMinV_Pre = localMinInd_Pre;
 
-localMinInd_Post = nan(size(spikeCodes.rawAmplitude)); 
+localMinInd_Post = nan(size(spikeCodes.rawAmplitude));
 localMinV_Post = localMinInd_Post;
 halfWidth = localMinInd_Pre;
 
@@ -60,7 +60,7 @@ function firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamps)
     spikeTimestamps = (spikeTimestamps - spikeTimestamps(1)) * 1000 + 250;
     maxSpikeTs = max(spikeTimestamps);
 
-    binEdges1 = 0:500:(500*floor(maxSpikeTs/500)+500); 
+    binEdges1 = 0:500:(500*floor(maxSpikeTs/500)+500);
     hist1 = histcounts(spikeTimestamps, binEdges1);
     spikeCount1 = hist1(floor(spikeTimestamps/500) + 1);
 
@@ -70,6 +70,3 @@ function firingRateAroundSpikeTime = calculateFiringRate(spikeTimestamps)
 
     firingRateAroundSpikeTime = .5 * max([spikeCount1(:), spikeCount2(:)], [], 2);
 end
-
-
-

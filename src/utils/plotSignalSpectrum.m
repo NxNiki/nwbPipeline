@@ -54,4 +54,3 @@ pxx = pxx(3:floor(length(pxx)/16));
 fxx = fxx(3:floor(length(fxx)/16)); % up to 1000 Hz.
 
 end
-

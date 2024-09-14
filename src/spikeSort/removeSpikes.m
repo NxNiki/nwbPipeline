@@ -16,7 +16,7 @@ revertedSpikes = zeros(size(signal));
 
 
 for u = 1:length(units)
-    
+
     fprintf('remove spike for unit %d...\n', units(u));
 
     unitTs = spikeTimestamps(spikeClass==units(u));
@@ -46,7 +46,7 @@ for u = 1:length(units)
     % add a gradual taper to the waveform so that there isn't an
     % abrupt cliff at the edges.
     padWidth = floor(length(unitAvgSpike)/2);
-    prePad = linspace(0, unitAvgSpike(1), padWidth+1); 
+    prePad = linspace(0, unitAvgSpike(1), padWidth+1);
     prePad(end) = [];
     postPad = linspace(unitAvgSpike(end), 0, padWidth+1);
     postPad(1) = [];

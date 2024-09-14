@@ -1,7 +1,7 @@
 function result = combineCellArrays(rowElements, colElements, delimiter)
 %COMBINECELLARRAYS Concatenates elements from two cell arrays into a new cell array.
 %   RESULT = COMBINECELLARRAYS(CELLARRAY1, CELLARRAY2) returns a cell array where each element
-%   is a concatenation of an element from CELLARRAY1 and an element from CELLARRAY2. Cell arrays 
+%   is a concatenation of an element from CELLARRAY1 and an element from CELLARRAY2. Cell arrays
 %   CELLARRAY1 and CELLARRAY2 should contain strings or characters.
 %
 %   RESULT is a numel(CELLARRAY1) by numel(CELLARRAY2) cell array, where the (i, j)-th element is

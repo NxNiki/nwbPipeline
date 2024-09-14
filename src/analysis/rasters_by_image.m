@@ -167,4 +167,3 @@ rect(2) = bottom + (nRows-vertNum)*(verticalSize+vertic);
 rect(3) = horizSize;
 rect(4) = verticalSize;
 end
-

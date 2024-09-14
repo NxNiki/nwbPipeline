@@ -1,5 +1,5 @@
 function [macroChannels, microChannels] = createChannels(montageConfigFile)
-% read montage json file and save macro and micro channel names as cell 
+% read montage json file and save macro and micro channel names as cell
 % arrays. For macro Channels, unused channels will be filled with empty
 % value so that we can match to the .ncs files (unused channels will also
 % save files).
@@ -30,8 +30,11 @@ for i = 1: length(headStages)
         channel = microConfig.(headStages{i}).(ports{j});
         numChannel = channel.Micros;
         brainLabel = channel.BrainLabel;
-        channels = arrayfun(@(idx) [headStages{i}, num2str(j), '-', brainLabel, num2str(idx)], 1: numChannel, 'UniformOutput', false);
+        if strcmp(brainLabel, '')
+            channels = cell(1, numChannel);
+        else
+            channels = arrayfun(@(idx) [headStages{i}, num2str(j), '-', brainLabel, num2str(idx)], 1: numChannel, 'UniformOutput', false);
+        end
         microChannels = [microChannels; channels(:)];
     end
 end
-

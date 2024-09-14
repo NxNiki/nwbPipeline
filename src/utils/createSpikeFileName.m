@@ -1,5 +1,5 @@
 function [spikeDetectionFileName, spikeClusteringFileName ] = createSpikeFileName(cscFileName)
-% create output filenames for spike detection and clustering. 
+% create output filenames for spike detection and clustering.
 % For now, the downstream analysis requires them with pattern:
 % *_spikes.mat and times_*.mat respectively.
 % the cscFileName has pattern: '*_001.mat'. We will remove the suffix in
@@ -30,6 +30,3 @@ channelName = extractChannelName(fname, '.*(?=_\d+)');
 fname1 = ['times_', channelName, '.mat'];
 
 end
-
-
-

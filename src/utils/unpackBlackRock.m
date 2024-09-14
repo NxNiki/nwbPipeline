@@ -29,4 +29,3 @@ tic
 
 writecell({inFile}, fullfile(fileparts(outFiles{1}), 'inFileNames.csv'));
 writecell(outFiles, fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
-

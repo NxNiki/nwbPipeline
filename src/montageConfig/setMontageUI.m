@@ -1,5 +1,5 @@
 function setMontageUI()
-% rename the .ncs files according to 
+% rename the .ncs files according to
 
     numMontageAdded = 0;
     % Create the main UI figure
@@ -8,7 +8,7 @@ function setMontageUI()
     % Directory and Pattern Input
     lblDir = uilabel(fig, 'Text', 'Directory:', 'Position', [20, 650, 60, 22]);
     editDir = uieditfield(fig, 'text', 'Position', [90, 650, 200, 22], 'Value', '/Volumes/DATA/NLData');
-    
+
     btnSelectFolder = uibutton(fig, 'push', 'Text', 'Select Folder', 'Position', [300, 650, 100, 22], ...
                                 'ButtonPushedFcn', @(btn,event) selectFolderButtonPushed());
 

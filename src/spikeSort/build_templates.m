@@ -13,6 +13,5 @@ for i=1:max_class,
                                              % the euclidean distance from
                                              % mean.
     pointdist(i,:)   = sqrt(var(fi,1));      % the std dev of the variation along each dimension.
-    
-end
 
+end

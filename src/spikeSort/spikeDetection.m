@@ -25,7 +25,7 @@ outputFiles = cell(1, size(cscFiles, 1));
 % Check if a parallel pool exists
 pool = gcp('nocreate');  % Get current parallel pool without creating a new one
 if ~isempty(pool)
-    delete(pool);  
+    delete(pool);
 end
 parJobs = min(maxNumCompThreads, size(cscFiles, 1));
 

@@ -24,22 +24,35 @@ channelId = NSx.MetaTags.ChannelID;
 channelIdx = channelId <= 256;
 
 if ~isempty(channelNames)
-    outFiles = channelNames;
+    outFiles = cellfun(@(x)fullfile(outputFilePath, [x, '.mat']), channelNames, 'UniformOutput', false);
 else
-    % trailing null characters (ASCII code 0) are often used in C-style strings 
+    % trailing null characters (ASCII code 0) are often used in C-style strings
     % to indicate the end of the string but can be problematic in MATLAB.
     outFiles = cellfun(@(x)fullfile(outputFilePath, [x(double(x) ~= 0), '.mat']), {NSx.ElectrodesInfo(channelIdx).Label}, 'UniformOutput', false);
 end
 
 nchan = length(outFiles);
+pattern = 'G[A-D][1-4]-(.*?)[1-9]';
 
-parfor i = 1: nchan
-    if skipExist && exist(outFiles{i}, 'file') 
+for i = 1: nchan
+    if skipExist && exist(outFiles{i}, 'file')
+        fprintf('skip existing file: %s\n', outFiles{i});
         continue
     end
 
-    if isempty(outFiles{i})
+    [~, outFile] = fileparts(outFiles{i});
+    if isempty(outFile)
         continue
+    end
+
+    % skip micro channel with empty channel name:
+    match = regexp(outFile, pattern, 'tokens', 'once');
+
+    if ~isempty(match)
+        if isempty(match{1}) || strcmp(match{1}, '''''') || strcmp(match{1}, '''') || strcmp(match{1}, ' ') || strcmp(match{1}, '""') || strcmp(match{1}, '" "')
+            warning('skip empty channel: %s', outFiles{i});
+            continue
+        end
     end
 
     fprintf('writing data to: %s\n', outFiles{i});
@@ -55,6 +68,7 @@ parfor i = 1: nchan
     outFileObj = matfile(tmpOutFile);
     outFileObj.data = data;
     outFileObj.samplingInterval = samplingInterval;
+    outFileObj.samplingIntervalSeconds = seconds(samplingInterval);
     outFileObj.BlackRockUnits = 1/4;
     movefile(tmpOutFile, outFiles{i});
 end

@@ -1,7 +1,7 @@
 function posVec = makePosVecFunction(nRows,nCols,borderBetweenRows,borderBetweenCols,outerBorder)
 % SYNTAX: posVec = makePosVecFunction(nRows,nCols,borderBetweenRows,borderBetweenCols,outerBorder)
-% defaults: outerBorder == .002; 
-%           borderbetweenRows = 0.025; 
+% defaults: outerBorder == .002;
+%           borderbetweenRows = 0.025;
 %           borderBetweenCols = 0.025
 %
 % I find Matlab's gui position vectors counter intuitive. I would rather
@@ -13,7 +13,7 @@ function posVec = makePosVecFunction(nRows,nCols,borderBetweenRows,borderBetween
 % Arguments: the starting column number from left, the number of columns to span
 %            the row number of the bottom  of the element counting from
 %            top of the window, the number of rows to span,
-%            
+%
 %
 % Note: This function expects and returns things in normalized units.
 if nargin==0 || (nargin==1 && ischar(nRows) && strcmp(nRows,'?'))

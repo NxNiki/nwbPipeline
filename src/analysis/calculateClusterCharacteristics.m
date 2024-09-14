@@ -7,7 +7,7 @@ if nargin < 4
 end
 
 log10_thresh = 3;
-sr = 32e3;
+
 maxlocalMaxima = 5;
 maxLocalMaximaRatio = .5;
 maxLateRangeRatio = 1;
@@ -20,14 +20,21 @@ if ~isempty(imageDir)
     allVideoDir = dir(fullfile(imageDir, '*.mp4'));
     allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)', 'match', 'once');
     [videoNames, videoIdxes] = intersect(imageNames, allVideoTrialTags);
-    imageNames(videoIdxes) = []; 
+    imageNames(videoIdxes) = [];
 end
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
-timestampsFileObj = matfile(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
-timestamps = timestampsFileObj.timeStamps;
+
+if isempty(clusterFiles)
+    error('no cluster files detected, run spike sorting before this step!');
+end
+
+[timestamps, ~, samplingIntervalSeconds] = readTimestamps(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
+
+sr = 1 / samplingIntervalSeconds;
 dataLength = numel(timestamps)/sr;
 time0 = timestamps(1);
+
 clusterCharacteristics = [];
 
 if isfield(trials, 'patient')
@@ -41,7 +48,7 @@ for i = 1:length(clusterFiles)
     end
     clusterFileObj = matfile(fullfile(spikeFolder, clusterFiles(i).name));
     cluster_class = clusterFileObj.cluster_class;
-    
+
     if ismember('spikes', who(clusterFileObj))
         spikes = clusterFileObj.spikes;
         cluster_class(:, 2) = cluster_class(:, 2) / 1000;
@@ -52,9 +59,9 @@ for i = 1:length(clusterFiles)
         spikes = spikeFileObj.spikes;
         spikes(rejectedSpikes, :) = [];
     end
-    
+
     % regular expression with lookbehind and lookahead
-    pattern = '(?<=times_)G[A-D][1-4]-\w+(?=.mat)'; 
+    pattern = '(?<=times_)G[A-D][1-4]-\w+(?=.mat)';
     info.cluster_region = extractChannelName(clusterFiles(i).name, pattern);
 
     clusterNums = unique(cluster_class(:, 1));
@@ -103,7 +110,7 @@ for i = 1:length(clusterFiles)
         else
             info.waveDuration = 1000*(maxLocation - 1)/sr;
         end
-        
+
         [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
         if ~isempty(videoNames)
             [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
@@ -114,13 +121,22 @@ end
 
 clusterCharacteristics = sortrows(clusterCharacteristics, 1);
 
+outFileObj = matfile(fullfile(spikeFolder, 'clusterCharacteristics.mat'), "Writable", true);
+outFileObj.clusterCharacteristics = clusterCharacteristics;
+outFileObj.samplingRate = sr;
+
 end
 
 function [screeningInfo, numSelective, selectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, imageNames, binEdges1, binEdges2)
 
 screeningInfo = struct;
 numStimuli = length(imageNames);
-stim_onsets = 1e3*([trials.stimulusOnsetTime] - time0);
+
+if trials(1).stimulusOnsetTime > time0
+    stim_onsets = 1e3*([trials.stimulusOnsetTime] - time0);
+else
+    stim_onsets = 1e3*([trials.stimulusOnsetTime]);
+end
 
 [ baselineLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-500 0]);
 [ stimLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [0 1000]);
@@ -137,17 +153,17 @@ for k = 1:numStimuli
     screeningInfo(k).imageName = imageNames{k};
     relevantTrials = find(strcmp({trials.trialTag}, imageNames{k}));
     stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
-    
+
     allFR(k) = stimSpikes;
     screeningInfo(k).spikes = allLatencies(relevantTrials);
     screeningInfo(k).name = imageNames{k};
-    
+
     if stimSpikes < 3
         screeningInfo(k).score = 0;
         allScores(k) = 0;
         continue;
     end
-    
+
     pr = zeros(1, 19);
     for h = 1:2:19
         pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages1(relevantTrials, ceil(h/2)), 'tail', 'left');

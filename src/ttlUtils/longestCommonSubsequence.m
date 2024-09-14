@@ -4,16 +4,16 @@ function [idx1, idx2, L] = longestCommonSubsequence(arr1, arr2)
     % of element occurrences up to each point in the arrays.
     n = length(arr1);
     m = length(arr2);
-    
+
     % Dynamic programming table initialization
     % L(i, j) will hold the length of the LCS of arr1(1:i) and arr2(1:j)
     L = zeros(1, m+1);
-    
+
     % We will also track the actual subsequences in a cell array and the
     % index that constructs the subsequence for arr1 and arr2:
     idx1 = cell(1, m+1);
     idx2 = cell(1, m+1);
-    
+
     % Build the LCS table
     for i = 1:n
         for j = 1:m
@@ -36,9 +36,9 @@ function [idx1, idx2, L] = longestCommonSubsequence(arr1, arr2)
             end
         end
     end
-    
+
     % The longest common subsequence with respect to frequency
     idx1 = idx1{end, end};
     idx2 = idx2{end, end};
-    
+
 end

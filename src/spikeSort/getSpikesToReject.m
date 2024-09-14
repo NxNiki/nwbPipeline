@@ -82,10 +82,10 @@ probabilityParams.locMinVLR2 = [25 60];
 % tails to determine the ratios.
 [n, c] = histcounts(spikeCodes.heightToWidthRatio);
 zeroSets = continuousRunsOfTrue(n<.02*max(n));
-inds = zeroSets(:,2)-zeroSets(:,1) < 3; 
+inds = zeroSets(:,2)-zeroSets(:,1) < 3;
 zeroSets(inds,:) = [];
 cValZeros = c(zeroSets);
-[~,peakInd] = max(n); 
+[~,peakInd] = max(n);
 peakVal = c(peakInd);
 lowEnd = cValZeros(find(cValZeros(:,2)<peakVal,1,'last'),2);
 if isempty(lowEnd), lowEnd = c(1)-1; end
@@ -186,7 +186,7 @@ end
 
 if ~exist('thresh','var') || isempty(rejectionThresh) || recomputeAll
     [n, c] = histcounts(spikeCodes.P_givenAll);
-    N = cumsum(n); 
+    N = cumsum(n);
     i = knee_pt(N, 1:length(N), 1);
     if isnan(i)
         rejectionThresh = .98;

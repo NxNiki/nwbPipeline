@@ -4,7 +4,7 @@ function par = updateParamForCluster(par, spikeFile)
     [outputPath, fileName, ~] = fileparts(spikeFile);
     channel = regexp(fileName, ".*(?=_spikes)", "match", "once");
     par.channel = channel;
-    
+
     par.fname_in = fullfile(outputPath, ['tmp_data_wc_' channel]);
     par.fname = fullfile(outputPath, ['data_' channel]);
     par.fnamespc = fullfile(outputPath, ['data_wc_' channel]);
@@ -12,4 +12,3 @@ function par = updateParamForCluster(par, spikeFile)
     par.filename = spikeFile;
 
 end
-

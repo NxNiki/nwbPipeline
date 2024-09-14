@@ -1,11 +1,11 @@
 function outputFiles = getSpikeCodes(spikeFiles, outputPath, skipExist)
-% SpikeCodes are features used to do clustering analysis. 
+% SpikeCodes are features used to do clustering analysis.
 % Most of the spike codes can be calculated for each channel separately.
 % `franctionConcurrent` and `frantionConcurrentPrecise` need information
 % across all channels.
 % Note: will not skipExist if more channels are added as this will change
 % across channel spikeCodes (fractionConcurrent and
-% fractionConcurrentPrecise). 
+% fractionConcurrentPrecise).
 
 updateCrossChannelSpikeCode = false;
 
@@ -39,8 +39,8 @@ for fnum = 1:length(spikeFiles)
         continue
     else
         % new channels found, will recalculate all across channel
-        % spikeCodes. 
-        updateCrossChannelSpikeCode = true; 
+        % spikeCodes.
+        updateCrossChannelSpikeCode = true;
     end
 
     fprintf('get spike codes:\n %s\n', outFileNames{fnum, 1});
@@ -50,7 +50,7 @@ for fnum = 1:length(spikeFiles)
     spikeTimestamps = spikeFileObj.spikeTimestamps;
     duration = spikeFileObj.duration; % expect duration in seconds.
     spikes = spikeFileObj.spikes;
-    
+
     % get spike codes to run clustering:
     spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, param, outputStruct);
     [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, param.sr);
@@ -82,7 +82,7 @@ percentConcurrentSpikesPrecise = sum(hasSpikesPrecise, 2);
 
 % get across channel spike codes:
 for fnum = 1:length(spikeFiles)
-    
+
     if exist(outFileNames{fnum, 2}, 'file') && skipExist && ~updateCrossChannelSpikeCode
         continue
     end
@@ -111,7 +111,7 @@ for fnum = 1:length(spikeFiles)
     if exist(tempOutFile, 'file')
         delete(tempOutFile);
     end
-    
+
     fprintf('write spike codes to file:\n %s\n', tempOutFile);
     matobj = matfile(tempOutFile, 'Writable', true);
     matobj.spikeCodes = spikeCodes;
@@ -120,6 +120,5 @@ for fnum = 1:length(spikeFiles)
 
     movefile(tempOutFile, outFileNames{fnum, 2});
     delete(outFileNames{fnum, 1});
-    
-end
 
+end

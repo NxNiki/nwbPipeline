@@ -11,19 +11,19 @@ filename = handles.simname;
 h_figs=get(0,'children');
 h_fig1 = findobj(h_figs,'Name','detection');
 h_fig2= findobj(h_figs,'Name','detection_aux');
-close(h_fig1); close(h_fig2); 
+close(h_fig1); close(h_fig2);
 
 % load original simulation data
 % spike times are in data counts
 eval(['load ' filename ';']);
 sim_times = cell2mat(spike_times)';
 sim_class = cell2mat(spike_class)' + 1;
-% spike_times units 
+% spike_times units
 % downsampling = 4;
-% tres = 1/96000; 
+% tres = 1/96000;
 % samplingInterval = 1/96000;
 % samps_per_ms     = round(tres/samplingInterval);
-% spiketimes = spiketimes * samps_per_ms; in this case ~1 
+% spiketimes = spiketimes * samps_per_ms; in this case ~1
 % spike_times = ceil(spiketimes/downsampling);
 sim_times = 1000 * (sim_times/24000); % time in miliseconds
 
@@ -34,14 +34,14 @@ det_times = index;% cluster_class(:,2);
 det_class = classes; % cluster_class(:,1);
 
 
-% class_det_sim = repmat(100,length(det_times),1); 
+% class_det_sim = repmat(100,length(det_times),1);
 for i=1:length(det_times)
     aux = abs(repmat(det_times(i),length(sim_times),1) - sim_times);
     [aux isim] = min(aux);
     if aux <= 1
         class_det_sim(i,1) = det_class(i);
         class_det_sim(i,2) = sim_class(isim);
-    else 
+    else
         class_det_sim(i,:) = [-1 -1];
     end
 end
@@ -56,8 +56,8 @@ for i=1:nclusters
     % labels of the simulated clusters
     % -1: this spike has not been generated as single or multiunit
     % 1: spike generated as multiunit
-    classim = class_det_sim(ind,2);  
-    
+    classim = class_det_sim(ind,2);
+
     % find the biggest class within the vector
     jj = 0;
     classim_size = [];
@@ -69,7 +69,7 @@ for i=1:nclusters
         classim_size(jj,2) = j;
     end
     [classim iclass] = max(classim_size(:,1));
-    iclass = classim_size(iclass,2);    
+    iclass = classim_size(iclass,2);
     rdetect = classim/classdet_size;
     intra_inter_simclass(i,1) = rdetect; % ratio of detection within the cluster
     if iclass == -1, intra_inter_simclass(i,2) = 0;
@@ -77,7 +77,7 @@ for i=1:nclusters
     intra_inter_simclass(i,3) = iclass;
 end
 
-colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y']; 
+colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y'];
 
 for i=1:size(intra_inter_simclass,1)
     %     if size(results_det,1) == 1, subplot(1,1,i); end
@@ -127,6 +127,3 @@ if ~isempty(h_fig2)
     set(gcf,'paperposition',[.25 .25 10.5 7.8])
     eval(['print(h_fig2,''-djpeg'',''det_' filename(1:end-4) '_a' ''')' ]);
 end
-
-
- 

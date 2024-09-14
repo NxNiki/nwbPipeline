@@ -6,8 +6,8 @@ function [c,l] = fix_wavedec(x,n)
 Lo_D = [ 0.7071 0.7071];
 Hi_D = [-0.7071 0.7071];
 
-s = size(x); x = x(:)'; 
-c = []; 
+s = size(x); x = x(:)';
+c = [];
 l = [length(x)];
 
 dwtEXTM = 'sym';
@@ -17,13 +17,13 @@ for k = 1:n
     lf = length(Lo_D);
     lx = length(x);
     lenEXT = lf-1; lenKEPT = lx+lf-1;
-   
+
     I = getSymIndices(lx,1);
     y  = x(I);
-    
+
     x = convdown(y,Lo_D,lenKEPT,shift);
     d = convdown(y,Hi_D,lenKEPT,shift);
-    
+
     c     = [d c];            % store detail
     l     = [length(d) l];    % store length
 end
@@ -126,4 +126,3 @@ switch side
   otherwise    , first = 1+floor(d); last = s-ceil(d);  % Default is left side
 end
 %----------------------------------------------------------------------------%
-

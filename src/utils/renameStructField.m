@@ -1,6 +1,6 @@
 function s = renameStructFields(s, oldFieldNames, newFieldNames)
     % renameStructFields Renames multiple fields in a structure or structure array.
-    % 
+    %
     % s = renameStructFields(s, oldFieldNames, newFieldNames)
     %
     % Inputs:

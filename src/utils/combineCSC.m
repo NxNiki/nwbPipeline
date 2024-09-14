@@ -1,16 +1,16 @@
 function [signal, timestamps, samplingIntervalDuration, timestampsStart] = combineCSC(signalFiles, timestampsFiles, maxGapDuration, useSinglePrecision)
 % combineCSC: Combine CSC signals. filling gaps with NaNs if gap between
 % segments larger than threshold. Set signalFiles empty to only process
-% timestampsFiles. 
+% timestampsFiles.
 
 % signalFiles: cell(n, 1)
 % timestampFiles: cell(n, 1). Timestamps file cannot be empty as we need it
 %   to fill the gaps between experiments/segments.
 % maxGapDuration: the max duration of gaps filled between experiments or
-%   segments caused by experiment pause. 
+%   segments caused by experiment pause.
 
 if nargin < 3 || isempty(maxGapDuration)
-    % maxGapDuration = milliseconds(2); 
+    % maxGapDuration = milliseconds(2);
     maxGapDuration = inf;
 end
 

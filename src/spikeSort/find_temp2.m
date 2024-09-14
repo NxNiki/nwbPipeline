@@ -13,13 +13,12 @@ temp = 1;         % Initial value
 
 for t=1:num_temp-1;
     % Looks for changes in the cluster size of any cluster larger than min_clus.
-    if ( aux(t) > min_clus | aux1(t) > min_clus | aux2(t) > min_clus | aux3(t) >min_clus )    
-        temp=t+1;         
+    if ( aux(t) > min_clus | aux1(t) > min_clus | aux2(t) > min_clus | aux3(t) >min_clus )
+        temp=t+1;
     end
 end
 
-%In case the second cluster is too small, then raise the temperature a little bit 
+%In case the second cluster is too small, then raise the temperature a little bit
 if (temp == 1 & tree(temp,6) < min_clus)
     temp = 2;
-end    
-   
+end

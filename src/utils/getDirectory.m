@@ -14,4 +14,3 @@ function workingDir = getDirectory()
     end
 
 end
-

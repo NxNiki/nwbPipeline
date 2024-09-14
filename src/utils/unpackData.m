@@ -56,10 +56,10 @@ parfor i = 1:length(inFileNames)
     timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{i}]);
 
     if strcmp(ext, '.ncs')
-        [signal, ADBitVolts, timeStamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
+        [signal, ADBitVolts, timestamps, samplingInterval, ~] = Nlx_readCSC(inFileNames{i}, computeTS(i), outFilePath);
         num_samples = length(signal);
         timeend = (num_samples-1) * samplingInterval;
-    
+
         matobj = matfile(outFileNameTemp, 'Writable', true);
         matobj.samplingInterval = samplingInterval;
         matobj.samplingIntervalSeconds = seconds(samplingInterval);
@@ -68,31 +68,24 @@ parfor i = 1:length(inFileNames)
         matobj.timeend = timeend;
         matobj.timeendSeconds = seconds(timeend);
         matobj.ADBitVolts = ADBitVolts;
-    
+
         if computeTS(i)
-            matobj = matfile(timestampFullFile, Writable=true);
-            matobj.timeStamps = timeStamps;
-            matobj.samplingInterval = samplingInterval;
-            matobj.samplingIntervalSeconds = seconds(samplingInterval);
-            matobj.time0 = 0;
-            matobj.timeend = timeend;
-            matobj.timeendSeconds = seconds(timeend);
+            saveTimestamps(timestamps, samplingInterval, timestampFile)
         end
     elseif strcmp(ext, '.nev')
-        [timeStamps, TTLs, header] = Nlx2MatEV_v3(inFileNames{i}, [1 0 1 0 0], 1,1,[]);
-        dt = diff(timeStamps);
+        [timetamps, TTLs, header] = Nlx2MatEV_v3(inFileNames{i}, [1 0 1 0 0], 1,1,[]);
+        dt = diff(timetamps);
         inds = find(dt<50 & dt>0);
         TTLs(inds) = [];
-        timeStamps(inds) = [];
-        timeStamps = timeStamps*1e-6; % convert timestamps to seconds.
+        timetamps(inds) = [];
+        timetamps = timetamps*1e-6; % convert timestamps to seconds.
 
         matobj = matfile(outFileNameTemp, 'Writable', true);
         matobj.TTLs = TTLs;
-        matobj.timestamps = timeStamps;
+        matobj.timestamps = timetamps;
         matobj.header = header;
     end
 
     movefile(outFileNameTemp, outFileName);
     outFileNames{i} = outFileName;
 end
-

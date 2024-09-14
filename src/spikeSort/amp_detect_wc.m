@@ -38,7 +38,7 @@ set(handles.file_name,'string','Detecting spikes ...');
 
 if ~(strcmp(handles.datatype,'CSC data (pre-clustered)') |...
         strcmp(handles.datatype,'ASCII (pre-clustered)'))
-        
+
     % LOCATE SPIKE TIMES
     switch detect
         case 'pos'
@@ -83,7 +83,7 @@ if ~(strcmp(handles.datatype,'CSC data (pre-clustered)') |...
     ls=w_pre+w_post;
     spikes=zeros(nspk,ls+4);
     xf=[xf zeros(1,w_post)];
-    
+
     for i=1:nspk                          %Eliminates artifacts
         if max(abs( xf(index(i)-w_pre:index(i)+w_post) )) < thrmax
             spikes(i,:)=xf(index(i)-w_pre-1:index(i)+w_post+2);
@@ -104,8 +104,8 @@ if ~(strcmp(handles.datatype,'CSC data (pre-clustered)') |...
 
     if ~(strcmp(handles.datatype, 'CSC data') & strcmp(handles.par.tmax, 'all'))
         USER_DATA = get(handles.wave_clus_figure,'userdata');
-        USER_DATA{2} = spikes;   
-        USER_DATA{3} = index*1000/sr; 
+        USER_DATA{2} = spikes;
+        USER_DATA{3} = index*1000/sr;
         set(handles.wave_clus_figure, 'userdata', USER_DATA);
         Plot_continuous_data(xf, handles, thr, thrmax)
     elseif handles.flag == 1

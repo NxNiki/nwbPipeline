@@ -12,17 +12,17 @@ function x=filtfilthd(varargin)
 %
 % ------------------------------------------------------------------------
 % The filter states of Hd on entry to FILTFILTHD will be used at the
-% beginning of each forward and each backward pass through the data. The 
+% beginning of each forward and each backward pass through the data. The
 % user should normally ensure that the initial states are zeroed before
 % calling filtfilthd [e.g. using reset(Hd);]
 % ------------------------------------------------------------------------
 %
-% x=FILTFILTHD(b, a, x) 
+% x=FILTFILTHD(b, a, x)
 % x=FILTFILTHD(b, a, x, method)
 %           format is also supported.
 %
 % x=FILTFILTHD(...., IMPULSELENGTH)
-%   allows the impulse response length to be specified on input. 
+%   allows the impulse response length to be specified on input.
 %
 %
 % method is a string describing the end-effect correction technique:
@@ -35,7 +35,7 @@ function x=filtfilthd(varargin)
 %
 % Each method has different merits/limitations. The most robust
 % method is reflect.
-% 
+%
 % The length of the padded data section at each end will be impzlength(Hd)
 % points, or with 'reflect', the minimum of impzlength(Hd) and the
 % data length (this is different to filtfilt where the padding is only
@@ -53,11 +53,11 @@ function x=filtfilthd(varargin)
 % Revisions:
 %   07.11.07    nfact=len-1 (not len) when impulse response longer than
 %                           data
-%   11.11.07    Use x=f(x) for improved memory performance 
+%   11.11.07    Use x=f(x) for improved memory performance
 %                           [instead of y=f(x)]
 %               Handles row vectors properly
 %   31.01.08    Allow impzlength to be specified on input
-%                           
+%
 
 % ARGUMENT CHECKS
 if isnumeric(varargin{1}) && isnumeric(varargin{2})
@@ -87,7 +87,7 @@ end
 % DEAL WITH MATRIX INPUTS-----------------------------------------------
 % Filter each column in turn through recursive calls
 [m,n]=size(x);
-if (m>1) && (n>1) 
+if (m>1) && (n>1)
     for i=1:n
         x(:,i)=filtfilthd(Hd, x(:,i), method, nfact);
     end
@@ -131,7 +131,7 @@ switch method
         post=[];
 end
 
-% % UNCOMMENT TO VIEW THE PADDED DATA 
+% % UNCOMMENT TO VIEW THE PADDED DATA
 % if length(pre);plot(pre,'color', 'r');end;
 % line(length(pre)+1:length(pre)+length(x), x);
 % if length(post);line(length(pre)+length(x)+1:length(pre)+length(x)+length(post), post, 'color', 'm');end;
@@ -171,7 +171,7 @@ set(Hd,'persistentmemory', memflag)
 
 % Revert to row if necessary
 if trflag
-    x=x.';   
+    x=x.';
 end
 
 return
