@@ -49,4 +49,6 @@ test/neuralynx/LFP_macro/
 test/neuralynx/LFP_micro/
 test/neuralynx/CSC_micro_spikes/
 
-montageConfig/configFiles/
+src/montageConfig/configFiles/
+src/montageConfig/*.cfg
+src/montageConfig/*.json
