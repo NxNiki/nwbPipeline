@@ -5,15 +5,15 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-expIds = [2];
+expIds = [5];
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/576_Screening';
 
 % 0: will remove all previous unpack files.
 % 1: skip existing files.
-skipExist = [1, 1, 0];
+skipExist = [0, 0, 0];
 
 % remove noises caused by power line interference:
-runRemovePLI = false;
+runRemovePLI = true;
 
 maxNumCompThreads(10);
 

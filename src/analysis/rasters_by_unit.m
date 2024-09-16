@@ -45,7 +45,7 @@ allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 
 figNames = cell(1, numPages);
 
-for i = 1:numPages
+parfor i = 1:numPages
 
     figNames{i} = fullfile(outputPath, ['rasters_p' num2str(i) '.pdf']);
     figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...

@@ -31,10 +31,12 @@ else
     outFiles = cellfun(@(x)fullfile(outputFilePath, [x(double(x) ~= 0), '.mat']), {NSx.ElectrodesInfo(channelIdx).Label}, 'UniformOutput', false);
 end
 
+writecell(outFiles, fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
+
 nchan = length(outFiles);
 pattern = 'G[A-D][1-4]-(.*?)[1-9]';
 
-for i = 1: nchan
+parfor i = 1: nchan
     if skipExist && exist(outFiles{i}, 'file')
         fprintf('skip existing file: %s\n', outFiles{i});
         continue
@@ -56,7 +58,14 @@ for i = 1: nchan
     end
 
     fprintf('writing data to: %s\n', outFiles{i});
-    NSx = openNSx('report','read', inFile, 'channels', i, 'precision', 'int16');
+
+    try
+        NSx = openNSx('report','read', inFile, 'channels', i, 'precision', 'int16');
+    catch e
+        warning('error occurs reading channel: %d', i);
+        disp(e);
+        continue
+    end
 
     data = NSx.Data;
     samplingInterval = seconds(1) / NSx.MetaTags.SamplingFreq;

@@ -5,9 +5,9 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 patient = 576;
-expId = 2;
+expId = 5;
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/576_Screening';
-skipExist = [1, 0];
+skipExist = [0, 0];
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 
@@ -15,7 +15,7 @@ expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D576/Screening1/576-12-Sep-2024-12-17-13/from laptop/ttlLog576-12-Sep-2024-12-17-13.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D576/Screening2/576-13-Sep-2024-17-29-0/from laptop/ttlLog576-13-Sep-2024-17-29-0.mat';
     % '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D577/Screening 1/577-10-Sep-2024-17-8-26/from laptop/ttlLog577-10-Sep-2024-17-8-26.mat';
     };
 
@@ -43,15 +43,14 @@ end
 
 %%
 
-% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-% rasters_by_unit_video(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
-% rasters_by_unit_video(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
 
 outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
 % rasters_by_unit(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
-rasters_by_unit(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
-rasters_by_image(patient, spikeFilePath, imageDirectory, 0, outputPath);
+% rasters_by_unit(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
+% rasters_by_image(patient, spikeFilePath, imageDirectory, 0, outputPath);
 
-
+outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
+% rasters_by_unit_video(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
+rasters_by_unit_video(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
 
 %%
