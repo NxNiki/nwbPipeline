@@ -70,7 +70,7 @@ parfor i = 1:length(inFileNames)
         matobj.ADBitVolts = ADBitVolts;
 
         if computeTS(i)
-            saveTimestamps(timestamps, samplingInterval, timestampFile)
+            saveTimestamps(timestamps, samplingInterval, timestampFullFile)
         end
     elseif strcmp(ext, '.nev')
         [timetamps, TTLs, header] = Nlx2MatEV_v3(inFileNames{i}, [1 0 1 0 0], 1,1,[]);

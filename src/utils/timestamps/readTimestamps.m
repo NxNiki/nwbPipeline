@@ -16,12 +16,14 @@ else
     duration = tsFileObj.timeend - tsFileObj.time0;
 end
 
-if ~ismember("samplingInterval", who(tsFileObj))
-    samplingIntervalSeconds = NaN;
-elseif isa(tsFileObj.samplingInterval, "duration")
+if ~ismember("samplingIntervalSeconds", who(tsFileObj))
+    samplingIntervalSeconds = tsFileObj.samplingIntervalSeconds;
+elseif ismember("samplingInterval", who(tsFileObj)) && isa(tsFileObj.samplingInterval, "duration")
     samplingIntervalSeconds = seconds(tsFileObj.samplingInterval);
-else
+elseif ismember("samplingInterval", who(tsFileObj))
     samplingIntervalSeconds = tsFileObj.samplingInterval;
+else
+    samplingIntervalSeconds = NaN;
 end
 
 end
