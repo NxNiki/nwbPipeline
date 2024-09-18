@@ -13,22 +13,20 @@ GAP_THRESHOLD = 2
 def combine_csc(
     timestamp_files: List[str],
     signal_files: Optional[List[str]] = None,
-    max_gap_duration: Optional[float] = None,
+    max_gap_duration: float = np.inf,
     use_single_precision: bool = True,
 ) -> Tuple[npt.NDArray[np.float_], Optional[npt.NDArray[np.float_]], float, float]:
     """
-    Combine CSC signals, filling gaps with NaNs if the gap between segments is larger than the threshold.
+    Combine CSC signals, filling gaps with NaNs if the gap between segments is larger than a threshold.
     Set signal_files to empty to only process timestamp_files.
 
     :param signal_files: list of signal file paths
     :param timestamp_files: list of timestamp file paths
-    :param max_gap_duration: maximum gap duration to fill between segments, default is infinity
+    :param max_gap_duration: maximum gap duration (seconds) to fill between segments. The gap exceeding max_gap_duration
+        will be discarded.
     :param use_single_precision: boolean to use single precision for output, default is True
     :return: combined signal, combined timestamps, sampling interval duration, start of timestamps
     """
-
-    if max_gap_duration is None:
-        max_gap_duration = np.inf
 
     # Error checking for empty files and mismatch lengths
     if signal_files is not None and len(timestamp_files) != len(signal_files):
@@ -97,9 +95,9 @@ def read_data(
             signal_to_combine[i] = np.full(len(timestamps_to_combine[i]), np.nan)
 
     if signal_files is None or len(signal_files) == 0:
-        return timestamps_to_combine, sampling_intervals, signal_to_combine
+        return timestamps_to_combine, sampling_intervals, None
 
-    return timestamps_to_combine, sampling_intervals, None
+    return timestamps_to_combine, sampling_intervals, signal_to_combine
 
 
 def check_sampling_intervals(sampling_intervals: npt.NDArray[np.float_]) -> float:
@@ -279,6 +277,8 @@ def file_exists(filepath: str) -> bool:
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
     csc_files_test = [
         "/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm/Experiment-5/"
         "CSC_macro/LA9_004.mat",
@@ -293,8 +293,13 @@ if __name__ == "__main__":
     ]
 
     (
-        signal_test,
         timestamps_test,
+        signal_test,
         sampling_interval_duration_test,
         timestamps_start_test,
     ) = combine_csc(timestamp_files_test, csc_files_test)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+    ax1.plot(timestamps_test)
+    ax2.plot(signal_test)
+    plt.show()
