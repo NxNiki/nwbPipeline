@@ -15,7 +15,7 @@ montageConfigFile = [];
 unpackConfig = struct();
 % generally we won't have memory issue in unpacking unless the raw ncs
 % files are combined for sleep experiments.
-unpackConfig.numParallelTasks = 8;
+unpackConfig.numParallelTasks = 10;
 
 defaultBasePath = '/Volumes/DATA/NLData/';
 defaultOutputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm';
