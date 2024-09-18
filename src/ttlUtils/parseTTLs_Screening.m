@@ -123,9 +123,15 @@ for s=1:length(stimPresentations)
         paradigmSpecificParameters.trialStartBeforeImageOnset;
     thisTrial.roomNumber = roomNumber;
     thisTrial.roomInstruction = instructions{roomNumber};
-    thisTrial.stimulusOffsetTime = TTLs{...
-        image_off(image_off>thisPresentation &...
-        image_off<nextPresentations(s)),1};
+
+    stimOffsetIdx = image_off(image_off>thisPresentation & image_off<nextPresentations(s));
+
+%    if isempty(stimOffsetIdx)
+%        warning('empty stimOffsetIdx');
+%        continue
+%    end
+    thisTrial.stimulusOffsetTime = TTLs{stimOffsetIdx, 1};
+
     thisTrial.trialEndTime = thisTrial.stimulusOffsetTime+...
         paradigmSpecificParameters.trialEndAfterImageOffset;
     response = pressed_button(pressed_button>thisPresentation &...
@@ -144,6 +150,11 @@ for s=1:length(stimPresentations)
     thisTrial.experimentWithinDay = experimentNumberCounter;
     thisTrial.trialTag = regexp(TTLs{thisPresentation,2},...
         '(?<=IMAGE ON\: ).*?(?=_id)','match','once');
+
+    if isempty(thisTrial.trialTag)
+        continue;
+    end
+
     [imageID, e] = regexp(TTLs{thisPresentation,2},...
         '(?<=_id)\d+','match','end','once');
     thisTrial.imageID = str2double(imageID);
@@ -159,6 +170,14 @@ for s=1:length(stimPresentations)
 end
 
 trialTags = {trials.trialTag};
+emptyIdx = cellfun(@(x)isempty(x), trialTags);
+
+if any(emptyIdx)
+    warning('empty elements in trialTag')'
+    trialTags = trialTags(~emptyIdx);
+    trials = trials(~emptyIdx);
+end
+
 for t=1:length(trials)
     if isempty(trials(t).inThisImageSet)
         tag = trials(t).trialTag;
@@ -174,7 +193,7 @@ imageSetSizes = mode(arrayfun(@(x)length(x.inThisImageSet),trials));
 looksGood = arrayfun(@(x)length(x.trialStartTime)==1,trials);
 looksGood(2,:) = arrayfun(@(x)length(x.trialEndTime)==1,trials);
 looksGood(3,:) = arrayfun(@(x)length(x.respondedAtTime)==1,trials);
-looksGood(4,:) = arrayfun(@(x)~isempty(regexp(x.response,'^(yes)|(no)$','once')),trials);
+looksGood(4,:) = arrayfun(@(x)~isempty(regexp(x.response,'^(yes)|(no)$','once')), trials);
 looksGood(5,:) = arrayfun(@(x)length(x.inThisImageSet)==imageSetSizes,trials);
 
 suspicious = find(~all(looksGood));

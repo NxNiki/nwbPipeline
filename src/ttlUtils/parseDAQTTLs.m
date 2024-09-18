@@ -34,8 +34,6 @@ end
 TTLs = arrayfun(@(x)x, ts, 'uniformoutput', 0);
 TTLs(:,2) = cellfun(@(x)x, ttlLog(:,2), 'uniformoutput', 0);
 
-save(fullfile(ttlSavePath, 'TTLs.mat'), 'TTLs');
-
 end
 
 function [ttlLogAlign,tsAlign] = realignTTLs(ttlLog, ts, ttlCode, ttlSavePath)

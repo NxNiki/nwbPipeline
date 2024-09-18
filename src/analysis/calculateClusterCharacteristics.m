@@ -30,8 +30,13 @@ if isempty(clusterFiles)
 end
 
 [timestamps, ~, samplingIntervalSeconds] = readTimestamps(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
-
 sr = 1 / samplingIntervalSeconds;
+
+if ~(2e4<=sr<=4e4)
+    warning('invalid sampling frequency: %f', sr);
+else
+    fprintf('calculateClusterCharacteristics: sampling frequency: %f', sr);
+end
 dataLength = numel(timestamps)/sr;
 time0 = timestamps(1);
 
@@ -88,13 +93,21 @@ for i = 1:length(clusterFiles)
         [pks, locs] = findpeaks(meanWaveform);
         info.localMaxima = numel(pks);
         minPkSeparation = round(.3*1e-3*sr);
-        [pksLim, locsLim] = findpeaks(meanWaveform, 'MinPeakDistance', minPkSeparation);
-        pksLim = sort(pksLim, 'descend');
-        if numel(pksLim) <2
+
+        try
+            [pksLim, locsLim] = findpeaks(meanWaveform, 'MinPeakDistance', minPkSeparation);
+
+            pksLim = sort(pksLim, 'descend');
+            if numel(pksLim) <2
+                info.localMaximaRatio = 0;
+            else
+                info.localMaximaRatio = pksLim(2)/pksLim(1);
+            end
+        catch err
+            warning('error occurs in calculate localMaximaRatio: %s\nset it to 0', err)
             info.localMaximaRatio = 0;
-        else
-            info.localMaximaRatio = pksLim(2)/pksLim(1);
         end
+
         info.lateRangeRatio = range(meanWaveform(round(numel(meanWaveform)/2):end)) / max(meanWaveform);
         info.meanStandardErr = mean( std(allWaveforms, 0, 1) / sqrt(size(allWaveforms, 1)));
         info.rejectCluster = info.localMaximaRatio > maxLocalMaximaRatio || ...

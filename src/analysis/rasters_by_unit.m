@@ -15,7 +15,6 @@ else
     warning('rasters_by_unit: set default sampling rate: %d', sr);
 end
 
-
 close all;
 plotsPerPage = 17;
 
@@ -46,7 +45,7 @@ allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 figNames = cell(1, numPages);
 
 parfor i = 1:numPages
-
+    tic
     figNames{i} = fullfile(outputPath, ['rasters_p' num2str(i) '.pdf']);
     figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
         'PaperUnits','inches','PaperPosition',[0 0 11 8.5],'PaperOrientation','landscape', 'Visible', 'off');
@@ -211,6 +210,7 @@ parfor i = 1:numPages
             histogram(histAxes, allSpikeTimes, -500:50:1000);
             xlim(histAxes, [-500, 1000]);   xticks(histAxes, -500:500:1000);
         end
+
     end
 
     thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
@@ -223,6 +223,7 @@ parfor i = 1:numPages
     end
     %exportgraphics(gcf,['Rasters_p' num2str(subject)'_ScreeningX_allUnits.pdf'],'Append',true) % takes too long
     close all;
+    toc
 end
 
 if useExportFig
