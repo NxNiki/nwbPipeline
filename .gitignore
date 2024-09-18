@@ -52,3 +52,5 @@ test/neuralynx/CSC_micro_spikes/
 src/montageConfig/configFiles/
 src/montageConfig/*.cfg
 src/montageConfig/*.json
+scripts/*.cfg
+scripts/*.json
