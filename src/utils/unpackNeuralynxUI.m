@@ -26,11 +26,13 @@ defaultSaveFile = 'Patient-xx_Exp-xx.json';
 macroPatternLabel = {
     '^[RL].*[0-9]';         % UCLA data
     '^LFPx*';               % IOWA data
+    '';                     % do not unpack macro
     };
 
 microPatternLabel = {
-    '^G[A-D].*[0-9]';         % UCLA data
+    '^G[A-D].*[0-9]';       % UCLA data
     '^PDes*';               % IOWA data
+    '';                     % do not unpack micro
     };
 
 eventPatternLabel = {
@@ -315,7 +317,7 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
         end
 
         if isfield(data, 'macroPattern') && ischar(data.macroPattern)
-            value = find(ismember(data.macroPattern, macroPatternLabel));
+            value = find(ismember(macroPatternLabel, data.macroPattern));
             if isempty(value)
                 [value, macroPatternLabel] = addChannelPattern(data.macroPattern, macroPatternLabel);
             end
@@ -323,7 +325,7 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
         end
 
         if isfield(data, 'microPattern') && ischar(data.microPattern)
-            value = find(ismember(data.microPattern, microPatternLabel));
+            value = find(ismember(microPatternLabel, data.microPattern));
             if isempty(value)
                 [value, microPatternLabel] = addChannelPattern(data.microPattern, microPatternLabel);
             end
