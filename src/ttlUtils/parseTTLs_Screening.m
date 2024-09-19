@@ -94,6 +94,7 @@ experimentNumberCounter = 0;
 entryCounter = 0;
 trials(length(stimPresentations)) = trialTemplate;
 
+trialNumberCounter = 0;
 for s=1:length(stimPresentations)
     thisPresentation = stimPresentations(s);
     entryCounter = entryCounter+1;
@@ -112,6 +113,9 @@ for s=1:length(stimPresentations)
                 ', experimentCounter said ',num2str(experimentNumberCounter),...
                 '. Please double check your TTLs!'])
         end
+    elseif trialNumberCounter == 0
+        warning('skip stimPresentation: %d', s);
+        continue
     end
 
     thisTrial = trialTemplate;
