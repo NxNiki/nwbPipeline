@@ -1,9 +1,13 @@
-function [clusterCharacteristics] = calculateClusterCharacteristics(spikeFolder, CSCFolder, trials, imageDir)
+function [clusterCharacteristics, sr] = calculateClusterCharacteristics(spikeFolder, CSCFolder, trials, imageDir, checkResponse)
 %CALCULATECLUSTERCHARACTERISTICS Summary of this function goes here
 %   Detailed explanation goes here
 
 if nargin < 4
     imageDir = [];
+end
+
+if nargin < 5
+    checkResponse = false;
 end
 
 log10_thresh = 3;
@@ -15,12 +19,21 @@ maxMeanStandardErr = 2;
 maxNoiseProminence = 2;
 maxWaveformsToInclude = 2500;
 
-imageNames = unique({trials.trialTag});
+trialsTag = {trials.trialTag};
+stimOnsetTime = [trials.stimulusOnsetTime];
+responseOnsetTime = [trials.respondedAtTime];
+if isfield(trials, 'patient')
+    info.patient_num = trials(1).patient;
+end
+clear trials
+
+imageNames = unique(trialsTag);
 if ~isempty(imageDir)
     allVideoDir = dir(fullfile(imageDir, '*.mp4'));
     allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)', 'match', 'once');
     [videoNames, videoIdxes] = intersect(imageNames, allVideoTrialTags);
     imageNames(videoIdxes) = [];
+    videoOnsetTime = stimOnsetTime(videoIdxes);
 end
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
@@ -29,22 +42,23 @@ if isempty(clusterFiles)
     error('no cluster files detected, run spike sorting before this step!');
 end
 
+% get the start time of experiment and sampling rate. The start time will
+% be subtracted from stimulus onset time. (both unix time in seconds)
 [timestamps, ~, samplingIntervalSeconds] = readTimestamps(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
 sr = 1 / samplingIntervalSeconds;
 
-if ~(2e4<=sr<=4e4)
+if ~((2e4 <= sr) && (sr <= 4e4))
     warning('invalid sampling frequency: %f', sr);
 else
-    fprintf('calculateClusterCharacteristics: sampling frequency: %f', sr);
+    fprintf('calculateClusterCharacteristics: sampling frequency: %d\n', sr);
 end
 dataLength = numel(timestamps)/sr;
-time0 = timestamps(1);
+
+stimOnsetTime = checkTimestamps(stimOnsetTime, timestamps(1), 1e3);
+responseOnsetTime = checkTimestamps(responseOnsetTime, timestamps(1), 1e3);
+clear timestamps
 
 clusterCharacteristics = [];
-
-if isfield(trials, 'patient')
-    info.patient_num = trials(1).patient;
-end
 
 for i = 1:length(clusterFiles)
     info.csc_num = i;
@@ -74,9 +88,9 @@ for i = 1:length(clusterFiles)
         info.cluster_num = clusterNums(j);
 
         allWaveforms = spikes(cluster_class(:, 1) == clusterNums(j), :);
-        allTimes = cluster_class(cluster_class(:, 1) == clusterNums(j), 2);
-        ISI = diff(allTimes);
-        info.allTimes = allTimes;
+        allSpikeTimes = cluster_class(cluster_class(:, 1) == clusterNums(j), 2);
+        ISI = diff(allSpikeTimes);
+        info.allTimes = allSpikeTimes;
         info.noiseProminence = max([ ...
             2*sum(ISI>.0156&ISI<0.0176)/max(sum(ISI>.0116&ISI<.0156), ...
             sum(ISI>.0176&ISI<.0216)), ...
@@ -124,36 +138,42 @@ for i = 1:length(clusterFiles)
             info.waveDuration = 1000*(maxLocation - 1)/sr;
         end
 
-        [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
+        [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
+
         if ~isempty(videoNames)
-            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
+            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(videoOnsetTime, trialsTag, allSpikeTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
         end
+
+        if checkResponse
+            [info.responseScreeningInfo, info.responseNumSelective, info.responseSelectivity] = getScreeningInfo(responseOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:1000:950), [-1000, 0, 500]);
+        end
+
         clusterCharacteristics = [clusterCharacteristics; struct2table(info, 'AsArray', 1)];
     end
 end
 
 clusterCharacteristics = sortrows(clusterCharacteristics, 1);
 
-outFileObj = matfile(fullfile(spikeFolder, 'clusterCharacteristics.mat'), "Writable", true);
-outFileObj.clusterCharacteristics = clusterCharacteristics;
-outFileObj.samplingRate = sr;
-
 end
 
-function [screeningInfo, numSelective, selectivity] = getScreeningInfo(trials, time0, allTimes, log10_thresh, imageNames, binEdges1, binEdges2)
+function [screeningInfo, numSelective, selectivity] = getScreeningInfo(stim_onsets, trialTag, allSpikeTimes, log10_thresh, imageNames, binEdges1, binEdges2, latencyWindow)
+
+if nargin < 8
+    latencyWindow = [-500, 0, 1000];
+end
 
 screeningInfo = struct;
 numStimuli = length(imageNames);
 
-if trials(1).stimulusOnsetTime > time0
-    stim_onsets = 1e3*([trials.stimulusOnsetTime] - time0);
-else
-    stim_onsets = 1e3*([trials.stimulusOnsetTime]);
-end
+[ baselineLatencies, ~ ] = getSpikeLatencies(stim_onsets, allSpikeTimes*1e3, [latencyWindow(1), latencyWindow(2)]);
+[ stimLatencies, ~ ] = getSpikeLatencies(stim_onsets, allSpikeTimes*1e3, [latencyWindow(2), latencyWindow(3)]);
+[ allLatencies, ~ ] = getSpikeLatencies(stim_onsets, allSpikeTimes*1e3, [-1000 10000]);
 
-[ baselineLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-500 0]);
-[ stimLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [0 1000]);
-[ allLatencies, ~ ] = getSpikeLatencies( stim_onsets, allTimes*1e3, [-1000 10000]);
+if latencyWindow(3) - latencyWindow(2) > latencyWindow(2) - latencyWindow(1)
+    testDirection = 'left';
+else
+    testDirection = 'right';
+end
 
 baselineToStimRatio = 500/mode(diff(binEdges1));
 baselineDistribution = cellfun(@numel, baselineLatencies);
@@ -162,9 +182,10 @@ spikesToAllImages1 = cell2mat(cellfun(@(x)histcounts(x, binEdges1), stimLatencie
 spikesToAllImages2 = cell2mat(cellfun(@(x)histcounts(x, binEdges2), stimLatencies, 'UniformOutput', 0)');
 allFR = zeros(1, numStimuli);
 allScores = zeros(1, numStimuli);
+
 for k = 1:numStimuli
     screeningInfo(k).imageName = imageNames{k};
-    relevantTrials = find(strcmp({trials.trialTag}, imageNames{k}));
+    relevantTrials = find(strcmp(trialTag, imageNames{k}));
     stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
 
     allFR(k) = stimSpikes;
@@ -179,16 +200,16 @@ for k = 1:numStimuli
 
     pr = zeros(1, 19);
     for h = 1:2:19
-        pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages1(relevantTrials, ceil(h/2)), 'tail', 'left');
+        pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages1(relevantTrials, ceil(h/2)), 'tail', testDirection);
     end
     for h = 2:2:18
-        pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages2(relevantTrials, h/2), 'tail', 'left');
+        pr(h) = ranksum(baselineDistribution, baselineToStimRatio*spikesToAllImages2(relevantTrials, h/2), 'tail', testDirection);
     end
-    [~, ~, ~, pr] = fdr_bh(pr);
+    [~, ~, ~, pr] = fdr_bh(pr); % why use fdr when we select the max score?
     scoreTrace = -log10(pr);
     screeningInfo(k).score = max(scoreTrace);
     allScores(k) = max(scoreTrace);
-    screeningInfo(k).responseOnset = find(scoreTrace > log10_thresh, 1)*mode(diff(binEdges1))/2;
+    screeningInfo(k).responseOnset = find(scoreTrace > log10_thresh, 1) * mode(diff(binEdges1))/2;
 end
 
 screeningInfo = {screeningInfo};
@@ -196,5 +217,19 @@ numSelective = sum(allScores > log10_thresh);
 FRThresh = linspace(0, max(allFR), 1000);
 scoreVals = arrayfun(@(x)sum(allFR > x), FRThresh)/numStimuli;
 selectivity = 1-2*mean(scoreVals);
+
+end
+
+function timestamps = checkTimestamps(timestamps, time0, factor)
+% check start time of timestamps and subtract experiment start time.
+% factor is used to convert seconds to milliseconds (if 1e3).
+% caution: factor unix time may lead to overflow of large numbers. so
+% subtract time0 before factor.
+
+if timestamps(1) > time0
+    timestamps = (timestamps - time0) * factor;
+else
+    timestamps = timestamps * factor;
+end
 
 end

@@ -1,32 +1,20 @@
-function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, useExportFig, outputPath)
+function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, screeningType)
 
+if nargin < 5
+    screeningType = 'screeningInfo';
+end
+
+outputPath = fullfile(trialFolder, ['raster_plots_', screeningType]);
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
 end
 
-clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
-allClusters = clusterFileObj.clusterCharacteristics;
-
-if ismember('samplingRate', who(clusterFileObj))
-    sr = clusterFileObj.samplingRate;
-    fprintf('rasters_by_unit: sampling rate: %d\n', sr);
-else
-    sr = 32e3;
-    warning('rasters_by_unit: set default sampling rate: %d', sr);
-end
+[clustersToPlot, sr] = getClusters(trialFolder, plotResponsive);
 
 close all;
 plotsPerPage = 17;
 
-if plotResponsive
-    clustersToPlot = allClusters(allClusters.numSelective > 0 & allClusters.cluster_num > 0, :);
-    clustersToPlot = sortrows(clustersToPlot,'selectivity','descend');
-else
-    clustersToPlot = allClusters(allClusters.cluster_num > 0 & allClusters.firingRate > .15, :); %& allClusters.rejectCluster == 0, :);
-    clustersToPlot = sortrows(clustersToPlot,'csc_num','ascend');
-end
-
-totalNumStimuli = length(clustersToPlot{1, 'screeningInfo'}{1});
+totalNumStimuli = length(clustersToPlot{1, screeningType}{1});
 pagesPerCluster =  ceil(clustersToPlot{:, 'numSelective'}/plotsPerPage); %ceil(totalNumStimuli/plotsPerPage)*ones(size(responsiveClusters, 1), 1);
 pagesPerCluster(pagesPerCluster==0) = 1;
 numPages = sum(pagesPerCluster);
@@ -44,9 +32,14 @@ allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 
 figNames = cell(1, numPages);
 
+imageLimits = [-500 1000];
+audioLimits = [-500 2000];
+videoLimits = [-1000 10000];
+responseLimits = [-1000 500];
+
 parfor i = 1:numPages
     tic
-    figNames{i} = fullfile(outputPath, ['rasters_p' num2str(i) '.pdf']);
+    figNames{i} = fullfile(outputPath, ['rasters_', screeningType, '_p' num2str(i) '.pdf']);
     figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
         'PaperUnits','inches','PaperPosition',[0 0 11 8.5],'PaperOrientation','landscape', 'Visible', 'off');
     set(gcf, 'Color', 'white');
@@ -57,7 +50,7 @@ parfor i = 1:numPages
     unitToPlot = find(i - cumSumClusters > 0, 1, 'last');
     posInPage = i - cumSumClusters(unitToPlot);
     nPagesInUnit = cumSumClusters(unitToPlot+1)-cumSumClusters(unitToPlot);
-    clusterInfo = struct2table(clustersToPlot{unitToPlot, 'screeningInfo'}{1});
+    clusterInfo = struct2table(clustersToPlot{unitToPlot, screeningType}{1});
     clusterInfo = sortrows(clusterInfo,'score','descend');
 
     % clusterInfoVideo = struct2table(clustersToPlot{unitToPlot, 'videoScreeningInfo'}{1});
@@ -93,9 +86,7 @@ parfor i = 1:numPages
     unitsToPlot = (posInPage-1)*plotsPerPage + [1:plotsPerPage];
     unitsToPlot(unitsToPlot > totalNumStimuli) = [];
 
-    imageLimits = [-500 1000];
-    audioLimits = [-500 2000];
-    videoLimits = [-1000 10000];
+
     for j = 1:length(unitsToPlot)
 
         imageAxes = axes(gcf, 'Position', getAxisRect(j, 1));
@@ -155,7 +146,13 @@ parfor i = 1:numPages
             if numel(spikeTimes{k}) > 0
                 trialSpikeTimes = spikeTimes{k};
                 if ~isempty(imageLookupIdx)
-                    trialSpikeTimes(trialSpikeTimes < imageLimits(1) | trialSpikeTimes > imageLimits(2)) = [];
+                    if strcmp(screeningType, 'screeningInfo')
+                        trialSpikeTimes(trialSpikeTimes < imageLimits(1) | trialSpikeTimes > imageLimits(2)) = [];
+                        stimColor = 'green';
+                    else
+                        trialSpikeTimes(trialSpikeTimes < responseLimits(1) | trialSpikeTimes > responseLimits(2)) = [];
+                        stimColor = 'blue';
+                    end
                 elseif ~isempty(videoLookupIdx)
                     trialSpikeTimes(trialSpikeTimes < videoLimits(1) | trialSpikeTimes > videoLimits(2)) = [];
                 elseif ~isempty(audioLookupIdx)
@@ -173,7 +170,11 @@ parfor i = 1:numPages
         ylim(rasterAxes, [.6, length(spikeTimes)+.4]);
 
         if ~isempty(imageLookupIdx)
-            xlim(rasterAxes, [-500, 1000]); xticks(rasterAxes, -500:500:1000);
+            if strcmp(screeningType, 'screeningInfo')
+                xlim(rasterAxes, [-500, 1000]); xticks(rasterAxes, -500:500:1000);
+            else
+                xlim(rasterAxes, [-1000, 500]); xticks(rasterAxes, -1000:500:500);
+            end
         elseif ~isempty(audioLookupIdx)
             xlim(rasterAxes, [-500, 2000]); xticks(rasterAxes, -500:1000:2000);
         elseif ~isempty(videoLookupIdx)
@@ -182,7 +183,7 @@ parfor i = 1:numPages
             xlim(rasterAxes, [-500, 1000]); xticks(rasterAxes, -500:500:1000);
         end
 
-        plot(rasterAxes, [0, 0 ], [.6, length(spikeTimes)+.4], 'Color', 'green');
+        plot(rasterAxes, [0, 0 ], [.6, length(spikeTimes)+.4], 'Color', stimColor);
         if responseOnset
             plot(rasterAxes, [responseOnset, responseOnset ], [.6, length(spikeTimes)+.4], 'Color', 'red');
         end
@@ -210,42 +211,34 @@ parfor i = 1:numPages
             histogram(histAxes, allSpikeTimes, -500:50:1000);
             xlim(histAxes, [-500, 1000]);   xticks(histAxes, -500:500:1000);
         end
-
     end
 
     thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
     annotation('textbox',[0 .9625 1 .025],'units','normalized', 'String',thisTitle,'EdgeColor','none', 'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold','Interpreter','tex');
-    if useExportFig
-        export_fig(gcf, figNames{i}, '-dpf');
-    else
-        xtickangle(findobj(gcf,'type','axes'),0);
-        print(gcf,'-dpdf','-r100','-vector',figNames{i});
-    end
-    %exportgraphics(gcf,['Rasters_p' num2str(subject)'_ScreeningX_allUnits.pdf'],'Append',true) % takes too long
+
+    xtickangle(findobj(gcf,'type','axes'),0);
+    print(gcf,'-dpdf','-r100','-vector',figNames{i});
+
     close all;
     toc
 end
 
-if useExportFig
-    append_pdfs(fullfile(outputPath, 'Rasters_all.pdf'), figNames);
+if plotResponsive
+    merge_fn = ['Rasters_p' num2str(subject), '_', screeningType, '_responsiveUnits'];
 else
-    if plotResponsive
-        merge_fn = ['Rasters_p' num2str(subject), '_ScreeningX_responsiveUnits'];
-    else
-        merge_fn = ['Rasters_p' num2str(subject) '_ScreeningX_allUnits'];
-    end
-
-    mergeSegments = [1:50:length(figNames), length(figNames)+1];
-    for i = 2:length(mergeSegments)
-        filenames1 = figNames(mergeSegments(i-1): (mergeSegments(i)-1));
-        if length(filenames1) > 1
-            mergePdfs(filenames1, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))));
-        else
-            movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
-        end
-    end
-
+    merge_fn = ['Rasters_p' num2str(subject) '_', screeningType, '_allUnits'];
 end
+
+mergeSegments = [1:50:length(figNames), length(figNames)+1];
+for i = 2:length(mergeSegments)
+    filenames1 = figNames(mergeSegments(i-1): (mergeSegments(i)-1));
+    if length(filenames1) > 1
+        mergePdfs(filenames1, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))));
+    else
+        movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
+    end
+end
+
 close all;
 end
 
@@ -276,4 +269,26 @@ function [rect] = getAxisRect(pos, sub_pos)
     else
         rect(4) = verticalMinSize;
     end
+end
+
+function [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive)
+
+clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
+allClusters = clusterFileObj.clusterCharacteristics;
+
+if ismember('samplingRate', who(clusterFileObj))
+    sr = clusterFileObj.samplingRate;
+    fprintf('rasters_by_unit: sampling rate: %d\n', sr);
+else
+    sr = 32e3;
+    warning('rasters_by_unit: set default sampling rate: %d', sr);
+end
+
+if plotResponsive
+    clustersToPlot = allClusters(allClusters.numSelective > 0 & allClusters.cluster_num > 0, :);
+    clustersToPlot = sortrows(clustersToPlot,'selectivity','descend');
+else
+    clustersToPlot = allClusters(allClusters.cluster_num > 0 & allClusters.firingRate > .15, :); %& allClusters.rejectCluster == 0, :);
+    clustersToPlot = sortrows(clustersToPlot,'csc_num','ascend');
+end
 end
