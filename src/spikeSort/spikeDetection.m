@@ -83,6 +83,10 @@ parfor i = 1: size(cscFiles, 1)
         end
 
         signal = readCSC(channelFiles{j}, runRemovePLI);
+        if isempty(signal)
+            warning(['error reading file: \n', sprintf('%s \n', channelFiles{j})]);
+            continue;
+        end
         [timestamps, dur] = readTimestamps(timestampFiles{j});
         duration = duration + dur;
 
