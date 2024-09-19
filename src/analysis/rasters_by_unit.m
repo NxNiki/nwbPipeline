@@ -142,13 +142,13 @@ parfor i = 1:numPages
             spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'}; %{1}
         end
 
+        stimColor = 'green';
         for k = 1:length(spikeTimes)
             if numel(spikeTimes{k}) > 0
                 trialSpikeTimes = spikeTimes{k};
                 if ~isempty(imageLookupIdx)
                     if strcmp(screeningType, 'screeningInfo')
                         trialSpikeTimes(trialSpikeTimes < imageLimits(1) | trialSpikeTimes > imageLimits(2)) = [];
-                        stimColor = 'green';
                     else
                         trialSpikeTimes(trialSpikeTimes < responseLimits(1) | trialSpikeTimes > responseLimits(2)) = [];
                         stimColor = 'blue';

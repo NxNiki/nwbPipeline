@@ -60,6 +60,7 @@ end
 % rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo')
 rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo')
 
+% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
 % rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
 
 % outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
