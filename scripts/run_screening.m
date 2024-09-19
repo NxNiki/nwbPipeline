@@ -4,20 +4,22 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 1809;
-expId = [82, 84, 86];
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1809_Screening';
+patient = 576;
+expId = [23];
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/576_Screening';
 skipExist = [1, 1, 1];
 
-expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
+% set true to create rasters for reponse (key press):
+checkResponseRaster = true;
 
 % In mose case we only have 1 ttlLog file. If the experiment is paused by
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1809_Screening/Experiment-82-84-86/CSC_events/ttlLog.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D576/Screening4/576-18-Sep-2024-17-35-19/from laptop/ttlLog576-18-Sep-2024-17-35-19.mat';
     };
 
+expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
 imageDirectory = fullfile(expFilePath, '/trial1');
 
@@ -42,24 +44,26 @@ end
 
 %%
 
-if ~exist(fullfile(spikeFilePath, 'clusterCharacteristics.mat'), "file") || ~skipExist(3)
+if ~exist(fullfile(expFilePath, 'clusterCharacteristics.mat'), "file") || ~skipExist(3)
     load(fullfile(expFilePath, 'trialStruct.mat'), 'trials');
     cscFilePath = fullfile(expFilePath, '/CSC_micro');
     disp('save clusterCharacteristics...');
     tic
-    clusterCharacteristics = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials, imageDirectory);
+    [clusterCharacteristics, samplingRate] = calculateClusterCharacteristics(spikeFilePath, cscFilePath, trials, imageDirectory, checkResponseRaster);
+    save(fullfile(expFilePath, 'clusterCharacteristics.mat'), 'clusterCharacteristics', 'samplingRate');
     toc
 end
 
 %%
 
-outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
-% rasters_by_unit(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
-rasters_by_unit(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
-rasters_by_image(patient, spikeFilePath, imageDirectory, 0, outputPath);
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo')
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo')
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo')
+
+% rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
 
 % outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-% rasters_by_unit_video(patient, spikeFilePath, imageDirectory, 1, 0, outputPath)
-% rasters_by_unit_video(patient, spikeFilePath, imageDirectory, 0, 0, outputPath)
+% rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath)
+% rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath)
 
 %%
