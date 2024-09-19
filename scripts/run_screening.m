@@ -5,7 +5,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 patient = 576;
-expId = [19];
+expId = [23];
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/576_Screening';
 skipExist = [1, 1, 1];
 
@@ -16,7 +16,7 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D576/Screening3/576-17-Sep-2024-14-15-26/from laptop/ttlLog576-17-Sep-2024-14-15-26.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D576/Screening4/576-18-Sep-2024-17-35-19/from laptop/ttlLog576-18-Sep-2024-17-35-19.mat';
     };
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
