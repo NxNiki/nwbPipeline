@@ -5,7 +5,17 @@ if nargin < 2
     runRemovePLI = false;
 end
 
-matObj = matfile(filename, 'Writable', false);
+% do not raise error if fail to read mat file so that we keep process
+% other channels.
+try
+    matObj = matfile(filename, 'Writable', false);
+catch
+    signal = [];
+    samplingIntervalSeconds = [];
+    warning('error occurs reading file: %s', filename);
+    return
+end
+
 signal = matObj.data;
 
 if runRemovePLI && ismember('signalRemovePLI', who('-file', filename))
