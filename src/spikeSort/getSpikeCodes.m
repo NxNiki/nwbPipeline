@@ -24,7 +24,9 @@ for fnum = 1:length(spikeFiles)
     spikeFile = spikeFiles{fnum};
     [~, filename, ext] = fileparts(spikeFile);
 
+    % spike codes without cross channel features:
     outFileNames{fnum, 1} = fullfile(outputPath, [strrep(filename, '_spikes', '_spikeCodes1'), ext]);
+    % spike codes with cross channel features:
     outFileNames{fnum, 2} = fullfile(outputPath, [strrep(filename, '_spikes', '_spikeCodes'), ext]);
 
     if exist(outFileNames{fnum, 2}, 'file') && skipExist
@@ -88,7 +90,13 @@ for fnum = 1:length(spikeFiles)
     end
 
     fprintf('get cross channel spike codes:\n %s\n', outFileNames{fnum, 2});
-    spikeCodeFileObj = matfile(outFileNames{fnum, 1}, 'Writable', false);
+
+    if exist(outFileNames{fnum, 1}, 'file')
+        spikeCodeFileObj = matfile(outFileNames{fnum, 1}, 'Writable', false);
+    else
+        spikeCodeFileObj = matfile(outFileNames{fnum, 2}, 'Writable', false);
+    end
+
     spikeCodes = spikeCodeFileObj.spikeCodes;
 
     spikeFileObj = matfile(spikeFiles{fnum}, 'Writable', false);
