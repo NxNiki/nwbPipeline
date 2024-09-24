@@ -75,7 +75,8 @@ if status ~= 0
     disp(result)
 end
 
-log_name = [par.filename 'spc_log.txt'];
+[log_path, log_filename] = fileparts(par.filename);
+log_name = fullfile(log_path, 'spc_log', [log_filename '_spc_log.txt']);
 f = fopen(log_name, 'w');
 fprintf(f, ['----------\nSPC result of file: ' par.filename '\n']);
 fprintf(f, result);

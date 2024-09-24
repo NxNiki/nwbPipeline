@@ -28,7 +28,7 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     end
 
     %% load file names micro data:
-    
+
     [microFiles, timestampFiles, expNames] = readFilePath(expIds, filePath);
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
 
@@ -58,10 +58,8 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     %% spike clustering:
 
     spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
-
     spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
+
     disp('Spike Clustering Finished!')
 
 end
-
-
