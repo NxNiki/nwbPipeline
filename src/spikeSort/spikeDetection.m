@@ -75,7 +75,7 @@ parfor i = 1: size(cscFiles, 1)
     duration = 0;
 
     [outputStruct, param] = getDetectionThresh(channelFiles, runRemovePLI);
-
+    timestampsStart = NaN;
     for j = 1: nSegments
         if ~exist(channelFiles{j}, "file")
             fprintf(['missing file in spike detection: \n', sprintf('%s \n', channelFiles{j})]);
@@ -84,14 +84,17 @@ parfor i = 1: size(cscFiles, 1)
 
         signal = readCSC(channelFiles{j}, runRemovePLI);
         if isempty(signal)
-            warning(['error reading file: \n', sprintf('%s \n', channelFiles{j})]);
+            warning(sprintf('spikeDetection: error reading file: \n%s \n', channelFiles{j}));
             continue;
         end
         [timestamps, dur] = readTimestamps(timestampFiles{j});
         duration = duration + dur;
 
-        if j == 1
-            timestampsStart = timestamps(1);
+        if j == 1 || isnan(timestampsStart)
+            timestampsStart = min(timestampsStart, timestamps(1));
+        elseif timestampsStart > timestamps(1)
+            warning('spikeDetection: timestamp files not correctly ordered!');
+            fprintf('%s\n', timestampFiles);
         end
 
         timestamps = timestamps - timestampsStart;
@@ -111,7 +114,7 @@ parfor i = 1: size(cscFiles, 1)
         spikeTimestamps{j} = timestamps(index);
     end
 
-    fprintf('write spikes to file:\n %s\n', tempSpikeFilename);
+    fprintf('spikeDetection: write spikes to file:\n %s\n', tempSpikeFilename);
 
     % in case server connection is lost:
     try
@@ -137,7 +140,7 @@ parfor i = 1: size(cscFiles, 1)
         if exist(spikeFilename, "file")
             delete(spikeFilename);
         end
-        warning('error writing file %s\n:', spikeFilename)
+        warning(sprintf('spikeDetection: error writing file %s\n:', spikeFilename))
         fprintf('Error message: %s\n', ME.message);
     end
 end
