@@ -48,24 +48,27 @@ end
 fclose(fid);
 
 system_type = computer;
+
+% CAUTION: command with .exe may fail if the file path is too long. So we
+% cd into working directory and use only the file name as input.
 switch system_type
-    % window not tested.
+    % windows not tested.
     case {'PCWIN'}
-        [status, result] = dos(sprintf('"%s" %s.run', which('cluster.exe'), fname));
+        [status, result] = dos(sprintf('"%s" %s.run', which('cluster.exe'), fileName));
     case {'PCWIN64'}
-        [status, result] = dos(sprintf('"%s" %s.run', which('cluster_64.exe'), fname));
+        [status, result] = dos(sprintf('"%s" %s.run', which('cluster_64.exe'), fileName));
     case {'MAC'}
         cluster_file = which('cluster_mac.exe');
-        [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
+        [status, result] = unix(sprintf('%s %s.run', cluster_file, fileName));
     case {'MACI', 'MACI64', 'MACA64'}
         cluster_file = which('cluster_maci.exe');
-        [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
+        [status, result] = unix(sprintf('%s %s.run', cluster_file, fileName));
     case {'GLNX86'}
         cluster_file = which('cluster_linux.exe');
-        [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
+        [status, result] = unix(sprintf('%s %s.run', cluster_file, fileName));
     case {'GLNXA64', 'GLNXI64'}
         cluster_file = which('cluster_linux64.exe');
-        [status, result] = unix(sprintf('%s %s.run', cluster_file, fname));
+        [status, result] = unix(sprintf('%s %s.run', cluster_file, fileName));
     otherwise
     	ME = MException('MyComponent:NotSupportedArq', '%s type of computer not supported.', system_type);
     	throw(ME)
