@@ -12,13 +12,13 @@ try
 catch
     signal = [];
     samplingIntervalSeconds = [];
-    warning('error occurs reading file: %s', filename);
+    warning('readCSC:error occurs reading file: %s', filename);
     return
 end
 
 signal = matObj.data;
 
-if runRemovePLI && ismember('signalRemovePLI', who('-file', filename))
+if runRemovePLI && ismember('signalRemovePLI', who('-file', filename)) && ~isempty(matObj.signalRemovePLI)
     signal = matObj.signalRemovePLI;
     runRemovePLI = false;
 elseif ismember('ADBitVolts', who('-file', filename)) && ~isnan(matObj.ADBitVolts)
