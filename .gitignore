@@ -38,6 +38,8 @@ test/neuralynx/CSC_micro_spikes/*.mat
 test/neuralynx/CSC_micro_spikes/*.txt
 test/neuralynx/LFP_micro/*.png
 test/neuralynx/nwb/*_tmp.nwb
+test/neuralynx/spike_files/spc_log/
+test/neuralynx/spike_files/*.mat
 
 notebooks/*.nwb
 
