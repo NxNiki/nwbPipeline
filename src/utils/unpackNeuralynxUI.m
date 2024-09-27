@@ -240,8 +240,12 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
             eventPattern = eventPatternLabel{get(eventPatternInput, 'Value')};
             montageConfigFile = get(montageFileInput, 'String');
 
-            % Construct the data structure
+            if length(experimentIds) ~= length(selectedFolders)
+                msgbox('Length of experiment Id and input Folder not match!', 'Warning', 'warn');
+                return
+            end
 
+            % Construct the data structure
             unpackConfig.BaseDirectory = get(baseDirInput, 'String');
             unpackConfig.ExperimentIds = experimentIds;
             unpackConfig.OutputFilePath = outputFilePath;
