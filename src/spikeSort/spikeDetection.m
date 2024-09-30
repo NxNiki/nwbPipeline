@@ -68,10 +68,12 @@ parfor i = 1: size(cscFiles, 1)
 
     fprintf(['spike detection: \n', sprintf('%s \n', channelFiles{:})])
 
-    spikes = cell(nSegments, 1);
+    matobj = matfile(tempSpikeFilename, 'Writable', true);
+    matobj_empty = true;
+    % spikes = cell(nSegments, 1);
     xfDetect = cell(nSegments, 1);
     ExpNameId = cell(nSegments, 1);
-    spikeTimestamps = cell(nSegments, 1);
+    % spikeTimestamps = cell(nSegments, 1);
     duration = 0;
 
     [outputStruct, param] = getDetectionThresh(channelFiles, runRemovePLI);
@@ -99,10 +101,13 @@ parfor i = 1: size(cscFiles, 1)
 
         timestamps = timestamps - timestampsStart;
         if saveXfDetect
-            [spikes{j}, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, outputStruct);
+            [spikes, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, outputStruct);
         else
-            [spikes{j}, index, ~] = amp_detect_AS(signal, param, outputStruct);
+            [spikes, index, ~] = amp_detect_AS(signal, param, outputStruct);
         end
+
+        % set unused variables to emtpy to save memory usage:
+        signal = []
 
         tsSingle = single(timestamps);
         if length(unique(tsSingle)) == length(timestamps)
@@ -111,21 +116,36 @@ parfor i = 1: size(cscFiles, 1)
         end
 
         ExpNameId{j} = repmat(j, 1, length(index));
-        spikeTimestamps{j} = timestamps(index);
-    end
+        spikeTimestamps = timestamps(index);
 
-    fprintf('spikeDetection: write spikes to file:\n %s\n', tempSpikeFilename);
+        timestamps = [];
+
+        try
+            fprintf('spikeDetection: write spikes:\n channel: %s\n%s\n', channelFiles{j}, tempSpikeFilename);
+            if matobj_empty
+                matobj.spikes = single(spikes);
+                matobj.spikeTimestamps = spikeTimestamps(:);
+                matobj_empty = false;
+            else
+                matobj.spikes(end+1:end+size(spikes, 1), :) = single(spikes);
+                matobj.spikeTimestamps(end+1:end+numel(spikeTimestamps), 1) = spikeTimestamps(:);
+            end
+        catch ME
+            catchErr(tempSpikeFilename, spikeFilename, ME)
+        end
+
+        spikes = [];
+        spikeTimestamps = [];
+
+    end
 
     % in case server connection is lost:
     try
-        matobj = matfile(tempSpikeFilename, 'Writable', true);
-        matobj.spikes = single(vertcat(spikes{:}));
         matobj.param = param;
         matobj.ExpNameId = int8([ExpNameId{:}]);
         matobj.ExpName = experimentName;
         matobj.timestampsStart = timestampsStart;
         matobj.outputStruct = outputStruct;
-        matobj.spikeTimestamps = [spikeTimestamps{:}];
         matobj.duration = duration;
 
         if saveXfDetect
@@ -134,17 +154,21 @@ parfor i = 1: size(cscFiles, 1)
         fprintf('save success, rename spike file name to:\n %s\n', spikeFilename);
         movefile(tempSpikeFilename, spikeFilename);
     catch ME
-        if exist(tempSpikeFilename, "file")
-            delete(tempSpikeFilename);
-        end
-        if exist(spikeFilename, "file")
-            delete(spikeFilename);
-        end
-        warning(sprintf('spikeDetection: error writing file %s\n:', spikeFilename))
-        fprintf('Error message: %s\n', ME.message);
+        catchErr(tempSpikeFilename, spikeFilename, ME)
     end
 end
 
 outputFiles = outputFiles(cellfun(@(x)~isempty(x), outputFiles));
 
+end
+
+function catchErr(tempSpikeFilename, spikeFilename, ME)
+    if exist(tempSpikeFilename, "file")
+        delete(tempSpikeFilename);
+    end
+    if exist(spikeFilename, "file")
+        delete(spikeFilename);
+    end
+    warning(sprintf('spikeDetection: error writing file %s\n:', spikeFilename))
+    fprintf('Error message: %s\n', ME.message);
 end

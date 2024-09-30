@@ -27,6 +27,7 @@ function [spikeThresh, param] = getDetectionThresh(channelFiles, runRemovePLI)
         param.sr = 1/samplingInterval;
 
         [~, ~, noise_std_detect(i), noise_std_sorted(i), thr(i), thrmax(i)] = highPassFilter(x, param);
+        x = [];
     end
 
     spikeThresh.thrmax = max(thrmax);
