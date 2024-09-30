@@ -60,10 +60,12 @@ end
 
 p = @(x,c,span)1-(1./(1+exp(-10*(x-c)/span)));
 % P = @(x,LR)p(x,sum(LR)/2,diff(LR));
-P = @(x,LR)max([double(x<LR(1));p(x,sum(LR)/2,diff(LR))]).*double(x<LR(2));
+P = @(x,LR)max([double(x<LR(1));
+p(x,sum(LR)/2,diff(LR))]).*double(x<LR(2));
 p2 = @(x,c,span)1./(1+exp(-10*(x-c)/span));
 % P2 = @(x,LR)p2(x,sum(LR)/2,diff(LR));
-P2 = @(x,LR)max([double(x>LR(2));p2(x,sum(LR)/2,diff(LR))]).*double(x>LR(1));
+P2 = @(x,LR)max([double(x>LR(2));
+p2(x,sum(LR)/2,diff(LR))]).*double(x>LR(1));
 Pbump = @(x,LRlow,LRhigh)min([P2(x,LRlow);P(x,LRhigh)]);
 %%
 probabilityParams.description = 'These parameters were used to determine the probability that a spike was physiological, based on that parameter. See "getSpikesToReject" for further info.';

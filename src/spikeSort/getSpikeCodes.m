@@ -104,8 +104,7 @@ for fnum = 1:length(spikeFiles)
     spikeTimestamps = spikeFileObj.spikeTimestamps;
     param = spikeFileObj.param;
 
-    binEdges = 0:3:1000*(duration)+3;
-    binEdgesPrecise = 0:2000/param.sr:1000*duration+1;
+    [binEdges, binEdgesPrecise] = createBinEdge(duration, param.sr);
 
     bin = discretize(spikeTimestamps, binEdges);
     fractionConcurrent = percentConcurrentSpikes(bin);

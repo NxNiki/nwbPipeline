@@ -1,7 +1,7 @@
 function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, samplingRate)
-    binEdges1 = 0:3:1000*(duration)+3;
-    binEdgesPrecise = 0:2000/samplingRate:1000*(duration)+1;
-    binEdges2 = 1.5:3:1000*(duration)+4.5;
+
+    [binEdges1, binEdgesPrecise] = createBinEdge(duration, samplingRate);
+    binEdges2 = binEdges1+1.5;
 
     if isempty(spikeTimestamps)
         spikeHist = zeros(1, length(binEdges1)-1);
@@ -15,6 +15,6 @@ function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, dur
     spikeHist2 = logical(histcounts(spikeTimestamps, binEdges2));
     spikeHist = spikeHist1 | spikeHist2;
 
-    spikeHistPrecise = logical(histc(spikeTimestamps, binEdgesPrecise));
+    spikeHistPrecise = logical(histcounts(spikeTimestamps, binEdgesPrecise));
 
 end
