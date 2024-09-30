@@ -39,7 +39,7 @@ if ~exist(fileName, "file")
     error("file not exist: %s", fileName);
 end
 
-% 1. Timestamps   
+% 1. Timestamps
 % 2. Sc Numbers
 % 3. Cell Numbers
 % 4. Params
@@ -101,8 +101,8 @@ else
     elseif strcmpi(InputInvertedText{1}, 'true') || strcmpi(InputInvertedText{1}, 'True')
         InputInverted = -1;
     else
-        message = [fname, ': InputInverted not true'];
-        logMessage(logFile, message);
+        % message = [fname, ': InputInverted not true'];
+        % logMessage(logFile, message);
     end
 end
 
@@ -111,7 +111,7 @@ signal(isnan(signal)) = [];
 signal = int16(signal * InputInverted);
 
 timeStamps = timeStamps * 1e-6; % ts now in seconds
-samplingInterval = milliseconds(1/sampleFrequency); 
+samplingInterval = milliseconds(1/sampleFrequency);
 
 if computeTS
     sampleIdx = cumsum([1; numSamples(:)]);
@@ -127,5 +127,3 @@ if computeTS
 else
     computedTimeStamps = NaN;
 end
-
-
