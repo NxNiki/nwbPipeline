@@ -20,6 +20,12 @@ from neo.rawio.neuralynxrawio.nlxheader import NlxHeader
 
 
 def split_xls_file(file_name: str, overwrite: bool = False) -> List[str]:
+    """
+    split sheets of xls file to .csv files
+    :param file_name:
+    :param overwrite:
+    :return:
+    """
     path = os.path.dirname(file_name)
     # Read all sheets into a dictionary of dataframes
     sheets_dict = pd.read_excel(file_name, sheet_name=None)
@@ -185,6 +191,12 @@ def find_ncs_files(base_path: str, patient_id: int) -> Tuple[str, pd.DataFrame]:
 
 
 def save_list(strings: List[str], file_name: str) -> None:
+    """
+    save contents in list to .csv file
+    :param strings:
+    :param file_name:
+    :return:
+    """
     strings.sort()
     with open(file_name, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
@@ -192,9 +204,17 @@ def save_list(strings: List[str], file_name: str) -> None:
             writer.writerow([string])
 
 
-def check_channels(
+def combine_channels(
     channels_in_file: pd.DataFrame, channels_in_montage: pd.DataFrame
 ) -> pd.DataFrame:
+    """
+    combine channels read from .ncs files and montage to a single dataframe.
+    add additional columns to indicate if channel names and IDs are same.
+
+    :param channels_in_file:
+    :param channels_in_montage:
+    :return:
+    """
     channels_combined = pd.merge(
         channels_in_montage,
         channels_in_file,
@@ -211,10 +231,17 @@ def check_channels(
     return channels_combined
 
 
-def check_files(
+def process_files(
     base_path: str,
     csv_files: List[str],
 ) -> None:
+    """
+    read channel info from montage and .ncs files.
+    combine channel info and compare channel names and IDs.
+    :param base_path:
+    :param csv_files:
+    :return:
+    """
     for csv_file in csv_files:
         print(f"check: {csv_file}")
         patient_id = extract_patient_id(csv_file)
@@ -222,7 +249,7 @@ def check_files(
         file_names_montage = create_channel_name_by_montage(csv_file)
 
         montage_file_path = os.path.dirname(csv_file)
-        channel_names_combined = check_channels(file_names, file_names_montage)
+        channel_names_combined = combine_channels(file_names, file_names_montage)
         channel_names_combined.to_csv(
             os.path.join(montage_file_path, f"channel_names_combined_{patient_id}.csv")
         )
@@ -233,4 +260,4 @@ if __name__ == "__main__":
     NCS_FILE_PATH = "/Volumes/DATA/NLData/"
 
     montage_files = split_xls_file(EXCEL_FILE)
-    check_files(NCS_FILE_PATH, montage_files)
+    process_files(NCS_FILE_PATH, montage_files)
