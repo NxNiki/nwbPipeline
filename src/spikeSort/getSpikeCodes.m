@@ -72,7 +72,6 @@ for fnum = 1:length(spikeFiles)
         hasSpikesPrecise = spikeHistPrecise(:);
     end
 
-
     disp('update hasSpikesSum...');
     hasSpikesSum = updateHasSpikesSum(hasSpikesSum, hasSpikes);
     hasSpikesPreciseSum = updateHasSpikesSum(hasSpikesPreciseSum, hasSpikesPrecise);
@@ -142,6 +141,8 @@ end
 end
 
 function hasSpikeSum = updateHasSpikesSum(hasSpikeSum, hasSpikes)
+% As this function updates hasSpikeSum, make sure the output variable has
+% the same name as the first input arg when calling this function!
 
     if isempty(hasSpikeSum)
         hasSpikeSum = hasSpikes(:);
