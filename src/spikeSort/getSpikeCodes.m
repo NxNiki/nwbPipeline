@@ -10,8 +10,8 @@ function outputFiles = getSpikeCodes(spikeFiles, outputPath, skipExist)
 updateCrossChannelSpikeCode = false;
 
 makeOutputPath(spikeFiles, outputPath, skipExist)
-hasSpikes = cell(length(spikeFiles), 1);
-hasSpikesPrecise = cell(length(spikeFiles), 1);
+hasSpikesSum = [];
+hasSpikesPreciseSum = [];
 outFileNames = cell(length(spikeFiles), 2);
 
 % calculate spikeCodes:
@@ -31,56 +31,66 @@ for fnum = 1:length(spikeFiles)
 
     if exist(outFileNames{fnum, 2}, 'file') && skipExist
         matobj = matfile(outFileNames{fnum, 2}, 'Writable', false);
-        hasSpikes{fnum} = matobj.spikeHist;
-        hasSpikesPrecise{fnum} = matobj.spikeHistPrecise;
-        continue
+        hasSpikes = matobj.spikeHist;
+        hasSpikesPrecise = matobj.spikeHistPrecise;
     elseif exist(outFileNames{fnum, 1}, 'file') && skipExist
         matobj = matfile(outFileNames{fnum, 1}, 'Writable', false);
-        hasSpikes{fnum} = matobj.spikeHist;
-        hasSpikesPrecise{fnum} = matobj.spikeHistPrecise;
-        continue
+        hasSpikes = matobj.spikeHist;
+        hasSpikesPrecise = matobj.spikeHistPrecise;
     else
         % new channels found, will recalculate all across channel
         % spikeCodes.
         updateCrossChannelSpikeCode = true;
+
+        fprintf('get spike codes:\n %s\n', outFileNames{fnum, 1});
+        spikeFileObj = matfile(spikeFile, 'Writable', false);
+        param = spikeFileObj.param;
+        outputStruct = spikeFileObj.outputStruct;
+        spikeTimestamps = spikeFileObj.spikeTimestamps;
+        duration = spikeFileObj.duration; % expect duration in seconds.
+        spikes = spikeFileObj.spikes;
+
+        % get spike codes to run clustering:
+        spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, param, outputStruct);
+        [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, param.sr);
+
+        tmpOutFile = strrep(outFileNames{fnum, 1}, '_spikeCodes1', '_spikeCodes1Temp');
+        fprintf('write spike codes to file:\n %s\n', tmpOutFile);
+        if exist(tmpOutFile, "file")
+            % delete unfinished temp file created in previous jobs. Otherwise
+            % writing to existing mat file will increase file size.
+            delete(tmpOutFile);
+        end
+
+        matobj = matfile(tmpOutFile, 'Writable', true);
+        matobj.spikeHist = spikeHist(:);
+        matobj.spikeHistPrecise = spikeHistPrecise(:);
+        matobj.spikeCodes = spikeCodes;
+        movefile(tmpOutFile, outFileNames{fnum, 1});
+
+        hasSpikes = spikeHist(:);
+        hasSpikesPrecise = spikeHistPrecise(:);
     end
 
-    fprintf('get spike codes:\n %s\n', outFileNames{fnum, 1});
-    spikeFileObj = matfile(spikeFile, 'Writable', false);
-    param = spikeFileObj.param;
-    outputStruct = spikeFileObj.outputStruct;
-    spikeTimestamps = spikeFileObj.spikeTimestamps;
-    duration = spikeFileObj.duration; % expect duration in seconds.
-    spikes = spikeFileObj.spikes;
 
-    % get spike codes to run clustering:
-    spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, param, outputStruct);
-    [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, param.sr);
-
-    tmpOutFile = strrep(outFileNames{fnum, 1}, '_spikeCodes1', '_spikeCodes1Temp');
-    fprintf('write spike codes to file:\n %s\n', tmpOutFile);
-    if exist(tmpOutFile, "file")
-        % delete unfinished temp file created in previous jobs. Otherwise
-        % writing to existing mat file will increase file size.
-        delete(tmpOutFile);
-    end
-
-    matobj = matfile(tmpOutFile, 'Writable', true);
-    matobj.spikeHist = spikeHist(:);
-    matobj.spikeHistPrecise = spikeHistPrecise(:);
-    matobj.spikeCodes = spikeCodes;
-    movefile(tmpOutFile, outFileNames{fnum, 1});
-
-    hasSpikes{fnum} = spikeHist(:);
-    hasSpikesPrecise{fnum} = spikeHistPrecise(:);
-
+    disp('update hasSpikesSum...');
+    hasSpikesSum = updateHasSpikesSum(hasSpikesSum, hasSpikes);
+    hasSpikesPreciseSum = updateHasSpikesSum(hasSpikesPreciseSum, hasSpikesPrecise);
 end
 
+hasSpikes = [];
+hasSpikesPrecise = [];
+spikeHist = [];
+spikeHistPrecise = [];
+spikeCodes = [];
+spikeTimestamps = [];
+
 outputFiles = outFileNames(:, 2);
-hasSpikes = [hasSpikes{:}];
-hasSpikesPrecise = [hasSpikesPrecise{:}];
-percentConcurrentSpikes = sum(hasSpikes, 2)/length(spikeFiles);
-percentConcurrentSpikesPrecise = sum(hasSpikesPrecise, 2);
+percentConcurrentSpikes = hasSpikesSum/length(spikeFiles);
+percentConcurrentSpikesPrecise = hasSpikesPreciseSum;
+
+hasSpikesSum = [];
+hasSpikesPreciseSum = [];
 
 % get across channel spike codes:
 for fnum = 1:length(spikeFiles)
@@ -127,5 +137,16 @@ for fnum = 1:length(spikeFiles)
 
     movefile(tempOutFile, outFileNames{fnum, 2});
     delete(outFileNames{fnum, 1});
+
+end
+end
+
+function hasSpikeSum = updateHasSpikesSum(hasSpikeSum, hasSpikes)
+
+    if isempty(hasSpikeSum)
+        hasSpikeSum = hasSpikes(:);
+    else
+        hasSpikeSum = sum([hasSpikeSum(:), hasSpikes(:)], 2);
+    end
 
 end
