@@ -94,7 +94,7 @@ hasSpikesSum = [];
 hasSpikesPreciseSum = [];
 
 % get across channel spike codes:
-for fnum = 1:length(spikeFiles)
+parfor fnum = 1:length(spikeFiles)
 
     if exist(outFileNames{fnum, 2}, 'file') && skipExist && ~updateCrossChannelSpikeCode
         continue
