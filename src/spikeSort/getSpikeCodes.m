@@ -30,10 +30,12 @@ for fnum = 1:length(spikeFiles)
     outFileNames{fnum, 2} = fullfile(outputPath, [strrep(filename, '_spikes', '_spikeCodes'), ext]);
 
     if exist(outFileNames{fnum, 2}, 'file') && skipExist
+        fprintf('read existing spike codes:\n %s\n', outFileNames{fnum, 2});
         matobj = matfile(outFileNames{fnum, 2}, 'Writable', false);
         hasSpikes = matobj.spikeHist;
         hasSpikesPrecise = matobj.spikeHistPrecise;
     elseif exist(outFileNames{fnum, 1}, 'file') && skipExist
+        fprintf('read existing spike codes:\n %s\n', outFileNames{fnum, 1});
         matobj = matfile(outFileNames{fnum, 1}, 'Writable', false);
         hasSpikes = matobj.spikeHist;
         hasSpikesPrecise = matobj.spikeHistPrecise;
@@ -42,7 +44,7 @@ for fnum = 1:length(spikeFiles)
         % spikeCodes.
         updateCrossChannelSpikeCode = true;
 
-        fprintf('get spike codes:\n %s\n', outFileNames{fnum, 1});
+        fprintf('compute spike codes:\n %s\n', outFileNames{fnum, 1});
         spikeFileObj = matfile(spikeFile, 'Writable', false);
         param = spikeFileObj.param;
         outputStruct = spikeFileObj.outputStruct;
