@@ -110,13 +110,17 @@ end
 
 % assume number of events file is same as or less than (no events occurs
 % during experiment) the number of segments.
-eventFiles = cell(1, size(groupFileNames, 2));
-eventFiles(:) = {''}; % empty cell cause error when reading from csv.
-eventFiles{1} = 'Events';
-eventFiles(2:length(eventFileNames)+1) = eventFileNames;
-eventFiles = cell2table(eventFiles);
-eventFiles.Properties.VariableNames = groupFileNames.Properties.VariableNames;
-groupFileNames = [groupFileNames; eventFiles];
+if length(eventFileNames) <= size(groupFileNames, 2) -1
+    eventFiles = cell(1, size(groupFileNames, 2));
+    eventFiles(:) = {''}; % empty cell cause error when reading from csv.
+    eventFiles{1} = 'Events';
+    eventFiles(2:length(eventFileNames)+1) = eventFileNames;
+    eventFiles = cell2table(eventFiles);
+    eventFiles.Properties.VariableNames = groupFileNames.Properties.VariableNames;
+    groupFileNames = [groupFileNames; eventFiles];
+else
+    warning('number of event files is larger than segments!')
+end
 
 groups = table2cell(groupFileNames(:, 1));
 fileNames = table2cell(groupFileNames(:, 2:end));
