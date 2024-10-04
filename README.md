@@ -22,7 +22,8 @@ It is recommended to download the latest release version, which has a smaller si
 
 Run `MontageConfigUI.m` to open the UI to set the montage:
 
-![image](https://github.com/NxNiki/nwbPipeline/assets/4017256/18fa6b1b-3a34-4f07-a18d-1bb9c57869bb)
+![image](https://github.com/user-attachments/assets/c1861c5f-edc3-40d1-98b7-25cf529f8c52)
+
 
 
 #### Micro channels
