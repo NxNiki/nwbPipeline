@@ -5,31 +5,31 @@ function MontageConfigUI()
     addpath(genpath(fileparts(scriptDir)));
 
     % Create a figure for the UI
-    f = figure('Position', [100, 100, 1000, 900], 'Name', 'Montage Setup');
+    f = figure('Position', [10, 10, 1500, 900], 'Name', 'Montage Setup');
 
     % ----------------------- Experiment Info Panel --------------------- %
 
     expInfoPanel = uipanel('Parent', f, 'Title', 'Experiment Info', ...
-                           'Position', [0.05, 0.9, 0.9, 0.065], 'FontSize', 12);
+                           'Position', [0.05, 0.9, 0.45, 0.065], 'FontSize', 12);
 
     % Patient ID
     uicontrol('Parent', expInfoPanel, 'Style', 'text', 'String', 'Patient ID:', ...
-              'Units', 'normalized', 'Position', [0.01, 0.2, 0.1, 0.6], 'HorizontalAlignment', 'left', 'FontSize', 12);
+              'Units', 'normalized', 'Position', [0.02, 0.19, 0.2, 0.6], 'HorizontalAlignment', 'left', 'FontSize', 12);
     patientIDEdit = uicontrol('Parent', expInfoPanel, 'Style', 'edit', ...
-                              'Units', 'normalized', 'Position', [0.12, 0.2, 0.1, 0.6], 'FontSize', 12, ...
+                              'Units', 'normalized', 'Position', [0.14, 0.21, 0.2, 0.6], 'FontSize', 12, ...
                               'Callback', @updateFileNames);
 
     % Experiment ID
     uicontrol('Parent', expInfoPanel, 'Style', 'text', 'String', 'Experiment ID:', ...
-              'Units', 'normalized', 'Position', [0.25, 0.2, 0.1, 0.6], 'HorizontalAlignment', 'left', 'FontSize', 12);
+              'Units', 'normalized', 'Position', [0.45, 0.19, 0.2, 0.6], 'HorizontalAlignment', 'left', 'FontSize', 12);
     experimentIDEdit = uicontrol('Parent', expInfoPanel, 'Style', 'edit', ...
-                                 'Units', 'normalized', 'Position', [0.36, 0.2, 0.1, 0.6], 'FontSize', 12, ...
+                                 'Units', 'normalized', 'Position', [0.61, 0.21, 0.2, 0.6], 'FontSize', 12, ...
                                  'Callback', @updateFileNames);
 
-    % ----------------------- Montage Panel ----------------------------- %
+    % ----------------------- Micro Montage Panel ----------------------------- %
 
     montagePanel = uipanel('Parent', f, 'Title', 'Micro Channels', ...
-                           'Position', [0.05, 0.125, 0.55, 0.77], 'FontSize', 12);
+                           'Position', [0.05, 0.125, 0.45, 0.77], 'FontSize', 12);
 
     % Brain labels
     brainLabels = {
@@ -77,6 +77,25 @@ function MontageConfigUI()
         'RST';
         'RSTG';
         'RTO'};
+
+    miscLabels = {
+        'C3';
+        'C4';
+        'PZ';
+        'Ez';
+        'EOG1';
+        'EOG2';
+        'EMG1';
+        'EMG2';
+        'A1';
+        'A2';
+        'MICROPHONE';
+        'HR_Ref';
+        'HR';
+        'TTLRef';
+        'TTLSync';
+        'Analogue1';
+        'Analogue2'};
 
     customBrainLabel = 'Custom';
 
@@ -133,46 +152,60 @@ function MontageConfigUI()
         end
     end
 
-    % ------------------------ Macro Channels Panel --------------------- %
+    % ------------------------ Channels Table Panel --------------------- %
+    function channelTable = createChannelTable(f, position, columnNames, labels, title)
 
-    channelPanel = uipanel('Parent', f, 'Title', 'Macro Channels', ...
-                           'Position', [0.61, 0.125, 0.34, 0.77], 'FontSize', 12);
+        channelPanel = uipanel('Parent', f, 'Title', title, ...
+                               'Position', position, 'FontSize', 12);
 
-    % Select all checkbox
-    selectAllCheckbox = uicontrol('Parent', channelPanel, 'Style', 'checkbox', 'String', 'Select All', ...
-                                  'Units', 'normalized', 'Position', [0.05, 0.95, 0.4, 0.04], 'Callback', @selectAllRows, 'FontSize', 12);
+
+        columnWidth = {40, 75, 70, 70};
+
+        channelTable = uitable('Parent', channelPanel, 'Units', 'normalized', ...
+            'Position', [0.05, 0.12, 0.85, 0.83], ...
+            'ColumnName', columnNames, ...
+            'ColumnEditable', true(1, length(columnNames)), ...
+            'ColumnFormat', {'logical', 'char', 'numeric', 'numeric'}, ...
+            'ColumnWidth', columnWidth(1: length(columnNames)), ...
+            'CreateFcn', @(src, event)createDefaultTableData(src, event, labels), ...
+            'CellSelectionCallback', @cellSelectionCallback);
+
+        % Select all checkbox
+        selectAllCheckbox = uicontrol( ...
+            'Parent', channelPanel, 'Style', 'checkbox', 'String', 'Select All Channels', ...
+            'Units', 'normalized', 'Position', [0.05, 0.95, 0.5, 0.04], ...
+            'Callback', @(src, event)selectAllRows(src, event, channelTable), 'FontSize', 12);
+
+        % Add listeners for mouse clicks and key presses
+        set(channelTable, 'KeyPressFcn', @keyPressCallback);
+        set(channelTable, 'KeyReleaseFcn', @keyReleaseCallback);
+
+        % Initialize last selected row and Shift key state
+        setappdata(channelTable, 'lastSelectedRow', []);
+        setappdata(channelTable, 'selectedCells', []);
+        setappdata(channelTable, 'isShiftPressed', false);
+
+        % Add/Remove rows buttons
+        uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Add Row', ...
+                  'Units', 'normalized', 'Position', [0.05, 0.01, 0.4, 0.04], 'Callback', @(src, event)addRow(src, event, channelTable), 'FontSize', 12);
+        uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Remove Row', ...
+                  'Units', 'normalized', 'Position', [0.55, 0.01, 0.4, 0.04], 'Callback', @(src, event)removeRow(src, event, channelTable), 'FontSize', 12);
+        uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Up', ...
+                  'Units', 'normalized', 'Position', [0.05, 0.06, 0.4, 0.04], 'Callback', @(src, event)moveUp(src, event, channelTable), 'FontSize', 12);
+        uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
+                  'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @(src, event)moveDown(src, event, channelTable), 'FontSize', 12);
+    end
 
     % Create the table for macro channels
     columnNames = {'', 'Label', 'Port Start', 'Port End'};
-    channelTable = uitable('Parent', channelPanel, 'Units', 'normalized', ...
-        'Position', [0.05, 0.12, 0.9, 0.83], ...
-        'ColumnName', columnNames, ...
-        'ColumnEditable', [true, true, true, true], ...
-        'ColumnFormat', {'logical', 'char', 'numeric', 'numeric'}, ...
-        'ColumnWidth', {40, 75, 70, 70}, ...
-        'CreateFcn', @createDefaultTableData, ...
-        'CellSelectionCallback', @cellSelectionCallback);
+    position = [0.51, 0.125, 0.24, 0.84];
+    channelTable = createChannelTable(f, position, columnNames, brainLabels, 'Macro Channels');
 
-    % Add listeners for mouse clicks and key presses
-    set(channelTable, 'KeyPressFcn', @keyPressCallback);
-    set(channelTable, 'KeyReleaseFcn', @keyReleaseCallback);
 
-    % Initialize last selected row and Shift key state
-    setappdata(channelTable, 'lastSelectedRow', []);
-    setappdata(channelTable, 'selectedCells', []);
-    setappdata(channelTable, 'isShiftPressed', false);
-
-    % Add/Remove rows buttons
-    uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Add Row', ...
-              'Units', 'normalized', 'Position', [0.05, 0.01, 0.4, 0.04], 'Callback', @addRow, 'FontSize', 12);
-    uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Remove Row', ...
-              'Units', 'normalized', 'Position', [0.55, 0.01, 0.4, 0.04], 'Callback', @removeRow, 'FontSize', 12);
-    uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Up', ...
-              'Units', 'normalized', 'Position', [0.05, 0.06, 0.4, 0.04], 'Callback', @moveUp, 'FontSize', 12);
-    uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
-              'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @moveDown, 'FontSize', 12);
-    uicontrol('Parent', channelPanel, 'Style', 'pushbutton', 'String', 'Move Down', ...
-              'Units', 'normalized', 'Position', [0.55, 0.06, 0.4, 0.04], 'Callback', @moveDown, 'FontSize', 12);
+    % Create the table for misc channels
+    columnNames = {'', 'Label', 'Port Id'};
+    position = [0.76, 0.125, 0.20, 0.84];
+    miscChannelTable = createChannelTable(f, position, columnNames, miscLabels, 'Misc Channels');
 
     % ------------------------- Save Config Panel ----------------------- %
 
@@ -197,20 +230,15 @@ function MontageConfigUI()
 
     % ---------------------- callback functions ------------------------- %
 
-    function createDefaultTableData(hObject, ~)
+    function createDefaultTableData(hObject, ~, labels)
         % Create default table data with brain labels and misc macros
-        miscMacros = {'C3', 'C4', 'PZ', 'Ez', 'EOG1', 'EOG2', 'EMG1', 'EMG2', 'A1', 'A2', ...
-                      'MICROPHONE', 'HR_Ref', 'HR', 'TTLRef', 'TTLSync', 'Analogue1', 'Analogue2'};
+
 
         numColumns = length(get(hObject, 'ColumnName'));
-        data = cell(length(brainLabels) + length(miscMacros), numColumns);
-        for i = 1:length(brainLabels)
+        data = cell(length(labels), numColumns);
+        for i = 1:length(labels)
             data{i, 1} = false;
-            data{i, 2} = brainLabels{i};
-        end
-        for i = 1:length(miscMacros)
-            data{length(brainLabels) + i, 1} = false;
-            data{length(brainLabels) + i, 2} = miscMacros{i};
+            data{i, 2} = labels{i};
         end
 
         set(hObject, 'Data', data);
@@ -307,8 +335,11 @@ function MontageConfigUI()
         end
 
         % Load macro channels
-        Data = loadMacroChannels(config.macroChannels, config.miscChannels);
+        Data = loadMacroChannels(config.macroChannels);
         set(channelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
+
+        Data = loadMacroChannels(config.miscChannels);
+        set(miscChannelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
     end
 
     function saveConfig(~, ~)
@@ -347,65 +378,19 @@ function MontageConfigUI()
 
                     if str2double(micros) > 0
                         microChannels = [microChannels, {brainLabel}];
-                    else
-                        microChannels = [microChannels, {""}];
+                    % else
+                    %     microChannels = [microChannels, {""}];
                     end
                 end
             end
         end
 
-        config.macroChannels = {};
-        config.miscChannels = {};
-        macroNumChannels = [];
-        macroChannels = {};
-        miscChannels = {};
-        channelData = get(channelTable, 'Data');
-        incompleteRows = any(cellfun(@isempty, channelData(:, 2)), 2);
-        channelData = channelData(~incompleteRows, :);
+        macroNumChannels = processChannelData(channelTable);
+        processChannelData(miscChannelTable);
 
-        % check for duplicated channel names:
-        if hasDuplicates(channelData(:, 2))
-            error('channel should not have duplicated names');
-        end
+        config.macroChannels = get(channelTable, 'Data');
+        config.miscChannels = get(miscChannelTable, 'Data');
 
-        rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
-        channelData(rowsWithPortStart, :) = sortrows(channelData(rowsWithPortStart, :), 3);
-        channelData(:, 1) = {true};
-
-        for i = 1:size(channelData, 1)
-            % automatically fill missing port index, assume each Label only
-            % has one port and no skipped ports.
-            if isempty(channelData{i, 3}) || isnan(channelData{i, 3})
-                if i == 1
-                    channelData{i, 3} = 1;
-                else
-                    channelData{i, 3} = channelData{i-1, 4} + 1;
-                end
-            end
-            if isempty(channelData{i, 4}) || isnan(channelData{i, 4})
-                if i == size(channelData, 1) || isempty(channelData{i + 1, 3}) || isnan(channelData{i + 1, 3})
-                    channelData{i, 4} = channelData{i, 3};
-                else
-                    channelData{i, 4} = channelData{i+1, 3} - 1;
-                end
-            end
-
-            if i > 1 && channelData{i, 3} <= channelData{i-1, 4}
-                error('overlap port index in macro channel: %s and %s\n', channelData{i-1, 2}, channelData{i, 2})
-            end
-
-            numChannels = channelData{i, 4} - channelData{i, 3} + 1;
-            if numChannels > 2
-                macroNumChannels(end+1) = numChannels;
-                config.macroChannels(end+1) = {channelData(i, 2:end)};
-                macroChannels(end+1) = channelData(i, 2);
-            else
-                config.miscChannels(end+1) = {channelData(i, 2:end)};
-                miscChannels(end+1) = channelData(i, 2);
-            end
-        end
-
-        set(channelTable, 'Data', channelData);
 
         % Save the montage information to a JSON file
         writeJson(config, montageFileNameStr)
@@ -413,16 +398,70 @@ function MontageConfigUI()
         % Save the configuration to .cfg file for neuralynx:
         microsToDuplicateList = [];
         generatePegasusConfigFile(str2double(patientID), ...
-            macroChannels, ...
+            config.macroChannels(:, 2), ...
             macroNumChannels, ...
             microChannels, ...
             microsToDuplicateList, ...
-            miscChannels, ...
+            config.miscChannels(:, 2), ...
             configFileNameStr)
 
          showMessageBox(['Configuration saved to: ', newline, ...
              montageFileNameStr, newline, ...
              configFileNameStr], 'Save Successful', 400, 150);
+    end
+
+    function channelNum = processChannelData(table)
+
+        channelData = get(table, 'Data');
+        incompleteRows = cellfun(@isempty, channelData(:, 2));
+        channelData = channelData(~incompleteRows, :);
+
+        % check for duplicated channel names:
+        if hasDuplicates(channelData(:, 2))
+            errordlg('channel should not have duplicated names', 'Error');
+        end
+
+        rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
+        channelData(rowsWithPortStart, :) = sortrows(channelData(rowsWithPortStart, :), 3);
+        channelData(:, 1) = {true};
+
+        prevIdx = 0;
+        numChannels = size(channelData, 1);
+        for i = 1:numChannels
+            % automatically fill missing port index, assume each Label only
+            % has one port and no skipped ports.
+            if isempty(channelData{i, 3}) || isnan(channelData{i, 3})
+                channelData{i, 3} = prevIdx + 1;
+            end
+
+            if size(channelData, 2) == 3
+                prevIdx = channelData{i, 3};
+                continue
+            end
+
+            if isempty(channelData{i, 4}) || isnan(channelData{i, 4})
+                if i == size(channelData, 1) || isempty(channelData{i + 1, 3}) || isnan(channelData{i + 1, 3})
+                    channelData{i, 4} = channelData{i, 3};
+                else
+                    channelData{i, 4} = channelData{i + 1, 3} - 1;
+                end
+            end
+            prevIdx = channelData{i, 4};
+
+            if i > 1 && channelData{i, 3} <= channelData{i - 1, 4}
+                errorMessage = sprintf('overlap port index in macro channel: %s and %s\n', channelData{i - 1, 2}, channelData{i, 2});
+                errordlg(errorMessage, 'Error');
+            end
+
+        end
+
+        if size(channelData, 2) > 3
+            channelNum = cell2mat(channelData(:, 4)) - cell2mat(channelData(:, 3)) + 1;
+        else
+            channelNum = ones(numChannels, 1);
+        end
+
+        set(table, 'Data', channelData);
     end
 
     function showMessageBox(message, title, width, height)
@@ -445,23 +484,27 @@ function MontageConfigUI()
                   'FontSize', 17);
     end
 
-    function addRow(~, ~)
+    function addRow(~, ~, table)
         % Add a new row to the table
-        data = get(channelTable, 'Data');
+        data = get(table, 'Data');
         rowToAdd = find(cell2mat(data(:, 1)), 1, 'last' );
+
+        newRow = {false, '', [], []};
+        newRow = newRow(1: size(data, 2));
+
         if isempty(rowToAdd) || rowToAdd == size(data, 1)
-            data(end + 1, :) = {false, '', [], []};
+            data(end + 1, :) = newRow;
         else
-            data = [data(1:rowToAdd,:);
-                    {false, '', [], []};
-                    data(rowToAdd+1:end,:)];
+            data = [data(1:rowToAdd, :);
+                    newRow;
+                    data(rowToAdd+1:end, :)];
         end
-        set(channelTable, 'Data', data);
+        set(table, 'Data', data);
     end
 
-    function removeRow(~, ~)
+    function removeRow(~, ~, table)
         % Remove the selected rows from the table
-        data = get(channelTable, 'Data');
+        data = get(table, 'Data');
         rowsToDelete = cell2mat(data(:, 1));
         if all(rowsToDelete)
             choice = questdlg(sprintf(['This will remove All macro channels.\n' ...
@@ -473,28 +516,28 @@ function MontageConfigUI()
             switch choice
                 case 'Yes'
                     data(rowsToDelete, :) = [];
-                    set(channelTable, 'Data', data);
+                    set(table, 'Data', data);
                 case 'No'
                     return
             end
         else
             data(rowsToDelete, :) = [];
-            set(channelTable, 'Data', data);
+            set(table, 'Data', data);
         end
     end
 
-    function moveUp(~, ~)
+    function moveUp(~, ~, table)
         % Move the selected row up
-        data = get(channelTable, 'Data');
+        data = get(table, 'Data');
         data = moveUpRows(data);
-        set(channelTable, 'Data', data);
+        set(table, 'Data', data);
     end
 
-    function moveDown(~, ~)
+    function moveDown(~, ~, table)
         % Move the selected row down
-        data = get(channelTable, 'Data');
+        data = get(table, 'Data');
         data = moveUpRows(data(end:-1:1, :));
-        set(channelTable, 'Data', data(end:-1:1,:));
+        set(table, 'Data', data(end:-1:1,:));
     end
 
     function data = moveUpRows(data)
@@ -517,15 +560,15 @@ function MontageConfigUI()
         end
     end
 
-    function selectAllRows(hObject, ~)
+    function selectAllRows(hObject, ~, table)
         % Select or deselect all rows based on the select all checkbox
-        data = get(channelTable, 'Data');
+        data = get(table, 'Data');
         if get(hObject, 'Value')
             data(:, 1) = {true};
         else
             data(:, 1) = {false};
         end
-        set(channelTable, 'Data', data);
+        set(table, 'Data', data);
     end
 
     % function keyPressCallback(hObject, eventdata)
