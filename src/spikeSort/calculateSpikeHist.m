@@ -5,7 +5,7 @@ function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, dur
 
     if isempty(spikeTimestamps)
         spikeHist = zeros(1, length(binEdges1)-1);
-        spikeHistPrecise = zeros(1, length(binEdgesPrecise));
+        spikeHistPrecise = zeros(1, length(binEdgesPrecise)-1);
         return
     end
 
