@@ -11,7 +11,7 @@ end
 
 montageConfig = readJson(montageConfigFile);
 macroChannels = {};
-[~, Data] = loadMacroChannels(montageConfig.macroChannels, montageConfig.miscChannels);
+Data = loadMacroChannels(montageConfig.macroChannels);
 for i = 1: size(Data, 1)
     numChannels = Data{i, 3} - Data{i, 2} + 1;
     startIdx = Data{i, 2};

@@ -388,8 +388,10 @@ function MontageConfigUI()
         macroNumChannels = processChannelData(channelTable);
         processChannelData(miscChannelTable);
 
-        config.macroChannels = get(channelTable, 'Data');
-        config.miscChannels = get(miscChannelTable, 'Data');
+        macroChannels = get(channelTable, 'Data');
+        miscChannels = get(miscChannelTable, 'Data');
+        config.macroChannels = nestCell(macroChannels(:, 2:end));
+        config.miscChannels = nestCell(miscChannels(:, 2:end));
 
 
         % Save the montage information to a JSON file
@@ -398,17 +400,26 @@ function MontageConfigUI()
         % Save the configuration to .cfg file for neuralynx:
         microsToDuplicateList = [];
         generatePegasusConfigFile(str2double(patientID), ...
-            config.macroChannels(:, 2), ...
+            macroChannels(:, 2), ...
             macroNumChannels, ...
             microChannels, ...
             microsToDuplicateList, ...
-            config.miscChannels(:, 2), ...
+            miscChannels(:, 2), ...
             configFileNameStr)
 
          showMessageBox(['Configuration saved to: ', newline, ...
              montageFileNameStr, newline, ...
              configFileNameStr], 'Save Successful', 400, 150);
     end
+
+    function B = nestCell(A)
+        % Assume your original n x m cell array is named 'A'
+        [n, m] = size(A);  % Number of rows in the original cell array
+
+        % Convert to n x 1 cell array where each cell contains a 1 x m cell array
+        B = mat2cell(A, ones(n, 1), m);
+    end
+
 
     function channelNum = processChannelData(table)
 
