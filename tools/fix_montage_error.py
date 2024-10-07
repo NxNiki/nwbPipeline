@@ -1,9 +1,9 @@
 """
-This script corrects file names created according to montage with mistake.
-One additional electrode was added to the montage file which does not exist,
-resulting in one additional file in result folder after that electrode.
+This script corrects file names created according to montage information.
+Sometimes the number of macro channels for a region is not correctly configured
+resulting in incorrect channel names for macro .ncs file.
 
-This script will rename files in folder with pattern *EXP* for subject 568.
+This script will rename files in folder with pattern *EXP* for specific patient.
 
 Example:
     correct file: [A1, A2, A3, B1, B2, B3, C1, C2, ...]
@@ -20,6 +20,8 @@ import re
 import shutil
 from typing import List, Tuple, Union
 
+import pandas as pd
+
 SKIP_EXISTING_FILES = True
 FILE_SUFFIX = ".ncs"
 
@@ -34,6 +36,32 @@ def generate_file_name(montage: List[Tuple[str, int]]) -> List[str]:
     return file_name
 
 
+# pylint: disable=all
+def read_montage_correction_file(file_name: str) -> Tuple[List[str], List[str]]:
+    """read montage correction file and generate file names with corresponding correct file names.
+    The montage correction file has three columns:
+        channel_name
+        num_channel_error
+        num_channel_correct
+
+    :param file_name:
+    :return:
+    """
+    montage_correction = pd.read_csv(file_name, delimiter="\t", index_col=None)
+    return [], []
+
+
+def read_montage_comparison_file(
+    file_name: str, montage_channel_col: str, actual_channel_col: str
+) -> Tuple[List[str], List[str]]:
+    montage_comparison = pd.read_csv(file_name, delimiter=",", index_col=None)
+    montage_comparison.dropna(how="any", inplace=True)
+    return (
+        montage_comparison[montage_channel_col].to_list(),
+        montage_comparison[actual_channel_col].to_list(),
+    )
+
+
 def rename_directory(directory: str) -> str:
     directory_split = directory.split("/")
 
@@ -42,9 +70,11 @@ def rename_directory(directory: str) -> str:
     first_match_index = next(
         (i for i, s in enumerate(directory_split) if re.match(pattern, s)), -1
     )
-    # add suffix to the parent folder of folder with pattern "^EXP.*':
+    # add suffix to the parent folder of folder with pattern "^EXP.*":
     first_match_index = first_match_index - 1
-    directory_split[first_match_index] = directory_split[first_match_index] + "_renamed"
+    directory_split[first_match_index] = (
+        directory_split[first_match_index] + "_macro_renamed"
+    )
 
     directory_rename = "/".join(directory_split)
     return directory_rename
@@ -127,7 +157,11 @@ def rename_files(
 
             try:
                 shutil.copyfile(file_name, dest_file)
-                logging.info("copy: %s \nto: %s", file_name, dest_file)
+                if file_error == file_correct:
+                    logging.info("copy: %s \nto: %s", file_name, dest_file)
+                else:
+                    logging.warning("copy: %s \nto: %s", file_name, dest_file)
+
             except OSError as err:
                 print(f"Error copying {file_name}: {err}")
                 logging.error("Error copying %s: %s", file_name, err)
@@ -135,8 +169,8 @@ def rename_files(
 
 def correct_file_name(
     file_directory: str,
-    montage_correct: List[Tuple[str, int]],
-    montage_error: List[Tuple[str, int]],
+    file_name_correct: List[str],
+    file_name_error: List[str],
 ) -> None:
     current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
     log_file = os.path.join(
@@ -147,9 +181,6 @@ def correct_file_name(
         level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
-
-    file_name_correct = generate_file_name(montage_correct)
-    file_name_error = generate_file_name(montage_error)
 
     sub_directories = list_sub_dirs_with_files(file_directory, ".ncs")
     for sub_dir in sub_directories:
@@ -165,7 +196,7 @@ def correct_file_name(
         ):
             os.makedirs(sub_dir_renamed)
 
-        if re.match(r"" + file_directory + "*EXP*", sub_dir):
+        if re.match(r"" + file_directory + ".*EXP.*", sub_dir):
             # copy macro files in the directory with file names corrected:
             rename_files(sub_dir, file_name_correct, file_name_error)
 
@@ -189,43 +220,13 @@ def correct_file_name(
 
 
 if __name__ == "__main__":
-    # file_directory = r'/Users/xinniu/Library/CloudStorage/Box-Box/Vwani_Movie/568/'
-    FILE_DIRECTORY = "/Volumes/DATA/NLData/D568_fix_name/"
+    FILE_DIRECTORY = "/Volumes/DATA/NLData/D563"
+    MONTAGE_COMPARISON_FILE = (
+        "/Volumes/DATA/NLData/D563/channel_names_combined_563_macro_error.csv"
+    )
 
-    # Putting 'PZ' at top so that files for this channel is not renamed.
-    MONTAGE_ERROR = [
-        ("PZ", 1),
-        ("RMH", 8),
-        ("RA", 9),
-        ("RAC", 8),
-        ("ROF", 8),
-        ("ROPRAI", 7),  # should be 6
-        ("RpSMAa", 7),
-        ("RpSMAp", 7),
-        ("RMF", 8),
-        ("LA", 9),
-        ("LAH", 8),
-        ("LAC", 9),
-        ("LOF", 8),
-        ("LAI", 7),
-        ("LpSMA", 7),
-    ]
-    MONTAGE_CORRECT = [
-        ("PZ", 1),
-        ("RMH", 8),
-        ("RA", 9),
-        ("RAC", 8),
-        ("ROF", 8),
-        ("ROPRAI", 6),
-        ("RpSMAa", 7),
-        ("RpSMAp", 7),
-        ("RMF", 8),
-        ("LA", 9),
-        ("LAH", 8),
-        ("LAC", 9),
-        ("LOF", 8),
-        ("LAI", 7),
-        ("LpSMA", 7),
-    ]
+    _file_name_correct, _file_name_error = read_montage_comparison_file(
+        MONTAGE_COMPARISON_FILE, "montage_channel_name", "channel_name"
+    )
 
-    correct_file_name(FILE_DIRECTORY, MONTAGE_CORRECT, MONTAGE_ERROR)
+    correct_file_name(FILE_DIRECTORY, _file_name_correct, _file_name_error)
