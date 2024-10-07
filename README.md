@@ -215,8 +215,9 @@ scripts to do hotfix on data such as rename file names, migrate variables across
 #### fix montage error:
 Errors in the montage configuration file results in incorrect channel names (mostly for macros and misc channels). 
 
-`check_macro_channels.py`
-`fix_montage_error.py`
+`check_macro_channels.py`: List macro channels according to montage and read channel names and id from neuralyn files.
+
+`fix_montage_error.py`: rename neuralyn files that does not match montage.
 
 ### test
 
