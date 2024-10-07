@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <h2>Add Patient Information</h2>
+
+    <div class="container">
+        <div class="box">
+            <label for="patient-name">Patient Name:</label>
+            <input type="text" id="patient-name" name="patient-name">
+        </div>
+        <div class="box">
+            <label for="patient-id">Patient ID:</label>
+            <input type="text" id="patient-id" name="patient-id">
+        </div>
+    </div>
+    
+    <div>
+        <label for="patient-sex">Sex:</label>
+        <select id="patient-sex" name="patient-sex">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+    <div>
+        <label for="patient-birthdate">Birth Date:</label>
+        <input type="date" id="patient-birthdate" name="patient-birthdate">
+    </div>
+
+    <h3>Experiments</h3>
+    <div id="experiments">
+        <div class="experiment">
+            <label for="experiment-name-1">Experiment Name:</label>
+            <select id="experiment-name-1" name="experiment-name-1">
+                <option value="exp1">Experiment 1</option>
+                <option value="exp2">Experiment 2</option>
+                <option value="exp3">Experiment 3</option>
+            </select>
+            <button class="remove-experiment">Remove</button>
+        </div>
+    </div>
+    <button id="add-experiment">Add Experiment</button>
+
+    <button id="confirm">Confirm</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/add_patient.js"></script>
+</body>
+</html>
