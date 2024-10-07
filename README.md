@@ -210,8 +210,13 @@ Jupyter-notebooks to read nwb data in python.
 
 ### tools
 
-scripts to do hotfix on data such as rename file names, migrate variables across files, editing variables, and check corrupted .mat files.
+scripts to do hotfix on data such as rename file names, migrate variables across files, editing variables, and check corrupted .mat files, etc.
 
+#### fix montage error:
+Errors in the montage configuration file results in incorrect channel names (mostly for macros and misc channels). 
+
+`check_macro_channels.py`
+`fix_montage_error.py`
 
 ### test
 
