@@ -25,11 +25,11 @@
 #$ -j y
 # Merge standard error with the job log (standard output)
 
-#$ -l h_rt=10:00:00,h_data=200G
+#$ -l h_rt=10:00:00,h_data=20G
 # Request resources: hours of runtime (h_rt) and memory (h_data)
 # Data limit applies to each task individually, no need to change if submit more tasks.
 
-#$ -pe shared 8
+#$ -pe shared 1
 # Request N core in a shared parallel environment. Adjust memory request (h_data) and change
 # maxThreads (at line 56) if you require more cores.
 
@@ -47,13 +47,13 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="1717"
-expIds="[49:52,54]" 
-runRemovePLI="true"
+patientId="1720"
+expIds="[133, 134, 137, 141]" 
+runRemovePLI="1"
 # if expIds is updated, do not skipExist any steps so that threshold for spike detection is same across experiments
-skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
+skipExist="[1, 1, 1]"  # [spike detection, spike code, spike clustering]
 mode="spikeSorting"  # Change to "extractLFP" to run extractLFP
-maxThreads="8"
+maxThreads="1"
 
 ## load the job environment:
 . /u/local/Modules/default/init/modules.sh
@@ -80,7 +80,7 @@ matlab  -nosplash -nodisplay <<EOF
     skipExist = ${skipExist};
     runRemovePLI = ${runRemovePLI};
     workingDir = getDirectory();
-    filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}');
+    filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}_xin');
 
     maxNumCompThreads($maxThreads);
     if strcmp('${mode}', 'spikeSorting')
@@ -102,5 +102,5 @@ echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
 echo " "
 
-mkdir -p $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID
-mv $HOME/sgelog/job-$JOB_ID/task_$SGE_TASK_ID.txt $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID/task_$SGE_TASK_ID.txt
+# mkdir -p $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID
+# mv $HOME/sgelog/job-$JOB_ID/task_$SGE_TASK_ID.txt $HOME/sgelog/$expName-$patientId/job-$mode-$JOB_ID/task_$SGE_TASK_ID.txt
