@@ -80,7 +80,7 @@ matlab  -nosplash -nodisplay <<EOF
     skipExist = ${skipExist};
     runRemovePLI = ${runRemovePLI};
     workingDir = getDirectory();
-    filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}_xin');
+    filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}');
 
     maxNumCompThreads($maxThreads);
     if strcmp('${mode}', 'spikeSorting')
