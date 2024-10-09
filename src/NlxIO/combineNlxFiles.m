@@ -34,17 +34,17 @@ function combineNlxFiles(inputFiles, outputDir, outputFileNames, overWriteExisti
     inputFiles = {'temp/GA1-RA1.ncs', 'temp/GA1-RA1_0001.ncs'};
     outputDir = 'temp/combined/';
     outputFileName = 'GA1-RA1.ncs';
-    combineNcsFiles(inputFiles, outputDir, outputFileName);
+    combineNlxFiles(inputFiles, outputDir, outputFileName);
 
     inputFiles = {'temp/GA1-RA1.ncs', 'temp/GA1-RA1_0001.ncs'; 'temp/GA1-RA2.ncs', 'temp/GA1-RA2_0001.ncs'};
     outputDir = 'temp/combined/';
     outputFileName = {'GA1-RA1.ncs', 'GA1-RA2.ncs'};
-    combineNcsFiles(inputFiles, outputDir, outputFileName);
+    combineNlxFiles(inputFiles, outputDir, outputFileName);
 
     inputFiles = {'temp/GA1-RA1.ncs', ''; 'temp/GA1-RA2.ncs', 'temp/GA1-RA2_0001.ncs'};
     outputDir = 'temp/combined/';
     outputFileName = {'GA1-RA1.ncs', 'GA1-RA2.ncs'};
-    combineNcsFiles(inputFiles, outputDir);
+    combineNlxFiles(inputFiles, outputDir);
 %}
 % See also: Nlx2MatCSC_v3, Mat2NlxCSC, groupFiles
 
