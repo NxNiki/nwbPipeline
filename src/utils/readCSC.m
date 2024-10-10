@@ -48,6 +48,7 @@ else
 end
 
 if clearRemovePLI
+    matObj = matfile(filename, 'Writable', true);
     matObj.signalRemovePLI = [];
 end
 
