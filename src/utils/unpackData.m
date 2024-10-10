@@ -40,7 +40,7 @@ parfor i = 1:length(inFileNames)
     outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
 
-    if exist(outFileName, "file") && skipExist
+    if exist(outFileName, "file") && skipExist && checkMatFileCorruption(outFileName)
         continue
     end
 
