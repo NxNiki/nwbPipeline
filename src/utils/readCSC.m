@@ -1,8 +1,12 @@
-function [signal, samplingIntervalSeconds] = readCSC(filename, runRemovePLI)
+function [signal, samplingIntervalSeconds] = readCSC(filename, runRemovePLI, clearRemovePLI)
 % samplingInterval will be converted to double type in seconds.
 
 if nargin < 2
     runRemovePLI = false;
+end
+
+if nargin < 3
+    clearRemovePLI = false;
 end
 
 % do not raise error if fail to read mat file so that we keep process
@@ -43,6 +47,10 @@ else
     end
 end
 
+if clearRemovePLI
+    matObj.signalRemovePLI = [];
+end
+
 if runRemovePLI
     fprintf("run removePLI on: %s\n", filename);
     tic
@@ -50,8 +58,10 @@ if runRemovePLI
     toc
     signalRemovePLI = single(signalRemovePLI);
     matObj = matfile(filename, 'Writable', true);
-    matObj.signalRemovePLI = signalRemovePLI;
+    if ~clearRemovePLI
+        matObj.signalRemovePLI = signalRemovePLI;
+    end
     signal = signalRemovePLI;
 end
 
-end
+

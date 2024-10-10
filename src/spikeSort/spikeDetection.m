@@ -84,7 +84,7 @@ parfor i = 1: size(cscFiles, 1)
             continue
         end
 
-        signal = readCSC(channelFiles{j}, runRemovePLI);
+        signal = readCSC(channelFiles{j}, runRemovePLI, True);
         if isempty(signal)
             warning(sprintf('spikeDetection: error reading file: \n%s \n', channelFiles{j}));
             continue;
