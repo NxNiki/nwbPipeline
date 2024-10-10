@@ -1,7 +1,7 @@
 function macroData = loadMacroChannels(channels)
 
-ncols = length(channels{1});
 if ~isempty(channels)
+    ncols = length(channels{1});
     macroData = reshape(flatten(channels), ncols, [])';
     macroData = sortrows(macroData, ncols);
 else
