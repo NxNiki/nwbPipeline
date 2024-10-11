@@ -11,7 +11,7 @@ from pynwb.core import DynamicTable as NWBDynamicTable
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
 
-from nwb_utils.nwb_exporter import NWBExporter
+from nwb_exporter import NWBExporter
 
 DEFAULT_DATE = "1900-01-01"
 
