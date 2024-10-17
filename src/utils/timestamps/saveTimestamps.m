@@ -19,11 +19,11 @@ function saveTimestamps(timestamps, samplingInterval, timestampFile)
         matobj.timeend = timeend;
         matobj.timeendSeconds = seconds(timeend);
 
+        movefile(timestampFileTemp, timestampFile);
+
     catch err
         fprintf('error happened saving timestamp file: %s\n', timestampFile);
         disp(err)
     end
-
-    movefile(timestampFileTemp, timestampFile);
 
 end
