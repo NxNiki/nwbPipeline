@@ -55,6 +55,7 @@ def read_montage_comparison_file(
     file_name: str, montage_channel_col: str, actual_channel_col: str
 ) -> Tuple[List[str], List[str]]:
     montage_comparison = pd.read_csv(file_name, delimiter=",", index_col=None)
+    montage_comparison = montage_comparison[[montage_channel_col, actual_channel_col]]
     montage_comparison.dropna(how="any", inplace=True)
     return (
         montage_comparison[montage_channel_col].to_list(),
@@ -220,13 +221,13 @@ def correct_file_name(
 
 
 if __name__ == "__main__":
-    FILE_DIRECTORY = "/Volumes/DATA/NLData/D563"
+    FILE_DIRECTORY = "/Volumes/DATA/NLData/D568"
     MONTAGE_COMPARISON_FILE = (
-        "/Volumes/DATA/NLData/D563/channel_names_combined_563_macro_error.csv"
+        "/Volumes/DATA/NLData/D568/channel_names_combined_568_macro_error_fix.csv"
     )
 
     _file_name_correct, _file_name_error = read_montage_comparison_file(
-        MONTAGE_COMPARISON_FILE, "montage_channel_name", "channel_name"
+        MONTAGE_COMPARISON_FILE, "rename_channel", "channel_name"
     )
 
     correct_file_name(FILE_DIRECTORY, _file_name_correct, _file_name_error)
