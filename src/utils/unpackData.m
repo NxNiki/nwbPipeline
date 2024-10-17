@@ -28,7 +28,8 @@ makeOutputPath(inFileNames, outFilePath, skipExist)
 timestampFileName = 'lfpTimeStamps';
 
 % compute stampstamp for the first channel in each segment.
-% each segment has a suffix with pattern '001'.
+% each segment has a suffix with pattern '001'. We need precompute when to
+% cmopute timestamps as deciding within parfor will cause issues.
 suffix = regexp(outFileNames, '(?<=_)\d{3}(?=.mat)', 'match', 'once');
 suffix_int = cellfun(@(x) int8(str2double(x)), suffix);
 [~, computeTS] = findFirstOccurrence(suffix_int);
@@ -40,7 +41,7 @@ parfor i = 1:length(inFileNames)
     outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);
 
-    if exist(outFileName, "file") && skipExist && checkMatFileCorruption(outFileName)
+    if skipExist && ~computeTS(i) && exist(outFileName, "file") && checkMatFileCorruption(outFileName) 
         continue
     end
 
