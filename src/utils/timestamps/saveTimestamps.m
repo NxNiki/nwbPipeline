@@ -5,6 +5,11 @@ function saveTimestamps(timestamps, samplingInterval, timestampFile)
     num_samples = length(timestamps);
     timeend = (num_samples-1) * samplingInterval;
 
+    [fpath, fname, ext] = fileparts(timestampFile);
+    if ~strcmp(ext, '.mat')
+        timestampFile = fullfile(fpath, [fname, '.mat']);
+    end
+
     timestampFileTemp = strrep(timestampFile, '.mat', '_temp.mat');
     if exist(timestampFileTemp, "file")
         delete(timestampFileTemp)
