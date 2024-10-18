@@ -17,8 +17,9 @@ unpackConfig = struct();
 % files are combined for sleep experiments.
 unpackConfig.numParallelTasks = 10;
 
+projectName = 'MovieParadigm';
 defaultBasePath = '/Volumes/DATA/NLData/';
-defaultOutputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm';
+defaultOutputPath = fullfile('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/', projectName);
 defaultSaveFile = 'Patient-xx_Exp-xx.json';
 
 
@@ -51,18 +52,28 @@ experimentIDPanel = uipanel('Title', 'Unpack Config', 'FontSize', 15, ...
 right = .02;
 height = 0.15;
 width = 0.15;
-widthEdit = .78;
+widthEdit = .2;
 bottom = 0.75;
-expIdLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
-    'Position', [right bottom width height], 'String', 'Experiment ID:', 'FontSize', 15, ...
+patientIdLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right bottom width height], 'String', 'Patient ID:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
 
-expIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
-    'Position', [0.17 bottom + 0.02 widthEdit height], 'String', '', 'FontSize', 15, ...
+patientIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
+    'Position', [right + width bottom + 0.02 widthEdit height], 'String', '', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left', 'Callback', @updateUIParam);
+
+expIdLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right + width + widthEdit + .01, bottom, width, height], 'String', 'Experiment ID:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
+
+widthEditExp = .45;
+expIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
+    'Position', [right + 2 * width + widthEdit, bottom + 0.02, widthEditExp, height], 'String', '', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left', 'Callback', @updateUIParam);
 
 bottom = .55;
 widthPopupMenu = 0.175;
+widthEdit = .78;
 macroLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
     'Position', [right bottom width height], 'String', 'Macro Pattern:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
@@ -172,6 +183,20 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
     'Position', [0.4 0.1 0.3 0.3], 'String', 'Skip Exist', ...
     'FontSize', 12, 'Value', 1); % Default to checked
 
+%% Function to udpate output file path and parameter name:
+
+    function updateUIParam(~, ~)
+        % Update the default file names based on Patient ID and Experiment ID
+        patientID = get(patientIdInput, 'String');
+        outputFilePath = fullfile(defaultOutputPath, [patientID, '_', projectName]);
+        set(outputFilePathInput, 'String', outputFilePath);
+
+        experimentID = get(expIdInput, 'String');
+        saveFile = strrep(defaultSaveFile, 'Patient-xx', ['Patient-', patientID]);
+        saveFile = strrep(saveFile, 'Exp-xx', ['Exp-', experimentID]);
+        
+        set(fileNameInput, 'String', saveFile);
+    end
 
 %% Function to add paths to the list
     function addPaths(~, ~)
