@@ -28,6 +28,7 @@ nilearn = "^0.10.4"
 mne = "^1.8.0"
 neo = "^0.13.3"
 hdmf = "^3.14.4"
+tqdm = "4.66.1"
 
 [tool.poetry.dev-dependencies]
 black = "^23.0"
