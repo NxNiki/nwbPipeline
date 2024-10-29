@@ -1,4 +1,4 @@
-function [signal, ADBitVolts, computedTimeStamps, samplingInterval, channelNumber] = Nlx_readCSC(fileName, computeTS, logPath)
+function [signal, ADBitVolts, samplingInterval, channelNumber] = Nlx_readCSC(fileName, logPath)
 
 % SYNTAX: [data,timeStamps,samplingInterval,chNum] = Nlx_readCSC(fileName,computeTS)
 %
@@ -25,11 +25,8 @@ function [signal, ADBitVolts, computedTimeStamps, samplingInterval, channelNumbe
 % Xin added check InputInverted in header.
 % Xin simplified algorithm to computeTS.
 % Xin change samplingInterval to matlab duration.
+% Xin isolated read timestamps to Nlx_readTimeStamps.m
 
-
-if ~exist('computeTS','var') || isempty(computeTS)
-    computeTS = 1;
-end
 
 if ~exist('logPath','var') || isempty(logPath)
     logPath = '';
@@ -44,7 +41,7 @@ end
 % 3. Cell Numbers
 % 4. Params
 % 5. Data Points
-FieldSelection(1) = 1;
+FieldSelection(1) = 0;
 FieldSelection(2) = 1;
 FieldSelection(3) = 1;
 FieldSelection(4) = 1;
@@ -54,7 +51,7 @@ ExtractHeader = 1;
 ExtractMode = 1;
 ModeArray=[]; %all.
 
-[timeStamps, channelNumber, sampleFrequency, numSamples, signal, header] = Nlx2MatCSC_v3(fileName, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
+[channelNumber, sampleFrequency, numSamples, signal, header] = Nlx2MatCSC_v3(fileName, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
 
 incompleteBlocks = find(numSamples ~= size(signal,1));
 for i = 1:length(incompleteBlocks)
@@ -62,7 +59,8 @@ for i = 1:length(incompleteBlocks)
 end
 
 [~, fname] = fileparts(fileName);
-logFile = fullfile(logPath, 'unpack_log', [fname, '.log']);
+logFile = fullfile(logPath, 'unpack_log-Nlx_readCSC', [fname, '.log']);
+logMessage(logFile, sprintf('read csc from: %s.', fileName));
 
 if length(unique(sampleFrequency))~=1
     message = [fname, ': Sampling Frequency is not uniform across data set, please proceed with caution...'];
@@ -101,8 +99,8 @@ else
     elseif strcmpi(InputInvertedText{1}, 'true') || strcmpi(InputInvertedText{1}, 'True')
         InputInverted = -1;
     else
-        % message = [fname, ': InputInverted not true'];
-        % logMessage(logFile, message);
+        message = [fname, ': InputInverted not true'];
+        logMessage(logFile, message);
     end
 end
 
@@ -110,20 +108,5 @@ signal = reshape(signal,[],1);
 signal(isnan(signal)) = [];
 signal = int16(signal * InputInverted);
 
-timeStamps = timeStamps * 1e-6; % ts now in seconds
 samplingInterval = milliseconds(1/sampleFrequency);
 
-if computeTS
-    sampleIdx = cumsum([1; numSamples(:)]);
-    computedTimeStamps = zeros(1, sampleIdx(end) - 1);
-
-    for i = 1:length(timeStamps)
-        startSample = sampleIdx(i);
-        endSample = sampleIdx(i+1)-1;
-        startTS = timeStamps(i);
-        theseTS = (1:numSamples(i)) * seconds(samplingInterval) + startTS;
-        computedTimeStamps(startSample: endSample) = theseTS;
-    end
-else
-    computedTimeStamps = NaN;
-end

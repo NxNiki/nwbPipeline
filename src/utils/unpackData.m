@@ -32,27 +32,12 @@ timestampFileName = 'lfpTimeStamps';
 % cmopute timestamps as deciding within parfor will cause issues.
 suffix = regexp(outFileNames(1,:), '(?<=_)\d{3}(?=.mat)', 'match', 'once');
 
+logFile = fullfile(outFilePath, 'unpack_log-unpackData', 'unpackData.log');
 % unpack ncs files:
 for segment = 1: size(inFileNames, 2)
-    % use non-parallel loop to read timestamps:
-    
-    timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{segment}]);
-    startIndx = 1;
-    if ~(skipExist && exist(timestampFullFile, "file"))
-        computedTimeStamps = NaN;
-        while isnan(computedTimeStamps) 
-            [signal, ADBitVolts, timestamps, numSamples, samplingInterval, ~] = Nlx_readCSC(inFileNames{startIndx, segment}, outFilePath);
-            computedTimeStamps = computeTimeStamps(timeStamps, numSamples);
 
-            if ~isnan(computedTimeStamps)
-                saveTimestamps(timestamps, samplingInterval, timestampFullFile)
-            end
-        end
-    end
-    
-
-
-    parfor i = startIndx:length(inFileNames)
+    dataLength = nan(1, size(inFileNames, 1));
+    parfor i = 1:size(inFileNames, 1)
         [~, ~, ext] = fileparts(inFileNames{i, segment});
 
         if ~strcmp(ext, '.ncs')
@@ -61,40 +46,57 @@ for segment = 1: size(inFileNames, 2)
         end
     
         [~, outFileName, ~] = fileparts(outFileNames{i, segment});
-        outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
         outFileName = fullfile(outFilePath, [outFileName, '.mat']);
     
-        if skipExist && ~computeTS && exist(outFileName, "file") && checkMatFileCorruption(outFileName) 
-            continue
-        end
-    
-        if exist(outFileNameTemp, "file")
-            warning('delete temp file: %s\n', outFileNameTemp);
-            delete(outFileNameTemp);
+        if skipExist && exist(outFileName, "file")
+            isCorrupted = checkMatFileCorruption(outFileName);
+            if ~isCorrupted
+                dataLength(i) = checkDataLength(outFileName);
+                continue
+            end
         end
     
         if verbose
             fprintf('unpack: %s\nto: %s\n', inFileNames{i, segment}, outFileName);
         end
+    
+        [signal, ADBitVolts, samplingInterval, ~] = Nlx_readCSC(inFileNames{i, segment}, outFilePath);
+        saveCSC(signal, ADBitVolts, samplingInterval, outFileName);
 
-    
-        [signal, ADBitVolts, ~, ~, samplingInterval, ~] = Nlx_readCSC(inFileNames{i, segment}, outFilePath);
-        
-        num_samples = length(signal);
-        timeend = (num_samples-1) * samplingInterval;
-    
-        matobj = matfile(outFileNameTemp, 'Writable', true);
-        matobj.samplingInterval = samplingInterval;
-        matobj.samplingIntervalSeconds = seconds(samplingInterval);
-        matobj.data = signal;
-        matobj.time0 = 0;
-        matobj.timeend = timeend;
-        matobj.timeendSeconds = seconds(timeend);
-        matobj.ADBitVolts = ADBitVolts;
-    
-
-    
-        movefile(outFileNameTemp, outFileName);
+        dataLength(i) = length(signal)
         outFileNames{i, segment} = outFileName;
     end
+
+    % read timestamps on the first file with max length:
+    timestampFullFile = fullfile(outFilePath, [timestampFileName, '_', suffix{segment}]);
+    
+    if ~(skipExist && exist(timestampFullFile, "file"))
+        completeFileIndex = find(dataLength == max(dataLength));
+        startIndx = 1;
+        while startIndx <= length(completeFileIndex)
+            [computedTimeStamps, samplingInterval, largeGap] = Nlx_readTimeStamps(inFileNames{completeFileIndex(startIndx), segment}, outFilePath);
+            if ~largeGap
+                saveTimestamps(computedTimeStamps, samplingInterval, timestampFullFile, inFileNames{completeFileIndex(startIndx), segment})
+                break
+            end
+            startIndx = startIndx + 1;
+        end
+    else
+        timestampFileObj = matfile(timestampFullFile, "Writable", false);
+        computedTimeStamps = timestampFileObj.timeStamps;
+    end
+
+    % fill channels with missing samples with NaNs:
+    incompleteFileIndex = find(dataLength ~= max(dataLength));
+    for idx = incompleteFileIndex
+        message = sprintf('fill missing samples in: %s', outFileNames{idx, segment});
+        logMessage(logFile, message, 1);
+        [signal, ADBitVolts, ~, ~] = Nlx_readCSC(inFileNames{idx, segment}, outFilePath);
+        [incompleteTimeStamps, samplingInterval] = Nlx_readTimeStamps(inFileNames{idx, segment}, outFilePath);
+
+        signal = interp1(incompleteTimeStamps, single(signal), computedTimeStamps, 'nearest', 'extrap');
+        signal = int16(signal);
+        saveCSC(signal, ADBitVolts, samplingInterval, outFileNames{idx, segment});
+    end
+
 end

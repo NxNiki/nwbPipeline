@@ -64,7 +64,6 @@ for i = 1:length(expIds)
     [inEventFiles, outEventFiles] = createIOFiles(eventOutFilePath, expOutFilePath, eventPattern);
 
     tic
-    % unpackData(inEventFiles, outEventFiles, eventOutFilePath, 1, skipExist);
     unpackEvents(inEventFiles, outEventFiles, eventOutFilePath, 1, skipExist);
     toc
     disp('event files unpack finished!')

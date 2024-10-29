@@ -1,4 +1,7 @@
-function logMessage(logFile, logMessage)
+function logMessage(logFile, logMessage, verbose)
+    if nargin < 3
+        verbose = false;
+    end
     % Maximum time to wait for the log file to become available (in seconds)
     maxWaitTime = 10;
     startTime = tic; % Start the timer
@@ -53,6 +56,10 @@ function logMessage(logFile, logMessage)
 
     % Create the log message with timestamp
     formattedMessage = sprintf('[%s] %s\n', char(currentTime), logMessage);
+
+    if verbose
+        disp(formattedMessage);
+    end
 
     % Write the log message to the file
     fprintf(fid, formattedMessage);

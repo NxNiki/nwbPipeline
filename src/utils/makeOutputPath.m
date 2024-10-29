@@ -2,6 +2,7 @@ function makeOutputPath(inputPath, outputPath, skipExist)
 % make outputPath if not exist.
 % remove outputPath if exists and skipExist is false. Check inputPath in
 % case inputPath and outputPath are same.
+% will extract file path if inputPath is full file name.
 
 removeExist = false;
 

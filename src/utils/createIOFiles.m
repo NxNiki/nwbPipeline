@@ -6,6 +6,11 @@ function [inFiles, outFiles] = createIOFiles(channelOutFilePath, expOutFilePath,
 %   The output file has a suffix with pattern '001.mat'. File name is the
 %   same as the .ncs file.
 
+% pattern: used to select micro/macro/event files.
+% renameChannels: set channel names according to montage (for iowa data).
+% inFiles (channels by segments): .ncs file names to be unpacked
+% outFiles(channels by segments): .mat file names to save unpacked data.
+
 if ~exist(channelOutFilePath, "dir")
     mkdir(channelOutFilePath);
 end
@@ -56,8 +61,5 @@ outFiles(emptyIdx) = {''};
 
 writecell(inFiles, fullfile(channelOutFilePath, 'inFileNames.csv'));
 writecell(outFiles, fullfile(channelOutFilePath, 'outFileNames.csv'));
-
-inFiles = inFiles(~emptyIdx);
-outFiles = outFiles(~emptyIdx);
 
 end

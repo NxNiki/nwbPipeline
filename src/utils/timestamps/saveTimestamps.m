@@ -1,4 +1,4 @@
-function saveTimestamps(timestamps, samplingInterval, timestampFile)
+function saveTimestamps(timestamps, samplingInterval, timestampFile, rawNcsFile)
 % timestamps should be in unix time
 % samplingInterval: float in seconds
 
@@ -23,6 +23,7 @@ function saveTimestamps(timestamps, samplingInterval, timestampFile)
         matobj.time0 = 0;
         matobj.timeend = timeend;
         matobj.timeendSeconds = seconds(timeend);
+        matobj.rawNcsFile = rawNcsFile;
 
         movefile(timestampFileTemp, timestampFile);
 
