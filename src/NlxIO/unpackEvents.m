@@ -11,6 +11,10 @@ makeOutputPath(inFileNames, outFilePath, skipExist)
 
 for i = 1:length(inFileNames)
 
+    if isempty(inFileNames{i})
+        continue
+    end
+
     [~, outFileName, ~] = fileparts(outFileNames{i});
     outFileNameTemp = fullfile(outFilePath, [outFileName, 'temp.mat']);
     outFileName = fullfile(outFilePath, [outFileName, '.mat']);

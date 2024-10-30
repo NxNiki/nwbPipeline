@@ -60,7 +60,7 @@ end
 
 [~, fname] = fileparts(fileName);
 logFile = fullfile(logPath, 'unpack_log-Nlx_readCSC', [fname, '.log']);
-logMessage(logFile, sprintf('read csc from: %s.', fileName));
+% logMessage(logFile, sprintf('read csc from: %s.', fileName));
 
 if length(unique(sampleFrequency))~=1
     message = [fname, ': Sampling Frequency is not uniform across data set, please proceed with caution...'];
