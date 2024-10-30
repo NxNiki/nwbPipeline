@@ -1,11 +1,12 @@
 import os.path
 import warnings
 from datetime import timedelta
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict, Any
 
 import numpy as np
 import numpy.typing as npt
 from mat73 import loadmat
+import scipy
 
 GAP_THRESHOLD = 2
 
@@ -217,7 +218,7 @@ def read_timestamps(filename: str) -> Tuple[npt.NDArray[np.float_], float, float
     :return: timestamps (1D array), duration (in seconds), samplingInterval (in seconds or NaN)
     """
 
-    mat_data = loadmat(filename)
+    mat_data = load_mat_file(filename)
 
     # Load timestamps
     timestamps = mat_data["timeStamps"].flatten()
@@ -241,10 +242,7 @@ def read_csc(filename: str) -> Tuple[npt.NDArray[np.float_], float]:
     :return: signal (1D array), samplingInterval in seconds
     """
 
-    # Load the .mat file
-    mat_data = loadmat(filename)
-
-    # Read the signal
+    mat_data = load_mat_file(filename)
     csc_signal = mat_data["data"].flatten()
 
     # Check if the file contains signalRemovePLI
@@ -269,11 +267,44 @@ def read_csc(filename: str) -> Tuple[npt.NDArray[np.float_], float]:
     return csc_signal, sampling_interval_seconds
 
 
+def check_var_length(filename: str, var_name: str) -> Tuple[int, int]:
+    """read the length of unpacked data in .mat file"""
+    print(f"count csc length: {filename}")
+    mat_data = load_mat_file(filename)
+
+    csc_signal = mat_data[var_name].flatten()
+    return len(csc_signal), np.isnan(csc_signal).sum()
+
+
 def file_exists(filepath: str) -> bool:
     """
     Check if a signal file exists.
     """
     return os.path.exists(filepath)
+
+
+def load_mat_file(filename: str) -> Dict[str, Any]:
+    """
+    Load a .mat file, attempting to use mat73 for MATLAB 7.3+ files,
+    and falling back to scipy.io.loadmat for earlier versions.
+
+    Parameters:
+        filename (str): Path to the .mat file to load.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the data from the .mat file,
+                        with variable names as keys.
+    """
+    try:
+        data = loadmat(filename)
+    except (TypeError, OSError):
+        warnings.warn(f"{filename} is not in MATLAB 7.3 format, loading with scipy.io.loadmat")
+        data = scipy.io.loadmat(filename)
+        # Clean metadata keys if loaded with scipy.io
+        if isinstance(data, dict) and '__globals__' in data:
+            for key in ['__header__', '__version__', '__globals__']:
+                data.pop(key, None)
+    return data
 
 
 if __name__ == "__main__":
