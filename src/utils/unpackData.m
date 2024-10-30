@@ -94,8 +94,9 @@ for segment = 1: size(inFileNames, 2)
         [signal, ADBitVolts, ~, ~] = Nlx_readCSC(inFileNames{idx, segment}, outFilePath);
         [incompleteTimeStamps, samplingInterval] = Nlx_readTimeStamps(inFileNames{idx, segment}, outFilePath);
 
-        signal = interp1(incompleteTimeStamps, single(signal), computedTimeStamps, 'nearest', 'extrap');
-        signal = int16(signal);
+        % signal = interp1(incompleteTimeStamps, single(signal), computedTimeStamps, 'nearest', 'extrap');
+        signal = fillMissingData(computedTimeStamps, incompleteTimeStamps, signal);
+
         saveCSC(signal, ADBitVolts, samplingInterval, outFileNames{idx, segment});
     end
 
