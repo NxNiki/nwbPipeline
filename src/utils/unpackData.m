@@ -86,7 +86,7 @@ for segment = 1: size(inFileNames, 2)
         computedTimeStamps = timestampFileObj.timeStamps;
     end
 
-    % fill channels with missing samples with NaNs:
+    % fill channels with missing samples with -inf:
     incompleteFileIndex = find(dataLength ~= max(dataLength));
     for idx = incompleteFileIndex
         message = sprintf('fill missing samples in: %s', outFileNames{idx, segment});
