@@ -7,7 +7,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 % set unpack config fie, or let it empty to set up with unpackNeuralynxUI:
-unpackConfigFile = [];
+% unpackConfigFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/1717_MovieParadigm/Patient-1717_Exp-49 50 51 52 54.json';
 
 
 %%

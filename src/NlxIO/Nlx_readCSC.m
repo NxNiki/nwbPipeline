@@ -99,8 +99,8 @@ else
     elseif strcmpi(InputInvertedText{1}, 'true') || strcmpi(InputInvertedText{1}, 'True')
         InputInverted = -1;
     else
-        message = [fname, ': InputInverted not true'];
-        logMessage(logFile, message);
+        % message = [fname, ': InputInverted not true'];
+        % logMessage(logFile, message);
     end
 end
 

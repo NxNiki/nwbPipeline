@@ -1,4 +1,5 @@
-function length = checkDataLength(cscFile)
+function data_length = checkDataLength(cscFile)
 
 fileObj = matfile(cscFile, "Writable", false);
-length = fileObj.data;
+data = fileObj.data;
+data_length = length(data(:));

@@ -74,11 +74,7 @@ def list_path(patient_id: str) -> List[str]:
 
 if __name__ == "__main__":
 
-    # PATIENTS = ["562", "563", "566", "567", "568", "570", "571", "572", "573", "1717", "1728"]
-    # PATIENTS = ["571", "572", "573", "1717", "1728"]
-    # PATIENTS = ["563", "1728"]
-    PATIENTS = ["570"]
-
+    PATIENTS = ["562", "563", "566", "567", "568", "570", "571", "572", "573", "1717", "1728"]
     logging.basicConfig(
         filename=f'{BASE_PATH}/{EXP_NAME}/count_csc_length.log',
         filemode='w',
