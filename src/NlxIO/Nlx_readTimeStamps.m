@@ -76,8 +76,12 @@ if isempty(header)
     logMessage(logFile, message);
 end
 
+% converts to nSamples per millisecond to be consistent with how we store data for Black Rock
+sampleFrequency = sampleFrequency(1) * 1e-3; 
+samplingInterval = milliseconds(1/sampleFrequency);
+
 % convert ts to seconds
 timeStamps = timeStamps * 1e-6; 
-[computedTimeStamps, samplingInterval, largeGap] = computeTimeStamps(timeStamps, numSamples, sampleFrequency);
+[computedTimeStamps, largeGap] = computeTimeStamps(timeStamps, numSamples);
 
 end
