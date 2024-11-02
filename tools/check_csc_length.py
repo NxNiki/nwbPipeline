@@ -20,7 +20,7 @@ import logging
 BASE_PATH = "/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/"
 EXP_NAME = "MovieParadigm"
 
-MAX_WORKERS = 10
+MAX_WORKERS = 8
 SKIP_EXIST = True
 
 
@@ -74,10 +74,12 @@ def list_path(patient_id: str) -> List[str]:
 
 if __name__ == "__main__":
 
-    PATIENTS = ["562", "563", "566", "567", "568", "570", "571", "572", "573", "1717", "1728"]
+    # PATIENTS = ["562", "563", "566", "567", "568", "570", "571", "572", "573", "1717", "1728"]
+    # PATIENTS = ["564", "565", "574", "576", "577", "1677", "1702", "1714", "1720", "1721", "1741", "1764"]
+    PATIENTS = ["576", "577", "1677", "1702", "1714", "1720", "1721", "1741", "1764"]
     logging.basicConfig(
         filename=f'{BASE_PATH}/{EXP_NAME}/count_csc_length.log',
-        filemode='w',
+        filemode='a',
         level=logging.CRITICAL,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )

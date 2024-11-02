@@ -5,7 +5,7 @@
 
 clear
 search_path = {
-    '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/557_MovieParadigm/Experiment-12';
+    '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/576_MovieParadigm/Experiment-16';
 };
 
 for i_path = 1: length(search_path)
@@ -19,6 +19,7 @@ for i_path = 1: length(search_path)
 
         try
             matFileObj = matfile(filePath, "Writable", false);
+            disp(matFileObj.samplingIntervalSeconds);
         catch
             fprintf("corrupted file: %s\n", filePath);
             movefile(filePath, strrep(filePath, '.mat', '_corrupted.mat'));
