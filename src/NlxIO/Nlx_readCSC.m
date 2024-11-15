@@ -41,7 +41,7 @@ end
 % 3. Cell Numbers
 % 4. Params
 % 5. Data Points
-FieldSelection(1) = 0;
+FieldSelection(1) = 1;
 FieldSelection(2) = 1;
 FieldSelection(3) = 1;
 FieldSelection(4) = 1;
@@ -51,7 +51,9 @@ ExtractHeader = 1;
 ExtractMode = 1;
 ModeArray=[]; %all.
 
-[channelNumber, sampleFrequency, numSamples, signal, header] = Nlx2MatCSC_v3(fileName, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
+[timestamps, channelNumber, sampleFrequency, numSamples, signal, header] = Nlx2MatCSC_v3(fileName, FieldSelection, ExtractHeader, ExtractMode, ModeArray);
+
+signal = removeOutlierBlocks(signal, timestamps);
 
 incompleteBlocks = find(numSamples ~= size(signal,1));
 for i = 1:length(incompleteBlocks)
@@ -71,7 +73,9 @@ if length(unique(channelNumber))~=1
     logMessage(logFile, message);
 end
 
-sampleFrequency = sampleFrequency(1) * 1e-3; % converts to nSamples per millisecond to be consistent with how we store data for Black Rock
+% converts to nSamples per millisecond to be consistent with how we store
+% data for Black Rock
+sampleFrequency = sampleFrequency(1) * 1e-3; 
 
 InputInverted = 1;
 if isempty(header)
@@ -104,7 +108,10 @@ else
     end
 end
 
-signal = reshape(signal,[],1);
+signal = reshape(signal, [], 1);
+% we remove missing data here, will fill missing data with -inf based on
+% reference timestamps and signal timestamps later. Will also fill shorter
+% or longer blocks with -inf. see fillMssingData.m
 signal(isnan(signal)) = [];
 signal = int16(signal * InputInverted);
 

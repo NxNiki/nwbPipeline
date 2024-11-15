@@ -21,7 +21,7 @@ for i = 1:length(timeStamps)
     endSample = sampleIdx(i+1)-1;
     startTS = timeStamps(i);
     if i < length(timeStamps)
-        samplingInterval = (timeStamps(i+1) - timeStamps(i))/512;
+        samplingInterval = (timeStamps(i+1) - timeStamps(i))/numSamples(i);
     end
     theseTS = ((1:numSamples(i))-1) * samplingInterval + startTS;
     computedTimeStamps(startSample: endSample) = theseTS;

@@ -7,7 +7,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 % set unpack config fie, or let it empty to set up with unpackNeuralynxUI:
-% unpackConfigFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/1717_MovieParadigm/Patient-1717_Exp-49 50 51 52 54.json';
+% unpackConfigFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/1677_MovieParadigm/Patient-1677_Exp-29 32.json';
 
 
 %%
@@ -60,6 +60,7 @@ for i = 1:length(expIds)
     end
 
     %% unpack Event Files:
+
     eventOutFilePath = [outFilePath, sprintf('/Experiment-%d/CSC_events', expId)];
     [inEventFiles, outEventFiles] = createIOFiles(eventOutFilePath, expOutFilePath, eventPattern);
 

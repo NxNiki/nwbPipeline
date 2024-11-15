@@ -78,6 +78,9 @@ for segment = 1: size(inFileNames, 2)
             if ~largeGap
                 saveTimestamps(computedTimeStamps, samplingInterval, timestampFullFile, inFileNames{completeFileIndex(startIndx), segment})
                 break
+            elseif startIndx == length(completeFileIndex)
+                timestampFullFile = strrep(timestampFullFile, '.mat', 'largeGap.mat');
+                saveTimestamps(computedTimeStamps, samplingInterval, timestampFullFile, inFileNames{completeFileIndex(startIndx), segment})
             end
             startIndx = startIndx + 1;
         end
@@ -96,7 +99,6 @@ for segment = 1: size(inFileNames, 2)
 
         % signal = interp1(incompleteTimeStamps, single(signal), computedTimeStamps, 'nearest', 'extrap');
         signal = fillMissingData(computedTimeStamps, incompleteTimeStamps, signal);
-
         saveCSC(signal, ADBitVolts, samplingInterval, outFileNames{idx, segment});
     end
 
