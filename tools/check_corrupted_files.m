@@ -11,7 +11,6 @@ search_path = {
 for i_path = 1: length(search_path)
     files = dir(fullfile(search_path{i_path}, '**/CSC_micro/G*.mat'));
 
-
     for i = 1:length(files)
         path = files(i).folder;
         fname = files(i).name;

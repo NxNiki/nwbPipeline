@@ -1,4 +1,5 @@
 % clear signalRemovePLI in csc files to save storage.
+% convert non-7.3 file to 7.3:
 
 clear
 search_path = {
@@ -20,6 +21,8 @@ for i_path = 1: length(search_path)
 
         fprintf("csc file: %s\n", filePath);
         matFileObj.signalRemovePLI = [];
+
+        
     end
 
 end

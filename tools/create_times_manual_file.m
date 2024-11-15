@@ -1,6 +1,6 @@
 % wave_clus will not create times_manual file if no manual curation is
-% applied. This script create times_manual file by copy cluster_class in
-% the times file.
+% applied (only when go to next file wtihout saving). This script create
+% times_manual file by copy cluster_class in the times file.
 
 clear
 search_path = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm/Experiment-4-5-6-7/CSC_micro_spikes/';
