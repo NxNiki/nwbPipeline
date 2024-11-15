@@ -4,8 +4,8 @@
 
 spike_path = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/563_MovieParadigm/Experiment-10-11-12/CSC_micro_spikes';
 % check_file_path(spike_path, "times_manual_G*-micro*.mat", 1, 1)
-check_file_path(spike_path, "times_G*-micro*.mat", 0, 1)
-check_file_path(spike_path, "G*-micro*.mat", 0, 1)
+% check_file_path(spike_path, "times_G*-micro*.mat", 0, 1)
+% check_file_path(spike_path, "G*-micro*.mat", 0, 1)
 
 
 file_path = {
@@ -17,7 +17,7 @@ file_path = {
 
 
 for i = 1: length(file_path)
-    check_file_path(spike_path(i), "G*-micro*.mat", 0, 1);
+    check_file_path(file_path(i), "G*-micro*.mat", 0, 1);
 end
 
 function check_file_path(file_path, file_pattern, count_spikes, move_file)
