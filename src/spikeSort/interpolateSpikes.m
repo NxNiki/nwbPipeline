@@ -3,7 +3,8 @@ function [signalInterpolate, spikeIntervalPercentage, interpolateIndex, spikeInd
 peakMissMatchWarnning = 0;
 
 interpolateRangePre = milliseconds(1);
-interpolateRangePost = milliseconds(1.5);
+% interpolateRangePost = milliseconds(1.5);
+interpolateRangePost = milliseconds(2);
 samplingRate = 32000;
 
 interpolateRangePre = round(interpolateRangePre / (seconds(1)/samplingRate));
