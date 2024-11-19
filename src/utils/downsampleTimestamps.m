@@ -11,10 +11,19 @@ function lfpTimestamps = downsampleTimestamps(microTimestampFiles, macroTimestam
         warning("micro and macro channels have different duration: %f", microTimestamps(end) - macroTimestamps(end));
     end
 
-    lfpTimestampsFileObj = matfile(fullfile(outputPath, "lfpTimestamps.mat"));
+    lfpTsFileName = fullfile(outputPath, "lfpTimestamps.mat");
+    lfpTsFileNameTemp = strrep(lfpTsFileName, '.mat', '_temp.mat');
+
+    if exist(lfpTsFileNameTemp, "file")
+        delete(lfpTsFileNameTemp);
+    end
+
+    lfpTimestampsFileObj = matfile(lfpTsFileNameTemp);
     lfpTimestampsFileObj.lfpTimestamps = [microTimestamps(1), 1/lfpFs, microTimestamps(end)];
     lfpTimestampsFileObj.microTimestampStart = microTimestampStart;
     lfpTimestampsFileObj.macroTimestampStart = macroTimestampStart;
+
+    movefile(lfpTsFileNameTemp, lfpTsFileName);
 
     lfpTimestamps = microTimestamps(1): 1/lfpFs: microTimestamps(end);
 

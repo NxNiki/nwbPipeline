@@ -25,9 +25,10 @@
 #$ -j y
 # Merge standard error with the job log (standard output)
 
-#$ -l h_rt=10:00:00,h_data=20G
+#$ -l h_rt=10:00:00,h_data=50G
 # Request resources: hours of runtime (h_rt) and memory (h_data)
 # Data limit applies to each task individually, no need to change if submit more tasks.
+# 20G for spike sort, 50G for lfp extraction. single thread
 
 #$ -pe shared 1
 # Request N core in a shared parallel environment. Adjust memory request (h_data) and change
@@ -47,12 +48,14 @@
 
 ## Set the experiment parameters ==========
 expName="MovieParadigm"
-patientId="1720"
-expIds="[133, 134, 137, 141]" 
+patientId="570"
+expIds="[4:7]" 
 runRemovePLI="1"
 # if expIds is updated, do not skipExist any steps so that threshold for spike detection is same across experiments
-skipExist="[1, 1, 1]"  # [spike detection, spike code, spike clustering]
-mode="spikeSorting"  # Change to "extractLFP" to run extractLFP
+# skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
+# mode="spikeSorting"  # Change to "extractLFP" to run extractLFP
+skipExist="[0, 0]"  # [micro, macro]
+mode="extractLFP"  # Change to "extractLFP" to run extractLFP
 maxThreads="1"
 
 ## load the job environment:
@@ -88,7 +91,7 @@ matlab  -nosplash -nodisplay <<EOF
         batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist, runRemovePLI);
     elseif strcmp('${mode}', 'extractLFP')
         disp("run extract LFP");
-        batch_extractLFP($SGE_TASK_ID, $total_tasks, expIds, filePath);
+        batch_extractLFP($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);
     else
         error('Unknown mode: ${mode}');
     end

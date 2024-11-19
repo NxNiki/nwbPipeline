@@ -76,7 +76,7 @@ for i = 2: numFiles
     gapInterval = min(seconds(timestampsCombinedNext{i-1}(1) - timestampsCombined{i-1}(end)), maxGapDuration);
     if gapInterval / samplingIntervalDuration > GAP_THRESHOLD
         gapLength = floor(gapInterval/samplingIntervalDuration);
-        signalGap{i-1} = NaN(1, gapLength);
+        signalGap{i-1} = NaN(gapLength, 1);
         timestampsGap{i-1} = (timestampsCombined{i-1}(end) + samplingInterval) + (0: samplingInterval: samplingInterval * (gapLength - 1));
     end
 end
@@ -86,7 +86,7 @@ timestamps = [timestampsCombined{:}];
 
 if processSignal
     signalCombined = [signalCombined(:), signalGap(:)]';
-    signal = [signalCombined{:}];
+    signal = vertcat(signalCombined{:});
 else
     signal = [];
 end
