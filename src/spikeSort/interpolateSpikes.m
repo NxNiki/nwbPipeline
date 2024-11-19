@@ -1,5 +1,18 @@
 function [signalInterpolate, spikeIntervalPercentage, interpolateIndex, spikeIndex] =  interpolateSpikes(signal, signalTimestamps, spikes, spikeTimestamps)
 
+if length(signal) ~= length(signalTimestamps)
+    warning("signal (%d) and timestamps (%d) length missmatch", length(signal), length(signalTimestamps));
+end
+
+if size(spikes, 1) ~= length(spikeTimestamps)
+    warning("spike (%d) and timestamps (%d) length missmatch", size(spikes, 1), length(spikeTimestamps));
+end
+
+if max(signalTimestamps) < max(spikeTimestamps)
+    warning("spikes extending signal are removed! Check spikes file match with micro CSC file!")
+    spikeTimestamps = spikeTimestamps(spikeTimestamps<=max(signalTimestamps));
+end
+
 peakMissMatchWarnning = 0;
 
 interpolateRangePre = milliseconds(1);
@@ -10,11 +23,6 @@ samplingRate = 32000;
 interpolateRangePre = round(interpolateRangePre / (seconds(1)/samplingRate));
 interpolateRangePost = round(interpolateRangePost / (seconds(1)/samplingRate));
 
-if max(signalTimestamps) < max(spikeTimestamps)
-    warning("spikes extending signal are removed! Check spikes file match with micro CSC file!")
-    spikeTimestamps = spikeTimestamps(spikeTimestamps<=max(signalTimestamps));
-end
-
 spikeIntervalPercentage = 0;
 spikeIndexInSignal = interp1(signalTimestamps, 1:length(signalTimestamps), spikeTimestamps, 'nearest');
 interpolateIndex = false(1, length(signal));
@@ -22,11 +30,18 @@ spikeIndex = false(1, length(signal));
 spikeIndex(spikeIndexInSignal) = true;
 
 for i = 1:length(spikeIndexInSignal)
-
+    
     % extract unit spike and corresponding signal:
     [~, unitPeakIdx] = max(abs(spikes(i,:) - median(spikes(i,:))));
     spikeInSignalIdxStart = spikeIndexInSignal(i) - unitPeakIdx + 1;
-    spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxStart + length(spikes(i,:)) - 1);
+    spikeInSignalIdxEnd = spikeInSignalIdxStart + length(spikes(i,:)) - 1;
+
+    if spikeInSignalIdxStart < 1 || spikeInSignalIdxEnd > length(spikeIndexInSignal)
+        warning('spike index (%d: %d) exceeds signal (length: %d)', spikeInSignalIdxStart, spikeInSignalIdxEnd, length(spikeIndexInSignal));
+        continue;
+    end
+
+    spikeInSignal = signal(spikeInSignalIdxStart: spikeInSignalIdxEnd);
     [~, signalPeakIdx] = max(abs(spikeInSignal - median(spikeInSignal)));
 
     if signalPeakIdx ~= unitPeakIdx && peakMissMatchWarnning

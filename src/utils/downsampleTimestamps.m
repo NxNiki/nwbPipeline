@@ -1,4 +1,8 @@
 function lfpTimestamps = downsampleTimestamps(microTimestampFiles, macroTimestampFiles, lfpFs, outputPath)
+    
+    if ~exist(outputPath, "dir")
+        mkdir(outputPath);
+    end
 
     [~, microTimestamps, ~, microTimestampStart] = combineCSC([], microTimestampFiles, inf);
     [~, macroTimestamps, ~, macroTimestampStart] = combineCSC([], macroTimestampFiles, inf);
