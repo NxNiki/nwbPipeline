@@ -3,6 +3,7 @@ filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParad
 expIds = 4:7;
 lfpFs = 2000;
 expFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm/Experiment-4-5-6-7_debug';
+microLFPPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm/Experiment-4-5-6-7_debug/LFP_micro';
 
 microFiles = {
     '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm/Experiment-4/CSC_micro/GA4-RPHG6_001.mat';
