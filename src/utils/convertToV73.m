@@ -1,4 +1,5 @@
 function convertToV73(inputFile)
+
     % Check if the input file exists
     if ~isfile(inputFile)
         error('Input file does not exist.');
@@ -26,6 +27,5 @@ function convertToV73(inputFile)
 
     % Save the data to a new .mat file in v7.3 format
     save(inputFile, '-struct', 'data', '-v7.3');
-
     
 end
