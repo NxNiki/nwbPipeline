@@ -71,8 +71,12 @@ if length(unique(channelNumber))~=1
 end
 
 if isempty(header)
-    % log this.
     message = [fname, ': Empty header info.'];
+    logMessage(logFile, message);
+end
+
+if any(numSamples(1:end-1) < 512)
+    message = sprintf('%s: blocks with missing samples: ', fname, find(numSamples(1:end-1) < 512));
     logMessage(logFile, message);
 end
 
