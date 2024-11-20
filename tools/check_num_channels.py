@@ -31,7 +31,6 @@ def check_segments(path: str, pattern: str, suffix_pattern: str) -> None:
         channel_names_segment = set([c.replace(f"{suffix}.mat", "") for c in channel_names if c.endswith(f"{suffix}.mat")])
         prev_channel_names_segment = check_channel_names(prev_channel_names_segment, channel_names_segment)
 
-
 def get_channel_names(path: str, pattern: str) -> set:
     channel_files = glob.glob(os.path.join(path, pattern))
     channel_files = set([os.path.basename(f) for f in channel_files])
@@ -49,6 +48,11 @@ def check_channel_names(prev_channels: set, curr_channels: set) -> set:
         prev_channels = curr_channels
 
     return prev_channels
+
+def parse_channel_file(file_name: str) -> tuple[str, str]:
+    """ extract the channel name and segment id from channel file name"""
+    search = re.search(r"(G*)_(\d{3})\.mat", file_name)
+    return search.group(1), search.group(2)
 
 
 if __name__ == "__main__":
