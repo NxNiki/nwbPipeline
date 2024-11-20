@@ -33,7 +33,7 @@ for i = 1:length(spikeIndexInSignal)
     
     % extract unit spike and corresponding signal:
     [~, unitPeakIdx] = max(abs(spikes(i,:) - median(spikes(i,:))));
-    spikeInSignalIdxStart = spikeIndexInSignal(i) - unitPeakIdx + 1;
+    spikeInSignalIdxStart = min(spikeIndexInSignal(i) - unitPeakIdx + 1, 1);
     spikeInSignalIdxEnd = spikeInSignalIdxStart + length(spikes(i,:)) - 1;
 
     if spikeInSignalIdxStart < 1 || spikeInSignalIdxEnd > length(signal)
