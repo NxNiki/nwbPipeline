@@ -36,8 +36,8 @@ for i = 1:length(spikeIndexInSignal)
     spikeInSignalIdxStart = spikeIndexInSignal(i) - unitPeakIdx + 1;
     spikeInSignalIdxEnd = spikeInSignalIdxStart + length(spikes(i,:)) - 1;
 
-    if spikeInSignalIdxStart < 1 || spikeInSignalIdxEnd > length(spikeIndexInSignal)
-        warning('spike index (%d: %d) exceeds signal (length: %d)', spikeInSignalIdxStart, spikeInSignalIdxEnd, length(spikeIndexInSignal));
+    if spikeInSignalIdxStart < 1 || spikeInSignalIdxEnd > length(signal)
+        warning('spike index (%d: %d) exceeds signal (length: %d)', spikeInSignalIdxStart, spikeInSignalIdxEnd, length(signal));
         continue;
     end
 
