@@ -3,12 +3,12 @@ function outputFiles = extractLFP(cscFiles, timestampFiles, lfpTimestamps, spike
 % for macros or micro with no spikes detected remove spikes will be
 % skipped.
 
-if nargin < 6 || isempty(skipExist)
+if nargin < 7 || isempty(skipExist)
     skipExist = true;
 end
 
 % save Raw signals to check spikes are removed correctly (see run_plotLFP.m).
-if nargin < 7
+if nargin < 8
     saveRaw = false;
 end
 
