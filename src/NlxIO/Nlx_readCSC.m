@@ -72,6 +72,10 @@ if length(unique(channelNumber))~=1
     message = [fname, ': More than one channel found. This code is not equipped for that...'];
     logMessage(logFile, message);
 end
+if any(numSamples(1:end-1) < 512)
+    message = sprintf('%s: blocks with missing samples: ', fname, find(numSamples(1:end-1) < 512));
+    logMessage(logFile, message);
+end
 
 % converts to nSamples per millisecond to be consistent with how we store
 % data for Black Rock
@@ -103,6 +107,7 @@ else
     elseif strcmpi(InputInvertedText{1}, 'true') || strcmpi(InputInvertedText{1}, 'True')
         InputInverted = -1;
     else
+        % sometimes we have permission issue creating log file...
         % message = [fname, ': InputInverted not true'];
         % logMessage(logFile, message);
     end
