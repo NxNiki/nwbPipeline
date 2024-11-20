@@ -1,4 +1,4 @@
-function [computedTimeStamps, samplingInterval, largeGap] = computeTimeStamps(timeStamps, numSamples)
+function [computedTimeStamps, largeGap] = computeTimeStamps(timeStamps, numSamples)
 % timeStamps, numSamples are returned by Nlx2MatCSC_v3. 
 
 % timeStamps: (seconds) the start timestamps of each block (512 samples)
