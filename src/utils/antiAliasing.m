@@ -37,7 +37,7 @@ end
 timestamps = timestamps - timestamps(1);
 downsampleTs = downsampleTs - downsampleTs(1);
 
-if length(unique(downsampleTs)) > 1
+if length(unique(diff(downsampleTs))) > 1
     warning('downsampled timestamps is irregular!');
 end
 
