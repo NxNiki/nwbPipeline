@@ -336,10 +336,18 @@ function MontageConfigUI()
 
         % Load macro channels
         Data = loadMacroChannels(config.macroChannels);
+        if isempty(Data)
+            Data = {'', [], []};
+        end
         set(channelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
+        set(channelTable, 'ColumnEditable', true(1, size(Data, 2)+1));
 
         Data = loadMacroChannels(config.miscChannels);
+        if isempty(Data)
+            Data = {'', []};
+        end
         set(miscChannelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
+        set(miscChannelTable, 'ColumnEditable', true(1, size(Data, 2)+1));
     end
 
     function saveConfig(~, ~)
