@@ -1,5 +1,10 @@
 function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, screeningType)
 
+% screeningType: if "responseScreeningInfo", will create raster plot for
+% key response, this will give larger time window before key press,
+% otherwise if "screeningInfo", there will be a larger time window after
+% the stimuli.
+
 if nargin < 5
     screeningType = 'screeningInfo';
 end
