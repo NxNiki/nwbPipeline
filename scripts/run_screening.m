@@ -4,10 +4,22 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 576;
-expId = [23];
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/576_Screening';
+patient = 1789;
+expId = [1];
+filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1789_Screening';
 skipExist = [1, 1, 1];
+
+targetLabel.GA1 = 'Amygdala1'; 
+targetLabel.GA2 = 'Thalamus1'; 
+targetLabel.GA3 = 'Thalamus2';
+targetLabel.GA4 = 'Amygdala2'; 
+targetLabel.GB1 = 'Middle hippocampus';
+targetLabel.GB2 = 'Posterior hippocampus';
+targetLabel.GB3 = 'Putamen1';
+targetLabel.GB4 = 'Putamen2';
+targetLabel.GC1 = 'Putamen3';
+targetLabel.GC3 = 'Putamen4';
+targetLabel.GC4 = 'Posterior superior';
 
 % set true to create rasters for reponse (key press):
 checkResponseRaster = true;
@@ -16,7 +28,7 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D576/Screening4/576-18-Sep-2024-17-35-19/from laptop/ttlLog576-18-Sep-2024-17-35-19.mat';
+    '/Volumes/DATA/NLData/i789L/789_screening1_logfiles/789-21-Nov-2024-9-35-42/from laptop/ttlLog789-21-Nov-2024-9-35-42.mat';
     };
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
@@ -56,12 +68,14 @@ end
 
 %%
 
-% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo')
-% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo')
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo')
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
 
-% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
-% rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
+
+outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
+rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
 
 % outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
 % rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath)

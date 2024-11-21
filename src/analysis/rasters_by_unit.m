@@ -1,4 +1,4 @@
-function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, screeningType)
+function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, screeningType, targetLabel)
 
 % screeningType: if "responseScreeningInfo", will create raster plot for
 % key response, this will give larger time window before key press,
@@ -9,12 +9,16 @@ if nargin < 5
     screeningType = 'screeningInfo';
 end
 
+if nargin < 6
+    targetLabel = [];
+end
+
 outputPath = fullfile(trialFolder, ['raster_plots_', screeningType]);
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
 end
 
-[clustersToPlot, sr] = getClusters(trialFolder, plotResponsive);
+[clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel);
 
 close all;
 plotsPerPage = 17;
@@ -276,10 +280,19 @@ function [rect] = getAxisRect(pos, sub_pos)
     end
 end
 
-function [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive)
+function [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel)
 
 clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
 allClusters = clusterFileObj.clusterCharacteristics;
+
+if ~isempty(targetLabel)
+    % add target label to clusters table:
+    for i = 1:size(allClusters, 1)
+        region = allClusters{i, 2};
+        headstageLabel = regexp(region{1}, '(^G[A-D][1-8])*', 'match', 'once');
+        allClusters{i, 2} = {[region{1}, '-', targetLabel.(headstageLabel)]};
+    end  
+end
 
 if ismember('samplingRate', who(clusterFileObj))
     sr = clusterFileObj.samplingRate;
