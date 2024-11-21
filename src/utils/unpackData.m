@@ -33,6 +33,12 @@ timestampFileName = 'lfpTimeStamps';
 suffix = regexp(outFileNames(1,:), '(?<=_)\d{3}(?=.mat)', 'match', 'once');
 
 logFile = fullfile(outFilePath, 'unpack_log-unpackData', 'unpackData.log');
+
+if ~skipExist
+    fprintf('remove all .mat file in: %s\n', outFilePath);
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, '*.mat')).name}));
+end
+
 % unpack ncs files:
 for segment = 1: size(inFileNames, 2)
 
@@ -63,7 +69,7 @@ for segment = 1: size(inFileNames, 2)
         [signal, ADBitVolts, samplingInterval, ~] = Nlx_readCSC(inFileNames{i, segment}, outFilePath);
         saveCSC(signal, ADBitVolts, samplingInterval, outFileName);
 
-        dataLength(i) = length(signal)
+        dataLength(i) = length(signal);
         outFileNames{i, segment} = outFileName;
     end
 
