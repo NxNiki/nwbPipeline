@@ -393,8 +393,8 @@ function MontageConfigUI()
             end
         end
 
-        macroNumChannels = processChannelData(channelTable);
-        processChannelData(miscChannelTable);
+        macroNumChannels = processChannelData(channelTable, 'macro');
+        processChannelData(miscChannelTable, 'misc');
 
         macroChannels = get(channelTable, 'Data');
         miscChannels = get(miscChannelTable, 'Data');
@@ -429,7 +429,7 @@ function MontageConfigUI()
     end
 
 
-    function channelNum = processChannelData(table)
+    function channelNum = processChannelData(table, channelType)
 
         channelData = get(table, 'Data');
         incompleteRows = cellfun(@isempty, channelData(:, 2));
@@ -437,7 +437,7 @@ function MontageConfigUI()
 
         % check for duplicated channel names:
         if hasDuplicates(channelData(:, 2))
-            errordlg('channel should not have duplicated names', 'Error');
+            errordlg([channelType, ' should not have duplicated names'], 'Error');
         end
 
         rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
@@ -573,9 +573,9 @@ function MontageConfigUI()
             if startIdx(i) == 1
                 continue
             end
-            temp = data(startIdx(i) - 1, 1:2);
-            data((startIdx(i): endIdx(i)) - 1, 1:2) = data(startIdx(i): endIdx(i), 1:2);
-            data(endIdx(i), 1:2) = temp;
+            temp = data(startIdx(i) - 1, :);
+            data((startIdx(i): endIdx(i)) - 1, :) = data(startIdx(i): endIdx(i), :);
+            data(endIdx(i), :) = temp;
         end
     end
 
