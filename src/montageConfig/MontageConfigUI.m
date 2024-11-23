@@ -3,6 +3,8 @@ function MontageConfigUI()
 % Blackrock).
     scriptDir = fileparts(mfilename('fullpath'));
     addpath(genpath(fileparts(scriptDir)));
+    macroTableColumns = 4;
+    miscTableColumns = 3;
 
     % Create a figure for the UI
     f = figure('Position', [10, 10, 1500, 900], 'Name', 'Montage Setup');
@@ -336,18 +338,12 @@ function MontageConfigUI()
 
         % Load macro channels
         Data = loadMacroChannels(config.macroChannels);
-        if isempty(Data)
-            Data = {'', [], []};
-        end
-        set(channelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
-        set(channelTable, 'ColumnEditable', true(1, size(Data, 2)+1));
+        set(channelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data(:, 1:macroTableColumns-1)]);
+        set(channelTable, 'ColumnEditable', true(1, macroTableColumns));
 
         Data = loadMacroChannels(config.miscChannels);
-        if isempty(Data)
-            Data = {'', []};
-        end
-        set(miscChannelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data]);
-        set(miscChannelTable, 'ColumnEditable', true(1, size(Data, 2)+1));
+        set(miscChannelTable, 'Data', [num2cell(true(size(Data, 1), 1)), Data(:, 1:miscTableColumns-1)]);
+        set(miscChannelTable, 'ColumnEditable', true(1, miscTableColumns));
     end
 
     function saveConfig(~, ~)
@@ -436,8 +432,9 @@ function MontageConfigUI()
         channelData = channelData(~incompleteRows, :);
 
         % check for duplicated channel names:
-        if hasDuplicates(channelData(:, 2))
-            errordlg([channelType, ' should not have duplicated names'], 'Error');
+        dupIdx = getDuplicates(channelData(:, 2));
+        if ~isempty(dupIdx)
+            errordlg([channelType, ' hase duplicated names:', sprintf(' %s', channelData{dupIdx, 2})], 'Error');
         end
 
         rowsWithPortStart = ~cellfun(@isempty, channelData(:, 3));
