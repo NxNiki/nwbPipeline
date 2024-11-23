@@ -33,7 +33,7 @@ function batch_extractLFP(workerId, totalWorkers, expIds, filePath, skipExist)
     %% micro electrodes:
     jobIds = splitJobs(size(microFiles, 1), totalWorkers, workerId);
     if isempty(jobIds)
-        disp("No job assigned to batch! This is due to more workers than number of micro files.")
+        disp("No job assigned to batch! This is due to more workers than number of micro files.");
     else
         disp(['micro jobIds: ', sprintf('%d ', jobIds)]);
         microFiles = microFiles(jobIds, :);
