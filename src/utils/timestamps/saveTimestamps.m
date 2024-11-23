@@ -27,9 +27,23 @@ function saveTimestamps(timestamps, samplingInterval, timestampFile, rawNcsFile)
 
         movefile(timestampFileTemp, timestampFile);
 
+        % save a figure of the diff of timestamps:
+        if any(diff(timestamps) < 0)
+            warning('non monotonic timestamps found in: %s\n', timestampFile);
+        end
+        
+        fig = figure('Visible', 'off');
+        plot(diff(timestamps));
+        xlabel(strrep(timestampFile, '.mat', ''));       
+        ylabel('diff of timestamps');    
+        saveas(fig, strrep(timestampFile, '.mat', '.png'));
+        close(fig);
+
     catch err
         fprintf('error happened saving timestamp file: %s\n', timestampFile);
         disp(err)
     end
+
+    
 
 end
