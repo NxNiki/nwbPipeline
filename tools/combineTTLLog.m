@@ -2,13 +2,12 @@
 
 
 files = {
-    '/Volumes/DATA/NLData/i809R/809_Screening1/809/809-16-Sep-2024-11-6-19/from laptop/TTLs809-16-Sep-2024-11-6-19_room2.mat';
-    '/Volumes/DATA/NLData/i809R/809_Screening1/809/809-16-Sep-2024-13-57-10/from laptop/TTLs809-16-Sep-2024-13-57-10_room3.mat';
-    '/Volumes/DATA/NLData/i809R/809_Screening1/809/809-17-Sep-2024-9-58-22/from laptop/TTLs809-17-Sep-2024-9-58-22_room3.mat';
+    '/Volumes/DATA/NLData/i789L/789-028_UCLA_Screen2/789-22-Nov-2024-10-1-30/from laptop/TTLs789-22-Nov-2024-10-1-30_room4.mat';
+    '/Volumes/DATA/NLData/i789L/789-029_UCLA_Screen2/789-22-Nov-2024-10-37-21/from laptop/TTLs789-22-Nov-2024-10-37-21_room4.mat';
     };
 
 
-outputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1809_Screening/Experiment-82-84-86/CSC_events/';
+outputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1789_Screening/Experiment-28-29/CSC_events/';
 outputFileName = 'ttlLog.mat';
 
 if ~exist(outputPath, "dir")

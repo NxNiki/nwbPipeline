@@ -5,7 +5,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 patient = 1789;
-expId = [1];
+expId = [28 29];
 filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1789_Screening';
 skipExist = [1, 1, 1];
 
@@ -28,7 +28,7 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Volumes/DATA/NLData/i789L/789_screening1_logfiles/789-21-Nov-2024-9-35-42/from laptop/ttlLog789-21-Nov-2024-9-35-42.mat';
+    '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1789_Screening/Experiment-28-29/CSC_events/ttlLog.mat';
     };
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
@@ -39,7 +39,7 @@ imageDirectory = fullfile(expFilePath, '/trial1');
 % this will create TTL.mat and trialStruct.mat
 % expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 
-if ~exist(fullfile(expFilePath, 'trialStruct.mat'), "file") || ~skipExist(1)
+if ~exist(fullfile(expFilePath, 'TTLs.mat'), "file") || ~skipExist(1)
     eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
 
     TTLs = parseDAQTTLs(eventFile, ttlLogFiles, expFilePath);
@@ -68,17 +68,17 @@ end
 
 %%
 
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
+% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
+% 
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
+% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
+% 
+% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
+% rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
 
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
-
-outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
-rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
-
-% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-% rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath)
-% rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath)
+outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
+rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath, targetLabel)
+rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath, targetLabel)
 
 %%

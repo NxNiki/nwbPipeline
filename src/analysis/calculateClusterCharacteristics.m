@@ -22,6 +22,18 @@ maxWaveformsToInclude = 2500;
 trialsTag = {trials.trialTag};
 stimOnsetTime = [trials.stimulusOnsetTime];
 responseOnsetTime = [trials.respondedAtTime];
+
+% get the start time of experiment and sampling rate. The start time will
+% be subtracted from stimulus onset time. (both unix time in seconds)
+[timestamps, ~, samplingIntervalSeconds] = readTimestamps(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
+sr = 1 / samplingIntervalSeconds;
+
+stimOnsetTime = checkTimestamps(stimOnsetTime, timestamps(1), 1e3);
+responseOnsetTime = checkTimestamps(responseOnsetTime, timestamps(1), 1e3);
+
+dataLength = numel(timestamps)/sr;
+clear timestamps
+
 if isfield(trials, 'patient')
     info.patient_num = trials(1).patient;
 end
@@ -33,7 +45,6 @@ if ~isempty(imageDir)
     allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)', 'match', 'once');
     [videoNames, videoIdxes] = intersect(imageNames, allVideoTrialTags);
     imageNames(videoIdxes) = [];
-    videoOnsetTime = stimOnsetTime(videoIdxes);
 end
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
@@ -42,21 +53,12 @@ if isempty(clusterFiles)
     error('no cluster files detected, run spike sorting before this step!');
 end
 
-% get the start time of experiment and sampling rate. The start time will
-% be subtracted from stimulus onset time. (both unix time in seconds)
-[timestamps, ~, samplingIntervalSeconds] = readTimestamps(fullfile(CSCFolder, 'lfpTimeStamps_001.mat'));
-sr = 1 / samplingIntervalSeconds;
-
 if ~((2e4 <= sr) && (sr <= 4e4))
     warning('invalid sampling frequency: %f', sr);
 else
     fprintf('calculateClusterCharacteristics: sampling frequency: %d\n', sr);
 end
-dataLength = numel(timestamps)/sr;
 
-stimOnsetTime = checkTimestamps(stimOnsetTime, timestamps(1), 1e3);
-responseOnsetTime = checkTimestamps(responseOnsetTime, timestamps(1), 1e3);
-clear timestamps
 
 clusterCharacteristics = [];
 
@@ -137,11 +139,11 @@ for i = 1:length(clusterFiles)
         else
             info.waveDuration = 1000*(maxLocation - 1)/sr;
         end
-
+        
         [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
-
+        
         if ~isempty(videoNames)
-            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(videoOnsetTime, trialsTag, allSpikeTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
+            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
         end
 
         if checkResponse
@@ -186,8 +188,8 @@ allScores = zeros(1, numStimuli);
 for k = 1:numStimuli
     screeningInfo(k).imageName = imageNames{k};
     relevantTrials = find(strcmp(trialTag, imageNames{k}));
-    stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
 
+    stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
     allFR(k) = stimSpikes;
     screeningInfo(k).spikes = allLatencies(relevantTrials);
     screeningInfo(k).name = imageNames{k};

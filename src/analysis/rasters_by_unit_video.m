@@ -1,27 +1,32 @@
-function [] = rasters_by_unit_video(subject, trialFolder, imageDirectory, plotResponsive, useExportFig, outputPath)
+function [] = rasters_by_unit_video(subject, trialFolder, imageDirectory, plotResponsive, useExportFig, outputPath, targetLabel)
 
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
 end
 
-sr = 32e3;
-
-clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
-allClusters = clusterFileObj.clusterCharacteristics;
-
-%trialStruct = load(fullfile(expInfo.pdmDataFolder, 'trialStruct.mat'));
-
-close all;
-plotsPerPage = 8;
-
-if plotResponsive
-    clustersToPlot = allClusters(allClusters.videoNumSelective > 0 & allClusters.cluster_num>0, :);
-    clustersToPlot = sortrows(clustersToPlot,'selectivity','descend');
-else
-    clustersToPlot = allClusters(allClusters.cluster_num>0 & allClusters.firingRate > .15 & allClusters.rejectCluster == 0, :);
-    clustersToPlot = sortrows(clustersToPlot,'csc_num','ascend');
+if nargin < 7
+    targetLabel = [];
 end
 
+sr = 32e3;
+
+[clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel);
+
+% clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
+% allClusters = clusterFileObj.clusterCharacteristics;
+% %trialStruct = load(fullfile(expInfo.pdmDataFolder, 'trialStruct.mat'));
+% 
+% close all;
+% 
+% if plotResponsive
+%     clustersToPlot = allClusters(allClusters.videoNumSelective > 0 & allClusters.cluster_num>0, :);
+%     clustersToPlot = sortrows(clustersToPlot,'selectivity','descend');
+% else
+%     clustersToPlot = allClusters(allClusters.cluster_num>0 & allClusters.firingRate > .15 & allClusters.rejectCluster == 0, :);
+%     clustersToPlot = sortrows(clustersToPlot,'csc_num','ascend');
+% end
+
+plotsPerPage = 8;
 totalNumStimuli = length(clustersToPlot{1, 'videoScreeningInfo'}{1});
 pagesPerCluster =  ceil(clustersToPlot{:, 'videoNumSelective'}/plotsPerPage); %ceil(totalNumStimuli/plotsPerPage)*ones(size(responsiveClusters, 1), 1);
 pagesPerCluster(pagesPerCluster==0) = 1;
