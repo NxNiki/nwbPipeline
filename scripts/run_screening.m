@@ -68,17 +68,17 @@ end
 
 %%
 
-% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
-% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
-% 
-% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
-% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
-% 
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
+
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
+
 % outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
 % rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
-
-outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath, targetLabel)
-rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath, targetLabel)
+% 
+% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
+% rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath, targetLabel)
+% rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath, targetLabel)
 
 %%
