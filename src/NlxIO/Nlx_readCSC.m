@@ -1,6 +1,6 @@
 function [signal, ADBitVolts, samplingInterval, channelNumber] = Nlx_readCSC(fileName, logPath)
 
-% SYNTAX: [data,timeStamps,samplingInterval,chNum] = Nlx_readCSC(fileName,computeTS)
+% SYNTAX: [data,timeStamps,samplingInterval,chNum] = Nlx_readCSC(fileName, computeTS)
 %
 % if computeTS is false,timeStamps will be returned as NaN; this can save a
 % lot of computational time if you're processing lots of files that all
