@@ -22,6 +22,8 @@ if nargin < 5
     skipExist = 1;
 end
 
+checkExistFileIsValid = false;
+
 makeOutputPath(inFileNames(:), outFilePath, skipExist)
 
 % TO DO: probably don't want to hard code timestamp file name.
@@ -35,14 +37,16 @@ suffix = regexp(outFileNames(1,:), '(?<=_)\d{3}(?=.mat)', 'match', 'once');
 logFile = fullfile(outFilePath, 'unpack_log-unpackData', 'unpackData.log');
 
 if ~skipExist
-    fprintf('remove all .mat file in: %s\n', outFilePath);
-    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, '*.mat')).name}));
+    fprintf('remove all old unpacked mat files in: %s\n', outFilePath);
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'G*_00?.mat')).name}));
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'R*_00?.mat')).name}));
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'L*_00?.mat')).name}));
 end
 
 % unpack ncs files:
 for segment = 1: size(inFileNames, 2)
 
-    dataLength = nan(1, size(inFileNames, 1));
+    dataLength = zeros(1, size(inFileNames, 1));
     parfor i = 1:size(inFileNames, 1)
         [~, ~, ext] = fileparts(inFileNames{i, segment});
 
@@ -55,9 +59,13 @@ for segment = 1: size(inFileNames, 2)
         outFileName = fullfile(outFilePath, [outFileName, '.mat']);
     
         if skipExist && exist(outFileName, "file")
-            isCorrupted = checkMatFileCorruption(outFileName);
-            if ~isCorrupted
-                dataLength(i) = checkDataLength(outFileName);
+            if checkExistFileIsValid
+                isCorrupted = checkMatFileCorruption(outFileName);
+                if ~isCorrupted
+                    dataLength(i) = checkDataLength(outFileName);
+                    continue
+                end
+            else
                 continue
             end
         end
@@ -85,6 +93,7 @@ for segment = 1: size(inFileNames, 2)
                 saveTimestamps(computedTimeStamps, samplingInterval, timestampFullFile, inFileNames{completeFileIndex(startIndx), segment})
                 break
             elseif startIndx == length(completeFileIndex)
+                warning("large gap found in timestamps file: %s", inFileNames{completeFileIndex(startIndx), segment});
                 timestampFullFile = strrep(timestampFullFile, '.mat', 'largeGap.mat');
                 saveTimestamps(computedTimeStamps, samplingInterval, timestampFullFile, inFileNames{completeFileIndex(startIndx), segment})
             end
@@ -96,7 +105,7 @@ for segment = 1: size(inFileNames, 2)
     end
 
     % fill channels with missing samples with -inf:
-    incompleteFileIndex = find(dataLength ~= max(dataLength));
+    incompleteFileIndex = find(dataLength ~= max(dataLength) & dataLength ~= 0);
     for idx = incompleteFileIndex
         message = sprintf('fill missing samples in: %s', outFileNames{idx, segment});
         logMessage(logFile, message, 1);
