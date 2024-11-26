@@ -1,4 +1,5 @@
 % configurations of pipeline:
+% see: getNeuralynxFiles.m
 
 MACRO_FILE_PATTERN = '^[RL].*[0-9]*.ncs';
 MICRO_FILE_PATTERN = '^G[A-D]-*.ncs';
@@ -17,4 +18,5 @@ IGNORE_FILES = {
     '^HR.ncs'
     '^MICROPHONE.*\.ncs';
     '^PZ.*\.ncs';
+    '^CSC.*\.ncs'; % unknown file in iowa data.
 };
