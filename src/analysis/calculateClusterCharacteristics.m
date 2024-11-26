@@ -11,7 +11,6 @@ if nargin < 5
 end
 
 log10_thresh = 3;
-
 maxlocalMaxima = 5;
 maxLocalMaximaRatio = .5;
 maxLateRangeRatio = 1;
