@@ -1,19 +1,19 @@
-function taskIds = splitJobs(numTasks, maxNumWorkers, workerId, channelsPerHeadstage)
+function taskIds = splitJobs(numTasks, maxNumWorkers, workerId, channelsPerBundle)
     % assign n tasks to m workers and return the id of tasks for a specific worker.
     % workerId and taskId starts from 1.
-    % channelsPerHeadstage: we always have 8 mico channels in a headstage, channels in a single headstage should be assigned to
+    % channelsPerBundle: we always have 8 mico channels in a bundle, channels in a single bundle should be assigned to
     % same job so that cross channel spikeCode calculation is done correctly.
 
     if nargin < 4
-        channelsPerHeadstage = 8;
+        channelsPerBundle = 8;
     end
 
-    if mod(numTasks, channelsPerHeadstage) ~= 0
-        warning("number of tasks should be a multiple of %d", channelsPerHeadstage);
+    if mod(numTasks, channelsPerBundle) ~= 0
+        warning("number of tasks should be a multiple of %d", channelsPerBundle);
     end
 
     taskPerWorker = floor(numTasks / maxNumWorkers);
-    taskPerWorker = ceil(taskPerWorker / channelsPerHeadstage) * channelsPerHeadstage;
+    taskPerWorker = ceil(taskPerWorker / channelsPerBundle) * channelsPerBundle;
     workersNeeded = ceil(numTasks / taskPerWorker);
 
     if workerId > workersNeeded
@@ -24,8 +24,8 @@ function taskIds = splitJobs(numTasks, maxNumWorkers, workerId, channelsPerHeads
     startJobId = taskPerWorker * (workerId - 1) + 1;
     taskIds = startJobId: min(startJobId + taskPerWorker - 1, numTasks);
 
-    if mod(length(taskIds) , channelsPerHeadstage) ~= 0
-        warning('number of tasks in each job should be multiple of %d to ensure channels in same headstage are procossed together', channelsPerHeadstage);
+    if mod(length(taskIds) , channelsPerBundle) ~= 0
+        warning('number of tasks in each job should be multiple of %d to ensure channels in same bundle are procossed together', channelsPerBundle);
     end
 
 end
