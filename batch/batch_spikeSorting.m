@@ -3,7 +3,7 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
 
-    if isempty(workerId) || isempty(totalWorkders)
+    if isempty(workerId) || isempty(totalWorkers)
         % run script without queue:
         workerId = 1;
         totalWorkers = 1;
