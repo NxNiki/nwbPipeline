@@ -19,4 +19,5 @@ IGNORE_FILES = {
     '^MICROPHONE.*\.ncs';
     '^PZ.*\.ncs';
     '^CSC.*\.ncs'; % unknown file in iowa data.
+    '^Inpt.*\.ncs';
 };
