@@ -119,10 +119,16 @@ parfor fnum = 1:length(spikeFiles)
 
     bin = discretize(spikeTimestamps, binEdges);
     fractionConcurrent = percentConcurrentSpikes(bin);
+    if ismember('fractionConcurrent', spikeCodes.Properties.VariableNames)
+        spikeCodes = removevars(spikeCodes, {'fractionConcurrent'});
+    end
     spikeCodes = [spikeCodes, table(fractionConcurrent(:), 'VariableNames', {'fractionConcurrent'})];
 
     binPrecise = discretize(spikeTimestamps, binEdgesPrecise);
     fractionConcurrentPrecise = percentConcurrentSpikesPrecise(binPrecise);
+    if ismember('fractionConcurrentPrecise', spikeCodes.Properties.VariableNames)
+        spikeCodes = removevars(spikeCodes, {'fractionConcurrentPrecise'});
+    end
     spikeCodes = [spikeCodes, table(fractionConcurrentPrecise(:), 'VariableNames', {'fractionConcurrentPrecise'})];
 
     tempOutFile = strrep(outFileNames{fnum, 2}, '_spikeCodes', '_spikeCodesTemp');
