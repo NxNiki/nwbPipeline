@@ -38,9 +38,9 @@ logFile = fullfile(outFilePath, 'unpack_log-unpackData', 'unpackData.log');
 
 if ~skipExist
     fprintf('remove all old unpacked mat files in: %s\n', outFilePath);
-    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'G*_00?.mat')).name}));
-    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'R*_00?.mat')).name}));
-    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'L*_00?.mat')).name}));
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'G*_00*.mat')).name}));
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'R*_00*.mat')).name}));
+    cellfun(@delete, fullfile(outFilePath, {dir(fullfile(outFilePath, 'L*_00*.mat')).name}));
 end
 
 % unpack ncs files:
