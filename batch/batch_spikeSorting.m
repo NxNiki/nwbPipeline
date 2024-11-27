@@ -3,24 +3,15 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
 
-    if nargin < 1
+    if isempty(workerId) || isempty(totalWorkders)
         % run script without queue:
         workerId = 1;
         totalWorkers = 1;
     end
 
     if workerId > totalWorkers
-        disp("workerId larger than number of workers! batch exit.")
+        disp("workerId larger than number of workers! batch exit.");
         return
-    end
-
-    if nargin < 3
-        addpath(genpath(fileparts(fileparts(mfilename('fullpath')))));
-        workingDir = getDirectory();
-
-        expIds = (4: 7);
-        filePath = fullfile(workingDir, 'MovieParadigm/570_MovieParadigm');
-        skipExist = [1, 1, 0];
     end
 
     if nargin < 6

@@ -1,4 +1,6 @@
 function [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel)
+% this function is isolated from rasters_by_unit and rasters_by_unit_video.
+
 
 clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
 allClusters = clusterFileObj.clusterCharacteristics;
