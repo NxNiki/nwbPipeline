@@ -30,6 +30,7 @@ nspkBeforeReject = size(spikes,1);
 spikeIdxRejected = [];
 if ~isempty(spikeCodes) && nspkBeforeReject >= min_spikes4SPC
     [spikeIdxRejected, rejectionThresh, spikeCodes, probabilityParams] = getSpikesToReject(spikeCodes);
+    fprintf("%d spikes are rejected.\n", sum(spikeIdxRejected));
     spikes(spikeIdxRejected,:) = [];
 end
 
