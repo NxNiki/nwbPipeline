@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <h1>Experiments List</h1>
+
+    <table id="experiments-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Patient rows will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <div id="experiments">
+        <div class="experiment">
+            <label for="experiment-name-1">Experiment Name:</label>
+            <select id="experiment-name-1" name="experiment-name-1">
+                <option value="exp1">Experiment 1</option>
+                <option value="exp2">Experiment 2</option>
+                <option value="exp3">Experiment 3</option>
+            </select>
+            <button class="remove-experiment">Remove</button>
+        </div>
+    </div>
+    <button id="add-experiment">Add Experiment</button>
+
+    <button id="confirm">Confirm</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/patients.js"></script>
+</body>
+</html>

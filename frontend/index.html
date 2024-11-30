@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Data Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- User input for name and path -->
+
+    <div class="form-row">
+        <label for="lab">Lab:</label>
+        <input type="text" id="lab" name="lab">
+    </div>
+
+    <div class="form-row">
+        <label for="name">Experimenter:</label>
+        <input type="text" id="name" name="name">
+    </div>
+
+    <div class="form-row">
+        <label for="path">Path to Save Data:</label>
+        <input type="text" id="path" name="path">
+    </div>
+
+    <!-- Button to confirm setting -->
+    <button id="confirm"> Confirm</button>
+
+    <div id="data-display"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
