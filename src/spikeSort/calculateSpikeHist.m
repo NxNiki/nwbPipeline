@@ -1,8 +1,5 @@
-function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, samplingRate)
+function [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, binEdges1, binEdgesPrecise)
 
-    fprintf('create spike hist, duration: %s seconds, sampling rate: %d Hz\n', num2str(duration), samplingRate);
-
-    [binEdges1, binEdgesPrecise] = createBinEdge(duration, samplingRate);
     binEdges2 = binEdges1+1.5;
 
     if isempty(spikeTimestamps)

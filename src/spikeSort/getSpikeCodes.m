@@ -13,6 +13,7 @@ makeOutputPath(spikeFiles, outputPath, skipExist)
 hasSpikesSum = [];
 hasSpikesPreciseSum = [];
 outFileNames = cell(length(spikeFiles), 2);
+binEdges = [];
 
 % calculate spikeCodes:
 for fnum = 1:length(spikeFiles)
@@ -54,7 +55,13 @@ for fnum = 1:length(spikeFiles)
 
         % get spike codes to run clustering:
         spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, param, outputStruct);
-        [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, duration, param.sr);
+
+        fprintf('duration: %s seconds, sampling rate: %d Hz\n', num2str(duration), param.sr);
+        if isempty(binEdges)
+            % assume duration and sr is same across files:
+            [binEdges, binEdgesPrecise] = createBinEdge(duration, param.sr);
+        end
+        [spikeHist, spikeHistPrecise] = calculateSpikeHist(spikeTimestamps, binEdges, binEdgesPrecise);
 
         tmpOutFile = strrep(outFileNames{fnum, 1}, '_spikeCodes1', '_spikeCodes1Temp');
         fprintf('write spike codes to file:\n %s\n', tmpOutFile);
@@ -116,7 +123,6 @@ parfor fnum = 1:length(spikeFiles)
     param = spikeFileObj.param;
 
     [binEdges, binEdgesPrecise] = createBinEdge(duration, param.sr);
-
     bin = discretize(spikeTimestamps, binEdges);
     fractionConcurrent = percentConcurrentSpikes(bin);
     if ismember('fractionConcurrent', spikeCodes.Properties.VariableNames)
