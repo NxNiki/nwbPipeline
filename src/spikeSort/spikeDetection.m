@@ -78,9 +78,8 @@ parfor i = 1: size(cscFiles, 1)
             signal = signal(:) - bundleMedianFileObj.bundleMedian(:);
         end
 
-
-        [timestamps, dur] = readTimestamps(timestampFiles{j});
-        duration = duration + dur;
+        [timestamps, ~] = readTimestamps(timestampFiles{j});
+        % duration = duration + dur;
 
         if j == 1 || isnan(timestampsStart)
             timestampsStart = min(timestampsStart, timestamps(1));
@@ -89,6 +88,10 @@ parfor i = 1: size(cscFiles, 1)
             fprintf('%s\n', timestampFiles);
         end
 
+        % duration includes gaps between experiments, which is necessary
+        % for spikeHist calculation in getSpikeCodes. This take huge
+        % memory.
+        duration = timestamps(end) - timestampsStart;
         timestamps = timestamps - timestampsStart;
         if saveXfDetect
             [spikes, index, ~, xfDetect{j}] = amp_detect_AS(signal, param, outputStruct);
@@ -107,7 +110,6 @@ parfor i = 1: size(cscFiles, 1)
 
         ExpNameId{j} = repmat(j, 1, length(index));
         spikeTimestamps = timestamps(index);
-
         timestamps = [];
 
         try
