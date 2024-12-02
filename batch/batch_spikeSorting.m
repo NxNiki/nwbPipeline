@@ -30,19 +30,33 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
 
     disp(['jobIds: ', sprintf('%d ', jobIds)]);
     microFiles = microFiles(jobIds, :);
+
+    % TO-DO: parallel jobs may not be correctly closed when running on hoffman.
+    % create Unique Job Storage Locations to resolve this.
+    parJobs = min(maxNumCompThreads, size(microFiles, 1));
+    % Check if the parallel pool is running
+    poolobj = gcp('nocreate'); % If no pool, do not create a new one
+    
+    % If the pool is running, delete it
+    if ~isempty(poolobj)
+        delete(poolobj);
+        disp('Existing parallel pool deleted.');
+    end
+    
+    parpool('local', parJobs);
+
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
+    %% calculate median for each bundle:
+    fprintf('run calculateBundleMedian in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
+    calculateBundleMedian(microFiles);
+    disp('calculate BundleMedian Finished!')
 
     %% spike detection:
 
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
-    % TO-DO: parallel jobs may not be correctly closed when running on hoffman.
-    % create Unique Job Storage Locations to resolve this.
-    % if isempty(gcp('nocreate'))
-    %     parpool('local', 1);  % Adjust the number of workers as needed
-    % end
-
+    fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
     spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI);
     disp('Spike Detection Finished!')
 

@@ -22,25 +22,6 @@ makeOutputPath(cscFiles, outputPath, skipExist);
 nSegments = length(timestampFiles);
 outputFiles = cell(1, size(cscFiles, 1));
 
-% Check if a parallel pool exists
-pool = gcp('nocreate');  % Get current parallel pool without creating a new one
-if ~isempty(pool)
-    delete(pool);
-end
-parJobs = min(maxNumCompThreads, size(cscFiles, 1));
-
-% Check if the parallel pool is running
-poolobj = gcp('nocreate'); % If no pool, do not create a new one
-
-% If the pool is running, delete it
-if ~isempty(poolobj)
-    delete(poolobj);
-    disp('Existing parallel pool deleted.');
-end
-
-parpool('local', parJobs);
-fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
-
 parfor i = 1: size(cscFiles, 1)
 
     channelFiles = cscFiles(i,:);
@@ -89,6 +70,15 @@ parfor i = 1: size(cscFiles, 1)
             warning(sprintf('spikeDetection: error reading file: \n%s \n', channelFiles{j}));
             continue;
         end
+
+        bundleMedianFile = getBundleFileName(channelFiles{j})
+        if exist(bundleMedianFile, "file")
+            bundleMedianFileObj = matfile(bundleMedianFile);
+            fprintf('remove bundle median using file: %s\n', bundleMedianFile);
+            signal = signal(:) - bundleMedianFileObj.bundleMedian(:);
+        end
+
+
         [timestamps, dur] = readTimestamps(timestampFiles{j});
         duration = duration + dur;
 
