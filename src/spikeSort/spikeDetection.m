@@ -75,7 +75,8 @@ parfor i = 1: size(cscFiles, 1)
         if exist(bundleMedianFile, "file")
             bundleMedianFileObj = matfile(bundleMedianFile);
             fprintf('remove bundle median using file: %s\n', bundleMedianFile);
-            signal = signal(:) - bundleMedianFileObj.bundleMedian(:);
+            bundleMedian = bundleMedianFileObj.bundleMedian;
+            signal = signal(:) - bundleMedian(:);
         end
 
         [timestamps, ~] = readTimestamps(timestampFiles{j});
