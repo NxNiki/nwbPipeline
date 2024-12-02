@@ -10,7 +10,7 @@ if all(isnan(cscSignal))
 end
 
 % this is the one I would recommend using but open to other options
-f_info.Fs = round(Fs);             % Neuralynx: micro 32000, macro 2000, Blackrock: micro 30000, macro 2000.
+f_info.Fs = round(Fs);      % Neuralynx: micro 32000, macro 2000, Blackrock: micro 30000, macro 2000.
 f_info.Fpass = 300;         % Passband Frequency
 f_info.Fstop = 1000;        % Stopband Frequency
 f_info.Apass = 0.0001;      % Passband Ripple (dB)
