@@ -72,7 +72,7 @@ probabilityParams.description = 'These parameters were used to determine the pro
 probabilityParams.amplitudeLR = [155 200];
 probabilityParams.firingRateLR = [90 150];
 probabilityParams.fractionConcurrentLR = [0.2 0.5];
-probabilityParams.channelsConcurrentPreciseLR = [3 6];
+probabilityParams.channelsConcurrentPreciseLR = [1.8 2.2]; % [3 6];
 probabilityParams.locMinIndPreLR = [-2 -1];% Note that this results in all spikes having P=1 for this... [2 7];
 probabilityParams.locMinIndPostLR = [55 75];
 probabilityParams.locMinVLR1 = [-100 -80];
