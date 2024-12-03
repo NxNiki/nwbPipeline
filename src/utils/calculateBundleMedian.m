@@ -14,13 +14,14 @@ parfor i = 1: numBundles
     for j = 1: nSegments
         bundleStartIdx = (i-1) * channelsPerBundle + 1;
         bundleMicroFiles = microFiles(bundleStartIdx:bundleStartIdx+channelsPerBundle-1, j);
-
-        fprintf('process: %s\n', bundleMicroFiles{:});
+        
         bundleMedianFileName = getBundleFileName(bundleMicroFiles{1});
 
         if skipExist && exist(bundleMedianFileName, "file")
+            fprintf('skip exist file: %s\n', bundleMedianFileName);
             continue;
         end
+        fprintf('process: %s\n', bundleMicroFiles{:});
 
         signal = readCSC(bundleMicroFiles{1}, runRemovePLI, true);
         cscLength = length(signal);
