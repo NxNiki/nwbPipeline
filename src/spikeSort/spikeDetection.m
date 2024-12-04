@@ -114,12 +114,13 @@ parfor i = 1: size(cscFiles, 1)
         timestamps = [];
 
         try
-            fprintf('spikeDetection: write spikes:\n channel: %s\n%s\n', channelFiles{j}, tempSpikeFilename);
             if matobj_empty
+                fprintf('spikeDetection: write spikes:\n channel: %s\n%s\n', channelFiles{j}, tempSpikeFilename);
                 matobj.spikes = single(spikes);
                 matobj.spikeTimestamps = spikeTimestamps(:);
                 matobj_empty = false;
             else
+                fprintf('spikeDetection: append spikes:\n channel: %s\n%s\n', channelFiles{j}, tempSpikeFilename);
                 matobj.spikes(end+1:end+size(spikes, 1), :) = single(spikes);
                 matobj.spikeTimestamps(end+1:end+numel(spikeTimestamps), 1) = spikeTimestamps(:);
             end

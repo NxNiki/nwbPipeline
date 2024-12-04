@@ -44,11 +44,14 @@ for fnum = 1:length(spikeFiles)
         % new channels found, will recalculate all across channel
         % spikeCodes.
         updateCrossChannelSpikeCode = true;
-
-        fprintf('compute spike codes:\n %s\n', outFileNames{fnum, 1});
         spikeFileObj = matfile(spikeFile, 'Writable', false);
         param = spikeFileObj.param;
         outputStruct = spikeFileObj.outputStruct;
+
+        if ~ismember('spikeTimestamps', who(spikeFileObj))
+            continue;
+        end
+        fprintf('compute spike codes:\n %s\n', outFileNames{fnum, 1});
         spikeTimestamps = spikeFileObj.spikeTimestamps;
         duration = spikeFileObj.duration; % expect duration in seconds.
         spikes = spikeFileObj.spikes;
