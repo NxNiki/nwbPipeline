@@ -51,6 +51,7 @@ expName="MovieParadigm"
 patientId="570"
 expIds="[4:7]" 
 runRemovePLI="1"
+runCAR="1"
 # if expIds is updated, do not skipExist any steps so that threshold for spike detection is same across experiments
 # skipExist="[0, 0, 0]"  # [spike detection, spike code, spike clustering]
 # mode="spikeSorting"  # Change to "extractLFP" to run extractLFP
@@ -82,13 +83,14 @@ matlab  -nosplash -nodisplay <<EOF
     expIds = ${expIds};
     skipExist = ${skipExist};
     runRemovePLI = ${runRemovePLI};
+    runCAR = ${runCAR};
     workingDir = getDirectory();
     filePath = fullfile(workingDir, '${expName}/${patientId}_${expName}');
 
     maxNumCompThreads($maxThreads);
     if strcmp('${mode}', 'spikeSorting')
         disp("run spike sorting");
-        batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist, runRemovePLI);
+        batch_spikeSorting($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist, runRemovePLI, runCAR);
     elseif strcmp('${mode}', 'extractLFP')
         disp("run extract LFP");
         batch_extractLFP($SGE_TASK_ID, $total_tasks, expIds, filePath, skipExist);

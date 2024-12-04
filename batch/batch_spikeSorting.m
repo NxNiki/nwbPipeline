@@ -1,4 +1,4 @@
-function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist, runRemovePLI)
+function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist, runRemovePLI, runCAR)
     % run spike detection and spike sorting to the unpacked data:
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
@@ -16,6 +16,10 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
 
     if nargin < 6
         runRemovePLI = false;
+    end
+
+    if nargin < 7
+        runCAR = false;
     end
 
     %% load file names micro data:
@@ -47,9 +51,11 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
 
     fprintf(['microFiles: \n', sprintf('%s\n', microFiles{:})]);
     %% calculate median for each bundle:
-    fprintf('run calculateBundleMedian in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
-    calculateBundleMedian(microFiles);
-    disp('calculate BundleMedian Finished!')
+    if runCAR
+        fprintf('run calculateBundleMedian in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
+        calculateBundleMedian(microFiles);
+        disp('calculate BundleMedian Finished!')
+    end
 
     %% spike detection:
 
@@ -57,7 +63,7 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
 
     fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
-    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI);
+    spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI, runCAR);
     disp('Spike Detection Finished!')
 
     %% spike clustering:

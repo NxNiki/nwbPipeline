@@ -1,4 +1,4 @@
-function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist, runRemovePLI)
+function outputFiles = spikeDetection(cscFiles, timestampFiles, outputPath, experimentName, skipExist, runRemovePLI, runCAR)
 %spikeDetection Summary of this function goes here
 %   cscFiles cell(m, n). m: number of channels. n: number of files in each
 %   channel. spikes detected from file in each row will be combined.
@@ -14,6 +14,10 @@ end
 
 if nargin < 6
     runRemovePLI = false;
+end
+
+if nargin < 7
+    runCAR = true;
 end
 
 saveXfDetect = false;
@@ -69,14 +73,6 @@ parfor i = 1: size(cscFiles, 1)
         if isempty(signal)
             warning(sprintf('spikeDetection: error reading file: \n%s \n', channelFiles{j}));
             continue;
-        end
-
-        bundleMedianFile = getBundleFileName(channelFiles{j})
-        if exist(bundleMedianFile, "file")
-            bundleMedianFileObj = matfile(bundleMedianFile);
-            fprintf('remove bundle median using file: %s\n', bundleMedianFile);
-            bundleMedian = bundleMedianFileObj.bundleMedian;
-            signal = signal(:) - bundleMedian(:);
         end
 
         [timestamps, ~] = readTimestamps(timestampFiles{j});
