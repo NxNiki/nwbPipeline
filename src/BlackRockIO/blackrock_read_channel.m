@@ -64,6 +64,7 @@ parfor i = 1: nchan
     catch e
         warning('error occurs reading channel: %d', i);
         disp(e);
+        disp(e.stack);
         continue
     end
 
