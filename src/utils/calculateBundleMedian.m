@@ -21,6 +21,12 @@ parfor i = 1: numBundles
             fprintf('skip exist file: %s\n', bundleMedianFileName);
             continue;
         end
+
+        if ~exist(bundleMicroFiles{1}, "file")
+            fprintf('skip non-exist file: %s\n', bundleMicroFiles{1});
+            continue;
+        end
+        
         fprintf('process: %s\n', bundleMicroFiles{:});
 
         signal = readCSC(bundleMicroFiles{1}, runRemovePLI, true);
