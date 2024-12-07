@@ -2,6 +2,10 @@ function saveTimestamps(timestamps, samplingInterval, timestampFile, rawNcsFile)
 % timestamps should be in unix time
 % samplingInterval: float in seconds
 
+    if nargin < 4
+        rawNcsFile = '';
+    end
+
     num_samples = length(timestamps);
     timeend = (num_samples-1) * samplingInterval;
 
@@ -41,7 +45,8 @@ function saveTimestamps(timestamps, samplingInterval, timestampFile, rawNcsFile)
 
     catch err
         fprintf('error happened saving timestamp file: %s\n', timestampFile);
-        disp(err)
+        disp(err);
+        disp(err.stack);
     end
 
     

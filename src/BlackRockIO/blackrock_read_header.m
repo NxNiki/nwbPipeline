@@ -31,7 +31,7 @@ function [tsFileName, electrodeInfoFileName] = blackrock_read_header(inFile, exp
         mkdir(outputFilePath)
     end
 
-    saveTimestamps(timestamps, samplingInterval, tsFileName)
+    saveTimestamps(timestamps, samplingInterval, tsFileName, inFile)
 
     % save electrode_info:
     % save general info about the electrodes and recording times:
