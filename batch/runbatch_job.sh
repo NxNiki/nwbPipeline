@@ -47,11 +47,12 @@
 
 
 ## Set the experiment parameters ==========
-expName="MovieParadigm"
+#expName="MovieParadigm"
+expName="ABCD"
 #expName="Screening"
 
 patientId="573"
-expIds="[3:8]" 
+expIds="[12]" 
 # patientId="1721"
 # expIds="[92:94]" 
 # patientId="1728"
@@ -86,6 +87,7 @@ total_tasks=$(( ($SGE_TASK_LAST - $SGE_TASK_FIRST) / $SGE_TASK_STEPSIZE + 1 ))
 ## echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
 echo "Job $JOB_ID started on:   " `date `
+echo "removePLI $runRemovePLI, CAR: $runCAR"
 echo " "
 echo "Start Matlab"
 echo "run $mode, task id: $SGE_TASK_ID, total tasks: $total_tasks"
