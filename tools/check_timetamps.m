@@ -4,9 +4,9 @@
 close all
 
 files = {
-    '/Volumes/DATA/NLData/i677R/677-029_WatchPAT overnight/2023-03-26_19-56-50/CSC193_0002.ncs';
-    '/Volumes/DATA/NLData/i728R/728-047_EEG_WatchPat_Overnight/2023-12-11_19-31-40/CSC193_0002.ncs';
-    '/Volumes/DATA/NLData/i717R/717-052_EEG WatchPAT Overnight/2023-11-06_19-01-39/CSC193_0002.ncs';
+    '/Volumes/DATA/NLData/i677R/677-029_WatchPAT overnight/2023-03-26_19-56-50/PDes1.ncs';
+    '/Volumes/DATA/NLData/i728R/728-047_EEG_WatchPat_Overnight/2023-12-11_19-31-40/PDes1.ncs';
+    '/Volumes/DATA/NLData/i717R/717-052_EEG WatchPAT Overnight/2023-11-06_19-01-39/PDes1.ncs';
     '/Volumes/DATA/NLData/D570/EXP5_Movie_24_Sleep/2024-01-27_00-01-35/GA3-RMH1_0003.ncs';
     '/Volumes/DATA/NLData/D571/EXP9_Movie_24_Sleep/2024-07-26_22-50-39/GA1-RAH8_0003.ncs';
     '/Volumes/DATA/NLData/D573/EXP9_Movie24_Sleep/2024-05-03_23-50-25/GA1-ROF7_0002.ncs';
@@ -36,7 +36,11 @@ for i = 1:length(files)
 
     % checkNumberofValidSamples(numSamples, strrep(files{i}, '.ncs', '_numberOfSamples.png'));
 
-    checkBlockDuration(timeStamps, strrep(files{i}, '.ncs', '_blockDuration.png'))
+    % checkBlockDuration(timeStamps, strrep(files{i}, '.ncs', '_blockDuration.png'));
+
+    % checkTimestampDiffHist(timeStamps, strrep(files{i}, '.ncs', '_blockHist.png'));
+
+    checkTimestampNumSampleCorrelation(timeStamps, numSamples, strrep(files{i}, '.ncs', '_TimestampNumSampleCorrelation.png'))
 
     disp('---')
 end
@@ -220,5 +224,44 @@ function checkBlockDuration(timeStamps, figName)
     saveas(gcf, figName);
 
 end
+
+function checkTimestampDiffHist(timeStamps, figName)
+    % checkTimestampDiffHist: Plots and saves a histogram of the differences in timestamps.
+    %
+    % Inputs:
+    %   timeStamps: Array of timestamp values (numeric vector).
+    %   figName: Name of the file to save the figure (string).
+    %
+    % Example:
+    %   checkTimestampDiffHist([1, 2, 4, 8, 16], 'timestamp_diff_hist.png')
+
+    % Calculate differences
+    timestampDiffs = diff(timeStamps);
+    
+    % Create histogram
+    figure;
+    % histogram(timestampDiffs, 'BinMethod', 'auto', 'EdgeColor', 'none');
+    histogram(timestampDiffs, 'NumBins', 100, 'EdgeColor', 'none');
+    set(gca, 'YScale', 'log')
+    title(figName(20:end-5));
+    xlabel('Time Difference');
+    ylabel('Frequency');
+    grid on;
+    
+    % Save the figure
+    saveas(gcf, figName);
+end
+
+function checkTimestampNumSampleCorrelation(timestamps, numSamples, figName)
+
+figure;
+plot(diff(timestamps), numSamples(1:end-1), '*');
+title(figName(20:end-5));
+xlabel('Time Difference');
+ylabel('num Samples');
+saveas(gcf, figName);
+
+end
+
 
 
