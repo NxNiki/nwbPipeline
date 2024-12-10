@@ -63,23 +63,19 @@ trialTemplate = struct('entryNumber',[],'trialNumber',[],...
     'imageCharacteristics',[],...
     'lfpTimeStamps',[]);
 
-imageCharactersitcs = struct('human',[],'place',[],'animal',[],'edible',[],...
-    'fantasyCreature',[],'sportEvent',[],'man',[],...
-    'filmOrTVcelebrity',[],'sportsCelebrity',[],'musicCelebrity',[],...
-    'religiousFigure',[],'politician',[],'terroristOrEnemy',[],...
-    'fromUCLA',[],'landmark',[],'building',[],...
-    'naturalLandscape',[],'cuteAnimal',[],'scaryAnimal',[],'livesOnLand',[],...
-    'livesInWater',[],'canFly',[],'mammal',[],'adult',[],'dangerous',[],...
-    'cartoon',[],'containsLetters',[],'containsPlants',[]);
+charactersticFieldNames = {
+    'human';
+    'animal';
+    'building';
+    'men';
+    'women';
+    'plants'
+    }; 
 
-charactersticFieldNames = {'human','place','animal','edible',...
-    'fantasyCreature','sportEvent','man',...
-    'filmOrTVcelebrity','sportsCelebrity','musicCelebrity',...
-    'religiousFigure','politician','terroristOrEnemy',...
-    'fromUCLA','landmark','building',...
-    'naturalLandscape','cuteAnimal','scaryAnimal','livesOnLand',...
-    'livesInWater','canFly','mammal','adult','dangerous',...
-    'cartoon','containsLetters','containsPlants'};
+imageCharactersitcs = struct(); 
+for i = 1:length(charactersticFieldNames)
+    imageCharactersitcs.(charactersticFieldNames{i}) = []; 
+end
 
 instructions = {'people','animals','buildings','men','plants','women',...
     'men or animals','women or buildings','mammals'};
@@ -177,7 +173,7 @@ trialTags = {trials.trialTag};
 emptyIdx = cellfun(@(x)isempty(x), trialTags);
 
 if any(emptyIdx)
-    warning('empty elements in trialTag')'
+    warning('empty elements in trialTag');
     trialTags = trialTags(~emptyIdx);
     trials = trials(~emptyIdx);
 end
@@ -193,14 +189,14 @@ for t=1:length(trials)
 end
 
 % sanity check for TTL success
-imageSetSizes = mode(arrayfun(@(x)length(x.inThisImageSet),trials));
-looksGood = arrayfun(@(x)length(x.trialStartTime)==1,trials);
-looksGood(2,:) = arrayfun(@(x)length(x.trialEndTime)==1,trials);
-looksGood(3,:) = arrayfun(@(x)length(x.respondedAtTime)==1,trials);
+imageSetSizes = mode(arrayfun(@(x)length(x.inThisImageSet), trials));
+looksGood = arrayfun(@(x)length(x.trialStartTime)==1, trials);
+looksGood(2,:) = arrayfun(@(x)length(x.trialEndTime)==1, trials);
+looksGood(3,:) = arrayfun(@(x)length(x.respondedAtTime)==1, trials);
 looksGood(4,:) = arrayfun(@(x)~isempty(regexp(x.response,'^(yes)|(no)$','once')), trials);
-looksGood(5,:) = arrayfun(@(x)length(x.inThisImageSet)==imageSetSizes,trials);
+looksGood(5,:) = arrayfun(@(x)length(x.inThisImageSet)==imageSetSizes, trials);
 
 suspicious = find(~all(looksGood));
 if ~isempty(suspicious)
-    warning(['TTLs for the following trials were suspicious. Please double check!  ',num2str(suspicious)]);
+    warning(['TTLs for the following trials were suspicious. Please double check!  ', num2str(suspicious)]);
 end
