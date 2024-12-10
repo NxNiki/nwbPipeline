@@ -1,6 +1,5 @@
 function [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles)
 % This function read *_spikes.mat file with corresponding times_*.mat,
-% data_*.dg_01 and data_*.dg_01.lab file.
 
 % As wave_clus also saves result as times_*.mat file. We will check
 % variables in times_*.mat to load spikes accordingly. This makes it
@@ -41,6 +40,7 @@ filename = strrep(filename, '_spikes', '');
 timesFile = fullfile(pathname, ['times_', filename]);
 if ~exist(timesFile, 'file')
     warning([timesFile, ' does not exist. Move on...'])
+    [cluster_class, tree, clu] = deal([]);
     return
 end
 

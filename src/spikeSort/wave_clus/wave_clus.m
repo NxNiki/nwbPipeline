@@ -147,8 +147,9 @@ end
 [pathname, fn, e] = fileparts(get(handles.file_name, 'String'));
 fn = [fn, e];
 
-spikeFiles = dir(fullfile(pathname, 'G*_spikes.mat'));
-spikeFiles = {'', spikeFiles(:).name, ''};
+timesFiles = dir(fullfile(pathname, 'times_G*.mat'));
+timesFiles = {'', timesFiles(:).name, ''};
+spikeFiles = cellfun(@timesFile2SpikeFile, timesFiles, "UniformOutput", false);
 
 num = find(strcmp(spikeFiles, fn));
 filename = '';
@@ -188,10 +189,11 @@ switch char(handles.datatype)
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
         if isempty(filename)
-            [filename, pathname] = uigetfile('*_spikes.mat','Select file');
+            [filename, pathname] = uigetfile('times_*.mat','Select file');
             if ~filename
                 return
             end
+            filename = timesFile2SpikeFile(filename);
         end
         [cluster_class, tree, ~, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
