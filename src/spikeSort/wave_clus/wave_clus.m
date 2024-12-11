@@ -189,7 +189,7 @@ switch char(handles.datatype)
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
         if isempty(filename)
-            [filename, pathname] = uigetfile('times_*.mat','Select file');
+            [filename, pathname] = uigetfile('times_*.mat', 'Select file');
             if ~filename
                 return
             end
@@ -315,7 +315,7 @@ set(handles.wave_clus_figure, 'userdata', USER_DATA);
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 plot_spikes(handles);
 
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results, 1)
 
