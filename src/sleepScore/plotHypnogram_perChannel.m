@@ -6,7 +6,7 @@ params.highCut = 30;
 params.ds_SR = 200;
 scaling_factor_delta_log = 2*10^-4 ; % Additive Factor to be used when computing the Spectrogram on a log scale
 
-f = figure('Name', figureName, 'NumberTitle', 'off', 'visible','off');
+figure('Name', figureName, 'NumberTitle', 'off', 'visible','off');
 % set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 21 30]); % this size is the maximal to fit on an A4 paper when printing to PDF
 set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 40 30]);
 
@@ -23,15 +23,15 @@ clear macroCSC;
 %[b,a]=ellip(2,0.1,40,[params.lowCut params.highCut]*2/params.ds_SR);
 %filteredBlock=filtfilt(b,a,data_ds);
 window = 30*params.ds_SR;
-[S,F,T,P]  = spectrogram(data_ds, window, 0.8*window, [0.5:0.2:flimits(2)], params.ds_SR, 'yaxis');
+[~,F,T,P]  = spectrogram(data_ds, window, 0.8*window, [0.5:0.2:flimits(2)], params.ds_SR, 'yaxis');
 clear data_ds;
 P = P/max(max(P));
-P1 = (10*log10(abs(P+scaling_factor_delta_log)))';
-P1 = [P1(:,1) P1 P1(:,end)];
+P = (10*log10(abs(P+scaling_factor_delta_log)))';
+P = [P(:,1) P P(:,end)];
 T = [0 T T(end)+1];
-Pplot = imgaussfilt(P1',3);
+P = imgaussfilt(P',3);
 
-imagesc(T,F,Pplot,[-40,-5]);axis xy;
+imagesc(T,F,P,[-40,-5]);axis xy;
 xlimits = [0 T(end)];
 xticks = 1:(60*60):T(end);
 for i = 1:length(xticks)
@@ -65,7 +65,7 @@ end
 end_time = datenum(sprintf('2017/10/21 %02d:%02d:00', hh, mm));
 
 xData = linspace(start_time,end_time,length(T));
-ah = imagesc(xData,F,Pplot,[-40,-5]);axis xy;
+ah = imagesc(xData, F, P, [-40,-5]); axis xy;
 axis([get(gca,'xlim'),[0.5,20]])
 set(gca,'ytick',[0.5,10,20])
 datetick('x','HH:MM PM','keeplimits')
@@ -80,7 +80,7 @@ if PPT_FIG
     newA4figure(figureName)
     set(gcf,'DefaultAxesFontSize',28);
     axes('position',[0.1,0.4,0.8,0.3])
-    imagesc(T,F,Pplot,[-40,-5]);axis xy;
+    imagesc(T,F,P,[-40,-5]);axis xy;
     hold on
     xlimits = [0 T(end)];
     xticks = 0:(60*60):T(end);
