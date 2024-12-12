@@ -34,8 +34,8 @@ numPages = sum(pagesPerCluster);
 
 titleRect = [0 .9625 1 .025];
 
-allImageDir = dir(fullfile(imageDirectory, '*.jpg'));
-allImageTrialTags = regexp({allImageDir.name}, '.*?(?=_id)','match','once');
+% allImageDir = dir(fullfile(imageDirectory, '*.jpg'));
+% allImageTrialTags = regexp({allImageDir.name}, '.*?(?=_id)','match','once');
 
 allVideoDir = dir(fullfile(imageDirectory, '*.mp4'));
 allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)','match','once');
@@ -96,13 +96,10 @@ parfor i = 1:numPages
 
         imageAxes = axes(gcf, 'Position', getAxisRect(j, 1));
         thisImageTrialTag = clusterInfo{unitsToPlot(j), 'imageName'}{1};
-        imageLookupIdx = find(strcmp(allImageTrialTags, thisImageTrialTag), 1);
         videoLookupIdx = find(strcmp(allVideoTrialTags, thisImageTrialTag), 1);
         audioLookupIdx = find(strcmp(allAudioTrialTags, thisImageTrialTag), 1);
-        if ~isempty(imageLookupIdx)
-            image = imread(fullfile(imageDirectory, allImageDir(imageLookupIdx).name));
-            imshow(image, 'Parent', imageAxes);
-        elseif ~isempty(videoLookupIdx)
+        
+        if ~isempty(videoLookupIdx)
             try
                 [y, Fs] = audioread(fullfile(imageDirectory, allVideoDir(videoLookupIdx).name));
                 plot(imageAxes, 1000/Fs*(1:length(y)), y(:, 1));
@@ -139,9 +136,7 @@ parfor i = 1:numPages
         for k = 1:length(spikeTimes)
             if numel(spikeTimes{k}) > 0
                 trialSpikeTimes = spikeTimes{k};
-                if ~isempty(imageLookupIdx)
-                    trialSpikeTimes(trialSpikeTimes < imageLimits(1) | trialSpikeTimes > imageLimits(2)) = [];
-                elseif ~isempty(videoLookupIdx)
+                if ~isempty(videoLookupIdx)
                     trialSpikeTimes(trialSpikeTimes < videoLimits(1) | trialSpikeTimes > videoLimits(2)) = [];
                 elseif ~isempty(audioLookupIdx)
                     trialSpikeTimes(trialSpikeTimes < audioLimits(1) | trialSpikeTimes > audioLimits(2)) = [];
@@ -157,14 +152,12 @@ parfor i = 1:numPages
 
         ylim(rasterAxes, [.6, length(spikeTimes)+.4]);
 
-        if ~isempty(imageLookupIdx)
-            xlim(rasterAxes, [-500, 1000]); xticks(rasterAxes, -500:500:1000);
-        elseif ~isempty(audioLookupIdx)
+        if ~isempty(audioLookupIdx)
             xlim(rasterAxes, [-500, 2000]); xticks(rasterAxes, -500:1000:2000);
         elseif ~isempty(videoLookupIdx)
             xlim(rasterAxes, [-1000, 10000]); xticks(rasterAxes, -1000:2500:10000);
         else
-            xlim(rasterAxes, [-500, 1000]); xticks(rasterAxes, -500:500:1000);
+            xlim(rasterAxes, [-1000, 10000]); xticks(rasterAxes, -1000:2500:10000);
         end
 
         plot(rasterAxes, [0, 0 ], [.6, length(spikeTimes)+.4], 'Color', 'green');
@@ -176,12 +169,7 @@ parfor i = 1:numPages
         histAxes = axes(gcf, 'Position', getAxisRect(j, 3));
         allSpikeTimes = vertcat(spikeTimes{:});
 
-        if ~isempty(imageLookupIdx)
-            histogram(histAxes, allSpikeTimes, -500:50:1000);
-            xlim(histAxes, [-500, 1000]);   xticks(histAxes, -500:500:1000);
-            % ENM adding ylim as test
-            % ylim(histAxes, [0,10]); yticks(histAxes, [0 5 10]);
-        elseif ~isempty(audioLookupIdx)
+        if ~isempty(audioLookupIdx)
             histogram(histAxes, allSpikeTimes, -500:100:2000);
             xlim(histAxes, [-500, 2000]);   xticks(histAxes, -500:1000:2000);
             % ENM adding ylim as test
@@ -192,8 +180,8 @@ parfor i = 1:numPages
             % ENM adding ylim as test
             % ylim(histAxes, [0,50]); yticks(histAxes, [0 25 50]);
         else
-            histogram(histAxes, allSpikeTimes, -500:50:1000);
-            xlim(histAxes, [-500, 1000]);   xticks(histAxes, -500:500:1000);
+            histogram(histAxes, allSpikeTimes, -1000:500:10000);
+            xlim(histAxes, [-1000, 10000]);   xticks(histAxes, -1000:2500:10000);
         end
 
     end
