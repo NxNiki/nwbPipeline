@@ -5,15 +5,18 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-expIds = [133, 134, 137, 141];
-expName = 'MovieParadigm';
-patient_id = 1720;
+% expIds = [133, 134, 137, 141];
 
-filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/%s/%d_%s_xin', expName, patient_id, expName);
+expIds = [4];
+expName = 'MovieParadigm';
+patient_id = 570;
+
+% filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/%s/%d_%s_xin', expName, patient_id, expName);
+filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/%s/%d_%s', expName, patient_id, expName);
 
 % 0: overwrite all previous files.
 % 1: skip existing files.
-skipExist = [1, 0, 0];  % [spike detection, spike code, spike clustering]
+skipExist = [0, 0, 0];  % [spike detection, spike code, spike clustering]
 
 % remove noises caused by power line interference:
 runRemovePLI = true;

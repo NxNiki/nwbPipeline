@@ -10,7 +10,9 @@ if ~isempty(targetLabel)
     for i = 1:size(allClusters, 1)
         region = allClusters{i, 2};
         headstageLabel = regexp(region{1}, '(^G[A-D][1-8])*', 'match', 'once');
-        allClusters{i, 2} = {[region{1}, '-', targetLabel.(headstageLabel)]};
+        if ~isempty(headstageLabel)
+            allClusters{i, 2} = {[region{1}, '-', targetLabel.(headstageLabel)]};
+        end
     end  
 end
 

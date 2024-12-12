@@ -4,22 +4,24 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 1789;
-expId = [28 29];
-filePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1789_Screening';
+patient = 579;
+expId = [2];
+filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening', patient);
 skipExist = [1, 1, 1];
 
-targetLabel.GA1 = 'Amygdala1'; 
-targetLabel.GA2 = 'Thalamus1'; 
-targetLabel.GA3 = 'Thalamus2';
-targetLabel.GA4 = 'Amygdala2'; 
-targetLabel.GB1 = 'Middle hippocampus';
-targetLabel.GB2 = 'Posterior hippocampus';
-targetLabel.GB3 = 'Putamen1';
-targetLabel.GB4 = 'Putamen2';
-targetLabel.GC1 = 'Putamen3';
-targetLabel.GC3 = 'Putamen4';
-targetLabel.GC4 = 'Posterior superior';
+% set target local for each micro channel:
+targetLabel.GA1 = ''; 
+targetLabel.GA2 = ''; 
+targetLabel.GA3 = '';
+targetLabel.GA4 = ''; 
+targetLabel.GB1 = '';
+targetLabel.GB2 = '';
+targetLabel.GB3 = '';
+targetLabel.GB4 = '';
+targetLabel.GC1 = '';
+targetLabel.GC2 = '';
+targetLabel.GC3 = '';
+targetLabel.GC4 = '';
 
 % set true to create rasters for reponse (key press):
 checkResponseRaster = true;
@@ -28,12 +30,14 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/1789_Screening/Experiment-28-29/CSC_events/ttlLog.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 1 _Behavioural/579-10-Dec-2024-20-35-41/from laptop/ttlLog579-10-Dec-2024-20-35-41.mat';
     };
+
+imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 1 Stimuli';
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
-imageDirectory = fullfile(expFilePath, '/trial1');
+% imageDirectory = fullfile(expFilePath, '/trial1');
 
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
@@ -74,11 +78,11 @@ rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', target
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
 rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
 
-% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
-% rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
-% 
-% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-% rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath, targetLabel)
-% rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath, targetLabel)
+outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
+rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
+
+outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
+rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath, targetLabel)
+rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath, targetLabel)
 
 %%
