@@ -6,7 +6,7 @@ params.highCut = 30;
 params.ds_SR = 200;
 scaling_factor_delta_log = 2*10^-4 ; % Additive Factor to be used when computing the Spectrogram on a log scale
 
-figure('Name', figureName, 'NumberTitle', 'off');
+f = figure('Name', figureName, 'NumberTitle', 'off', 'visible','off');
 % set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 21 30]); % this size is the maximal to fit on an A4 paper when printing to PDF
 set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 40 30]);
 
