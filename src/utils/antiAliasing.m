@@ -1,8 +1,8 @@
 function lfpSignal = antiAliasing(cscSignal, timestamps, Fs, downsampleTs)
 % downsample csc signal according to downsampleTs
 % If there is large gaps in the timestamps, linearizing timestamps will
-% lead to huge lfpSignal with interpolated nan values. This is fixed with
-% linearizeTimestamps.m
+% lead to huge gap in lfpSignal with interpolated nan values. This is fixed
+% with linearizeTimestamps.m
 
 if all(isnan(cscSignal))
     lfpSignal = [];
