@@ -139,14 +139,14 @@ for i = 1:length(clusterFiles)
             info.waveDuration = 1000*(maxLocation - 1)/sr;
         end
         
-        [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
+        [info.stim, info.numSelective, info.selectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
         
         if ~isempty(videoNames)
-            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
+            [info.video, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
         end
 
         if checkResponse
-            [info.responseScreeningInfo, info.responseNumSelective, info.responseSelectivity] = getScreeningInfo(responseOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:1000:950), [-1000, 0, 500]);
+            [info.response, info.responseNumSelective, info.responseSelectivity] = getScreeningInfo(responseOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:1000:950), [-1000, 0, 500]);
         end
 
         clusterCharacteristics = [clusterCharacteristics; struct2table(info, 'AsArray', 1)];

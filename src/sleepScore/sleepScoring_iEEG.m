@@ -33,6 +33,8 @@ classdef sleepScoring_iEEG < handle
         
         function [sleep_score_vec] = evaluateDelta(obj, data, LocalHeader, outputPath)
             data(isnan(data)) = 0;
+
+            sleepScoreFile = fullfile(outputPath, sprintf('sleepScore_%s.mat', LocalHeader.origName));
             
             % remove extremely noisy data segments (like around stimulation
             % that shift the power to higher frequencies)
@@ -248,9 +250,7 @@ classdef sleepScoring_iEEG < handle
                     sleep_score_vec(T(iEpoch-1)*obj.samplingRate+1:T(iEpoch)*obj.samplingRate) = obj.REM_CODE;
                 end
             end
-            
-            save(fullfile(outputPath, sprintf('sleepScore_%s.mat', LocalHeader.origName)),...
-                'T','F','P2','sleep_score_vec','obj','P_delta','pointsPassedSleepThresh','pointsPassedREMThresh')
+            save(sleepScoreFile,'T','F','P2','sleep_score_vec','obj','P_delta','pointsPassedSleepThresh','pointsPassedREMThresh')
             
             if obj.PLOT_FIG
                 

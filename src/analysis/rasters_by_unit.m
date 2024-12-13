@@ -1,41 +1,50 @@
-function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, screeningType, targetLabel)
+function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, stimuliType, targetLabel, outputPath)
 
-% screeningType: if "responseScreeningInfo", will create raster plot for
-% key response, this will give larger time window before key press,
-% otherwise if "screeningInfo", there will be a larger time window after
-% the stimuli.
+% stimuliType:
+%       "stim": for images and audio, there will be larger time window
+%       after the stimuli.
+%       "response": for key response, this will give larger time window 
+%       before key press,
+%       "video": for video stimuli, there will be a wider time window.
+% targetLabel:
+%       a struct with fields G[A-D][1-8] to add target of micro electrodes 
+%       in the brain.
 
-if nargin < 5
-    screeningType = 'screeningInfo';
+
+if ~exist('stimuliType', "var")
+    stimuliType = 'stim';
 end
 
-if nargin < 6
+if ~exist('targetLabel', "var")
     targetLabel = [];
 end
 
-outputPath = fullfile(trialFolder, ['raster_plots_', screeningType]);
+if ~exist('outputPath', "var") || isempty(outputPath)
+    outputPath = trialFolder;
+end
+
+outputPath = fullfile(outputPath, ['raster_plots_', stimuliType]);
+
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
 end
 
 [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel);
+totalNumStimuli = length(clustersToPlot{1, stimuliType}{1});
 
-close all;
-plotsPerPage = 17;
-
-totalNumStimuli = length(clustersToPlot{1, screeningType}{1});
-
-if strcmp(screeningType, 'videoScreeningInfo')
+if strcmp(stimuliType, 'video')
     clusterColLabel = 'videoNumSelective';
     rasterNCol = 3; rasterNRow = 3;
     stimColor = 'blue';
+    plotsPerPage = 8;
     stimLimits = (-1000:2500:10000);
     stimHistLimits = (-1000:500:10000);
 else
     clusterColLabel = 'numSelective';
     rasterNCol = 6; rasterNRow = 3;
     stimColor = 'green';
-    if strcmp(screeningType, 'responseScreeningInfo')
+    plotsPerPage = 17;
+    if strcmp(stimuliType, 'response')
         stimLimits = (-1000:500:500);
         stimHistLimits = (-1000:50:500);
     else
@@ -60,20 +69,9 @@ allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 
 figNames = cell(1, numPages);
 
-% imageLimits = (-500:500:1000);
-% imageHistLimits = (-500:50:1000);
-% audioLimits = (-500:1000:2000);
-% audioHistLimits = (-500:100:2000);
-% audioLimits = (-500:500:1000);
-% audioHistLimits = (-500:50:1000);
-% videoLimits = (-1000:2500:10000);
-% videoHistLimits = (-1000:500:10000);
-% responseLimits = (-1000:500:500);
-% responseHistLimits = (-1000:50:500);
-
 parfor i = 1:numPages
 
-    figNames{i} = fullfile(outputPath, ['rasters_', screeningType, '_p' num2str(i) '.pdf']);
+    figNames{i} = fullfile(outputPath, ['rasters_', stimuliType, '_p' num2str(i) '.pdf']);
     figure('Name', ['Page ',num2str(i)], ...
         'units','normalized', ...
         'position',[0.0238    0.0736    0.8    0.9],...
@@ -88,7 +86,7 @@ parfor i = 1:numPages
     unitToPlot = find(i - cumSumClusters > 0, 1, 'last');
     posInPage = i - cumSumClusters(unitToPlot);
     nPagesInUnit = cumSumClusters(unitToPlot+1)-cumSumClusters(unitToPlot);
-    clusterInfo = struct2table(clustersToPlot{unitToPlot, screeningType}{1});
+    clusterInfo = struct2table(clustersToPlot{unitToPlot, stimuliType}{1});
     clusterInfo = sortrows(clusterInfo, 'score', 'descend');
 
     axes1 = axes(gcf, 'Position', getAxisRect(0, 1));
@@ -109,15 +107,6 @@ parfor i = 1:numPages
     ISITimes(ISITimes>100)=[];
     histogram(axes2, ISITimes, 0:10:100);
     xlim(axes2, [0 100]);
-
-    %     allSpikeTimes = clustersToPlot{unitToPlot, 'allTimes'}{1};
-    %     allTimeStamps = 0:1/1000:ceil(allSpikeTimes(end));
-    %     allSpikeTrace = zeros(1, length(allTimeStamps));
-    %     allSpikeTrace(round(allSpikeTimes*1e3)) = 1;
-    %     smoothSpikeTrace = smooth(allSpikeTrace, 1000)*1000;
-    %     smoothSpikeTrace(smoothSpikeTrace > mean(smoothSpikeTrace + 5*std(smoothSpikeTrace))) = 0;
-    %     plot(axes2, allTimeStamps, smoothSpikeTrace');
-    %     xlim(axes2, [0 ceil(allSpikeTimes(end))]);
 
     unitsToPlot = (posInPage-1)*plotsPerPage + (1:plotsPerPage);
     unitsToPlot(unitsToPlot > totalNumStimuli) = [];
@@ -168,7 +157,7 @@ parfor i = 1:numPages
         if iscell(clusterInfo{unitsToPlot(j), 'spikes'}) && length(clusterInfo{unitsToPlot(j), 'spikes'}) == 1
             spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'}{1};
         else
-            spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'}; %{1}
+            spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'};
         end
 
         for k = 1:length(spikeTimes)
@@ -216,9 +205,9 @@ parfor i = 1:numPages
 end
 
 if plotResponsive
-    merge_fn = ['Rasters_p' num2str(subject), '_', screeningType, '_responsiveUnits'];
+    merge_fn = ['Rasters_p' num2str(subject), '_', stimuliType, '_responsiveUnits'];
 else
-    merge_fn = ['Rasters_p' num2str(subject) '_', screeningType, '_allUnits'];
+    merge_fn = ['Rasters_p' num2str(subject) '_', stimuliType, '_allUnits'];
 end
 
 mergeSegments = [1:50:length(figNames), length(figNames)+1];
@@ -229,6 +218,7 @@ for i = 2:length(mergeSegments)
     else
         movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
     end
+    cellfun(@delete, filenames1);
 end
 
 end

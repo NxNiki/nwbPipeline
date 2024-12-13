@@ -1,4 +1,10 @@
-function [] = rasters_by_image(subject, trialFolder, imageDirectory, useExportFig, outputPath)
+function [] = rasters_by_image(subject, trialFolder, imageDirectory, outputPath)
+
+if ~exist('outputPath', "var")
+    outputPath = trialFolder;
+end
+
+outputPath = fullfile(outputPath, 'raster_plots_byimage');
 
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
@@ -7,11 +13,10 @@ end
 clusterFile = load(fullfile(trialFolder, 'clusterCharacteristics.mat'));
 allClusters = clusterFile.clusterCharacteristics;
 
-close all;
-tic
 plotsPerPage = 48;
 responsiveClusters = allClusters(allClusters.numSelective > 0, :);
 log10_thresh = 3;
+nCols = 6; nRows = 8;
 
 if height(responsiveClusters) < 1
     return
@@ -78,7 +83,7 @@ parfor i = 1:numPages
             continue
         end
         responseOnset = clusterInfo(unitOrder(unitsToPlot(j))).responseOnset;
-        rasterAxes = axes(gcf, 'Position', getAxisRect(j));
+        rasterAxes = axes(gcf, 'Position', getAxisRect(j, nCols, nRows));
         spikeTimes = clusterInfo(unitOrder(unitsToPlot(j))).spikes;
         for k = 1:length(spikeTimes)
             if numel(spikeTimes{k}) > 0
@@ -130,40 +135,32 @@ parfor i = 1:numPages
 
     thisTitle = [strrep(imageCharacteristics{imageToPlot, 'name'}{1}, '_', '\_')];
     annotation('textbox',[0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', 'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold', 'interpreter', 'tex');
-    if useExportFig
-        export_fig(gcf, figNames{i}, '-dpf', '-nocrop');
-    else
-        xtickangle(findobj(gcf,'type','axes'),0)
-        print(gcf,'-dpdf','-r100','-vector', figNames{i})
-    end
-    close all;
-end
-if useExportFig
-    append_pdfs(fullfile(outputPath, 'ImageRasters_all.pdf'), figNames);
-else
-    merge_fn = ['Rasters_p' num2str(subject) '_ScreeningX_byImage.pdf'];
-    mergePdfs(figNames, fullfile(outputPath, merge_fn))
+
+    xtickangle(findobj(gcf,'type','axes'),0)
+    print(gcf,'-dpdf','-r100','-vector', figNames{i})
 end
 
-toc
-close all;
+merge_fn = ['Rasters_p' num2str(subject) '_screening_byImage.pdf'];
+mergePdfs(figNames, fullfile(outputPath, merge_fn))
+cellfun(@delete, figNames)
+
 end
 
-function [rect] = getAxisRect(pos)
-vertNum = floor((pos-1)/6)+1;
-horzNum = mod(pos-1, 6) + 1;
-
-nCols = 6; nRows = 8;
-
-top = .025; bottom = .025; edge = .015; vertic = .05;  horiz = .025;
-imageVert = .15;
-
-verticalSize = (1 - top - bottom - imageVert - nRows*vertic)/nRows;
-horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
-
-
-rect(1) = edge + (horzNum-1)*(horizSize+horiz);
-rect(2) = bottom + (nRows-vertNum)*(verticalSize+vertic);
-rect(3) = horizSize;
-rect(4) = verticalSize;
-end
+% function [rect] = getAxisRect(pos)
+% vertNum = floor((pos-1)/6)+1;
+% horzNum = mod(pos-1, 6) + 1;
+% 
+% nCols = 6; nRows = 8;
+% 
+% top = .025; bottom = .025; edge = .015; vertic = .05;  horiz = .025;
+% imageVert = .15;
+% 
+% verticalSize = (1 - top - bottom - imageVert - nRows*vertic)/nRows;
+% horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
+% 
+% 
+% rect(1) = edge + (horzNum-1)*(horizSize+horiz);
+% rect(2) = bottom + (nRows-vertNum)*(verticalSize+vertic);
+% rect(3) = horizSize;
+% rect(4) = verticalSize;
+% end

@@ -34,10 +34,10 @@ ttlLogFiles = {
     };
 
 imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 2 Stimuli';
-
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
-% imageDirectory = fullfile(expFilePath, '/trial1');
+outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
+
 
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
@@ -73,19 +73,18 @@ end
 %%
 
 % generate rasters plots by units for image and audio stimuli:
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath)
 
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath)
 
 % generate raster plots organized by image:
-outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
-rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
+rasters_by_image(patient, expFilePath, imageDirectory, outputPath);
 
 % generate raster plots by units for video stimuli:
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'videoScreeningInfo', targetLabel);
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'videoScreeningInfo', targetLabel);
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
 % outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
 % rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, outputPath, targetLabel)

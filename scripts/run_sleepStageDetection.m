@@ -22,9 +22,18 @@ channel_index = [1];
 %% Step 3 - run automated sleep scoring on the selected channels
 
 manualValidation = 0;
-outputPath = fullfile(fileparts(macroPath), 'auto_sleep_score');
+outputPath = fullfile(fileparts(macroPath), 'sleep_score');
 disp('automated sleep scoring...')
 tic
 sleepScoring_iEEG_wrapper(macroFiles(channel_index, :), macroTimestampFiles, outputPath, manualValidation); 
 toc
 disp('automated sleep scoring finished!')
+
+%% Step 3 - run automated sleep scoring on the selected channels
+
+manualValidation = 1;
+disp('manual sleep scoring...')
+tic
+sleepScoring_iEEG_wrapper(macroFiles(channel_index, :), macroTimestampFiles, outputPath, manualValidation); 
+toc
+disp('manual sleep scoring finished!')
