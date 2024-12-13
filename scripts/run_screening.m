@@ -5,7 +5,7 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 patient = 579;
-expId = [2];
+expId = [4];
 filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening', patient);
 skipExist = [1, 1, 1];
 
@@ -30,10 +30,10 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 1 _Behavioural/579-10-Dec-2024-20-35-41/from laptop/ttlLog579-10-Dec-2024-20-35-41.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening_2_Behavioural/579-12-Dec-2024-11-22-26/from laptop/ttlLog579-12-Dec-2024-11-22-26.mat';
     };
 
-imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 1 Stimuli';
+imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 2 Stimuli';
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
@@ -72,17 +72,23 @@ end
 
 %%
 
+% generate rasters plots by units for image and audio stimuli:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'screeningInfo', targetLabel)
 rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'screeningInfo', targetLabel)
 
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'responseScreeningInfo', targetLabel)
 rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'responseScreeningInfo', targetLabel)
 
+% generate raster plots organized by image:
 outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots'];
 rasters_by_image(patient, expFilePath, imageDirectory, 0, outputPath);
 
-outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, 0, outputPath, targetLabel)
-rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, 0, outputPath, targetLabel)
+% generate raster plots by units for video stimuli:
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'videoScreeningInfo', targetLabel);
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'videoScreeningInfo', targetLabel);
+
+% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
+% rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, outputPath, targetLabel)
+% rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, outputPath, targetLabel)
 
 %%

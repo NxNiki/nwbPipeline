@@ -1,4 +1,4 @@
-function [] = rasters_by_unit_video(subject, trialFolder, imageDirectory, plotResponsive, useExportFig, outputPath, targetLabel)
+function [] = rasters_by_unit_video(subject, trialFolder, imageDirectory, plotResponsive, outputPath, targetLabel)
 
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
@@ -8,23 +8,7 @@ if nargin < 7
     targetLabel = [];
 end
 
-sr = 32e3;
-
 [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel);
-
-% clusterFileObj = matfile(fullfile(trialFolder, 'clusterCharacteristics.mat'));
-% allClusters = clusterFileObj.clusterCharacteristics;
-% %trialStruct = load(fullfile(expInfo.pdmDataFolder, 'trialStruct.mat'));
-% 
-% close all;
-% 
-% if plotResponsive
-%     clustersToPlot = allClusters(allClusters.videoNumSelective > 0 & allClusters.cluster_num>0, :);
-%     clustersToPlot = sortrows(clustersToPlot,'selectivity','descend');
-% else
-%     clustersToPlot = allClusters(allClusters.cluster_num>0 & allClusters.firingRate > .15 & allClusters.rejectCluster == 0, :);
-%     clustersToPlot = sortrows(clustersToPlot,'csc_num','ascend');
-% end
 
 plotsPerPage = 8;
 totalNumStimuli = length(clustersToPlot{1, 'videoScreeningInfo'}{1});
@@ -33,9 +17,6 @@ pagesPerCluster(pagesPerCluster==0) = 1;
 numPages = sum(pagesPerCluster);
 
 titleRect = [0 .9625 1 .025];
-
-% allImageDir = dir(fullfile(imageDirectory, '*.jpg'));
-% allImageTrialTags = regexp({allImageDir.name}, '.*?(?=_id)','match','once');
 
 allVideoDir = dir(fullfile(imageDirectory, '*.mp4'));
 allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)','match','once');
@@ -92,9 +73,10 @@ parfor i = 1:numPages
     unitsToPlot(unitsToPlot > totalNumStimuli) = [];
 
     imageLimits = [-500 1000]; audioLimits = [-500 2000]; videoLimits = [-1000 10000];
+    ncols = 3; nrows = 3;
     for j = 1:length(unitsToPlot)
 
-        imageAxes = axes(gcf, 'Position', getAxisRect(j, 1));
+        imageAxes = axes(gcf, 'Position', getAxisRect(j, 1, ncols, nrows));
         thisImageTrialTag = clusterInfo{unitsToPlot(j), 'imageName'}{1};
         videoLookupIdx = find(strcmp(allVideoTrialTags, thisImageTrialTag), 1);
         audioLookupIdx = find(strcmp(allAudioTrialTags, thisImageTrialTag), 1);
@@ -126,7 +108,7 @@ parfor i = 1:numPages
         else
             title(imageAxes, [strrep(thisImageTrialTag, '_', '\_'), ' (' num2str(round(clusterInfo{unitsToPlot(j), 'score'},1)) ')'], 'FontSize', 8,'Interpreter','tex');
         end
-        rasterAxes = axes(gcf, 'Position', getAxisRect(j, 2));
+        rasterAxes = axes(gcf, 'Position', getAxisRect(j, 2, ncols, nrows));
         if iscell(clusterInfo{unitsToPlot(j), 'spikes'}) && length(clusterInfo{unitsToPlot(j), 'spikes'}) == 1
             spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'}{1};
         else
@@ -166,7 +148,7 @@ parfor i = 1:numPages
         end
         hold(rasterAxes, 'off');
 
-        histAxes = axes(gcf, 'Position', getAxisRect(j, 3));
+        histAxes = axes(gcf, 'Position', getAxisRect(j, 3, ncols, nrows));
         allSpikeTimes = vertcat(spikeTimes{:});
 
         if ~isempty(audioLookupIdx)
@@ -188,58 +170,49 @@ parfor i = 1:numPages
 
     thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
     annotation('textbox',[0 .9625 1 .025],'units','normalized', 'String',thisTitle,'EdgeColor','none', 'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold','Interpreter','tex');
-    if useExportFig
-        export_fig(gcf, figNames{i}, '-dpf');
-    else
-        xtickangle(findobj(gcf,'type','axes'),0);
-        print(gcf,'-dpdf','-r100','-vector',figNames{i});
-    end
-    %exportgraphics(gcf,['Rasters_p' num2str(subject)'_ScreeningX_allUnits.pdf'],'Append',true) % takes too long
-    close all;
+
+    xtickangle(findobj(gcf,'type','axes'),0);
+    print(gcf,'-dpdf','-r100','-vector',figNames{i});
+
 end
 
-if useExportFig
-    append_pdfs(fullfile(outputPath, 'Rasters_all.pdf'), figNames);
+
+if plotResponsive
+    merge_fn = ['Rasters_p' num2str(subject), '_ScreeningX_responsiveUnits'];
 else
-    if plotResponsive
-        merge_fn = ['Rasters_p' num2str(subject), '_ScreeningX_responsiveUnits'];
+    merge_fn = ['Rasters_p' num2str(subject) '_ScreeningX_allUnits'];
+end
+
+mergeSegments = [1:50:length(figNames), length(figNames)+1];
+for i = 2:length(mergeSegments)
+    filenames1 = figNames(mergeSegments(i-1): (mergeSegments(i)-1));
+    if length(filenames1) > 1
+        mergePdfs(filenames1, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))));
     else
-        merge_fn = ['Rasters_p' num2str(subject) '_ScreeningX_allUnits'];
+        movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
     end
-
-    mergeSegments = [1:50:length(figNames), length(figNames)+1];
-    for i = 2:length(mergeSegments)
-        filenames1 = figNames(mergeSegments(i-1): (mergeSegments(i)-1));
-        if length(filenames1) > 1
-            mergePdfs(filenames1, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))));
-        else
-            movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
-        end
-    end
+end
 
 end
 
-close all;
-end
-
-function [rect] = getAxisRect(pos, sub_pos)
-pos = pos + 1;
-vertNum = floor((pos-1)/6)+1;
-horzNum = mod(pos-1, 6) + 1;
-
-nCols = 3; nRows = 3;
-top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
-verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
-
-if sub_pos==1, subpos_factor = verticalMinSize+verticalMajSize+2*verticalMin;
-elseif sub_pos == 2, subpos_factor = verticalMinSize+verticalMin;
-else subpos_factor = 0;
-end
-
-rect(1) = edge + (horzNum-1)*(horizSize+horiz);
-rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
-rect(3) = horizSize;
-if sub_pos == 1 || sub_pos == 2, rect(4) = verticalMajSize; else rect(4) = verticalMinSize; end
-end
+% function [rect] = getAxisRect(pos, sub_pos)
+% pos = pos + 1;
+% vertNum = floor((pos-1)/6)+1;
+% horzNum = mod(pos-1, 6) + 1;
+% 
+% nCols = 3; nRows = 3;
+% top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
+% verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
+% verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
+% horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
+% 
+% if sub_pos==1, subpos_factor = verticalMinSize+verticalMajSize+2*verticalMin;
+% elseif sub_pos == 2, subpos_factor = verticalMinSize+verticalMin;
+% else subpos_factor = 0;
+% end
+% 
+% rect(1) = edge + (horzNum-1)*(horizSize+horiz);
+% rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
+% rect(3) = horizSize;
+% if sub_pos == 1 || sub_pos == 2, rect(4) = verticalMajSize; else rect(4) = verticalMinSize; end
+% end
