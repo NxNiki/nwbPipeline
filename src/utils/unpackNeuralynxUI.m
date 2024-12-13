@@ -17,9 +17,8 @@ unpackConfig = struct();
 % files are combined for sleep experiments.
 unpackConfig.numParallelTasks = 10;
 
-projectName = 'MovieParadigm';
 defaultBasePath = '/Volumes/DATA/NLData/';
-defaultOutputPath = fullfile('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/', projectName);
+defaultOutputPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/';
 defaultSaveFile = 'Patient-xx_Exp-xx.json';
 
 
@@ -40,9 +39,15 @@ eventPatternLabel = {
     'Events*';
     };
 
+expNameList = {
+    'MovieParadigm';
+    'Screening';
+    'ABCD';
+    };
+
 
 % Create a figure for the GUI
-f = figure('Position', [300 300 900 1150], 'Name', 'Folder Selector', ...
+f = figure('Position', [300 300 900 1250], 'Name', 'Folder Selector', ...
     'NumberTitle', 'off', 'Resize', 'on');
 
 %% Unpack Config Panel:
@@ -52,28 +57,35 @@ experimentIDPanel = uipanel('Title', 'Unpack Config', 'FontSize', 15, ...
 right = .02;
 height = 0.15;
 width = 0.15;
-widthEdit = .2;
+widthEdit = .17;
+widthPopupMenu = 0.175;
 bottom = 0.75;
+
 patientIdLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
     'Position', [right bottom width height], 'String', 'Patient ID:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
 
 patientIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
-    'Position', [right + width bottom + 0.02 widthEdit height], 'String', '', 'FontSize', 15, ...
+    'Position', [right + width, bottom + 0.02, widthEdit - .02, height], 'String', '', 'FontSize', 15, ...
     'HorizontalAlignment', 'left', 'Callback', @updateUIParam);
 
 expIdLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
-    'Position', [right + width + widthEdit + .01, bottom, width, height], 'String', 'Experiment ID:', 'FontSize', 15, ...
+    'Position', [right + width + widthEdit + .01, bottom, width, height], 'String', 'Exp ID:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
 
-widthEditExp = .45;
 expIdInput = uicontrol('Parent', experimentIDPanel, 'Style', 'edit', 'Units', 'normalized', ...
-    'Position', [right + 2 * width + widthEdit, bottom + 0.02, widthEditExp, height], 'String', '', 'FontSize', 15, ...
+    'Position', [right + 2 * width + widthEdit - .05, bottom + 0.02, widthEdit, height], 'String', '', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left', 'Callback', @updateUIParam);
+
+expNameLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
+    'Position', [right + 2 * width + 2 * widthEdit - .01, bottom, width, height], 'String', 'Exp Name:', 'FontSize', 15, ...
+    'HorizontalAlignment', 'left');
+
+expNameInput = uicontrol('Parent', experimentIDPanel, 'Style', 'popupmenu', 'String', expNameList, 'Units', 'normalized', ...
+    'Position', [right + 3 * width + 2 * widthEdit - .03, bottom, widthPopupMenu, height], 'FontSize', 15, ...
     'HorizontalAlignment', 'left', 'Callback', @updateUIParam);
 
 bottom = .55;
-widthPopupMenu = 0.175;
-widthEdit = .78;
 macroLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
     'Position', [right bottom width height], 'String', 'Macro Pattern:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
@@ -99,6 +111,7 @@ eventPatternInput = uicontrol('Parent', experimentIDPanel, 'Style', 'popupmenu',
     'HorizontalAlignment', 'left');
 
 bottom = .25;
+widthEdit = .78;
 montageLabel = uicontrol('Parent', experimentIDPanel, 'Style', 'text', 'Units', 'normalized', ...
     'Position', [right bottom width height], 'String', 'Montage File:', 'FontSize', 15, ...
     'HorizontalAlignment', 'left');
@@ -188,7 +201,8 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
     function updateUIParam(~, ~)
         % Update the default file names based on Patient ID and Experiment ID
         patientID = get(patientIdInput, 'String');
-        outputFilePath = fullfile(defaultOutputPath, [patientID, '_', projectName]);
+        expName = expNameList{get(expNameInput, 'Value')};
+        outputFilePath = fullfile(defaultOutputPath, expName, [patientID, '_', expName]);
         set(outputFilePathInput, 'String', outputFilePath);
 
         experimentID = get(expIdInput, 'String');
@@ -260,6 +274,7 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
             outputFilePath = get(outputFilePathInput, 'String');
             experimentIds = tempIds;  % Update local variable
             fileNameInputString = get(fileNameInput, 'String');
+            expName = expNameList{get(expNameInput, 'Value')};
             macroPattern = macroPatternLabel{get(macroPatternInput, 'Value')};
             microPattern = microPatternLabel{get(microPatternInput, 'Value')};
             eventPattern = eventPatternLabel{get(eventPatternInput, 'Value')};
@@ -276,6 +291,7 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
             unpackConfig.OutputFilePath = outputFilePath;
             unpackConfig.SelectedFolders = selectedFolders;  % Ensure this is updated
             unpackConfig.fileNameInput = fileNameInputString;
+            unpackConfig.expName = expName;
             unpackConfig.macroPattern = macroPattern;
             unpackConfig.microPattern = microPattern;
             unpackConfig.eventPattern = eventPattern;
@@ -343,6 +359,14 @@ skipExistCheckbox = uicontrol('Parent', savePanel, 'Style', 'checkbox', 'Units',
 
         if isfield(data, 'fileNameInput') && ischar(data.fileNameInput)
             set(fileNameInput, 'String', data.fileNameInput);
+        end
+
+        if isfield(data, 'expName') && ischar(data.expName)
+            value = find(ismember(expNameList, data.expName));
+            if isempty(value)
+                [value, expNameList] = addChannelPattern(data.expName, expNameList);
+            end
+            set(expNameInput, 'Value', value);
         end
 
         if isfield(data, 'macroPattern') && ischar(data.macroPattern)
