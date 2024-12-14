@@ -71,23 +71,19 @@ if ~exist(fullfile(expFilePath, 'clusterCharacteristics.mat'), "file") || ~skipE
 end
 
 %%
-
 % generate rasters plots by units for image and audio stimuli:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath)
 rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath)
-
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath)
-
-% generate raster plots organized by image:
-rasters_by_image(patient, expFilePath, imageDirectory, outputPath);
 
 % generate raster plots by units for video stimuli:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
 rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
-% outputPath = [filePath, '/Experiment', sprintf('-%d', expId), '/raster_plots_video'];
-% rasters_by_unit_video(patient, expFilePath, imageDirectory, 1, outputPath, targetLabel)
-% rasters_by_unit_video(patient, expFilePath, imageDirectory, 0, outputPath, targetLabel)
+% generate raster plots organized by image:
+rasters_by_image(patient, expFilePath, imageDirectory, outputPath);
+
+% generate raster plots with response time as onset:
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath)
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath)
 
 %%

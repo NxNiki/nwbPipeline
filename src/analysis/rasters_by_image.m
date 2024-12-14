@@ -16,12 +16,12 @@ allClusters = clusterFile.clusterCharacteristics;
 plotsPerPage = 48;
 responsiveClusters = allClusters(allClusters.numSelective > 0, :);
 log10_thresh = 3;
-nCols = 6; nRows = 8;
+nCols = 4; nRows = 4;
 
 if height(responsiveClusters) < 1
     return
 end
-numImages = length(responsiveClusters{1, 'screeningInfo'}{1});
+numImages = length(responsiveClusters{1, 'stim'}{1});
 numClusters = height(responsiveClusters);
 
 pagesPerImage = ceil(numClusters/plotsPerPage);%7*ones(size(responsiveClusters, 1), 1);%
@@ -29,12 +29,12 @@ numPages = numImages*pagesPerImage;
 
 imageCharacteristics = [];
 for i = 1:numImages
-    thisImage.name = responsiveClusters{1, 'screeningInfo'}{1}(i).imageName;
+    thisImage.name = responsiveClusters{1, 'stim'}{1}(i).stimName;
     clusterInfo = struct;
     for j = 1:numClusters
-        clusterInfo(j).spikes = responsiveClusters{j, 'screeningInfo'}{1}(i).spikes;
-        clusterInfo(j).score = responsiveClusters{j, 'screeningInfo'}{1}(i).score;
-        clusterInfo(j).responseOnset = responsiveClusters{j, 'screeningInfo'}{1}(i).responseOnset;
+        clusterInfo(j).spikes = responsiveClusters{j, 'stim'}{1}(i).spikes;
+        clusterInfo(j).score = responsiveClusters{j, 'stim'}{1}(i).score;
+        clusterInfo(j).responseOnset = responsiveClusters{j, 'stim'}{1}(i).responseOnset;
         if isempty(clusterInfo(j).responseOnset), clusterInfo(j).responseOnset = NaN; end
         clusterInfo(j).csc_num = responsiveClusters{j, 'csc_num'};
         clusterInfo(j).cluster_num = responsiveClusters{j, 'cluster_num'};
@@ -58,6 +58,7 @@ allAudioDir = dir(fullfile(imageDirectory, '*.aiff'));
 allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
 
 figNames = {};
+
 parfor i = 1:numPages
     figNames{i} = fullfile(outputPath, ['image_rasters_p' num2str(i) '.pdf']);
     figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
@@ -83,7 +84,7 @@ parfor i = 1:numPages
             continue
         end
         responseOnset = clusterInfo(unitOrder(unitsToPlot(j))).responseOnset;
-        rasterAxes = axes(gcf, 'Position', getAxisRect(j, nCols, nRows));
+        rasterAxes = axes(gcf, 'Position', getAxisRect(j, 0, nCols, nRows));
         spikeTimes = clusterInfo(unitOrder(unitsToPlot(j))).spikes;
         for k = 1:length(spikeTimes)
             if numel(spikeTimes{k}) > 0
@@ -134,7 +135,8 @@ parfor i = 1:numPages
     end
 
     thisTitle = [strrep(imageCharacteristics{imageToPlot, 'name'}{1}, '_', '\_')];
-    annotation('textbox',[0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', 'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold', 'interpreter', 'tex');
+    annotation('textbox',[0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', ...
+        'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold', 'interpreter', 'tex');
 
     xtickangle(findobj(gcf,'type','axes'),0)
     print(gcf,'-dpdf','-r100','-vector', figNames{i})
@@ -146,21 +148,3 @@ cellfun(@delete, figNames)
 
 end
 
-% function [rect] = getAxisRect(pos)
-% vertNum = floor((pos-1)/6)+1;
-% horzNum = mod(pos-1, 6) + 1;
-% 
-% nCols = 6; nRows = 8;
-% 
-% top = .025; bottom = .025; edge = .015; vertic = .05;  horiz = .025;
-% imageVert = .15;
-% 
-% verticalSize = (1 - top - bottom - imageVert - nRows*vertic)/nRows;
-% horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
-% 
-% 
-% rect(1) = edge + (horzNum-1)*(horizSize+horiz);
-% rect(2) = bottom + (nRows-vertNum)*(verticalSize+vertic);
-% rect(3) = horizSize;
-% rect(4) = verticalSize;
-% end
