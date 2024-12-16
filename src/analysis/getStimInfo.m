@@ -13,6 +13,7 @@ if ~startsWith(ext, '.')
 end
 
 stimDir = dir(fullfile(stimPath, ['*', ext]));
+stimDir = stimDir(arrayfun(@(x) x.name(1) ~= '.', stimDir));
 stimDir = stimDir(~[stimDir.isdir]);
 
 if isempty(stimDir)
