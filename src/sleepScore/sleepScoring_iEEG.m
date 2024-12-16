@@ -39,6 +39,7 @@ classdef sleepScoring_iEEG < handle
             % remove extremely noisy data segments (like around stimulation
             % that shift the power to higher frequencies)
             if obj.EXTREME_NOISE
+                fprintf('remove extreme noise...\n');
                 timeWin = 10*obj.samplingRate;
                 dataL = size(data,2);
                 nTimeWins = floor(dataL/timeWin);
@@ -86,7 +87,8 @@ classdef sleepScoring_iEEG < handle
             
             figure_name_out = sprintf('sleepScore_process_%s.png', LocalHeader.origName);
             figure('Name', fullfile(outputPath, figure_name_out), 'NumberTitle', 'off');
-            set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 25 35]); % this size is the maximal to fit on an A4 paper when printing to PDF
+            % set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 25 35]); % this size is the maximal to fit on an A4 paper when printing to PDF
+            set(gcf, 'PaperUnits', 'centimeters', 'PaperPosition', [0.2 0.2 45 35]); 
             set(gcf, 'PaperOrientation', 'portrait');
             set(gcf, 'Units', 'centimeters', 'Position', get(gcf, 'paperPosition') + [1 1 0 0]);
             colormap('jet');
@@ -128,9 +130,11 @@ classdef sleepScoring_iEEG < handle
             hold on
             plot(T(pointsPassedSleepThresh),25,'.','markersize',5,'color','w')
             plot(T(logical(Svec)),20,'.','markersize',5,'color','r')
-            legend('P delta','P spindle','TH1','TH2')
+            legend('P delta','P spindle','TH1','TH2', 'Location', 'bestoutside');
             title(sprintf('white - sleep scoring based on delta TH, red - based on clustering delta+spindle, diff = %2.2f%%',...
                 100*sum(pointsPassedSleepThresh - Svec)/length(Svec)))
+            
+            saveas(gcf, fullfile(outputPath, figure_name_out));
             
             for ii_a = 1:2
                 if ii_a == 1
@@ -240,6 +244,7 @@ classdef sleepScoring_iEEG < handle
                 
             end
             
+            
             sleep_score_vec = zeros(1,length(data));
             sleep_score_vec(1:T(1)*obj.samplingRate) = pointsPassedSleepThresh(1);
             
@@ -252,11 +257,13 @@ classdef sleepScoring_iEEG < handle
             end
             save(sleepScoreFile,'T','F','P2','sleep_score_vec','obj','P_delta','pointsPassedSleepThresh','pointsPassedREMThresh')
             
+            
             if obj.PLOT_FIG
                 
                 figure_name_out = fullfile(outputPath, sprintf('sleepScore_%s.png', LocalHeader.origName));
                 figure('Name', figure_name_out,'NumberTitle','off');
-                set(gcf,'PaperUnits','centimeters','PaperPosition',[0.2 0.2 21 30]); % this size is the maximal to fit on an A4 paper when printing to PDF
+                % set(gcf,'PaperUnits','centimeters','PaperPosition',[0.2 0.2 21 30]); % this size is the maximal to fit on an A4 paper when printing to PDF
+                set(gcf,'PaperUnits','centimeters','PaperPosition',[0.2 0.2 41 30]);
                 set(gcf,'PaperOrientation','portrait');
                 set(gcf,'Units','centimeters','Position', get(gcf,'paperPosition')+[1 1 0 0]);
                 colormap('jet');
@@ -366,6 +373,7 @@ classdef sleepScoring_iEEG < handle
                 
                 filename = sprintf('sleepScore_%s_stats', LocalHeader.origName);
                 save(fullfile(outputPath, filename),'SLEEP_properties_IDX','SLEEP_properties');
+                saveas(gcf, figure_name_out);
                 % PrintActiveFigs(figure_folder)
             end
             

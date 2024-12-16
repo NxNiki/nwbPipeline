@@ -3,7 +3,8 @@
 % Xin Niu.
 close all;
 
-macroPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/576_MovieParadigm/Experiment-16/CSC_macro';
+% macroPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/576_MovieParadigm/Experiment-16/CSC_macro';
+macroPath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/570_MovieParadigm/Experiment-5/CSC_macro';
 [macroFiles, macroTimestampFiles] = readCSCFilePath(macroPath);
 skipExist = 1;
 
