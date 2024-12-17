@@ -141,12 +141,14 @@ parfor i = 1:numPages
             end
         end
 
-        responseOnset = NaN;
+        responseOnset = [];
         if any(strcmp('responseOnset', fieldnames(clusterInfo)))% isfield(clusterInfo, 'responseOnset')
             responseOnset = clusterInfo{unitsToPlot(j), 'responseOnset'};
         end
         if iscell(responseOnset)
             responseOnset = mean(cell2mat(responseOnset));
+        else
+            responseOnset = mean(responseOnset);
         end
 
         stimTag = stimTags{stimLookupIdx};
@@ -180,7 +182,7 @@ parfor i = 1:numPages
         % add vertical line at onset time:
         plot(rasterAxes, [0, 0], yLimit, 'Color', eventColor);
 
-        if ~isnan(responseOnset(1)) && ~strcmp(stimuliType, 'response')
+        if ~isempty(responseOnset) && ~strcmp(stimuliType, 'response')
             plot(rasterAxes, [responseOnset, responseOnset], yLimit, 'Color', 'red');
         end
         hold(rasterAxes, 'off');
