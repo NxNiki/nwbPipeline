@@ -22,7 +22,7 @@ for i = 1: length(expIds)
 
     [cscFile, timestampsFile] = readCSCFilePath(cscFilePath);
     cscFiles = [cscFiles, cscFile];
-    timestampsFiles = [timestampsFiles, timestampsFile];
+    timestampFiles = [timestampFiles, timestampsFile];
 
     expNames(expNamesId: length(timestampFiles)) = {sprintf('Exp%d', expIds(i))};
     expNamesId = length(timestampFiles) + 1;
