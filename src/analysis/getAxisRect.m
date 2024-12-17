@@ -1,34 +1,59 @@
 function [rect] = getAxisRect(pos, sub_pos, nCols, nRows)
+% sub_pos: row of sub position for a stim. 1: top, 2: middle, 3: bottom.
+% nCols: number of columns of raster plots in each page.
+% nRows: number of rows of raster plots in each page.
+% number of rows for a single stim. usually 3, top: image, middle:
+%   raster plots, bottom: histgram of inter-spike intervals.
 
     if nargin < 3
         nCols = 6; nRows = 3;
     end
 
-    vertNum = floor(pos/nRows) + 1;
-    horzNum = mod(pos, nCols) + 1;
 
-    top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
-    verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-    verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-    horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
 
-    if sub_pos == 1
-        subpos_factor = verticalMinSize + verticalMajSize + 2 * verticalMin;
-    elseif sub_pos == 2
-        subpos_factor = verticalMinSize + verticalMin;
+    top = .025; bottom = .025; horizonEdge = .025; horiz = .025;
+    verticalMaj = .05; verticalMin = .025; 
+    if sub_pos == 0
+        % for image rasters, only one raster plot in each block:
+        imageVert = .15;
+        pos = pos - 1;
+        verticalSize = (1 - top - bottom - imageVert - nRows*verticalMaj)/nRows;
+        horizSize = (1 - 2*horizonEdge - (nCols-1)*horiz)/nCols;        
     else
-        subpos_factor = 0;
+        % unit rasters, show image, raster plot and histgram.
+        verticalMaj = .05; verticalMin = .025; 
+        blockHeight = (1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
+        verticalMajSize = 2/5 * blockHeight;
+        verticalMinSize = 1/5 * blockHeight;
+        horizSize = (1 - 2*horizonEdge - (nCols-1)*horiz)/nCols;
+        if sub_pos == 1
+            subpos_factor = verticalMinSize + verticalMajSize + 2 * verticalMin;
+        elseif sub_pos == 2
+            subpos_factor = verticalMinSize + verticalMin;
+        else
+            subpos_factor = 0;
+        end
     end
 
-    rect(1) = edge + (horzNum-1)*(horizSize+horiz);
-    rect(3) = horizSize;
-    rect(4) = verticalMajSize;
-    if sub_pos == 1 || sub_pos == 2
+    vertNum = floor(pos/nCols) + 1;
+    horzNum = mod(pos, nCols) + 1;
+
+    rect(1) = horizonEdge + (horzNum-1)*(horizSize+horiz);
+    if sub_pos > 0
         rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
     else
         % for image rasters:
-        rect(2) = bottom + (nRows-vertNum)*(verticalMajSize+verticalMaj);
+        rect(2) = bottom + (nRows-vertNum)*(verticalSize+verticalMaj);
     end
+    rect(3) = horizSize;
+    if sub_pos == 0
+        rect(4) = verticalSize;
+    elseif sub_pos < 3
+        rect(4) = verticalMajSize;
+    else
+        rect(4) = verticalMinSize;
+    end
+
 end
 
 % function [rect] = getAxisRect(pos)

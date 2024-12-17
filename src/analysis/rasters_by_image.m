@@ -13,10 +13,11 @@ end
 clusterFile = load(fullfile(trialFolder, 'clusterCharacteristics.mat'));
 allClusters = clusterFile.clusterCharacteristics;
 
-plotsPerPage = 48;
+
 responsiveClusters = allClusters(allClusters.numSelective > 0, :);
 log10_thresh = 3;
-nCols = 4; nRows = 4;
+nCols = 5; nRows = 8;
+plotsPerPage = nCols * nRows;
 
 if height(responsiveClusters) < 1
     return
