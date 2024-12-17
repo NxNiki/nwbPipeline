@@ -18,12 +18,15 @@ filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/%s
 % 1: skip existing files.
 skipExist = [0, 0, 0];  % [spike detection, spike code, spike clustering]
 
+% remove median across channels in each bundle:
+runCAR = true;
+
 % remove noises caused by power line interference:
-runRemovePLI = true;
+runRemovePLI = false;
 
 % On Mac studio with 10 cores and 64 GB memory:
 % max 4 tasks for movie paradigm (with sleep data)
 % max 10 tasks for screening
 maxNumCompThreads(5);
 
-batch_spikeSorting(1, 1, expIds, filePath, skipExist, runRemovePLI);
+batch_spikeSorting(1, 1, expIds, filePath, skipExist, runRemovePLI, runCAR);
