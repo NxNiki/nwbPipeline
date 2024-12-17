@@ -10,7 +10,6 @@ if nargin < 5
     checkResponse = false;
 end
 
-log10_thresh = 3;
 maxlocalMaxima = 5;
 maxLocalMaximaRatio = .5;
 maxLateRangeRatio = 1;
@@ -18,7 +17,7 @@ maxMeanStandardErr = 2;
 maxNoiseProminence = 2;
 maxWaveformsToInclude = 2500;
 
-trialsTag = {trials.trialTag};
+trialStimId = cell2mat({trials.imageID});
 stimOnsetTime = [trials.stimulusOnsetTime];
 responseOnsetTime = [trials.respondedAtTime];
 
@@ -38,13 +37,11 @@ if isfield(trials, 'patient')
 end
 clear trials
 
-imageNames = unique(trialsTag);
-if ~isempty(imageDir)
-    allVideoDir = dir(fullfile(imageDir, '*.mp4'));
-    allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)', 'match', 'once');
-    [videoNames, videoIdxes] = intersect(imageNames, allVideoTrialTags);
-    imageNames(videoIdxes) = [];
-end
+[imageNames, imageId] = getStimInfo(imageDir, '.jpg');
+[audioNames, audioId] = getStimInfo(imageDir, '.aiff');
+[videoNames, videoId] = getStimInfo(imageDir, '.mp4');
+imageNames = [imageNames(:); audioNames(:)];
+imageId = [imageId(:); audioId(:)];
 
 clusterFiles = dir(fullfile(spikeFolder, 'times_*.mat'));
 
@@ -58,27 +55,23 @@ else
     fprintf('calculateClusterCharacteristics: sampling frequency: %d\n', sr);
 end
 
-
 clusterCharacteristics = [];
 
 for i = 1:length(clusterFiles)
+    fprintf('process: %s\n', clusterFiles(i).name);
     info.csc_num = i;
     if info.csc_num == 129
         continue
     end
     clusterFileObj = matfile(fullfile(spikeFolder, clusterFiles(i).name));
     cluster_class = clusterFileObj.cluster_class;
-
-    if ismember('spikes', who(clusterFileObj))
-        spikes = clusterFileObj.spikes;
-        cluster_class(:, 2) = cluster_class(:, 2) / 1000;
-    else
-        rejectedSpikes = clusterFileObj.spikeIdxRejected;
-        spikeFileName = strrep(strrep(clusterFiles(i).name, 'times_', ''), '.mat', '_spikes.mat');
-        spikeFileObj = matfile(fullfile(spikeFolder, spikeFileName));
-        spikes = spikeFileObj.spikes;
-        spikes(rejectedSpikes, :) = [];
-    end
+    
+    % read spike waveforms:
+    rejectedSpikes = clusterFileObj.spikeIdxRejected;
+    spikeFileName = strrep(strrep(clusterFiles(i).name, 'times_', ''), '.mat', '_spikes.mat');
+    spikeFileObj = matfile(fullfile(spikeFolder, spikeFileName));
+    spikes = spikeFileObj.spikes;
+    spikes(rejectedSpikes, :) = [];
 
     % regular expression with lookbehind and lookahead
     pattern = '(?<=times_)G[A-D][1-4]-\w+(?=.mat)';
@@ -139,14 +132,14 @@ for i = 1:length(clusterFiles)
             info.waveDuration = 1000*(maxLocation - 1)/sr;
         end
         
-        [info.screeningInfo, info.numSelective, info.selectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:100:950));
+        [info.stim, info.numSelective, info.selectivity] = getScreeningInfo(stimOnsetTime, trialStimId, allSpikeTimes, imageNames, imageId, (0:100:1000), (50:100:950));
         
         if ~isempty(videoNames)
-            [info.videoScreeningInfo, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(stimOnsetTime, trialsTag, allSpikeTimes, log10_thresh, videoNames, (0:1000:10000), (500:1000:9500));
+            [info.video, info.videoNumSelective, info.videoSelectivity] = getScreeningInfo(stimOnsetTime, trialStimId, allSpikeTimes, videoNames, videoId, (0:1000:10000), (500:1000:9500));
         end
 
         if checkResponse
-            [info.responseScreeningInfo, info.responseNumSelective, info.responseSelectivity] = getScreeningInfo(responseOnsetTime, trialsTag, allSpikeTimes, log10_thresh, imageNames, (0:100:1000), (50:1000:950), [-1000, 0, 500]);
+            [info.response, info.responseNumSelective, info.responseSelectivity] = getScreeningInfo(responseOnsetTime, trialStimId, allSpikeTimes, imageNames, imageId, (0:100:1000), (50:1000:950), [-1000, 0, 500]);
         end
 
         clusterCharacteristics = [clusterCharacteristics; struct2table(info, 'AsArray', 1)];
@@ -157,14 +150,16 @@ clusterCharacteristics = sortrows(clusterCharacteristics, 1);
 
 end
 
-function [screeningInfo, numSelective, selectivity] = getScreeningInfo(stim_onsets, trialTag, allSpikeTimes, log10_thresh, imageNames, binEdges1, binEdges2, latencyWindow)
+function [screeningInfo, numSelective, selectivity] = getScreeningInfo(stim_onsets, allStimId, allSpikeTimes, stimNames, stimId, binEdges1, binEdges2, latencyWindow)
+
+log10_thresh = 3;
 
 if nargin < 8
     latencyWindow = [-500, 0, 1000];
 end
 
 screeningInfo = struct;
-numStimuli = length(imageNames);
+numStimuli = length(stimNames);
 
 [ baselineLatencies, ~ ] = getSpikeLatencies(stim_onsets, allSpikeTimes*1e3, [latencyWindow(1), latencyWindow(2)]);
 [ stimLatencies, ~ ] = getSpikeLatencies(stim_onsets, allSpikeTimes*1e3, [latencyWindow(2), latencyWindow(3)]);
@@ -185,13 +180,13 @@ allFR = zeros(1, numStimuli);
 allScores = zeros(1, numStimuli);
 
 for k = 1:numStimuli
-    screeningInfo(k).imageName = imageNames{k};
-    relevantTrials = find(strcmp(trialTag, imageNames{k}));
+    relevantTrials = allStimId==stimId(k);
 
     stimSpikes = median(sum(spikesToAllImages1(relevantTrials, :), 2));
     allFR(k) = stimSpikes;
     screeningInfo(k).spikes = allLatencies(relevantTrials);
-    screeningInfo(k).name = imageNames{k};
+    screeningInfo(k).stimName = stimNames{k};
+    screeningInfo(k).stimId = stimId(k);
 
     if stimSpikes < 3
         screeningInfo(k).score = 0;

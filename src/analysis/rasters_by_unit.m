@@ -1,76 +1,88 @@
-function [] = rasters_by_unit(subject, trialFolder, imageDirectory, plotResponsive, screeningType, targetLabel)
+function [] = rasters_by_unit(subject, trialFolder, stimDirectory, plotResponsive, stimuliType, targetLabel, outputPath)
 
-% screeningType: if "responseScreeningInfo", will create raster plot for
-% key response, this will give larger time window before key press,
-% otherwise if "screeningInfo", there will be a larger time window after
-% the stimuli.
+% stimuliType:
+%       "stim": for images and audio, there will be larger time window
+%       after the stimuli.
+%       "response": for key response, this will give larger time window 
+%       before key press,
+%       "video": for video stimuli, there will be a wider time window.
+% targetLabel:
+%       a struct with fields G[A-D][1-8] to add target of micro electrodes 
+%       in the brain.
 
-if nargin < 5
-    screeningType = 'screeningInfo';
+
+if ~exist('stimuliType', "var")
+    stimuliType = 'stim';
 end
 
-if nargin < 6
+if ~exist('targetLabel', "var")
     targetLabel = [];
 end
 
-outputPath = fullfile(trialFolder, ['raster_plots_', screeningType]);
+if ~exist('outputPath', "var") || isempty(outputPath)
+    outputPath = trialFolder;
+end
+
+outputPath = fullfile(outputPath, ['raster_plots_', stimuliType]);
+
 if ~exist(outputPath, "dir")
     mkdir(outputPath)
 end
 
 [clustersToPlot, sr] = getClusters(trialFolder, plotResponsive, targetLabel);
+totalNumStimuli = length(clustersToPlot{1, stimuliType}{1});
 
-close all;
-plotsPerPage = 17;
+eventColor = 'green';
+if strcmp(stimuliType, 'video')
+    clusterColLabel = 'videoNumSelective';
+    rasterNCol = 3; rasterNRow = 3;    
+    stimLimits = (-1000:2500:10000);
+    stimHistLimits = (-1000:500:10000);
+else
+    clusterColLabel = 'numSelective';
+    rasterNCol = 6; rasterNRow = 3;
+    
+    if strcmp(stimuliType, 'response')
+        stimLimits = (-1000:500:500);
+        stimHistLimits = (-1000:50:500);
+        eventColor = 'blue';
+    else
+        stimLimits = (-500:500:1000);
+        stimHistLimits = (-500:50:1000);
+    end
+end
 
-totalNumStimuli = length(clustersToPlot{1, screeningType}{1});
-pagesPerCluster =  ceil(clustersToPlot{:, 'numSelective'}/plotsPerPage); %ceil(totalNumStimuli/plotsPerPage)*ones(size(responsiveClusters, 1), 1);
+plotsPerPage = rasterNCol * rasterNRow - 1;
+pagesPerCluster =  ceil(clustersToPlot{:, clusterColLabel}/plotsPerPage); %ceil(totalNumStimuli/plotsPerPage)*ones(size(responsiveClusters, 1), 1);
 pagesPerCluster(pagesPerCluster==0) = 1;
 numPages = sum(pagesPerCluster);
 
 % titleRect = [0 .9625 1 .025];
 
-allImageDir = dir(fullfile(imageDirectory, '*.jpg'));
-allImageTrialTags = regexp({allImageDir.name}, '.*?(?=_id)','match','once');
-
-allVideoDir = dir(fullfile(imageDirectory, '*.mp4'));
-allVideoTrialTags = regexp({allVideoDir.name}, '.*?(?=_id)','match','once');
-
-allAudioDir = dir(fullfile(imageDirectory, '*.aiff'));
-allAudioTrialTags = regexp({allAudioDir.name}, '.*?(?=_id)','match','once');
-
+[stimTags, stimIds, stimNames] = getStimInfo(stimDirectory);
 figNames = cell(1, numPages);
 
-imageLimits = (-500:500:1000);
-imageHistLimits = (-500:50:1000);
-% audioLimits = (-500:1000:2000);
-% audioHistLimits = (-500:100:2000);
-audioLimits = (-500:500:1000);
-audioHistLimits = (-500:50:1000);
-videoLimits = (-1000:2500:10000);
-videoHistLimits = (-1000:500:10000);
-responseLimits = (-1000:500:500);
-responseHistLimits = (-1000:50:500);
-
 parfor i = 1:numPages
-    tic
-    figNames{i} = fullfile(outputPath, ['rasters_', screeningType, '_p' num2str(i) '.pdf']);
-    figure('Name',['Page ',num2str(i)],'units','normalized','position',[0.0238    0.0736    0.8    0.9],...
-        'PaperUnits','inches','PaperPosition',[0 0 11 8.5],'PaperOrientation','landscape', 'Visible', 'off');
-    set(gcf, 'Color', 'white');
 
+    figNames{i} = fullfile(outputPath, ['rasters_', stimuliType, '_p' num2str(i) '.pdf']);
+    figure('Name', ['Page ',num2str(i)], ...
+        'units','normalized', ...
+        'position',[0.0238    0.0736    0.8    0.9],...
+        'PaperUnits','inches', ...
+        'PaperPosition',[0 0 11 8.5], ...
+        'PaperOrientation','landscape', ...
+        'Visible', 'off');
+    set(gcf, 'Color', 'white');
     disp([num2str(i) ' of ' num2str(numPages)]);
 
     cumSumClusters = [0; cumsum(pagesPerCluster)];
     unitToPlot = find(i - cumSumClusters > 0, 1, 'last');
     posInPage = i - cumSumClusters(unitToPlot);
-    nPagesInUnit = cumSumClusters(unitToPlot+1)-cumSumClusters(unitToPlot);
-    clusterInfo = struct2table(clustersToPlot{unitToPlot, screeningType}{1});
+    nPagesInUnit = cumSumClusters(unitToPlot + 1) - cumSumClusters(unitToPlot);
+    clusterInfo = struct2table(clustersToPlot{unitToPlot, stimuliType}{1});
     clusterInfo = sortrows(clusterInfo, 'score', 'descend');
 
-    % clusterInfoVideo = struct2table(clustersToPlot{unitToPlot, 'videoScreeningInfo'}{1});
-    % clusterInfoVideo = sortrows(clusterInfoVideo,'score','descend');
-
+    % plot spike waveforms:
     axes1 = axes(gcf, 'Position', getAxisRect(0, 1));
     plot(axes1, (1:74)/sr*1000, clustersToPlot{unitToPlot, 'allWaveforms'}{1}', 'Color', 'blue');
     hold(axes1, 'on');
@@ -84,141 +96,106 @@ parfor i = 1:numPages
     end
     xlim(axes1, [0, 74/sr*1000]);
 
+    % plot histgram of inter spike intervals:
     axes2 = axes(gcf, 'Position', getAxisRect(0, 2));
     ISITimes = 1000*diff(clustersToPlot{unitToPlot, 'allTimes'}{1}); 
     ISITimes(ISITimes>100)=[];
-    histogram(axes2, ISITimes, 0:10:100);
+    histogram(axes2, ISITimes, 0:5:100);
     xlim(axes2, [0 100]);
-
-    %     allSpikeTimes = clustersToPlot{unitToPlot, 'allTimes'}{1};
-    %     allTimeStamps = 0:1/1000:ceil(allSpikeTimes(end));
-    %     allSpikeTrace = zeros(1, length(allTimeStamps));
-    %     allSpikeTrace(round(allSpikeTimes*1e3)) = 1;
-    %     smoothSpikeTrace = smooth(allSpikeTrace, 1000)*1000;
-    %     smoothSpikeTrace(smoothSpikeTrace > mean(smoothSpikeTrace + 5*std(smoothSpikeTrace))) = 0;
-    %     plot(axes2, allTimeStamps, smoothSpikeTrace');
-    %     xlim(axes2, [0 ceil(allSpikeTimes(end))]);
 
     unitsToPlot = (posInPage-1)*plotsPerPage + (1:plotsPerPage);
     unitsToPlot(unitsToPlot > totalNumStimuli) = [];
 
-
     for j = 1:length(unitsToPlot)
 
-        imageAxes = axes(gcf, 'Position', getAxisRect(j, 1));
-        thisImageTrialTag = clusterInfo{unitsToPlot(j), 'imageName'}{1};
-        imageLookupIdx = find(strcmp(allImageTrialTags, thisImageTrialTag), 1);
+        stimId = clusterInfo{unitsToPlot(j), 'stimId'};
+        stimLookupIdx = stimId == stimIds;
 
-        % thisVideoTrialTag = clusterInfoVideo{unitsToPlot(j), 'imageName'}{1};
-        videoLookupIdx = find(strcmp(allVideoTrialTags, thisImageTrialTag), 1);
-        audioLookupIdx = find(strcmp(allAudioTrialTags, thisImageTrialTag), 1);
-        if ~isempty(imageLookupIdx)
-            imageFile = fullfile(imageDirectory, allImageDir(imageLookupIdx).name);
-            fprintf('image: %s\n', allImageDir(imageLookupIdx).name)
-            image = imread(imageFile);
+        if all(stimLookupIdx==0)
+            warning('no matched stimID found.');
+            continue
+        end
+
+        if sum(stimLookupIdx) > 1
+            warning('more than one stim found with ID: %d\n', stimId);
+        end
+
+        stimName = stimNames{stimLookupIdx}; % this will return the first stim if multiple stim with stimId found (which should not happen)
+        stimFile = fullfile(stimDirectory, stimName);
+        fprintf('stimulus: %s\n', stimName)
+        
+        % plot stim (image/sound wave) at the top of each rectangle
+        % position:
+        stimAxes = axes(gcf, 'Position', getAxisRect(j, 1, rasterNCol, rasterNRow));
+        if endsWith(stimName, '.jpg') || endsWith(stimName, '.png')
+            image = imread(stimFile);
             image = imresize(image, .2);
-            imshow(image, 'Parent', imageAxes);
-        elseif ~isempty(videoLookupIdx)
-            try
-                videoFile = fullfile(imageDirectory, allVideoDir(videoLookupIdx).name);
-                fprintf('video: %s\n', allVideoDir(videoLookupIdx).name)
-                [y, Fs] = audioread(videoFile);
-                plot(imageAxes, 1000/Fs*(1:length(y)), y(:, 1));
-            catch
-                warning('audio is not loaded successfully: %s', fullfile(imageDirectory, allVideoDir(videoLookupIdx).name))
-                
-            end
-            xlim(imageAxes, [videoLimits(1), videoLimits(2)]);
-        elseif ~isempty(audioLookupIdx)
-            [y, Fs] = audioread(fullfile(imageDirectory, allAudioDir(audioLookupIdx).name));
-            plot(imageAxes, 1000/Fs*(1:length(y)), y(:, 1));
-            xlim(imageAxes, [audioLimits(1), audioLimits(end)]);
-        end
-        if any(strcmp('responseOnset',fieldnames(clusterInfo)))% isfield(clusterInfo, 'responseOnset')
-            try
-                responseOnset = clusterInfo{unitsToPlot(j), 'responseOnset'}{1};
-            catch
-                responseOnset = clusterInfo{unitsToPlot(j), 'responseOnset'};
-            end
+            imshow(image, 'Parent', stimAxes);
         else
-            responseOnset = [];
+            try
+                [y, Fs] = audioread(stimFile);
+                plot(stimAxes, 1000/Fs*(1:length(y)), y(:, 1));
+                xlim(stimAxes, [stimLimits(1), stimLimits(end)]);
+            catch
+                warning('audio is not loaded successfully: %s', fullfile(stimDirectory, stimName))
+            end
         end
-        if length(thisImageTrialTag)>20, thisImageTrialTag = thisImageTrialTag(1:20);end
-        if responseOnset
-            title(imageAxes, [strrep(thisImageTrialTag, '_', '\_'), ' (' num2str(round(clusterInfo{unitsToPlot(j), 'score'},1)) '), ' num2str(round(responseOnset)) ' ms'], 'FontSize', 8,'Interpreter','tex');
+
+        responseOnset = [];
+        if any(strcmp('responseOnset', fieldnames(clusterInfo)))% isfield(clusterInfo, 'responseOnset')
+            responseOnset = clusterInfo{unitsToPlot(j), 'responseOnset'};
+        end
+        if iscell(responseOnset)
+            responseOnset = mean(cell2mat(responseOnset));
         else
-            title(imageAxes, [strrep(thisImageTrialTag, '_', '\_'), ' (' num2str(round(clusterInfo{unitsToPlot(j), 'score'},1)) ')'], 'FontSize', 8,'Interpreter','tex');
+            responseOnset = mean(responseOnset);
         end
-        rasterAxes = axes(gcf, 'Position', getAxisRect(j, 2));
+
+        stimTag = stimTags{stimLookupIdx};
+        stimTag = stimTag(1: min(20, length(stimTag)));
+        axesTitle = [strrep(stimTag, '_', '\_'), sprintf(': (%.1f), %d ms', clusterInfo{unitsToPlot(j), 'score'}, round(responseOnset))];
+        title(stimAxes, axesTitle, 'FontSize', 8,'Interpreter','tex');
+
+        % plot rasters:
+        rasterAxes = axes(gcf, 'Position', getAxisRect(j, 2 , rasterNCol, rasterNRow));
         if iscell(clusterInfo{unitsToPlot(j), 'spikes'}) && length(clusterInfo{unitsToPlot(j), 'spikes'}) == 1
             spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'}{1};
         else
-            spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'}; %{1}
+            spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'};
         end
 
-        stimColor = 'green';
+        hold(rasterAxes, 'on');
         for k = 1:length(spikeTimes)
             if numel(spikeTimes{k}) > 0
                 trialSpikeTimes = spikeTimes{k};
-                if ~isempty(imageLookupIdx)
-                    if strcmp(screeningType, 'screeningInfo')
-                        trialSpikeTimes(trialSpikeTimes < imageLimits(1) | trialSpikeTimes > imageLimits(end)) = [];
-                    else
-                        trialSpikeTimes(trialSpikeTimes < responseLimits(1) | trialSpikeTimes > responseLimits(end)) = [];
-                        stimColor = 'blue';
-                    end
-                elseif ~isempty(videoLookupIdx)
-                    trialSpikeTimes(trialSpikeTimes < videoLimits(1) | trialSpikeTimes > videoLimits(end)) = [];
-                elseif ~isempty(audioLookupIdx)
-                    trialSpikeTimes(trialSpikeTimes < audioLimits(1) | trialSpikeTimes > audioLimits(end)) = [];
-                else
-                    trialSpikeTimes(trialSpikeTimes < imageLimits(1) | trialSpikeTimes > imageLimits(end)) = [];
-                end
+                trialSpikeTimes(trialSpikeTimes < stimLimits(1) | trialSpikeTimes > stimLimits(end)) = [];
                 spikeTimesToPlot = [trialSpikeTimes, trialSpikeTimes];
                 thisTrialVertPos = repmat([k-.4, k+.4], numel(trialSpikeTimes), 1);
                 plot(rasterAxes, spikeTimesToPlot', thisTrialVertPos', 'Color', 'black');
-                hold(rasterAxes, 'on');
             end
         end
+        yLimit = [.6, length(spikeTimes)+.4];
+        ylim(rasterAxes, yLimit);
+        xlim(rasterAxes, [stimLimits(1), stimLimits(end)]); 
+        xticks(rasterAxes, stimLimits);
+        
+        % add vertical line at onset time:
+        plot(rasterAxes, [0, 0], yLimit, 'Color', eventColor);
 
-        ylim(rasterAxes, [.6, length(spikeTimes)+.4]);
-        histLimits = imageHistLimits;
-        histXTicks = imageLimits;
-        if ~isempty(imageLookupIdx) && strcmp(screeningType, 'responseScreeningInfo')
-            xlim(rasterAxes, [responseLimits(1), responseLimits(end)]); 
-            xticks(rasterAxes, responseLimits);
-            histLimits = responseHistLimits;
-            histXTicks = responseLimits;
-        elseif ~isempty(audioLookupIdx)
-            xlim(rasterAxes, [audioLimits(1), audioLimits(end)]); 
-            xticks(rasterAxes, audioLimits);
-            histLimits = audioHistLimits;
-            histXTicks = audioLimits;
-        elseif ~isempty(videoLookupIdx)
-            xlim(rasterAxes, [videoLimits(1), videoLimits(end)]); 
-            xticks(rasterAxes, videoLimits);
-            histLimits = videoHistLimits;
-            histXTicks = videoLimits;
-        else
-            xlim(rasterAxes, [imageLimits(1), imageLimits(end)]); 
-            xticks(rasterAxes, imageLimits);
-        end
-
-        plot(rasterAxes, [0, 0], [.6, length(spikeTimes)+.4], 'Color', stimColor);
-        if responseOnset
-            plot(rasterAxes, [responseOnset, responseOnset], [.6, length(spikeTimes)+.4], 'Color', 'red');
+        if ~isempty(responseOnset) && ~strcmp(stimuliType, 'response')
+            plot(rasterAxes, [responseOnset, responseOnset], yLimit, 'Color', 'red');
         end
         hold(rasterAxes, 'off');
 
-        histAxes = axes(gcf, 'Position', getAxisRect(j, 3));
+        histAxes = axes(gcf, 'Position', getAxisRect(j, 3, rasterNCol, rasterNRow));
         allSpikeTimes = vertcat(spikeTimes{:});
 
-        histogram(histAxes, allSpikeTimes, histLimits);
-        xlim(histAxes, [histLimits(1), histLimits(end)]);
-        xticks(histAxes, histXTicks);
+        histogram(histAxes, allSpikeTimes, stimHistLimits);
+        xlim(histAxes, [stimHistLimits(1), stimHistLimits(end)]);
+        xticks(histAxes, stimLimits);
     end
 
-    thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}) ' Unit ' num2str(clustersToPlot{unitToPlot, 'cluster_num'}) ' (' num2str(posInPage) '/' num2str(nPagesInUnit) ')'];
+    thisTitle = [cell2mat(clustersToPlot{unitToPlot, 'cluster_region'}), sprintf(' Unit %d (%d/%d)', clustersToPlot{unitToPlot, 'cluster_num'}, posInPage, nPagesInUnit)];
     annotation('textbox', [0 .9625 1 .025], ...
         'units', 'normalized', ...
         'String', thisTitle, ...
@@ -231,14 +208,12 @@ parfor i = 1:numPages
     xtickangle(findobj(gcf, 'type', 'axes'), 0);
     print(gcf,'-dpdf', '-r100', '-vector', figNames{i});
 
-    close all;
-    toc
 end
 
 if plotResponsive
-    merge_fn = ['Rasters_p' num2str(subject), '_', screeningType, '_responsiveUnits'];
+    merge_fn = ['Rasters_p' num2str(subject), '_', stimuliType, '_responsiveUnits'];
 else
-    merge_fn = ['Rasters_p' num2str(subject) '_', screeningType, '_allUnits'];
+    merge_fn = ['Rasters_p' num2str(subject) '_', stimuliType, '_allUnits'];
 end
 
 mergeSegments = [1:50:length(figNames), length(figNames)+1];
@@ -249,37 +224,10 @@ for i = 2:length(mergeSegments)
     else
         movefile(filenames1{1}, fullfile(outputPath, sprintf('%s_%d_%d.pdf', merge_fn, mergeSegments(i-1), (mergeSegments(i)-1))))
     end
+    cellfun(@delete, filenames1);
 end
 
-close all;
 end
 
-function [rect] = getAxisRect(pos, sub_pos)
-    pos = pos + 1;
-    vertNum = floor((pos-1)/6)+1;
-    horzNum = mod(pos-1, 6) + 1;
 
-    nCols = 6; nRows = 3;
-    top = .025; bottom = .025; edge = .025; verticalMaj = .05; verticalMin = .025; horiz = .025;
-    verticalMajSize = 2/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-    verticalMinSize = 1/5*(1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
-    horizSize = (1 - 2*edge - (nCols-1)*horiz)/nCols;
-
-    if sub_pos == 1
-        subpos_factor = verticalMinSize + verticalMajSize + 2 * verticalMin;
-    elseif sub_pos == 2
-        subpos_factor = verticalMinSize + verticalMin;
-    else
-        subpos_factor = 0;
-    end
-
-    rect(1) = edge + (horzNum-1)*(horizSize+horiz);
-    rect(2) = bottom + (nRows-vertNum)*(2*verticalMajSize+verticalMinSize+verticalMaj+2*verticalMin) + subpos_factor;
-    rect(3) = horizSize;
-    if sub_pos == 1 || sub_pos == 2
-        rect(4) = verticalMajSize;
-    else
-        rect(4) = verticalMinSize;
-    end
-end
 
