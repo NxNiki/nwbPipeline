@@ -7,14 +7,15 @@ scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
 skipExist = 1;
-expIds = 1;
+expIds = 3;
 filePath = {...
-    '/Volumes/DATA/BRData/SubjectData/D578/EXp1_Screening_1/20241216-130813',...
+    '/Volumes/DATA/BRData/SubjectData/578/EXP3_ABCD/20241216-180000',...
     };
 
-outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/578_Screening/';
+outFilePath = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/ABCD/578_ABCD/';
 
-montageConfigFile = '/Volumes/DATA/BRData/SubjectData/D578/EXp1_Screening_1/montage_Patient-568_exp-1_2024-12-16_14-36-02.json';
+montageConfigFile = '/Volumes/DATA/BRData/SubjectData/578/montage_Patient-568_exp-1_2024-12-16_14-36-02.json';
+
 % montageConfigFile = [];
 [renameMacroChannels, renameMicroChannels] = createChannels(montageConfigFile);
 
