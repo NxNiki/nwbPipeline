@@ -120,6 +120,10 @@ parfor fnum = 1:length(spikeFiles)
 
     spikeCodes = spikeCodeFileObj.spikeCodes;
 
+    if isempty(spikeCodes)
+        continue;
+    end
+
     spikeFileObj = matfile(spikeFiles{fnum}, 'Writable', false);
     duration = spikeFileObj.duration; % expect duration in seconds.
     spikeTimestamps = spikeFileObj.spikeTimestamps;

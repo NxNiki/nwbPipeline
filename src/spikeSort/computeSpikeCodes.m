@@ -2,6 +2,7 @@ function spikeCodes = computeSpikeCodes(spikes, spikeTimestamps, par, inputStruc
 % spikeTimestamp should be in seconds.
 
 if isempty(spikeTimestamps)
+    warning('no spikes detected!')
     spikeCodes = [];
     return
 end
