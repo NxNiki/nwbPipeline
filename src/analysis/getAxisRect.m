@@ -9,19 +9,18 @@ function [rect] = getAxisRect(pos, sub_pos, nCols, nRows)
         nCols = 6; nRows = 3;
     end
 
-
-
     top = .025; bottom = .025; horizonEdge = .025; horiz = .025;
-    verticalMaj = .05; verticalMin = .025; 
+    verticalMaj = .05;
     if sub_pos == 0
-        % for image rasters, only one raster plot in each block:
+        % for rasters by image, only one raster plot in each block:
         imageVert = .15;
         pos = pos - 1;
         verticalSize = (1 - top - bottom - imageVert - nRows*verticalMaj)/nRows;
         horizSize = (1 - 2*horizonEdge - (nCols-1)*horiz)/nCols;        
     else
-        % unit rasters, show image, raster plot and histgram.
-        verticalMaj = .05; verticalMin = .025; 
+        % for rasters by unit, show image, raster plot and histgram in each 
+        % block.
+        verticalMin = .025; 
         blockHeight = (1 - top - bottom - nRows*verticalMaj - 2*nRows*verticalMin)/nRows;
         verticalMajSize = 2/5 * blockHeight;
         verticalMinSize = 1/5 * blockHeight;

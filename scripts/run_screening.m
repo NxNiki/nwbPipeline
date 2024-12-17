@@ -4,8 +4,8 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 578;
-expId = [1];
+patient = 579;
+expId = [4];
 filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening', patient);
 skipExist = [1, 1, 1];
 
@@ -30,10 +30,10 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D578/578_screening_1/578-16-Dec-2024-13-4-22/from laptop/ttlLog578-16-Dec-2024-13-4-22.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening_2_Behavioural/579-12-Dec-2024-11-22-26/from laptop/ttlLog579-12-Dec-2024-11-22-26.mat';
     };
 
-imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D578/screening_1_stimuli';
+imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 2 Stimuli';
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
 outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
@@ -73,17 +73,17 @@ end
 %%
 % generate rasters plots by units for image and audio stimuli:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath)
+% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath)
 
 % generate raster plots by units for video stimuli:
-% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
 % rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
 % generate raster plots organized by image:
 rasters_by_image(patient, expFilePath, imageDirectory, outputPath);
 
 % generate raster plots with response time as onset:
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath)
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath)
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath)
+% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath)
 
 %%

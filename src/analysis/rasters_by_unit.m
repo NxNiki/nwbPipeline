@@ -36,13 +36,12 @@ eventColor = 'green';
 if strcmp(stimuliType, 'video')
     clusterColLabel = 'videoNumSelective';
     rasterNCol = 3; rasterNRow = 3;    
-    plotsPerPage = 8;
     stimLimits = (-1000:2500:10000);
     stimHistLimits = (-1000:500:10000);
 else
     clusterColLabel = 'numSelective';
     rasterNCol = 6; rasterNRow = 3;
-    plotsPerPage = 17;
+    
     if strcmp(stimuliType, 'response')
         stimLimits = (-1000:500:500);
         stimHistLimits = (-1000:50:500);
@@ -52,6 +51,8 @@ else
         stimHistLimits = (-500:50:1000);
     end
 end
+
+plotsPerPage = rasterNCol * rasterNRow - 1;
 pagesPerCluster =  ceil(clustersToPlot{:, clusterColLabel}/plotsPerPage); %ceil(totalNumStimuli/plotsPerPage)*ones(size(responsiveClusters, 1), 1);
 pagesPerCluster(pagesPerCluster==0) = 1;
 numPages = sum(pagesPerCluster);
@@ -81,6 +82,7 @@ parfor i = 1:numPages
     clusterInfo = struct2table(clustersToPlot{unitToPlot, stimuliType}{1});
     clusterInfo = sortrows(clusterInfo, 'score', 'descend');
 
+    % plot spike waveforms:
     axes1 = axes(gcf, 'Position', getAxisRect(0, 1));
     plot(axes1, (1:74)/sr*1000, clustersToPlot{unitToPlot, 'allWaveforms'}{1}', 'Color', 'blue');
     hold(axes1, 'on');
@@ -94,10 +96,11 @@ parfor i = 1:numPages
     end
     xlim(axes1, [0, 74/sr*1000]);
 
+    % plot histgram of inter spike intervals:
     axes2 = axes(gcf, 'Position', getAxisRect(0, 2));
     ISITimes = 1000*diff(clustersToPlot{unitToPlot, 'allTimes'}{1}); 
     ISITimes(ISITimes>100)=[];
-    histogram(axes2, ISITimes, 0:10:100);
+    histogram(axes2, ISITimes, 0:5:100);
     xlim(axes2, [0 100]);
 
     unitsToPlot = (posInPage-1)*plotsPerPage + (1:plotsPerPage);
@@ -105,18 +108,25 @@ parfor i = 1:numPages
 
     for j = 1:length(unitsToPlot)
 
-        stimAxes = axes(gcf, 'Position', getAxisRect(j, 1, rasterNCol, rasterNRow));
         stimId = clusterInfo{unitsToPlot(j), 'stimId'};
         stimLookupIdx = stimId == stimIds;
 
         if all(stimLookupIdx==0)
-            continue;
+            warning('no matched stimID found.');
+            continue
         end
 
-        stimName = stimNames{stimLookupIdx};
+        if sum(stimLookupIdx) > 1
+            warning('more than one stim found with ID: %d\n', stimId);
+        end
+
+        stimName = stimNames{stimLookupIdx}; % this will return the first stim if multiple stim with stimId found (which should not happen)
         stimFile = fullfile(stimDirectory, stimName);
         fprintf('stimulus: %s\n', stimName)
-
+        
+        % plot stim (image/sound wave) at the top of each rectangle
+        % position:
+        stimAxes = axes(gcf, 'Position', getAxisRect(j, 1, rasterNCol, rasterNRow));
         if endsWith(stimName, '.jpg') || endsWith(stimName, '.png')
             image = imread(stimFile);
             image = imresize(image, .2);
@@ -136,12 +146,12 @@ parfor i = 1:numPages
             responseOnset = clusterInfo{unitsToPlot(j), 'responseOnset'};
         end
         if iscell(responseOnset)
-            responseOnset = responseOnset{1};
+            responseOnset = mean(cell2mat(responseOnset));
         end
 
         stimTag = stimTags{stimLookupIdx};
         stimTag = stimTag(1: min(20, length(stimTag)));
-        axesTitle = [strrep(stimTag, '_', '\_'), sprintf(' (%.1f), %d ms', clusterInfo{unitsToPlot(j), 'score'}, round(responseOnset))];
+        axesTitle = [strrep(stimTag, '_', '\_'), sprintf(': (%.1f), %d ms', clusterInfo{unitsToPlot(j), 'score'}, round(responseOnset))];
         title(stimAxes, axesTitle, 'FontSize', 8,'Interpreter','tex');
 
         % plot rasters:
@@ -152,6 +162,7 @@ parfor i = 1:numPages
             spikeTimes = clusterInfo{unitsToPlot(j), 'spikes'};
         end
 
+        hold(rasterAxes, 'on');
         for k = 1:length(spikeTimes)
             if numel(spikeTimes{k}) > 0
                 trialSpikeTimes = spikeTimes{k};
@@ -159,18 +170,18 @@ parfor i = 1:numPages
                 spikeTimesToPlot = [trialSpikeTimes, trialSpikeTimes];
                 thisTrialVertPos = repmat([k-.4, k+.4], numel(trialSpikeTimes), 1);
                 plot(rasterAxes, spikeTimesToPlot', thisTrialVertPos', 'Color', 'black');
-                hold(rasterAxes, 'on');
             end
         end
-
-        ylim(rasterAxes, [.6, length(spikeTimes)+.4]);
+        yLimit = [.6, length(spikeTimes)+.4];
+        ylim(rasterAxes, yLimit);
         xlim(rasterAxes, [stimLimits(1), stimLimits(end)]); 
         xticks(rasterAxes, stimLimits);
+        
+        % add vertical line at onset time:
+        plot(rasterAxes, [0, 0], yLimit, 'Color', eventColor);
 
-        plot(rasterAxes, [0, 0], [.6, length(spikeTimes)+.4], 'Color', eventColor);
-
-        if ~isempty(responseOnset) && ~isnan(responseOnset(1)) && ~strcmp(stimuliType, 'response')
-            plot(rasterAxes, [responseOnset, responseOnset], [.6, length(spikeTimes)+.4], 'Color', 'red');
+        if ~isnan(responseOnset(1)) && ~strcmp(stimuliType, 'response')
+            plot(rasterAxes, [responseOnset, responseOnset], yLimit, 'Color', 'red');
         end
         hold(rasterAxes, 'off');
 
