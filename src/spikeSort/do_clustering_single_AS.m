@@ -5,8 +5,14 @@ spikeFileObj = matfile(spikeFile, "Writable", true);
 spikes = spikeFileObj.spikes;
 param = spikeFileObj.param;
 
-spikeCodeFileObj = matfile(spikeCodeFile);
-spikeCodes = spikeCodeFileObj.spikeCodes;
+if ~exist(spikeCodeFile, "file")
+    spikeCodes = [];
+else
+    spikeCodeFileObj = matfile(spikeCodeFile);
+    spikeCodes = spikeCodeFileObj.spikeCodes;
+end
+
+
 
 par = set_parameters;
 par.sr = param.sr;
