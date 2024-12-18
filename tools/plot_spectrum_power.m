@@ -1,4 +1,5 @@
 function plot_spectrum_power(data, timerange, sampling_rate, remove_PLI)
+% check spectrum power of raw data with and without removePLI.
 
 if nargin < 3
     sampling_rate = 32000;
