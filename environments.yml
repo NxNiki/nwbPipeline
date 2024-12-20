@@ -1,0 +1,11 @@
+name: nwbPipeline
+channels:
+  - pennmem
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - ptsa
+  - pip
+  - pip:
+      - poetry

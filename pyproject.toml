@@ -25,10 +25,10 @@ mat73 = "^0.65"
 jupyter = "^1.1.1"
 scikit-learn = "^1.5.2"
 nilearn = "^0.10.4"
-mne = "^1.8.0"
+mne = "^1.9.0"
 neo = "^0.13.3"
 hdmf = "^3.14.4"
-tqdm = "4.66.1"
+tqdm = "^4.66.1"
 
 [tool.poetry.dev-dependencies]
 black = "^23.0"
@@ -38,6 +38,7 @@ pylint = "^3.3.1"
 pre-commit = "^3.7.1"
 openpyxl = "^3.1.5"
 git-filter-repo = "2.27.1"
+# ptsa = { git = "https://github.com/pennmem/ptsa.git", name = "ptsa", rev = "v3.0.5" }
 
 [tool.isort]
 profile = "black"
