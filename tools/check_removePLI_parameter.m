@@ -3,7 +3,8 @@
 % cscFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/578_Screening/Experiment-1/CSC_micro/GB2-LOF3.mat';
 % cscFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/578_Screening/Experiment-1/CSC_micro/GA1-LEC1.mat';
 % cscFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/578_Screening/Experiment-1/CSC_micro/GA4-LFSG1.mat';
-cscFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/579_Screening/Experiment-2/CSC_micro/GA4-RFSG6_001.mat';
+% cscFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/579_Screening/Experiment-2/CSC_micro/GA4-RFSG6_001.mat';
+cscFile = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/579_Screening/Experiment-2/CSC_macro/RFSG4_001.mat';
 
 removePliParam.M = 50; % number of harmonics to remove
 removePliParam.B = [50 .2 1];
@@ -13,6 +14,7 @@ removePliParam.f_ax = 60;
 flimits = [0, 65];
 
 [data, samplingInterval] = readCSC(cscFile);
+fprintf('sampling rate: %d\n', 1/samplingInterval);
 % data = data(1:min(length(data), 5e7));
 
 figure('Position', [100, 100, 1400, 900]);
