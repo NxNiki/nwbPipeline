@@ -1,4 +1,4 @@
-function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist, runRemovePLI, runCAR)
+function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist, runRemovePLI, runCAR, runSpikeReject)
     % run spike detection and spike sorting to the unpacked data:
     % run can modify this script and run on different patients/exp when
     % at least one previous job is running (a temporary job script is created).
@@ -20,6 +20,10 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
 
     if nargin < 7
         runCAR = false;
+    end
+
+    if ~exist('runSpikeReject', 'var')
+        runSpikeReject = true;
     end
 
     %% load file names micro data:
@@ -67,8 +71,10 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     disp('Spike Detection Finished!')
 
     %% spike clustering:
-
-    spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
+    spikeCodeFiles = [];
+    if runSpikeReject
+        spikeCodeFiles = getSpikeCodes(spikeFiles, outputPath, skipExist(2));
+    end
     spikeClustering(spikeFiles, spikeCodeFiles, outputPath, skipExist(3));
 
     disp('Spike Clustering Finished!')

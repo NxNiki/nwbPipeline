@@ -5,14 +5,12 @@ spikeFileObj = matfile(spikeFile, "Writable", true);
 spikes = spikeFileObj.spikes;
 param = spikeFileObj.param;
 
-if ~exist(spikeCodeFile, "file")
+if isempty(spikeCodeFile) || ~exist(spikeCodeFile, "file")
     spikeCodes = [];
 else
     spikeCodeFileObj = matfile(spikeCodeFile);
     spikeCodes = spikeCodeFileObj.spikeCodes;
 end
-
-
 
 par = set_parameters;
 par.sr = param.sr;
