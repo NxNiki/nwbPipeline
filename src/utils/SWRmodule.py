@@ -8,7 +8,7 @@ import functools
 import datetime
 import scipy
 
-from general import *
+from utils.general import *
 
 # all the unique sub names for FR tasks in df. Need fixed list so can do 40/60 data split
 # note that for FR1 this was before localization.pairs pipeline was added.
