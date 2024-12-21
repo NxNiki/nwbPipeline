@@ -36,8 +36,8 @@ poetry install
 
 If you do not want to use poetry, install via pip directly:
 ```
-pip install requirements.txt
-pip install requirements_dev.txt
+pip install -r requirements.txt
+pip install -r requirements_dev.txt
 ```
 
 ### Set montage
@@ -154,12 +154,6 @@ https://github.com/NeurodataWithoutBorders/matnwb/blob/master/tutorials/convertT
 https://github.com/rutishauserlab/recogmem-release-NWB/blob/master/RutishauserLabtoNWB/events/newolddelay/matlab/export/NWBexport_demo.m
 
 #### Read NWB with Python
-
-It is recommended that a virtual environment be started for this project. Then install dependencies for Python:
-
-```
-pip install -r requirements.txt
-```
 
 Start jupyter-notebook in a terminal:
 
