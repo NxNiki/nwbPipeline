@@ -18,6 +18,28 @@ It is recommended to download the latest release version, which has a smaller si
 
 `batch`: Pipelines to run on SGE.
 
+### Set environment:
+
+create a conda environment:
+```
+conda create --file environments.yml
+```
+This will install python and package ptsa (which is not managed by pip) in the virtual environment.
+Then activate the conda environment:
+```
+conda activate nwbPipeline
+```
+Install python packages with poetry:
+```
+poetry install
+```
+
+If you do not want to use poetry, install via pip directly:
+```
+pip install requirements.txt
+pip install requirements_dev.txt
+```
+
 ### Set montage
 
 Run `MontageConfigUI.m` to open the UI to set the montage:
