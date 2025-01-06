@@ -4,9 +4,8 @@ This script checks channel names of macro files from the Neuralynx system.
 The macro files may be incorrectly named due to mistake in the config file. This script will read the digitized montage
 file (.csv). And confirm the channel name in .ncs file is consistent to what is expected from the montage file.
 
-This script will create two files in the montage folder if there are unmatched channels:
-<patient_id>_file_unmatch.csv has files that does not have corresponding channels in the montage file.
-<patient_id>_montage_unmatch.csv has channels that does not have corresponding files in the Neuralynx directory.
+This script will create a file in the montage folder with channel name and id for the .ncs files and for what should be
+expected based on the montage file.
 """
 
 import csv
