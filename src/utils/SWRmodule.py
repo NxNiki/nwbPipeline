@@ -1305,7 +1305,7 @@ def downsampleBinary(array,factor):
             array_save = superVstack(array_save,np.round(resample(array[t],new_sampling)))
     return array_save
 
-def ptsa_to_mne(eegs,time_length): # in ms
+def ptsa_to_mne(eegs, time_length): # in ms
     # convert ptsa to mne    
     import mne
 

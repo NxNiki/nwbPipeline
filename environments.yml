@@ -5,7 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.10
-  # - ptsa this package has import (and perhaps installing) error
+  - ptsa=3.0.5  # this package has import (and perhaps installing) error, TimeSeries works
   - pip
   - pip:
       - poetry
