@@ -245,7 +245,7 @@ def read_csc(filename: str) -> Tuple[npt.NDArray[np.float_], float]:
     mat_data = load_mat_file(filename)
     csc_signal = mat_data["data"].flatten()
 
-    # Check if the file contains signalRemovePLI
+    # Check if the file contains ADBitVolts
     if "ADBitVolts" in mat_data and not np.isnan(mat_data["ADBitVolts"]):
         csc_signal = (
             csc_signal.astype(np.float32) * mat_data["ADBitVolts"].item() * 1e6
@@ -262,7 +262,9 @@ def read_csc(filename: str) -> Tuple[npt.NDArray[np.float_], float]:
             warnings.warn("Scaling samplingIntervalSeconds down by 1000")
             sampling_interval_seconds /= 1000
     else:
-        raise ValueError("samplingIntervalSeconds not found in the file")
+        warning_message = "samplingIntervalSeconds not found in the file."
+        warnings.warn(warning_message)
+        sampling_interval_seconds = None
 
     return csc_signal, sampling_interval_seconds
 

@@ -11,6 +11,10 @@ end
 % Basic statistics of sleep oscillations
 % Whole sleep spectrogram - to see SWS\Spindles periods
 % Generating spectrograms for *all* channels
+
+dataTable = cell2table(macroFiles);
+writetable(dataTable, fullfile(outputPath, 'inFiles.csv'), 'WriteVariableNames', false);
+
 maxNumCompThreads(8); 
 parfor i = 1:size(macroFiles, 1)
     
