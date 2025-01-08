@@ -64,7 +64,7 @@ function batch_spikeSorting(workerId, totalWorkers, expIds, filePath, skipExist,
     %% spike detection:
 
     expFilePath = [filePath, '/Experiment', sprintf('-%d', expIds)];
-    outputPath = fullfile(expFilePath, 'CSC_micro_spikes');
+    outputPath = fullfile(expFilePath, sprintf('CSC_micro_spikes_removePLI-%d_CAR-%d_rejectNoiseSpikes-%d', int8(runRemovePLI), int8(runCAR), int8(runSpikeReject)));
 
     fprintf('run spike detection in parallel on %d (out of %d) threads...\n', parJobs, maxNumCompThreads);
     spikeFiles = spikeDetection(microFiles, timestampFiles, outputPath, expNames, skipExist(1), runRemovePLI, runCAR);
