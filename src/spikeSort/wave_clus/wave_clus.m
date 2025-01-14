@@ -21,7 +21,7 @@ function varargout = wave_clus(varargin)
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
 % Edit the above text to modify the response to help wave_clus
-% Last Modified by GUIDE v2.5 10-Jan-2023 14:57:13
+% Last Modified by GUIDE v2.5 13-Jan-2025 17:47:48
 
 % JMG101208
 % USER_DATA DEFINITIONS
@@ -232,6 +232,7 @@ clustering_results(:,2) = classes; % GUI classes
 clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
 clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
+clustering_results(:,6) = cluster_class(:, 2); % timestamps of spikes
 clustering_results_bk   = clustering_results; % old clusters for undo actions
 USER_DATA{10} = clustering_results;
 USER_DATA{11} = clustering_results_bk;
@@ -644,7 +645,7 @@ set(handles.isi3_reject_button, 'value', 0);
 function isi3_reject_button_Callback(hObject, eventdata, handles)
 set(hObject, 'value', 1);
 [handles, USER_DATA, tree] = rejectCluster(hObject, handles, 3);
-handles = updateHandles(hObject, handles, {'setclus','reject'}, {'force', 'merge',  'undo'}, 10);
+handles = updateHandles(hObject, handles, {'setclus', 'reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
 
 clustering_results = USER_DATA{10};
@@ -688,10 +689,10 @@ function Plot_polytrode_button_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 if strcmp(par.filename(1:9), 'polytrode')
-    Plot_polytrode(handles)
+    Plot_polytrode(handles);
 elseif strcmp(par.filename(1:13), 'C_sim_script_')
     handles.simname = par.filename;
-    Plot_simulations(handles)
+    Plot_simulations(handles);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1021,3 +1022,30 @@ function sorterName_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in pushbutton27.
+function pushbutton27_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton27 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
+clustersFixedIdx = getFixClusterIndex(handles);
+clustersFixedIdx = find(clustersFixedIdx);
+
+if length(clustersFixedIdx) ~= 2
+    errordlg('Please select 2 clusters to create cross correlogram!', 'Error');
+    return
+end
+
+fix_class1 = USER_DATA{19+clustersFixedIdx(1)}';
+fix_class2 = USER_DATA{19+clustersFixedIdx(2)}';
+
+clustering_results = USER_DATA{10};
+spikeTime1 = clustering_results(fix_class1, 6);
+spikeTime2 = clustering_results(fix_class2, 6);
+
+[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2);
+
+
