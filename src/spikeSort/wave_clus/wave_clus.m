@@ -192,7 +192,7 @@ switch char(handles.datatype)
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
         if isempty(filename)
-            [filename, pathname] = uigetfile('times_*.mat', 'Select file');
+            [filename, pathname] = uigetfile([pathname, filesep, 'times_*.mat'], 'Select file');
             if ~filename
                 return
             end
@@ -1035,7 +1035,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in pushbutton27.
 function pushbutton27_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton27 (see GCBO)
@@ -1043,9 +1042,9 @@ function pushbutton27_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
-clustersFixedIdx = getFixClusterIndex(handles);
+clustersFixedIdx = getFixClusterIndex();
 [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
-[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2);
+[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
 
 
 % --- Executes when selected object is changed in uibuttongroup1.

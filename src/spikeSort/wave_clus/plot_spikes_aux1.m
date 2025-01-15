@@ -1,4 +1,4 @@
-function Plot_Spikes_aux(handles)
+function plot_spikes_aux1(handles)
 USER_DATA = get(handles.wave_clus_aux1,'userdata');
 par = USER_DATA{1};
 spikes = USER_DATA{2};
