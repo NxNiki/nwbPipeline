@@ -1,13 +1,20 @@
-function clustersFixedIdx = getFixClusterIndex(handles)
+function clustersFixedIdx = getFixClusterIndex(handles, startIdx)
+% get the indices of clusters that the fix button is pressed in the current
+% handle.
 
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-par = USER_DATA{1};
-
-clustersFixedIdx = logical(par.max_clus);
-for i = 1:par.max_clus
-    if i <= 3
-        clustersFixedIdx(i) = get(handles.(['fix' num2str(i), '_button']), 'value');
-    else
-        clustersFixedIdx(i) = par.(['fix', num2str(i)]);
-    end
+if nargin < 2
+    startIdx = 1;
 end
+
+if startIdx == 1
+    num_clus = 3;
+else
+    num_clus = 5;
+end
+
+clustersFixedIdx = false(1, num_clus + startIdx - 1);
+for i = startIdx: startIdx + num_clus - 1
+    clustersFixedIdx(i) = get(handles.(['fix' num2str(i), '_button']), 'value');
+end
+
+clustersFixedIdx = find(clustersFixedIdx);

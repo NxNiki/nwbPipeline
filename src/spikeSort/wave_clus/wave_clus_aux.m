@@ -22,7 +22,7 @@ function varargout = wave_clus_aux(varargin)
 
 % Edit the above text to modify the response to help wave_clus_aux
 
-% Last Modified by GUIDE v2.5 16-Dec-2004 18:37:28
+% Last Modified by GUIDE v2.5 14-Jan-2025 14:57:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,6 +65,13 @@ set(handles.fix6_button,'value',0);
 set(handles.fix7_button,'value',0);
 set(handles.fix8_button,'value',0);
 
+set(handles.radiobutton45, 'Value', 1);
+set(handles.radiobutton48, 'Value', 1);
+set(handles.radiobutton51, 'Value', 1);
+set(handles.radiobutton54, 'Value', 1);
+set(handles.radiobutton57, 'Value', 1);
+
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -105,7 +112,7 @@ h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
 h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
 h_fig4 = findobj(h_figs,'tag','wave_clus_aux4');
 h_fig5 = findobj(h_figs,'tag','wave_clus_aux5');
-USER_DATA = get(h_fig,'UserData');
+USER_DATA = get(h_fig, 'UserData');
 par = USER_DATA{1};
 
 set(handles.isi4_nbins,'string',par.nbins4);
@@ -155,8 +162,6 @@ set(h_fig1,'userdata',USER_DATA)
 plot_spikes_aux(handles)
 
 
-
-
 % Change nbins
 % -------------------------------------------------------------
 function isi4_nbins_Callback(hObject, eventdata, handles)
@@ -168,7 +173,7 @@ classes = USER_DATA{6};
 par.class_to_plot = find(classes==4);
 USER_DATA{1} = par;
 USER_DATA{6} = classes;
-set(handles.wave_clus_aux,'userdata',USER_DATA);
+set(handles.wave_clus_aux,'userdata', USER_DATA);
 plot_spikes_aux(handles)
 % --------------------------------------------------------------------
 function isi5_nbins_Callback(hObject, eventdata, handles)
@@ -436,8 +441,6 @@ cla reset
 set(gcbo,'value',0);
 set(handles.isi8_accept_button,'value',1);
 
-
-
 % FIX buttons
 % --------------------------------------------------------
 function fix4_button_Callback(hObject, eventdata, handles)
@@ -537,7 +540,7 @@ set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
 % --------------------------------------------------------
 function fix8_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux,'userdata');
+USER_DATA = get(handles.wave_clus_aux, 'userdata');
 par = USER_DATA{1};
 classes = USER_DATA{6};
 fix_class = find(classes==8);
@@ -560,11 +563,6 @@ set(h_fig1,'userdata',USER_DATA)
 set(h_fig2,'userdata',USER_DATA)
 set(h_fig3,'userdata',USER_DATA)
 
-
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 % --- Executes during object creation, after setting all properties.
 function isi4_nbins_CreateFcn(hObject, eventdata, handles)
 if ispc
@@ -644,3 +642,61 @@ if ispc
 else
     set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
 end
+
+
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup1_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 4);
+
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 5);
+
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 6);
+
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup4_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 7);
+
+
+% --- Executes when selected object is changed in uibuttongroup5.
+function uibuttongroup5_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup5 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 8);
+
+
+% --- Executes on button press in pushbutton1.
+function pushbutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% h_figs=get(0, 'children');
+% h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
+% USER_DATA = get(h_fig.wave_clus_figure, 'userdata');
+USER_DATA = get(handles.wave_clus_aux, 'userdata');
+
+clustersFixedIdx = getFixClusterIndex(handles, 4);
+[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
+[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2);

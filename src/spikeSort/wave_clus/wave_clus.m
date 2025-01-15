@@ -21,7 +21,7 @@ function varargout = wave_clus(varargin)
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
 % Edit the above text to modify the response to help wave_clus
-% Last Modified by GUIDE v2.5 13-Jan-2025 17:47:48
+% Last Modified by GUIDE v2.5 14-Jan-2025 03:22:42
 
 % JMG101208
 % USER_DATA DEFINITIONS
@@ -96,6 +96,9 @@ set(handles.plot_average_button,'value',0);
 set(handles.fix1_button,'value',0);
 set(handles.fix2_button,'value',0);
 set(handles.fix3_button,'value',0);
+set(handles.radiobutton22, 'Value', 1);
+set(handles.radiobutton25, 'Value', 1);
+set(handles.radiobutton28, 'Value', 1);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -198,7 +201,7 @@ switch char(handles.datatype)
         [cluster_class, tree, ~, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
-temp=find_temp2(tree, handles);                                  % Selects temperature.
+temp = find_temp2(tree, handles);                             % Selects temperature.
 set(handles.file_name, 'string', fullfile(pathname, filename));
 
 % EM: This is where identification gets set. But really, we want to use the
@@ -232,7 +235,7 @@ clustering_results(:,2) = classes; % GUI classes
 clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
 clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
-clustering_results(:,6) = cluster_class(:, 2); % timestamps of spikes
+
 clustering_results_bk   = clustering_results; % old clusters for undo actions
 USER_DATA{10} = clustering_results;
 USER_DATA{11} = clustering_results_bk;
@@ -370,9 +373,14 @@ if isempty(sortedBy) || strcmp(sortedBy, 'Enter your name')
 end
 
 % Saves clusters
-cluster_class = zeros(size(spikes, 1), 2);
+cluster_class = zeros(size(spikes, 1), 3);
 cluster_class(:,1) = classes(:);
 cluster_class(:,2) = USER_DATA{3}' / 1000;
+cluster_class(:,3) = 1;
+
+for i = 1:length(handles.clusterUnitType)
+    cluster_class(classes(:)==i, 3) = handles.clusterUnitType(i);
+end
 
 [pathname, fn] = fileparts(get(handles.file_name, 'String'));
 outFileName = strrep(['times_manual_' fn], '_spikes', '');
@@ -406,9 +414,13 @@ switch outFileName(7:9)
 end
 
 h_figs = get(0, 'children');
-saveWaveClusFigure(h_figs, 'wave_clus_figure',   pathname, outFileName(startInd:end))
+saveWaveClusFigure(h_figs, 'wave_clus_figure', pathname, outFileName(startInd:end))
 if nClusts>3
-    saveWaveClusFigure(h_figs, 'wave_clus_aux',  pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs,  'wave_clus_aux', pathname, outFileName(startInd:end))
+    h_fig = findobj(h_figs, 'tag', 'wave_clus_aux');
+    for i = 4: nClusts
+        cluster_class(classes(:)==i, 3) = h_fig.clusterUnitType(i);
+    end
 end
 if nClusts>8
     saveWaveClusFigure(h_figs, 'wave_clus_aux1', pathname, outFileName(startInd:end))
@@ -442,7 +454,7 @@ helpdlg('Check the set_parameters files in the subdirectory Wave_clus\Parameters
 % --------------------------------------------------------------------
 function force_button_Callback(hObject, eventdata, handles)
 %set(gcbo,'value',1);
-USER_DATA = get(handles.wave_clus_figure,'userdata');
+USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 spikes = USER_DATA{2};
 classes = USER_DATA{6};
@@ -499,7 +511,7 @@ function Plot_all_projections_button_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 
-if strcmp(par.filename(1:4),'poly')
+if strcmp(par.filename(1:4), 'poly')
     % do we need this part? Xin.
     Plot_amplitudes(handles)
 else
@@ -1032,20 +1044,30 @@ function pushbutton27_Callback(hObject, eventdata, handles)
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustersFixedIdx = getFixClusterIndex(handles);
-clustersFixedIdx = find(clustersFixedIdx);
-
-if length(clustersFixedIdx) ~= 2
-    errordlg('Please select 2 clusters to create cross correlogram!', 'Error');
-    return
-end
-
-fix_class1 = USER_DATA{19+clustersFixedIdx(1)}';
-fix_class2 = USER_DATA{19+clustersFixedIdx(2)}';
-
-clustering_results = USER_DATA{10};
-spikeTime1 = clustering_results(fix_class1, 6);
-spikeTime2 = clustering_results(fix_class2, 6);
-
+[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
 [ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2);
 
 
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup1_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 1);
+
+% --- Executes when selected object is changed in uibuttongroup2.
+function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 2);
+
+% --- Executes when selected object is changed in uibuttongroup3.
+function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(hObject, eventdata, handles, 3);
