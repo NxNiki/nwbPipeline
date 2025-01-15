@@ -201,6 +201,7 @@ switch char(handles.datatype)
         [cluster_class, tree, ~, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
+handles.clusterUnitType = int8(ones(1, length(unique(cluster_class(:, 1))) - 1)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
 temp = find_temp2(tree, handles);                             % Selects temperature.
 set(handles.file_name, 'string', fullfile(pathname, filename));
 
@@ -393,16 +394,7 @@ if ~ismember('sortedBy', who(outFileObj)) || ~iscell(outFileObj.sortedBy)
 else
     sortedByPrev = outFileObj.sortedBy;
 end
-
 sortedByPrev = [sortedByPrev; {sortedBy, char(datetime("now"))}];
-
-outFileObj.sortedBy = sortedByPrev;
-outFileObj.cluster_class = cluster_class;
-outFileObj.temp = temp;
-% outFileObj.par = par;
-% outFileObj.spikes = spikes;
-% outFileObj.ipermut = USER_DATA{12};
-% outFileObj.inspk = USER_DATA{7};
 
 %Save figures
 nClusts = max(cluster_class(:,1));
@@ -417,9 +409,8 @@ h_figs = get(0, 'children');
 saveWaveClusFigure(h_figs, 'wave_clus_figure', pathname, outFileName(startInd:end))
 if nClusts>3
     saveWaveClusFigure(h_figs,  'wave_clus_aux', pathname, outFileName(startInd:end))
-    h_fig = findobj(h_figs, 'tag', 'wave_clus_aux');
     for i = 4: nClusts
-        cluster_class(classes(:)==i, 3) = h_fig.clusterUnitType(i);
+        cluster_class(classes(:)==i, 3) = handles.clusterUnitType(i);
     end
 end
 if nClusts>8
@@ -437,6 +428,15 @@ end
 if nClusts>28
     saveWaveClusFigure(h_figs, 'wave_clus_aux5', pathname, outFileName(startInd:end))
 end
+
+outFileObj.sortedBy = sortedByPrev;
+outFileObj.cluster_class = cluster_class;
+outFileObj.temp = temp;
+% outFileObj.par = par;
+% outFileObj.spikes = spikes;
+% outFileObj.ipermut = USER_DATA{12};
+% outFileObj.inspk = USER_DATA{7};
+
 fprintf('Finished!\n')
 
 % --- Executes on selection change in data_type_popupmenu.
@@ -1054,7 +1054,7 @@ function uibuttongroup1_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 1);
+updateClusterUnit(eventdata, 1);
 
 % --- Executes when selected object is changed in uibuttongroup2.
 function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
@@ -1062,7 +1062,7 @@ function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 2);
+updateClusterUnit(eventdata, 2);
 
 % --- Executes when selected object is changed in uibuttongroup3.
 function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
@@ -1070,4 +1070,4 @@ function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 3);
+updateClusterUnit(eventdata, 3);

@@ -71,7 +71,6 @@ set(handles.radiobutton51, 'Value', 1);
 set(handles.radiobutton54, 'Value', 1);
 set(handles.radiobutton57, 'Value', 1);
 
-
 % Update handles structure
 guidata(hObject, handles);
 
@@ -153,7 +152,7 @@ else
     par.fix8 = 0;
 end
 USER_DATA{1} = par;
-set(handles.wave_clus_aux,'userdata',USER_DATA)
+set(handles.wave_clus_aux, 'userdata', USER_DATA)
 set(h_fig,'userdata',USER_DATA)
 set(h_fig1,'userdata',USER_DATA)
 set(h_fig,'userdata',USER_DATA)
@@ -453,7 +452,7 @@ if get(handles.fix4_button,'value') ==1
     par.fix4 = 1;
 else
     USER_DATA{23} = [];
-    par.fix4 = 0
+    par.fix4 = 0;
 end
 USER_DATA{1} = par;
 h_figs=get(0,'children');
@@ -650,7 +649,7 @@ function uibuttongroup1_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 4);
+updateClusterUnit(eventdata, 4);
 
 % --- Executes when selected object is changed in uibuttongroup1.
 function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
@@ -658,7 +657,7 @@ function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 5);
+updateClusterUnit(eventdata, 5);
 
 % --- Executes when selected object is changed in uibuttongroup1.
 function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
@@ -666,7 +665,7 @@ function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 6);
+updateClusterUnit(eventdata, 6);
 
 % --- Executes when selected object is changed in uibuttongroup1.
 function uibuttongroup4_SelectionChangedFcn(hObject, eventdata, handles)
@@ -674,7 +673,7 @@ function uibuttongroup4_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 7);
+updateClusterUnit(eventdata, 7);
 
 
 % --- Executes when selected object is changed in uibuttongroup5.
@@ -683,10 +682,10 @@ function uibuttongroup5_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-updateClusterUnit(hObject, eventdata, handles, 8);
+updateClusterUnit(eventdata, 8);
 
 
-% --- Executes on button press in pushbutton1.
+% --- Executes on button press in pushbutton1 (plot_cross_correlogram).
 function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
