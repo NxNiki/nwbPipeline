@@ -47,6 +47,7 @@ end
 timesFileObj = matfile(timesFile);
 cluster_class = timesFileObj.cluster_class;
 manualTimesFile = fullfile(pathname, ['times_manual_' filename]);
+
 if exist(manualTimesFile, 'file')
     message = 'This spike file has been manually sorted, do you want to load the manually sorted result?';
     title = 'Spikes manually sorted already!';
