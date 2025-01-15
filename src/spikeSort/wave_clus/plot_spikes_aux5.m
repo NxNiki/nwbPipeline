@@ -1,5 +1,5 @@
-function Plot_Spikes_aux(handles)
-USER_DATA = get(handles.wave_clus_aux5,'userdata');
+function plot_spikes_aux5(handles)
+USER_DATA = get(handles.wave_clus_aux5, 'userdata');
 par = USER_DATA{1};
 spikes = USER_DATA{2};
 spk_times = USER_DATA{3};
