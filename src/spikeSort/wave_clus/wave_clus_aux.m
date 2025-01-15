@@ -691,11 +691,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% h_figs=get(0, 'children');
-% h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
-% USER_DATA = get(h_fig.wave_clus_figure, 'userdata');
 USER_DATA = get(handles.wave_clus_aux, 'userdata');
-
-clustersFixedIdx = getFixClusterIndex(handles, 4);
+clustersFixedIdx = getFixClusterIndex();
 [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
-[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2);
+[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
