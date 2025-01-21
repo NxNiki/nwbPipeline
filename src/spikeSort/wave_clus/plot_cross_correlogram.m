@@ -55,7 +55,11 @@ tvec = tvec.*cfg.binsize;
 
 % Plot the cross-correlogram
 figure;
+hold on;
 bar(tvec, ccf, 'k', 'EdgeColor', 'none'); % bar plot for cross-correlogram
+xline(.03, '--r', 'LineWidth', 1.5);
+xline(-.03, '--r', 'LineWidth', 1.5);
+hold off
 xlabel('Time Lag (s)');
 ylabel('Cross-Correlation');
 title(sprintf('Cross-Correlogram: cluster %d vs %d, resolution: %.3f ms', tsLabel1, tsLabel2, cfg.binsize * 1000));

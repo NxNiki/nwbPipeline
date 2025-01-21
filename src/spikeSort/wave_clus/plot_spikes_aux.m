@@ -1,4 +1,4 @@
-function Plot_Spikes_aux(handles)
+function plot_spikes_aux(handles)
 USER_DATA = get(handles.wave_clus_aux,'userdata');
 par = USER_DATA{1};
 spikes = USER_DATA{2};
@@ -64,3 +64,19 @@ set(handles.fix5_button,'value',0);
 set(handles.fix6_button,'value',0);
 set(handles.fix7_button,'value',0);
 set(handles.fix8_button,'value',0);
+
+mainHandle = findobj('tag', 'wave_clus_figure');
+mainHandles = guidata(mainHandle);
+
+for i = 1:5
+    % Find the desired radio button handle
+    clusterIdx = 3 + i;
+    if clusterIdx > length(mainHandles.clusterUnitType)
+        break;
+    end
+    
+    % Find the uibuttongroup handle for unit type
+    idx = mainHandles.clusterUnitType(clusterIdx) + 44 + (i-1)*3;
+    rb = handles.(sprintf('radiobutton%d', idx));
+    set(handles.(sprintf('uibuttongroup%d', i)), 'SelectedObject', rb);
+end
