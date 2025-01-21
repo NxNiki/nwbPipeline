@@ -1,68 +1,126 @@
-function [ccf, tvec] = plot_cross_correlogram(ts1, ts2, tsLabel1, tsLabel2)
-% function [ccf,tvec] = ccf(cfg,ts1,ts2)
+function plot_cross_correlogram(ts1, ts2, tsLabel1, tsLabel2)
+% function plot_cross_correlogram_ui(ts1, ts2, tsLabel1, tsLabel2)
 %
-% estimate crosscorrelation of input spike trains
+% Creates a UI to adjust cfg parameters and plot the cross-correlogram.
 %
 % INPUTS:
-% ts1: vector of spike times (in s), [nSpikes x 1]
-% ts2: vector of spike times (in s), [nSpikes x 1]
-%
-% cfg_def.binsize = 0.001; % ccf bin size in s
-% cfg_def.max_t = 0.5; % length of ccf in s
-% cfg_def.smooth = 0; % set to 1 to smooth
-% cfg_def.gauss_w = 1; % width of Gaussian convolution window (in s)
-% cfg_def.gauss_sd = 0.02; % SD of Gaussian convolution window (in s)
-% cfg_def.xcorr = 'coeff'; % method to compute SDF xcorr
-%test_xc
-% OUTPUTS:
-% ccf: autocorrelation estimate (distribution of ts1 relative to ts2)
-% tvec: bin centers (in s)
-%
-% MvdM 2015-01-29 initial version
-%
-% TODO: implement version that runs on ts input (ccfs between all cells)
+% ts1, ts2: vectors of spike times (in seconds)
+% tsLabel1, tsLabel2: labels for the spike time series
 
-cfg = [];
+% Default configuration
 cfg.binsize = 0.001;
 cfg.max_t = 0.05;
-cfg.smooth = 0; % set to 1 to compute ccf on SDF, 0 for raw spikes
-cfg.gauss_w = 1; % width of Gaussian convolution window (in s)
-cfg.gauss_sd = 0.02; % SD of Gaussian convolution window (in s)
-cfg.xcorr = 'coeff'; % method to compute SDF xcorr
+cfg.smooth = 0;
+cfg.gauss_w = 1;
+cfg.gauss_sd = 0.02;
+cfg.xcorr = 'coeff';
 
-% guarantee vectoricity
-if ~isempty(ts1), ts1 = ts1(:); end
-if ~isempty(ts2), ts2 = ts2(:); end
+% Create the UI figure
+fig = figure('Name', 'Cross-Correlogram Parameters', 'Position', [100, 100, 900, 600]);
 
-% construct timebase for binarized spike trains
-tbin_edges = min(cat(1,ts1,ts2)):cfg.binsize:max(cat(1,ts1,ts2));
+text_width = .15;
+edit_width = .10;
+% Create UI components using normalized units
+uicontrol('Style', 'text', 'Units', 'normalized', ...
+    'Position', [0.05, 0.83, text_width, 0.04], 'String', 'Bin Size (s):', 'HorizontalAlignment', 'left');
+binsizeInput = uicontrol('Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.25, 0.83, edit_width, 0.04], 'String', cfg.binsize);
 
-% binarize spike trains
-ts1_sdf = histc(ts1,tbin_edges); ts1_sdf = ts1_sdf(1:end-1);
-ts2_sdf = histc(ts2,tbin_edges); ts2_sdf = ts2_sdf(1:end-1);
+uicontrol('Style', 'text', 'Units', 'normalized', ...
+    'Position', [0.05, 0.76, text_width, 0.04], 'String', 'Max Time (s):', 'HorizontalAlignment', 'left');
+maxTInput = uicontrol('Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.25, 0.76, edit_width, 0.04], 'String', cfg.max_t);
 
-if cfg.smooth % SDF (spike density function) version
-    % convolve with kernel
-    gauss_window = cfg.gauss_w./cfg.binsize; % 1 second window
-    gauss_SD = cfg.gauss_sd./cfg.binsize; % 0.02 seconds (20ms) SD
-    gk = gausskernel(gauss_window,gauss_SD); gk = gk./cfg.binsize; % normalize by binsize
-    ts1_sdf = conv2(ts1_sdf, gk, 'same'); % convolve with gaussian window
-    ts2_sdf = conv2(ts2_sdf, gk, 'same'); % convolve with gaussian window
+uicontrol('Style', 'text', 'Units', 'normalized', ...
+    'Position', [0.05, 0.69, text_width, 0.04], 'String', 'Smooth:', 'HorizontalAlignment', 'left');
+smoothInput = uicontrol('Style', 'checkbox', 'Units', 'normalized', ...
+    'Position', [0.25, 0.69, edit_width, 0.04], 'Value', cfg.smooth);
+
+uicontrol('Style', 'text', 'Units', 'normalized', ...
+    'Position', [0.05, 0.62, text_width, 0.04], 'String', 'Gaussian Window Width (s):', 'HorizontalAlignment', 'left');
+gaussWInput = uicontrol('Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.25, 0.62, edit_width, 0.04], 'String', cfg.gauss_w);
+
+uicontrol('Style', 'text', 'Units', 'normalized', ...
+    'Position', [0.05, 0.55, text_width, 0.04], 'String', 'Gaussian Window SD (s):', 'HorizontalAlignment', 'left');
+gaussSDInput = uicontrol('Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.25, 0.55, edit_width, 0.04], 'String', cfg.gauss_sd);
+
+uicontrol('Style', 'text', 'Units', 'normalized', ...
+    'Position', [0.05, 0.48, text_width, 0.04], 'String', 'XCorr Method:', 'HorizontalAlignment', 'left');
+xcorrInput = uicontrol('Style', 'edit', 'Units', 'normalized', ...
+    'Position', [0.25, 0.48, edit_width, 0.04], 'String', cfg.xcorr);
+
+% Axes for plotting
+axesPlot = axes('Parent', fig, 'Units', 'normalized', ...
+    'Position', [0.45, 0.33, 0.45, 0.5]);
+
+% Plot button
+uicontrol('Style', 'pushbutton', 'Units', 'normalized', ...
+    'Position', [0.15, 0.35, 0.12, 0.05], 'String', 'Plot', ...
+    'Callback', @plotButtonCallback);
+
+% Disable Gaussian parameters if smooth is unchecked
+set(smoothInput, 'Callback', @toggleGaussianFields);
+
+% Callback for the Plot button
+function plotButtonCallback(~, ~)
+    % Update cfg with current UI values
+    cfg.binsize = str2double(get(binsizeInput, 'String'));
+    cfg.max_t = str2double(get(maxTInput, 'String'));
+    cfg.smooth = get(smoothInput, 'Value');
+    cfg.gauss_w = str2double(get(gaussWInput, 'String'));
+    cfg.gauss_sd = str2double(get(gaussSDInput, 'String'));
+    cfg.xcorr = get(xcorrInput, 'String');
+
+    % Guarantee vectoricity
+    if ~isempty(ts1), ts1 = ts1(:); end
+    if ~isempty(ts2), ts2 = ts2(:); end
+
+    % Construct timebase for binarized spike trains
+    tbin_edges = min(cat(1, ts1, ts2)):cfg.binsize:max(cat(1, ts1, ts2));
+
+    % Binarize spike trains
+    ts1_sdf = histc(ts1, tbin_edges); ts1_sdf = ts1_sdf(1:end-1);
+    ts2_sdf = histc(ts2, tbin_edges); ts2_sdf = ts2_sdf(1:end-1);
+
+    if cfg.smooth % SDF (spike density function) version
+        gauss_window = cfg.gauss_w / cfg.binsize;
+        gauss_SD = cfg.gauss_sd / cfg.binsize;
+        gk = gausskernel(gauss_window, gauss_SD); gk = gk / cfg.binsize;
+        ts1_sdf = conv(ts1_sdf, gk, 'same');
+        ts2_sdf = conv(ts2_sdf, gk, 'same');
+    end
+
+    [ccf, tvec] = xcorr(ts1_sdf, ts2_sdf, cfg.max_t / cfg.binsize, cfg.xcorr);
+    tvec = tvec * cfg.binsize;
+
+    % Plot the cross-correlogram in the UI
+    cla(axesPlot); % Clear the axes
+    bar(axesPlot, tvec, ccf, 'k', 'EdgeColor', 'none'); % Bar plot for cross-correlogram
+    hold(axesPlot, 'on');
+    xline(axesPlot, 0.003, '--r', 'LineWidth', 1.5);
+    xline(axesPlot, -0.003, '--r', 'LineWidth', 1.5);
+    hold(axesPlot, 'off');
+    xlabel(axesPlot, 'Time Lag (s)');
+    ylabel(axesPlot, 'Cross-Correlation');
+    title(axesPlot, sprintf('Cross-Correlogram: cluster %d vs %d, binsize: %.3f ms', tsLabel1, tsLabel2, cfg.binsize * 1000));
+    grid(axesPlot, 'on');
 end
 
-[ccf, tvec] = xcorr(ts1_sdf, ts2_sdf, cfg.max_t./cfg.binsize, cfg.xcorr);
-tvec = tvec.*cfg.binsize;
+% Toggle Gaussian fields based on Smooth value
+function toggleGaussianFields(~, ~)
+    if get(smoothInput, 'Value') == 0
+        set(gaussWInput, 'Enable', 'off');
+        set(gaussSDInput, 'Enable', 'off');
+    else
+        set(gaussWInput, 'Enable', 'on');
+        set(gaussSDInput, 'Enable', 'on');
+    end
+end
 
-% Plot the cross-correlogram
-figure;
-hold on;
-bar(tvec, ccf, 'k', 'EdgeColor', 'none'); % bar plot for cross-correlogram
-xline(.03, '--r', 'LineWidth', 1.5);
-xline(-.03, '--r', 'LineWidth', 1.5);
-hold off
-xlabel('Time Lag (s)');
-ylabel('Cross-Correlation');
-title(sprintf('Cross-Correlogram: cluster %d vs %d, resolution: %.3f ms', tsLabel1, tsLabel2, cfg.binsize * 1000));
-grid on;
-    
+% Initialize Gaussian fields and plot on start
+toggleGaussianFields();
+plotButtonCallback();
+
 end
