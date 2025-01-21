@@ -1055,7 +1055,7 @@ function pushbutton27_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustersFixedIdx = getFixClusterIndex();
 [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
-[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
+plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
 
 
 % --- Executes when selected object is changed in uibuttongroup1.
