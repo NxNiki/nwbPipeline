@@ -23,29 +23,22 @@ clustering_results = USER_DATA{10};
 
 % Closes aux figures
 h_figs = get(0, 'children');
-h_fig  = findobj(h_figs, 'tag', 'wave_clus_figure');
+mainHandle  = findobj(h_figs, 'tag', 'wave_clus_figure');
+% mainHandle = findobj('tag', 'wave_clus_figure');
 
 % EM: It's inefficient to close all of these if you're just going to open
 % them again shortly. Set to visible off instead.
-% h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-% h_fig2= findobj(h_figs,'tag','wave_clus_aux1');
-% h_fig3= findobj(h_figs,'tag','wave_clus_aux2');
-% h_fig4= findobj(h_figs,'tag','wave_clus_aux3');
-% h_fig5= findobj(h_figs,'tag','wave_clus_aux4');
-% h_fig6= findobj(h_figs,'tag','wave_clus_aux5');
-% close(h_fig1); close(h_fig2); close(h_fig3); close(h_fig4); close(h_fig5); close(h_fig6);
 
-aux_figs = cellfun(@(x)findobj(h_figs, 'tag', ['wave_clus_aux',x]),...
-    {'','1','2','3','4','5'}, 'uniformoutput', 0);
-for m=1:length(aux_figs)
-    if ~isempty(aux_figs{m})
-        set(0,'currentFigure',aux_figs{m});
-        set(aux_figs{m},'visible','off');
-        ch = get(aux_figs{m},'children');
-        for k = 1:length(ch)
-            cla(ch(k),'reset');
-        end
-        arrayfun(@(x)cla(x,'reset'),ch);
+mainHandles = guidata(mainHandle);
+aux_figs_label = {'wave_clus_aux', 'wave_clus_aux1', 'wave_clus_aux2', 'wave_clus_aux3', 'wave_clus_aux4', 'wave_clus_aux5'};
+
+for m=1:length(aux_figs_label)
+    aux_fig = findobj(h_figs, 'tag', aux_figs_label{m});
+    if ~isempty(aux_fig)
+        set(0, 'currentFigure', aux_fig);
+        set(aux_fig, 'visible', 'off');
+        ch = get(aux_fig, 'children');
+        arrayfun(@(x)cla(x,'reset'), ch);
     end
 end
 
@@ -335,17 +328,17 @@ for i = 1:nclusters+1
             USER_DATA{1} = par;
             set(handles.wave_clus_figure, 'userdata', USER_DATA)
             if i < 10
-                wave_clus_aux
+                wave_clus_aux;
             elseif i < 15
-                wave_clus_aux1
+                wave_clus_aux1;
             elseif i < 20
-                wave_clus_aux2
+                wave_clus_aux2;
             elseif i < 25
-                wave_clus_aux3
+                wave_clus_aux3;
             elseif i < 30
-                wave_clus_aux4
+                wave_clus_aux4;
             else
-                wave_clus_aux5
+                wave_clus_aux5;
             end
             %--------------------------------------------------------------
         end

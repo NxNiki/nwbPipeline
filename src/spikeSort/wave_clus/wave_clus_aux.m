@@ -54,22 +54,14 @@ function wave_clus_aux_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for wave_clus_aux
 handles.output = hObject;
-set(handles.isi4_accept_button,'value',1);
-set(handles.isi5_accept_button,'value',1);
-set(handles.isi6_accept_button,'value',1);
-set(handles.isi7_accept_button,'value',1);
-set(handles.isi8_accept_button,'value',1);
-set(handles.fix4_button,'value',0);
-set(handles.fix5_button,'value',0);
-set(handles.fix6_button,'value',0);
-set(handles.fix7_button,'value',0);
-set(handles.fix8_button,'value',0);
 
-set(handles.radiobutton45, 'Value', 1);
-set(handles.radiobutton48, 'Value', 1);
-set(handles.radiobutton51, 'Value', 1);
-set(handles.radiobutton54, 'Value', 1);
-set(handles.radiobutton57, 'Value', 1);
+clusterIdx = 4:8;
+radiobuttonIdx = [45, 48, 51, 54, 57];
+for i = 1:5
+    set(handles.(sprintf('isi%d_accept_button', clusterIdx(i))),'value',1);
+    set(handles.(sprintf('fix%d_button', clusterIdx(i))),'value',0);
+    set(handles.(sprintf('radiobutton%d', radiobuttonIdx(i))),'value',1);
+end
 
 % Update handles structure
 guidata(hObject, handles);
@@ -88,69 +80,34 @@ function varargout = wave_clus_aux_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-set(handles.isi4_accept_button,'value',1);
-set(handles.isi5_accept_button,'value',1);
-set(handles.isi6_accept_button,'value',1);
-set(handles.isi7_accept_button,'value',1);
-set(handles.isi8_accept_button,'value',1);
-set(handles.isi4_reject_button,'value',0);
-set(handles.isi5_reject_button,'value',0);
-set(handles.isi6_reject_button,'value',0);
-set(handles.isi7_reject_button,'value',0);
-set(handles.isi8_reject_button,'value',0);
-set(handles.fix4_button,'value',0);
-set(handles.fix5_button,'value',0);
-set(handles.fix6_button,'value',0);
-set(handles.fix7_button,'value',0);
-set(handles.fix8_button,'value',0);
-
 h_figs=get(0,'children');
 h_fig = findobj(h_figs,'tag','wave_clus_figure');
+USER_DATA = get(h_fig, 'UserData');
+par = USER_DATA{1};
+
+clusterIdx = 4:8;
+for i = 1:5
+    set(handles.(sprintf('isi%d_accept_button', clusterIdx(i))), 'value', 1);
+    set(handles.(sprintf('isi%d_reject_button', clusterIdx(i))), 'value', 0);
+    set(handles.(sprintf('fix%d_button', clusterIdx(i))), 'value', 0);
+    set(handles.(sprintf('isi%d_nbins', clusterIdx(i))), 'string', par.(sprintf('nbins%d', clusterIdx(i))));
+    set(handles.(sprintf('isi%d_bin_step', clusterIdx(i))), 'string', par.(sprintf('bin_step%d', clusterIdx(i))));
+
+    % That's for passing the fix button settings to plot_spikes.
+    if get(handles.(sprintf('fix%d_button', clusterIdx(i))),'value') == 1
+        par.(sprintf('fix%d', clusterIdx(i))) = 1;
+    else
+        par.(sprintf('fix%d', clusterIdx(i))) = 0;
+    end
+end
+
 h_fig1 = findobj(h_figs,'tag','wave_clus_aux1');
 h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
 h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
 h_fig4 = findobj(h_figs,'tag','wave_clus_aux4');
 h_fig5 = findobj(h_figs,'tag','wave_clus_aux5');
-USER_DATA = get(h_fig, 'UserData');
-par = USER_DATA{1};
 
-set(handles.isi4_nbins,'string',par.nbins4);
-set(handles.isi5_nbins,'string',par.nbins5);
-set(handles.isi6_nbins,'string',par.nbins6);
-set(handles.isi7_nbins,'string',par.nbins7);
-set(handles.isi8_nbins,'string',par.nbins8);
-set(handles.isi4_bin_step,'string',par.bin_step4);
-set(handles.isi5_bin_step,'string',par.bin_step5);
-set(handles.isi6_bin_step,'string',par.bin_step6);
-set(handles.isi7_bin_step,'string',par.bin_step7);
-set(handles.isi8_bin_step,'string',par.bin_step8);
 
-% That's for passing the fix button settings to plot_spikes.
-if get(handles.fix4_button,'value') ==1
-    par.fix4 = 1;
-else
-    par.fix4 = 0;
-end
-if get(handles.fix5_button,'value') ==1
-    par.fix5 = 1;
-else
-    par.fix5 = 0;
-end
-if get(handles.fix6_button,'value') ==1
-    par.fix6 = 1;
-else
-    par.fix6 = 0;
-end
-if get(handles.fix7_button,'value') ==1
-    par.fix7 = 1;
-else
-    par.fix7 = 0;
-end
-if get(handles.fix8_button,'value') ==1
-    par.fix8 = 1;
-else
-    par.fix8 = 0;
-end
 USER_DATA{1} = par;
 set(handles.wave_clus_aux, 'userdata', USER_DATA)
 set(h_fig,'userdata',USER_DATA)

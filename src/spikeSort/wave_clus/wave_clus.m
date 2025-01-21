@@ -122,25 +122,19 @@ set(0,'DefaultAxesColorOrder', clus_colors)
 % --- Executes on button press in load_data_button.
 function load_data_button_Callback(hObject, eventdata, handles)
 fprintf('Loading ')
-set(handles.isi1_accept_button,'value',1);
-set(handles.isi2_accept_button,'value',1);
-set(handles.isi3_accept_button,'value',1);
-set(handles.isi1_reject_button,'value',0);
-set(handles.isi2_reject_button,'value',0);
-set(handles.isi3_reject_button,'value',0);
-set(handles.isi1_nbins,'string','Auto');
-set(handles.isi1_bin_step,'string','Auto');
-set(handles.isi2_nbins,'string','Auto');
-set(handles.isi2_bin_step,'string','Auto');
-set(handles.isi3_nbins,'string','Auto');
-set(handles.isi3_bin_step,'string','Auto');
+
 set(handles.isi0_nbins,'string','Auto');
 set(handles.isi0_bin_step,'string','Auto');
 set(handles.force_button,'value',0);
 set(handles.force_button,'string','Force');
-set(handles.fix1_button,'value',0);
-set(handles.fix2_button,'value',0);
-set(handles.fix3_button,'value',0);
+
+for i = 1:3
+    set(handles.(sprintf('isi%d_accept_button', i)),'value',1);
+    set(handles.(sprintf('isi%d_reject_button', i)),'value',0);
+    set(handles.(sprintf('isi%d_nbins', i)),'string','Auto');
+    set(handles.(sprintf('isi%d_bin_step', i)),'string','Auto');
+    set(handles.(sprintf('fix%d_button', i)),'value',0);
+end
 
 thisTag = get(hObject,'Tag');
 if isa(hObject,'matlab.ui.container.ContextMenu')
@@ -202,6 +196,23 @@ switch char(handles.datatype)
 end
 
 handles.clusterUnitType = int8(ones(1, length(unique(cluster_class(:, 1))) - 1)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
+if size(cluster_class, 2) == 3
+    cluster_class_unit_type = unique(cluster_class(:, [1, 3]), 'rows');
+    radiobuttonLabels = {'22','23','24'; '25', '26', '27'; '28', '29', '30'};
+    for i = 1:size(cluster_class_unit_type, 1)
+        clusterIdx = cluster_class_unit_type(i, 1);
+        unitTypeIdx = cluster_class_unit_type(i, 2);
+        if clusterIdx > 0
+            handles.clusterUnitType(clusterIdx) = unitTypeIdx;
+            if clusterIdx <= 3
+                radiobuttonLabel = radiobuttonLabels{clusterIdx, unitTypeIdx};
+                rb = handles.(sprintf('radiobutton%s', radiobuttonLabel));
+                set(handles.(sprintf('uibuttongroup%d', clusterIdx)), 'SelectedObject', rb);
+            end
+        end
+    end
+end
+
 temp = find_temp2(tree, handles);                             % Selects temperature.
 set(handles.file_name, 'string', fullfile(pathname, filename));
 
