@@ -270,7 +270,7 @@ function update_fix_button(handles, plotIdx)
     par = USER_DATA{1};
     classes = USER_DATA{6};
     fix_class = find(classes==clusterIdx);
-    if get(handles.(sprintf('fix%_button', plotLabelIdx)), 'value') == 1
+    if get(handles.(sprintf('fix%d_button', plotLabelIdx)), 'value') == 1
         USER_DATA{23} = fix_class;
         par.(sprintf('fix%d', clusterIdx)) = 1;
     else
@@ -405,5 +405,5 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 USER_DATA = get(handles.wave_clus_aux, 'userdata');
 clustersFixedIdx = getFixClusterIndex();
 [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
-[ccf, tvec] = plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
+plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
 end
