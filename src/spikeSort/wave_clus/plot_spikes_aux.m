@@ -9,12 +9,12 @@ par.to_plot_std = 1;                % # of std from mean to plot
 if ~isfield(par,'axes_nr')
     axes_nr = 5;
 else
-axes_nr = par.axes_nr;
+    axes_nr = par.axes_nr;
 end
 if ~isfield(par,'ylimit')
     ylimit = [-60 80; -60 60; -50 40];
 else
-ylimit = par.ylimit;
+    ylimit = par.ylimit;
 end
 class_to_plot = par.class_to_plot;
 max_spikes = min(par.max_spikes, length(class_to_plot));
@@ -22,7 +22,9 @@ sup_spikes = length(class_to_plot);
 
 % Plot clusters
 colors = ['k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
-eval(['axes(handles.spikes' num2str(axes_nr-1) ');']);
+% eval(['axes(handles.spikes' num2str(axes_nr-1) ');']);
+axes(handles.(['spikes' num2str(axes_nr-1)]));
+
 cla reset
 hold on
 av   = mean(spikes(class_to_plot,:));
@@ -39,17 +41,25 @@ else
 end
 xlim([1 ls])
 aux = num2str(length(class_to_plot));
-eval(['title([''Cluster ' num2str(axes_nr-1) ':  # ' aux '''],''Fontweight'',''bold'')']);
-eval(['axes(handles.isi' num2str(axes_nr-1) ');']);
+% eval(['title([''Cluster ' num2str(axes_nr-1) ':  # ' aux '''],''Fontweight'',''bold'')']);
+title(['Cluster ' num2str(axes_nr-1) ':  # ', aux], 'Fontweight', 'bold');
+
+% eval(['axes(handles.isi' num2str(axes_nr-1) ');']);
+axes(handles.(['isi' num2str(axes_nr-1)]));
+
 times = diff(spk_times(class_to_plot));
 % Calculates # ISIs < 3ms
 bin_step_temp = 1;
-eval(['[N,X]=hist(times,0:bin_step_temp:par.nbins' num2str(axes_nr-1) ');']);
+% eval(['[N,X]=hist(times,0:bin_step_temp:par.nbins' num2str(axes_nr-1) ');']);
+[N,X]=hist(times, 0: bin_step_temp: par.(['nbins' num2str(axes_nr-1)]));
 multi_isi= sum(N(1:3));
 % Builds and plots the histogram
-eval(['[N,X]=hist(times,0:par.bin_step' num2str(axes_nr-1) ':par.nbins' num2str(axes_nr-1) ');']);
+% eval(['[N,X]=hist(times,0:par.bin_step' num2str(axes_nr-1) ':par.nbins' num2str(axes_nr-1) ');']);
+[N,X]=hist(times, 0: par.(['bin_step' num2str(axes_nr-1)]): par.(['nbins' num2str(axes_nr-1)]));
 bar(X(1:end-1),N(1:end-1))
-eval(['xlim([0 par.nbins' num2str(axes_nr-1) ']);']);
+% eval(['xlim([0 par.nbins' num2str(axes_nr-1) ']);']);
+xlim([0, par.(['nbins' num2str(axes_nr-1)])]);
+
 %eval(['set(get(gca,''children''),''facecolor'',''' colors(axes_nr) ''',''edgecolor'',''' colors(axes_nr) ''',''linewidth'',0.01);']);
 title([num2str(multi_isi) ' in < 3ms'])
 xlabel('ISI (ms)');
@@ -57,7 +67,9 @@ xlabel('ISI (ms)');
 %Resize axis
 ymin = min(ylimit(:,1));
 ymax = max(ylimit(:,2));
-eval(['axes(handles.spikes' num2str(axes_nr-1) '); ylim([ymin ymax])'])
+% eval(['axes(handles.spikes' num2str(axes_nr-1) ');'])
+axes(handles.(['spikes' num2str(axes_nr-1)]));
+ylim([ymin ymax]);
 
 set(handles.fix4_button,'value',0);
 set(handles.fix5_button,'value',0);
