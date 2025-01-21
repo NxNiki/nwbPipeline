@@ -14,6 +14,15 @@ from mne.io import RawArray
 We have import error for psta version 3.0.5 (see: https://github.com/pennmem/ptsa/issues/251).
 Try to install earlier version 3.0.4 with pip install git+ssh://git@github.com/pennmem/ptsa@v3.0.4 but failed.
 Try to avoid ptsa and use mne for signal processing.
+
+This code contains 3 methods for ripple detection which is published in:
+https://www.nature.com/articles/s41467-022-33536-x 
+
+In Figure 5:
+hamming is Norman
+butter is Vaz
+staresina is staresina
+
 """
 
 from numpy.core.defchararray import endswith
@@ -51,7 +60,7 @@ DESIRED_SAMPLE_RATE = 500. # in Hz. This seems like lowest common denominator re
 EEG_BUFFER = 300 # buffer to add to either end of IRI when processing eeg #**
 
 
-def read_raw_data(timestamps_files: List[str], channel_files: List[List[str]], sampling_rate: int) -> Tuple[RawArray, int]:
+def read_raw_data(timestamps_files: List[str], channel_files: List[List[str]]) -> Tuple[RawArray, int]:
     """
     read raw data and save to mne RawArray.
     """
@@ -68,9 +77,11 @@ def read_raw_data(timestamps_files: List[str], channel_files: List[List[str]], s
         signals.append(data)
         ch_names.append(str(channel_name.replace('.mat', '')))
 
+    sampling_rate = int(1/sampling_interval_seconds)
     # Create MNE Raw object
     info = mne.create_info(ch_names=ch_names, sfreq=sampling_rate, ch_types='eeg')
     raw = RawArray(signals, info)
+
 
     return raw, int(1/sampling_interval_seconds)
 
@@ -138,7 +149,7 @@ if __name__ == "__main__":
         ],
     ]
 
-    raw_csc, sampling_rate = read_raw_data(timestamps_files, csc_files, 2000)
+    raw_csc, sampling_rate = read_raw_data(timestamps_files, csc_files)
     eeg_rip_band, eeg_ied_band = filter_timeseries(raw_csc, sampling_rate=sampling_rate)
 
 
