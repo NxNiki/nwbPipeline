@@ -33,8 +33,8 @@ for m=1:length(aux_figs_label)
     if ~isempty(aux_fig)
         set(0, 'currentFigure', aux_fig);
         set(aux_fig, 'visible', 'off');
-        % ch = get(aux_fig, 'children');
-        % arrayfun(@(x)cla(x,'reset'), ch);
+        ch = get(aux_fig, 'children');
+        arrayfun(@(x)cla(x,'reset'), ch);
     end
 end
 
@@ -326,11 +326,11 @@ for i = 1:nclusters+1
             USER_DATA{1} = par;
             set(handles.wave_clus_figure, 'userdata', USER_DATA)
             
-            % if mod(i, 5) == 0
-            %     h = openfig('wave_clus_aux.fig', 'new', 'visible'); % create a new aux fig.
-            %     set(h, 'Tag', aux_figs_label{floor((i - 5)/5)+1}); % Assign a unique tag
-            % end
-            wave_clus_aux;
+            if i < 10
+                wave_clus_aux;
+            else
+                wave_clus_aux1;
+            end
         end
 
         hold(handles.projections, 'off')
