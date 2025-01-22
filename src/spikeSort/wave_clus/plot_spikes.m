@@ -23,13 +23,9 @@ clustering_results = USER_DATA{10};
 
 % Closes aux figures
 h_figs = get(0, 'children');
-mainHandle  = findobj(h_figs, 'tag', 'wave_clus_figure');
-% mainHandle = findobj('tag', 'wave_clus_figure');
 
 % EM: It's inefficient to close all of these if you're just going to open
 % them again shortly. Set to visible off instead.
-
-mainHandles = guidata(mainHandle);
 aux_figs_label = {'wave_clus_aux', 'wave_clus_aux1', 'wave_clus_aux2', 'wave_clus_aux3', 'wave_clus_aux4', 'wave_clus_aux5'};
 
 for m=1:length(aux_figs_label)
@@ -37,8 +33,8 @@ for m=1:length(aux_figs_label)
     if ~isempty(aux_fig)
         set(0, 'currentFigure', aux_fig);
         set(aux_fig, 'visible', 'off');
-        ch = get(aux_fig, 'children');
-        arrayfun(@(x)cla(x,'reset'), ch);
+        % ch = get(aux_fig, 'children');
+        % arrayfun(@(x)cla(x,'reset'), ch);
     end
 end
 
@@ -254,6 +250,7 @@ cla(handles.projections, 'reset');
 ylimit = [];
 colors = ['k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 
+
 for i = 1:nclusters+1
     if ~ (isempty(class0) && i==1)
         %PLOTS SPIKES OR PROJECTIONS
@@ -322,25 +319,18 @@ for i = 1:nclusters+1
             hold(ax,'off');
         else
             par.axes_nr = i;
+            par.cluster_index = i - 1;
             par.ylimit = ylimit;
             par.class_to_plot = classDefs{i};
             par.plot_all_button = get(handles.plot_all_button, 'value');
             USER_DATA{1} = par;
             set(handles.wave_clus_figure, 'userdata', USER_DATA)
-            if i < 10
-                wave_clus_aux;
-            elseif i < 15
-                wave_clus_aux1;
-            elseif i < 20
-                wave_clus_aux2;
-            elseif i < 25
-                wave_clus_aux3;
-            elseif i < 30
-                wave_clus_aux4;
-            else
-                wave_clus_aux5;
+            
+            if mod(i, 5) == 0
+                h = openfig('wave_clus_aux.fig', 'new', 'visible'); % create a new aux fig.
+                set(h, 'Tag', aux_figs_label{floor((i - 5)/5)+1}); % Assign a unique tag
             end
-            %--------------------------------------------------------------
+            wave_clus_aux(h);
         end
 
         hold(handles.projections, 'off')

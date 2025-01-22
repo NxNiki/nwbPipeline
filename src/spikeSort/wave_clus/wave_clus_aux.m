@@ -25,28 +25,57 @@ function varargout = wave_clus_aux(varargin)
 % Last Modified by GUIDE v2.5 14-Jan-2025 14:57:27
 
 % Begin initialization code - DO NOT EDIT
-gui_Singleton = 1;
-gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
-                   'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
-if nargin & isstr(varargin{1})
-    gui_State.gui_Callback = str2func(varargin{1});
-end
-
-if nargout
-    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
-else
-    gui_mainfcn(gui_State, varargin{:});
-end
+% gui_Singleton = 1;
+% gui_State = struct('gui_Name',       mfilename, ...
+%                    'gui_Singleton',  gui_Singleton, ...
+%                    'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
+%                    'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
+%                    'gui_LayoutFcn',  [] , ...
+%                    'gui_Callback',   []);
+% if nargin & isstr(varargin{1})
+%     gui_State.gui_Callback = str2func(varargin{1});
+% end
+% 
+% if nargout
+%     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+% else
+%     gui_mainfcn(gui_State, varargin{:});
+% end
 % End initialization code - DO NOT EDIT
-end
 
+    % modified to use passed handle instead of creating a new one:
+    % Check if a figure handle is passed
+    if ~isempty(varargin) && isgraphics(varargin{1}, 'figure')
+        % A figure handle is passed, reuse it
+        figHandle = varargin{1};
+        % Set the figure handle as the current figure
+        figure(figHandle);
+
+        % Use the GUI state setup for this figure
+        gui_State = struct('gui_Name',       mfilename, ...
+                           'gui_Singleton',  0, ...
+                           'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
+                           'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
+                           'gui_LayoutFcn',  [] , ...
+                           'gui_Callback',   []);
+        varargin = varargin(2:end); % Remove the figure handle from varargin
+        gui_mainfcn(gui_State, figHandle, varargin{:});
+    else
+        % Default behavior: Create a new figure
+        gui_State = struct('gui_Name',       mfilename, ...
+                           'gui_Singleton',  1, ...
+                           'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
+                           'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
+                           'gui_LayoutFcn',  [] , ...
+                           'gui_Callback',   []);
+        gui_mainfcn(gui_State, varargin{:});
+    end
+
+
+end
 
 % --- Executes just before wave_clus_aux is made visible.
-function wave_clus_aux_OpeningFcn(hObject, eventdata, handles, clusterIdx)
+function wave_clus_aux_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -56,18 +85,37 @@ function wave_clus_aux_OpeningFcn(hObject, eventdata, handles, clusterIdx)
 % Choose default command line output for wave_clus_aux
 handles.output = hObject;
 
-if ~exist('clusterIdx', 'var') || isempty(clusterIdx)
-    clusterIdx = 4:8;
+% Check if a figure handle was passed
+if ~isempty(varargin)
+    handles.figHandle = varargin{1}; % Store varargin{1} as a field
+else
+    handles.figHandle = []; % Default if no handle is passed
 end
 
-handles.clusterIdx = clusterIdx;
+h_figs=get(0, 'children');
+h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
+USER_DATA = get(h_fig, 'UserData');
+par = USER_DATA{1};
+
+if par.cluster_index <=8
+    handles.clusterIdx = 4:8;
+elseif par.cluster_index <=13
+    handles.clusterIdx = 9:13;
+elseif par.cluster_index <=18
+    handles.clusterIdx = 14:18;
+elseif par.cluster_index <=23
+    handles.clsuterIdx = 19:23;
+else
+    error('too many clusters!');
+end
+
 plotLabelIdx = 4:8;
 handles.plotLabelIdx = plotLabelIdx;
 radiobuttonIdx = [45, 48, 51, 54, 57];
 for i = 1:5
-    set(handles.(sprintf('isi%d_accept_button', plotLabelIdx(i))),'value',1);
-    set(handles.(sprintf('fix%d_button', plotLabelIdx(i))),'value',0);
-    set(handles.(sprintf('radiobutton%d', radiobuttonIdx(i))),'value',1);
+    set(handles.(sprintf('isi%d_accept_button', plotLabelIdx(i))), 'value', 1);
+    set(handles.(sprintf('fix%d_button', plotLabelIdx(i))), 'value', 0);
+    set(handles.(sprintf('radiobutton%d', radiobuttonIdx(i))), 'value', 1);
 end
 
 % Update handles structure
@@ -88,11 +136,11 @@ function varargout = wave_clus_aux_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
+h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
 USER_DATA = get(h_fig, 'UserData');
 par = USER_DATA{1};
 
-clusterIdx = handles.clusterIdx;
+clusterIdx = handles.clusterIdx; % define in plot_spikes.
 plotLabelIdx = handles.plotLabelIdx;
 for i = 1:5
     set(handles.(sprintf('isi%d_accept_button', plotLabelIdx(i))), 'value', 1);
@@ -111,7 +159,7 @@ end
 
 USER_DATA{1} = par;
 set(handles.wave_clus_aux, 'userdata', USER_DATA)
-set(h_fig,'userdata',USER_DATA)
+set(h_fig, 'userdata', USER_DATA)
 plot_spikes_aux(handles)
 end
 
@@ -121,12 +169,11 @@ function change_isi_bins(handles, plotIdx)
     USER_DATA = get(handles.wave_clus_aux,'userdata');
     par = USER_DATA{1};
     clusterIdx = handles.clusterIdx(plotIdx);
-    par.(sprintf('nbins%d', clusterIdx)) = str2num(get(hObject, 'String'));
+    par.(sprintf('nbins%d', clusterIdx)) = str2double(get(hObject, 'String'));
     par.axes_nr = clusterIdx + 1;
     classes = USER_DATA{6};
     par.class_to_plot = find(classes==clusterIdx);
     USER_DATA{1} = par;
-    % USER_DATA{6} = classes;
     set(handles.wave_clus_aux,'userdata', USER_DATA);
     plot_spikes_aux(handles)
 end
@@ -155,11 +202,11 @@ end
 
 % Change bin steps
 % -------------------------------------------------------------
-function change_isi_bin_step(handles, plotIdx)
+function change_isi_bin_step(hObject, handles, plotIdx)
     USER_DATA = get(handles.wave_clus_aux,'userdata');
     par = USER_DATA{1};
     clusterIdx = handles.clusterIdx(plotIdx);
-    par.(sprintf('bin_step%d', clusterIdx)) = str2num(get(hObject, 'String'));
+    par.(sprintf('bin_step%d', clusterIdx)) = str2double(get(hObject, 'String'));
     par.axes_nr = clusterIdx+1;
     classes = USER_DATA{6};
     par.class_to_plot = find(classes==clusterIdx);
@@ -170,23 +217,23 @@ function change_isi_bin_step(handles, plotIdx)
 end
 
 function isi4_bin_step_Callback(hObject, eventdata, handles)
-    change_isi_bin_step(handles, 1);
+    change_isi_bin_step(hObject, handles, 1);
 end
 
 function isi5_bin_step_Callback(hObject, eventdata, handles)
-    change_isi_bin_step(handles, 2);
+    change_isi_bin_step(hObject, handles, 2);
 end
 
 function isi6_bin_step_Callback(hObject, eventdata, handles)
-    change_isi_bin_step(handles, 3);
+    change_isi_bin_step(hObject, handles, 3);
 end
 
 function isi7_bin_step_Callback(hObject, eventdata, handles)
-    change_isi_bin_step(handles, 4);
+    change_isi_bin_step(hObject, handles, 4);
 end
 
 function isi8_bin_step_Callback(hObject, eventdata, handles)
-    change_isi_bin_step(handles, 5);
+    change_isi_bin_step(hObject, handles, 5);
 end
 
 % Accept and Reject buttons
@@ -226,7 +273,7 @@ function isi4_reject_button_Callback(hObject, eventdata, handles)
 end
 
 function isi5_accept_button_Callback(hObject, eventdata, handles)
-    set(gcbo,'value',1);
+    set(hObject,'value',1);
     set(handles.isi5_reject_button,'value',0);
 end
 
@@ -235,7 +282,7 @@ function isi5_reject_button_Callback(hObject, eventdata, handles)
 end
 
 function isi6_accept_button_Callback(hObject, eventdata, handles)
-    set(gcbo,'value',1);
+    set(hObject,'value',1);
     set(handles.isi6_reject_button,'value',0);
 end
 
@@ -244,7 +291,7 @@ function isi6_reject_button_Callback(hObject, eventdata, handles)
 end
 
 function isi7_accept_button_Callback(hObject, eventdata, handles)
-    set(gcbo,'value',1);
+    set(hObject,'value',1);
     set(handles.isi7_reject_button,'value',0);
 end
 
@@ -253,7 +300,7 @@ function isi7_reject_button_Callback(hObject, eventdata, handles)
 end
 
 function isi8_accept_button_Callback(hObject, eventdata, handles)
-    set(gcbo,'value',1);
+    set(hObject,'value',1);
     set(handles.isi8_reject_button,'value',0);
 end
 
@@ -308,9 +355,9 @@ end
 % --- Executes during object creation, after setting all properties.
 function isi_setbackground(hObject)
     if ispc
-        set(hObject,'BackgroundColor','white');
+        set(hObject,'BackgroundColor', 'white');
     else
-        set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+        set(hObject,'BackgroundColor', get(0,'defaultUicontrolBackgroundColor'));
     end
 end
 

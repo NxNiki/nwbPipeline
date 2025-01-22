@@ -16,7 +16,7 @@ if ~isfield(par,'ylimit')
 else
     ylimit = par.ylimit;
 end
-class_to_plot = par.class_to_plot;
+class_to_plot = par.class_to_plot;  % defined in plot_spikes.m: par.class_to_plot = classDefs{i};
 max_spikes = min(par.max_spikes, length(class_to_plot));
 sup_spikes = length(class_to_plot);
 
