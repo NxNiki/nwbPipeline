@@ -11,8 +11,8 @@ function plot_cross_correlogram(ts1, ts2, tsLabel1, tsLabel2)
 cfg.binsize = 0.001;
 cfg.max_t = 0.05;
 cfg.smooth = 0;
-cfg.gauss_w = 1;
-cfg.gauss_sd = 0.02;
+cfg.gauss_w = 0.010;
+cfg.gauss_sd = 0.07;
 cfg.xcorr = 'coeff';
 
 % Create the UI figure
