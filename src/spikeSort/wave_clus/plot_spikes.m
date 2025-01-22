@@ -21,7 +21,7 @@ par.to_plot_std = 1;                % # of std from mean to plot
 minclus = handles.minclus;
 clustering_results = USER_DATA{10};
 
-% Closes aux figures
+% Close aux figures
 h_figs = get(0, 'children');
 
 % EM: It's inefficient to close all of these if you're just going to open

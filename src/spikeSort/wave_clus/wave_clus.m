@@ -21,7 +21,7 @@ function varargout = wave_clus(varargin)
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
 % Edit the above text to modify the response to help wave_clus
-% Last Modified by GUIDE v2.5 14-Jan-2025 03:22:42
+% Last Modified by GUIDE v2.5 22-Jan-2025 15:12:32
 
 % JMG101208
 % USER_DATA DEFINITIONS
@@ -1081,3 +1081,14 @@ function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 updateClusterUnit(eventdata, 3);
+
+
+% --- Executes on button press in pushbutton28.
+function pushbutton28_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton28 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+unFixAllClusters();
+
+
