@@ -326,11 +326,11 @@ for i = 1:nclusters+1
             USER_DATA{1} = par;
             set(handles.wave_clus_figure, 'userdata', USER_DATA)
             
-            if mod(i, 5) == 0
-                h = openfig('wave_clus_aux.fig', 'new', 'visible'); % create a new aux fig.
-                set(h, 'Tag', aux_figs_label{floor((i - 5)/5)+1}); % Assign a unique tag
-            end
-            wave_clus_aux(h);
+            % if mod(i, 5) == 0
+            %     h = openfig('wave_clus_aux.fig', 'new', 'visible'); % create a new aux fig.
+            %     set(h, 'Tag', aux_figs_label{floor((i - 5)/5)+1}); % Assign a unique tag
+            % end
+            wave_clus_aux;
         end
 
         hold(handles.projections, 'off')

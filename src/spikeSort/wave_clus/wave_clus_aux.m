@@ -25,57 +25,28 @@ function varargout = wave_clus_aux(varargin)
 % Last Modified by GUIDE v2.5 14-Jan-2025 14:57:27
 
 % Begin initialization code - DO NOT EDIT
-% gui_Singleton = 1;
-% gui_State = struct('gui_Name',       mfilename, ...
-%                    'gui_Singleton',  gui_Singleton, ...
-%                    'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
-%                    'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
-%                    'gui_LayoutFcn',  [] , ...
-%                    'gui_Callback',   []);
-% if nargin & isstr(varargin{1})
-%     gui_State.gui_Callback = str2func(varargin{1});
-% end
-% 
-% if nargout
-%     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
-% else
-%     gui_mainfcn(gui_State, varargin{:});
-% end
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
+                   'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin & isstr(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
 % End initialization code - DO NOT EDIT
-
-    % modified to use passed handle instead of creating a new one:
-    % Check if a figure handle is passed
-    if ~isempty(varargin) && isgraphics(varargin{1}, 'figure')
-        % A figure handle is passed, reuse it
-        figHandle = varargin{1};
-        % Set the figure handle as the current figure
-        figure(figHandle);
-
-        % Use the GUI state setup for this figure
-        gui_State = struct('gui_Name',       mfilename, ...
-                           'gui_Singleton',  0, ...
-                           'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
-                           'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
-                           'gui_LayoutFcn',  [] , ...
-                           'gui_Callback',   []);
-        varargin = varargin(2:end); % Remove the figure handle from varargin
-        gui_mainfcn(gui_State, figHandle, varargin{:});
-    else
-        % Default behavior: Create a new figure
-        gui_State = struct('gui_Name',       mfilename, ...
-                           'gui_Singleton',  1, ...
-                           'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
-                           'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
-                           'gui_LayoutFcn',  [] , ...
-                           'gui_Callback',   []);
-        gui_mainfcn(gui_State, varargin{:});
-    end
-
 
 end
 
 % --- Executes just before wave_clus_aux is made visible.
-function wave_clus_aux_OpeningFcn(hObject, eventdata, handles, varargin)
+function wave_clus_aux_OpeningFcn(hObject, eventdata, handles)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -84,13 +55,6 @@ function wave_clus_aux_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for wave_clus_aux
 handles.output = hObject;
-
-% Check if a figure handle was passed
-if ~isempty(varargin)
-    handles.figHandle = varargin{1}; % Store varargin{1} as a field
-else
-    handles.figHandle = []; % Default if no handle is passed
-end
 
 h_figs=get(0, 'children');
 h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
