@@ -1,5 +1,5 @@
 function varargout = wave_clus_aux1(varargin)
-% WAVE_CLUS_AUX1 M-file for wave_clus_aux.fig
+% WAVE_CLUS_AUX M-file for wave_clus_aux.fig
 %      WAVE_CLUS_AUX, by itself, creates a new WAVE_CLUS_AUX or raises the existing
 %      singleton*.
 %
@@ -22,14 +22,14 @@ function varargout = wave_clus_aux1(varargin)
 
 % Edit the above text to modify the response to help wave_clus_aux
 
-% Last Modified by GUIDE v2.5 16-Dec-2004 18:37:28
+% Last Modified by GUIDE v2.5 14-Jan-2025 14:57:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @wave_clus_aux1_OpeningFcn, ...
-                   'gui_OutputFcn',  @wave_clus_aux1_OutputFcn, ...
+                   'gui_OpeningFcn', @wave_clus_aux_OpeningFcn, ...
+                   'gui_OutputFcn',  @wave_clus_aux_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin & isstr(varargin{1})
@@ -43,604 +43,347 @@ else
 end
 % End initialization code - DO NOT EDIT
 
+end
 
 % --- Executes just before wave_clus_aux is made visible.
-function wave_clus_aux1_OpeningFcn(hObject, eventdata, handles, varargin)
+function wave_clus_aux_OpeningFcn(hObject, eventdata, handles)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to wave_clus_aux (see VARARGIN)
 
 % Choose default command line output for wave_clus_aux
 handles.output = hObject;
-set(handles.isi9_accept_button,'value',1);
-set(handles.isi10_accept_button,'value',1);
-set(handles.isi11_accept_button,'value',1);
-set(handles.isi12_accept_button,'value',1);
-set(handles.isi13_accept_button,'value',1);
-set(handles.fix9_button,'value',0);
-set(handles.fix10_button,'value',0);
-set(handles.fix11_button,'value',0);
-set(handles.fix12_button,'value',0);
-set(handles.fix13_button,'value',0);
+
+USER_DATA = getUserData();
+par = USER_DATA{1};
+
+if par.cluster_index <=8
+    handles.clusterIdx = 4:8;
+elseif par.cluster_index <=13
+    handles.clusterIdx = 9:13;
+elseif par.cluster_index <=18
+    handles.clusterIdx = 14:18;
+elseif par.cluster_index <=23
+    handles.clsuterIdx = 19:23;
+else
+    error('too many clusters!');
+end
+
+plotLabelIdx = 4:8;
+handles.plotLabelIdx = plotLabelIdx;
+radiobuttonIdx = [45, 48, 51, 54, 57];
+for i = 1:5
+    set(handles.(sprintf('isi%d_accept_button', plotLabelIdx(i))), 'value', 1);
+    set(handles.(sprintf('fix%d_button', plotLabelIdx(i))), 'value', 0);
+    set(handles.(sprintf('radiobutton%d', radiobuttonIdx(i))), 'value', 1);
+end
 
 % Update handles structure
 guidata(hObject, handles);
 
 % UIWAIT makes wave_clus_aux wait for user response (see UIRESUME)
 % uiwait(handles.wave_clus_aux);
-
+end
 
 % --- Outputs from this function are returned to the command line.
-function varargout = wave_clus_aux1_OutputFcn(hObject, eventdata, handles)
+function varargout = wave_clus_aux_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
+
 varargout{1} = handles.output;
+[par, spikes, spike_times] = getUserData(1:3);
+clusterIdx = handles.clusterIdx; % define in plot_spikes.
+plotLabelIdx = handles.plotLabelIdx;
+for i = 1:5
+    set(handles.(sprintf('isi%d_accept_button', plotLabelIdx(i))), 'value', 1);
+    set(handles.(sprintf('isi%d_reject_button', plotLabelIdx(i))), 'value', 0);
+    set(handles.(sprintf('fix%d_button', plotLabelIdx(i))), 'value', 0);
+    set(handles.(sprintf('isi%d_nbins', plotLabelIdx(i))), 'string', par.(sprintf('nbins%d', clusterIdx(i))));
+    set(handles.(sprintf('isi%d_bin_step', plotLabelIdx(i))), 'string', par.(sprintf('bin_step%d', clusterIdx(i))));
 
-set(handles.isi9_accept_button,'value',1);
-set(handles.isi10_accept_button,'value',1);
-set(handles.isi11_accept_button,'value',1);
-set(handles.isi12_accept_button,'value',1);
-set(handles.isi13_accept_button,'value',1);
-set(handles.isi9_reject_button,'value',0);
-set(handles.isi10_reject_button,'value',0);
-set(handles.isi11_reject_button,'value',0);
-set(handles.isi12_reject_button,'value',0);
-set(handles.isi13_reject_button,'value',0);
-set(handles.fix9_button,'value',0);
-set(handles.fix10_button,'value',0);
-set(handles.fix11_button,'value',0);
-set(handles.fix12_button,'value',0);
-set(handles.fix13_button,'value',0);
-
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-h_fig4 = findobj(h_figs,'tag','wave_clus_aux4');
-h_fig5 = findobj(h_figs,'tag','wave_clus_aux5');
-USER_DATA = get(h_fig,'UserData');
-par = USER_DATA{1};
-
-set(handles.isi9_nbins,'string',par.nbins9);
-set(handles.isi10_nbins,'string',par.nbins10);
-set(handles.isi11_nbins,'string',par.nbins11);
-set(handles.isi12_nbins,'string',par.nbins12);
-set(handles.isi13_nbins,'string',par.nbins13);
-set(handles.isi9_bin_step,'string',par.bin_step9);
-set(handles.isi10_bin_step,'string',par.bin_step10);
-set(handles.isi11_bin_step,'string',par.bin_step11);
-set(handles.isi12_bin_step,'string',par.bin_step12);
-set(handles.isi13_bin_step,'string',par.bin_step13);
-
-% That's for passing the fix button settings to plot_spikes.
-if get(handles.fix9_button,'value') ==1
-    par.fix9 = 1;
-else
-    par.fix9 = 0;
+    % That's for passing the fix button settings to plot_spikes.
+    if get(handles.(sprintf('fix%d_button', plotLabelIdx(i))),'value') == 1
+        par.(sprintf('fix%d', clusterIdx(i))) = 1;
+    else
+        par.(sprintf('fix%d', clusterIdx(i))) = 0;
+    end
 end
-if get(handles.fix10_button,'value') ==1
-    par.fix10 = 1;
-else
-    par.fix10 = 0;
-end
-if get(handles.fix11_button,'value') ==1
-    par.fix11 = 1;
-else
-    par.fix11 = 0;
-end
-if get(handles.fix12_button,'value') ==1
-    par.fix12 = 1;
-else
-    par.fix12 = 0;
-end
-if get(handles.fix13_button,'value') ==1
-    par.fix13 = 1;
-else
-    par.fix13 = 0;
-end
-USER_DATA{1} = par;
-set(handles.wave_clus_aux1,'userdata',USER_DATA)
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
 
-plot_spikes_aux1(handles)
-
-
-
+setUserData(par, 1);
+plot_spikes_aux(handles, par, spikes, spike_times)
+end
 
 % Change nbins
 % -------------------------------------------------------------
-function isi9_nbins_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.nbins9 = str2num(get(hObject, 'String'));
-par.axes_nr = 10;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==9);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi10_nbins_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.nbins10 = str2num(get(hObject, 'String'));
-par.axes_nr = 11;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==10);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi11_nbins_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.nbins11 = str2num(get(hObject, 'String'));
-par.axes_nr = 12;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==11);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi12_nbins_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.nbins12 = str2num(get(hObject, 'String'));
-par.axes_nr = 13;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==12);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi13_nbins_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.nbins13 = str2num(get(hObject, 'String'));
-par.axes_nr = 14;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==13);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
+function change_isi_bins(hObject, handles, plotIdx)
+    [par, classes] = getUserData([1, 6]);
+    clusterIdx = handles.clusterIdx(plotIdx);
+    par.(sprintf('nbins%d', clusterIdx)) = str2double(get(hObject, 'String'));
+    par.axes_nr = clusterIdx + 1;
+    par.class_to_plot = find(classes==clusterIdx);
+    setUserData(par, 1);
+    plot_spikes_aux(handles)
+end
+
+function isi4_nbins_Callback(hObject, eventdata, handles)
+    change_isi_bins(hObject, handles, 1);
+end
+
+function isi5_nbins_Callback(hObject, eventdata, handles)
+    change_isi_bins(hObject, handles, 2);
+end
+
+function isi6_nbins_Callback(hObject, eventdata, handles)
+    change_isi_bins(hObject, handles, 3);
+end
+
+function isi7_nbins_Callback(hObject, eventdata, handles)
+    change_isi_bins(hObject, handles, 4);
+end
+
+function isi8_nbins_Callback(hObject, eventdata, handles)
+    change_isi_bins(hObject, handles, 5);
+end
 % --------------------------------------------------------------------
 
 
 % Change bin steps
-% --------------------------------------------------------
-function isi9_bin_step_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.bin_step9 = str2num(get(hObject, 'String'));
-par.axes_nr = 10;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==9);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi10_bin_step_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.bin_step10 = str2num(get(hObject, 'String'));
-par.axes_nr = 11;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==10);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi11_bin_step_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.bin_step11 = str2num(get(hObject, 'String'));
-par.axes_nr = 12;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==11);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi12_bin_step_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.bin_step12 = str2num(get(hObject, 'String'));
-par.axes_nr = 13;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==12);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
-function isi13_bin_step_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-par.bin_step13 = str2num(get(hObject, 'String'));
-par.axes_nr = 14;
-classes = USER_DATA{6};
-par.class_to_plot = find(classes==13);
-USER_DATA{1} = par;
-USER_DATA{6} = classes;
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-plot_spikes_aux1(handles)
-% --------------------------------------------------------------------
+% -------------------------------------------------------------
+function change_isi_bin_step(hObject, handles, plotIdx)
+    [par, classes] = getUserData([1, 6]);
+    clusterIdx = handles.clusterIdx(plotIdx);
+    par.(sprintf('bin_step%d', clusterIdx)) = str2double(get(hObject, 'String'));
+    par.axes_nr = clusterIdx+1;
+    par.class_to_plot = find(classes==clusterIdx);
+    setUserData(par, 1);
+    plot_spikes_aux(handles)
+end
 
+function isi4_bin_step_Callback(hObject, eventdata, handles)
+    change_isi_bin_step(hObject, handles, 1);
+end
+
+function isi5_bin_step_Callback(hObject, eventdata, handles)
+    change_isi_bin_step(hObject, handles, 2);
+end
+
+function isi6_bin_step_Callback(hObject, eventdata, handles)
+    change_isi_bin_step(hObject, handles, 3);
+end
+
+function isi7_bin_step_Callback(hObject, eventdata, handles)
+    change_isi_bin_step(hObject, handles, 4);
+end
+
+function isi8_bin_step_Callback(hObject, eventdata, handles)
+    change_isi_bin_step(hObject, handles, 5);
+end
 
 % Accept and Reject buttons
-% --------------------------------------------------------
-function isi9_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi9_reject_button,'value',0);
-% --------------------------------------------------------------------
-function isi9_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi9_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-classes = USER_DATA{6};
-classes(find(classes==9))=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes9);
-cla reset
-axes(handles.isi9);
-cla reset
-set(gcbo,'value',0);
-set(handles.isi9_accept_button,'value',1);
+function reject_buttons(hObject, handles, plotIdx)
+    clusterIdx = handles.clusterIdx(plotIdx);
+    plotLabelIdx = handles.plotLabelIdx(plotIdx);
 
-% --------------------------------------------------------
-function isi10_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi10_reject_button,'value',0);
-% --------------------------------------------------------------------
-function isi10_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi10_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-classes = USER_DATA{6};
-classes(find(classes==10))=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes10);
-cla reset
-axes(handles.isi10);
-cla reset
-set(gcbo,'value',0);
-set(handles.isi10_accept_button,'value',1);
+    set(hObject, 'value', 1);
+    set(handles.(sprintf('isi%d_accept_button', plotLabelIdx)), 'value', 0);
+    
+    classes = getUserData(6);
+    classes(classes==clusterIdx)=0;
+    setUserData(classes, [6, 9]);
+    
+    axes(handles.(sprintf('spikes%d', plotLabelIdx)));
+    cla reset
+    axes(handles.(sprintf('isi%d', plotLabelIdx)));
+    cla reset
+    set(hObject,'value',0);
+    set(handles.(sprintf('isi%d_accept_button', plotLabelIdx)), 'value', 1);
+end
 
-% --------------------------------------------------------
-function isi11_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi11_reject_button,'value',0);
-% --------------------------------------------------------------------
-function isi11_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi11_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-classes = USER_DATA{6};
-classes(find(classes==11))=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes11);
-cla reset
-axes(handles.isi11);
-cla reset
-set(gcbo,'value',0);
-set(handles.isi11_accept_button,'value',1);
+function isi4_accept_button_Callback(hObject, eventdata, handles)
+    set(hObject,'value',1);
+    set(handles.isi4_reject_button,'value',0);
+end
 
-% --------------------------------------------------------
-function isi12_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi12_reject_button,'value',0);
-% --------------------------------------------------------------------
-function isi12_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi12_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-classes = USER_DATA{6};
-classes(find(classes==12))=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes12);
-cla reset
-axes(handles.isi12);
-cla reset
-set(gcbo,'value',0);
-set(handles.isi12_accept_button,'value',1);
+function isi4_reject_button_Callback(hObject, eventdata, handles)
+    reject_buttons(hObject, handles, 1)
+end
 
-% --------------------------------------------------------
-function isi13_accept_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi13_reject_button,'value',0);
-% --------------------------------------------------------------------
-function isi13_reject_button_Callback(hObject, eventdata, handles)
-set(gcbo,'value',1);
-set(handles.isi13_accept_button,'value',0);
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-classes = USER_DATA{6};
-classes(find(classes==13))=0;
-USER_DATA{6} = classes;
-USER_DATA{9} = classes;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-axes(handles.spikes13);
-cla reset
-axes(handles.isi13);
-cla reset
-set(gcbo,'value',0);
-set(handles.isi13_accept_button,'value',1);
+function isi5_accept_button_Callback(hObject, eventdata, handles)
+    set(hObject,'value',1);
+    set(handles.isi5_reject_button,'value',0);
+end
 
+function isi5_reject_button_Callback(hObject, eventdata, handles)
+    reject_buttons(hObject, handles, 2)
+end
 
+function isi6_accept_button_Callback(hObject, eventdata, handles)
+    set(hObject,'value',1);
+    set(handles.isi6_reject_button,'value',0);
+end
+
+function isi6_reject_button_Callback(hObject, eventdata, handles)
+    reject_buttons(hObject, handles, 3)
+end
+
+function isi7_accept_button_Callback(hObject, eventdata, handles)
+    set(hObject,'value',1);
+    set(handles.isi7_reject_button,'value',0);
+end
+
+function isi7_reject_button_Callback(hObject, eventdata, handles)
+    reject_buttons(hObject, handles, 4)
+end
+
+function isi8_accept_button_Callback(hObject, eventdata, handles)
+    set(hObject,'value',1);
+    set(handles.isi8_reject_button,'value',0);
+end
+
+function isi8_reject_button_Callback(hObject, eventdata, handles)
+    reject_buttons(hObject, handles, 5)
+end
 
 % FIX buttons
-% --------------------------------------------------------
-function fix9_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-classes = USER_DATA{6};
-fix_class = find(classes==9);
-if get(handles.fix9_button,'value') ==1
-    USER_DATA{28} = fix_class;
-    par.fix9 = 1;
-else
-    USER_DATA{28} = [];
-    par.fix9 = 0
-end
-USER_DATA{1} = par;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-% --------------------------------------------------------
-function fix10_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-classes = USER_DATA{6};
-fix_class = find(classes==10);
-if get(handles.fix10_button,'value') ==1
-    USER_DATA{29} = fix_class;
-    par.fix10 = 1;
-else
-    USER_DATA{29} = [];
-    par.fix10 = 0;
-end
-USER_DATA{1} = par;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-% --------------------------------------------------------
-function fix11_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-classes = USER_DATA{6};
-fix_class = find(classes==11);
-if get(handles.fix11_button,'value') ==1
-    USER_DATA{30} = fix_class;
-    par.fix11 = 1;
-else
-    USER_DATA{30} = [];
-    par.fix11 = 0;
-end
-USER_DATA{1} = par;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-% --------------------------------------------------------
-function fix12_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-classes = USER_DATA{6};
-fix_class = find(classes==12);
-if get(handles.fix12_button,'value') ==1
-    USER_DATA{31} = fix_class;
-    par.fix12 = 1;
-else
-    USER_DATA{31} = [];
-    par.fix12 = 0;
-end
-USER_DATA{1} = par;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
-% --------------------------------------------------------
-function fix13_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_aux1,'userdata');
-par = USER_DATA{1};
-classes = USER_DATA{6};
-fix_class = find(classes==13);
-if get(handles.fix13_button,'value') ==1
-    USER_DATA{32} = fix_class;
-    par.fix13 = 1;
-else
-    USER_DATA{32} = [];
-    par.fix13 = 0;
-end
-USER_DATA{1} = par;
-h_figs=get(0,'children');
-h_fig = findobj(h_figs,'tag','wave_clus_figure');
-h_fig1 = findobj(h_figs,'tag','wave_clus_aux');
-h_fig2 = findobj(h_figs,'tag','wave_clus_aux2');
-h_fig3 = findobj(h_figs,'tag','wave_clus_aux3');
-set(handles.wave_clus_aux1,'userdata',USER_DATA);
-set(h_fig,'userdata',USER_DATA)
-set(h_fig1,'userdata',USER_DATA)
-set(h_fig2,'userdata',USER_DATA)
-set(h_fig3,'userdata',USER_DATA)
+function update_fix_button(handles, plotIdx)
+    clusterIdx = handles.clusterIdx(plotIdx);
+    plotLabelIdx = handles.plotLabelIdx(plotIdx);
 
+    [par, classes] = getUserData([1, 6]);
+    fix_class = find(classes==clusterIdx);
+    if get(handles.(sprintf('fix%d_button', plotLabelIdx)), 'value') == 1
+        par.(sprintf('fix%d', clusterIdx)) = 1;
+    else
+        fix_class = [];
+        par.(sprintf('fix%d', clusterIdx)) = 0;
+    end
+    
+    setUserData({par, fix_class}, [1, 23]);
+end
 
+function fix4_button_Callback(hObject, eventdata, handles)
+    update_fix_button(handles, 1);
+end
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% --- Executes during object creation, after setting all properties.
-function isi9_nbins_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+function fix5_button_Callback(hObject, eventdata, handles)
+    update_fix_button(handles, 2);
+end
+
+function fix6_button_Callback(hObject, eventdata, handles)
+    update_fix_button(handles, 3);
+end
+
+function fix7_button_Callback(hObject, eventdata, handles)
+    update_fix_button(handles, 4);
+end
+
+function fix8_button_Callback(hObject, eventdata, handles)
+    update_fix_button(handles, 5);
 end
 
 % --- Executes during object creation, after setting all properties.
-function isi9_bin_step_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+function isi_setbackground(hObject)
+    if ispc
+        set(hObject,'BackgroundColor', 'white');
+    else
+        set(hObject,'BackgroundColor', get(0,'defaultUicontrolBackgroundColor'));
+    end
 end
 
+function isi4_nbins_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
 % --- Executes during object creation, after setting all properties.
-function isi10_nbins_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+function isi4_bin_step_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi5_nbins_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi5_bin_step_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi6_nbins_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi6_bin_step_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi7_nbins_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi7_bin_step_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi8_nbins_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
+end
+% --- Executes during object creation, after setting all properties.
+function isi8_bin_step_CreateFcn(hObject, eventdata, handles)
+    isi_setbackground(hObject);
 end
 
-% --- Executes during object creation, after setting all properties.
-function isi10_bin_step_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup1_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(eventdata, 4);
+end
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup2_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(eventdata, 5);
+end
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup3_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(eventdata, 6);
+end
+% --- Executes when selected object is changed in uibuttongroup1.
+function uibuttongroup4_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup1 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(eventdata, 7);
 end
 
-% --- Executes during object creation, after setting all properties.
-function isi11_nbins_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+% --- Executes when selected object is changed in uibuttongroup5.
+function uibuttongroup5_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup5 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+updateClusterUnit(eventdata, 8);
 end
 
-% --- Executes during object creation, after setting all properties.
-function isi11_bin_step_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
-end
+% --- Executes on button press in pushbutton1 (plot_cross_correlogram).
+function pushbutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-% --- Executes during object creation, after setting all properties.
-function isi12_nbins_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
-end
-
-% --- Executes during object creation, after setting all properties.
-function isi12_bin_step_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
-end
-
-% --- Executes during object creation, after setting all properties.
-function isi13_nbins_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
-end
-
-% --- Executes during object creation, after setting all properties.
-function isi13_bin_step_CreateFcn(hObject, eventdata, handles)
-if ispc
-    set(hObject,'BackgroundColor','white');
-else
-    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+clustersFixedIdx = getFixClusterIndex();
+[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx);
+plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
 end

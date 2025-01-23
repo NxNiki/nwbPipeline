@@ -1,4 +1,4 @@
-function [handles, USER_DATA, tree] = rejectCluster(hObject, handles, clusterIdx)
+function [handles, clustering_results, tree] = rejectCluster(hObject, handles, clusterIdx)
 
     switch clusterIdx
         case 1
@@ -8,18 +8,15 @@ function [handles, USER_DATA, tree] = rejectCluster(hObject, handles, clusterIdx
         case 3
             set(handles.isi3_accept_button, 'value', 0);
     end
+    
+    [tree, classes, clustering_results] = getUserData([5,6,10]);
 
-    USER_DATA = get(handles.wave_clus_figure, 'userdata');
-    classes = USER_DATA{6};
-    tree = USER_DATA{5};
     classes(classes==clusterIdx) = 0;
     classes = shrinkClassIndex(classes);
-    USER_DATA{6} = classes;
-    USER_DATA{9} = classes;
-    set(handles.wave_clus_figure, 'userdata', USER_DATA);
+    setUserData(classes, [6, 9]);
 
     if ~isempty(hObject)
-        guidata(hObject, handles)
+        guidata(hObject, handles);
     end
 
 end
