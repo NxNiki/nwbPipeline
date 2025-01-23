@@ -196,7 +196,7 @@ switch char(handles.datatype)
 end
 
 % add more clusters for testing:
-cluster_class(:, 1) = cluster_class(:, 1) + randi([0, 1], 24104, 1) * max(cluster_class(:, 1));
+% cluster_class(:, 1) = cluster_class(:, 1) + randi([0, 1], 24104, 1) * max(cluster_class(:, 1));
 
 handles.clusterUnitType = int8(ones(1, length(unique(cluster_class(:, 1))) - 1)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
 if size(cluster_class, 2) == 3
