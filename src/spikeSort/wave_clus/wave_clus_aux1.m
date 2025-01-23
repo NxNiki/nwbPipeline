@@ -1,15 +1,15 @@
 function varargout = wave_clus_aux1(varargin)
-% WAVE_CLUS_AUX M-file for wave_clus_aux.fig
-%      WAVE_CLUS_AUX, by itself, creates a new WAVE_CLUS_AUX or raises the existing
+% WAVE_CLUS_AUX1 M-file for wave_clus_aux1.fig
+%      WAVE_CLUS_AUX1, by itself, creates a new WAVE_CLUS_AUX1 or raises the existing
 %      singleton*.
 %
-%      H = WAVE_CLUS_AUX returns the handle to a new WAVE_CLUS_AUX or the handle to
+%      H = WAVE_CLUS_AUX1 returns the handle to a new WAVE_CLUS_AUX1 or the handle to
 %      the existing singleton*.
 %
-%      WAVE_CLUS_AUX('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in WAVE_CLUS_AUX.M with the given input arguments.
+%      WAVE_CLUS_AUX1('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in WAVE_CLUS_AUX1.M with the given input arguments.
 %
-%      WAVE_CLUS_AUX('Property','Value',...) creates a new WAVE_CLUS_AUX or raises the
+%      WAVE_CLUS_AUX1('Property','Value',...) creates a new WAVE_CLUS_AUX1 or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
 %      applied to the GUI before wave_clus_aux_OpeningFunction gets called.  An
 %      unrecognized property name or invalid value makes property application
@@ -20,9 +20,9 @@ function varargout = wave_clus_aux1(varargin)
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help wave_clus_aux
+% Edit the above text to modify the response to help wave_clus_aux1
 
-% Last Modified by GUIDE v2.5 14-Jan-2025 14:57:27
+% Last Modified by GUIDE v2.5 22-Jan-2025 16:22:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -45,15 +45,15 @@ end
 
 end
 
-% --- Executes just before wave_clus_aux is made visible.
+% --- Executes just before wave_clus_aux1 is made visible.
 function wave_clus_aux_OpeningFcn(hObject, eventdata, handles)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to wave_clus_aux (see VARARGIN)
+% varargin   command line arguments to wave_clus_aux1 (see VARARGIN)
 
-% Choose default command line output for wave_clus_aux
+% Choose default command line output for wave_clus_aux1
 handles.output = hObject;
 
 h_figs=get(0, 'children');
@@ -85,8 +85,8 @@ end
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes wave_clus_aux wait for user response (see UIRESUME)
-% uiwait(handles.wave_clus_aux);
+% UIWAIT makes wave_clus_aux1 wait for user response (see UIRESUME)
+% uiwait(handles.wave_clus_aux1);
 end
 
 % --- Outputs from this function are returned to the command line.
@@ -122,15 +122,15 @@ for i = 1:5
 end
 
 USER_DATA{1} = par;
-set(handles.wave_clus_aux, 'userdata', USER_DATA)
+% set(handles.wave_clus_aux, 'userdata', USER_DATA)
 set(h_fig, 'userdata', USER_DATA)
-plot_spikes_aux(handles)
+plot_spikes_aux(handles, USER_DATA{1}, USER_DATA{2}, USER_DATA{3})
 end
 
 % Change nbins
 % -------------------------------------------------------------
 function change_isi_bins(handles, plotIdx)
-    USER_DATA = get(handles.wave_clus_aux,'userdata');
+    USER_DATA = get(handles.wave_clus_aux1,'userdata');
     par = USER_DATA{1};
     clusterIdx = handles.clusterIdx(plotIdx);
     par.(sprintf('nbins%d', clusterIdx)) = str2double(get(hObject, 'String'));
@@ -138,7 +138,7 @@ function change_isi_bins(handles, plotIdx)
     classes = USER_DATA{6};
     par.class_to_plot = find(classes==clusterIdx);
     USER_DATA{1} = par;
-    set(handles.wave_clus_aux,'userdata', USER_DATA);
+    set(handles.wave_clus_aux1,'userdata', USER_DATA);
     plot_spikes_aux(handles)
 end
 
@@ -167,7 +167,7 @@ end
 % Change bin steps
 % -------------------------------------------------------------
 function change_isi_bin_step(hObject, handles, plotIdx)
-    USER_DATA = get(handles.wave_clus_aux,'userdata');
+    USER_DATA = get(handles.wave_clus_aux1,'userdata');
     par = USER_DATA{1};
     clusterIdx = handles.clusterIdx(plotIdx);
     par.(sprintf('bin_step%d', clusterIdx)) = str2double(get(hObject, 'String'));
@@ -176,7 +176,7 @@ function change_isi_bin_step(hObject, handles, plotIdx)
     par.class_to_plot = find(classes==clusterIdx);
     USER_DATA{1} = par;
     % USER_DATA{6} = classes;
-    set(handles.wave_clus_aux, 'userdata', USER_DATA);
+    set(handles.wave_clus_aux1, 'userdata', USER_DATA);
     plot_spikes_aux(handles)
 end
 
@@ -208,7 +208,7 @@ function reject_buttons(hObject, handles, plotIdx)
     set(hObject, 'value', 1);
     set(handles.(sprintf('isi%d_accept_button', plotLabelIdx)), 'value', 0);
     
-    USER_DATA = get(handles.wave_clus_aux, 'userdata');
+    USER_DATA = get(handles.wave_clus_aux1, 'userdata');
     classes = USER_DATA{6};
     classes(classes==clusterIdx)=0;
     USER_DATA{6} = classes;
@@ -216,7 +216,7 @@ function reject_buttons(hObject, handles, plotIdx)
 
     h_figs=get(0,'children');
     h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
-    set(handles.wave_clus_aux, 'userdata', USER_DATA);
+    set(handles.wave_clus_aux1, 'userdata', USER_DATA);
     set(h_fig, 'userdata', USER_DATA)
     
     axes(handles.(sprintf('spikes%d', plotLabelIdx)));
@@ -277,7 +277,7 @@ function update_fix_button(handles, plotIdx)
     clusterIdx = handles.clusterIdx(plotIdx);
     plotLabelIdx = handles.plotLabelIdx(plotIdx);
 
-    USER_DATA = get(handles.wave_clus_aux, 'userdata');
+    USER_DATA = get(handles.wave_clus_aux1, 'userdata');
     par = USER_DATA{1};
     classes = USER_DATA{6};
     fix_class = find(classes==clusterIdx);
@@ -292,7 +292,7 @@ function update_fix_button(handles, plotIdx)
     h_figs=get(0, 'children');
     h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
     
-    set(handles.wave_clus_aux, 'userdata', USER_DATA);
+    set(handles.wave_clus_aux1, 'userdata', USER_DATA);
     set(h_fig, 'userdata', USER_DATA)
 end
 
@@ -413,7 +413,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-USER_DATA = get(handles.wave_clus_aux, 'userdata');
+USER_DATA = get(handles.wave_clus_aux1, 'userdata');
 clustersFixedIdx = getFixClusterIndex();
 [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
 plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));

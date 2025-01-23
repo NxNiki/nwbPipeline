@@ -51,14 +51,11 @@ function wave_clus_aux_OpeningFcn(hObject, eventdata, handles)
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to wave_clus_aux (see VARARGIN)
 
 % Choose default command line output for wave_clus_aux
 handles.output = hObject;
 
-h_figs=get(0, 'children');
-h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
-USER_DATA = get(h_fig, 'UserData');
+USER_DATA = getUserData();
 par = USER_DATA{1};
 
 if par.cluster_index <=8
@@ -97,13 +94,9 @@ function varargout = wave_clus_aux_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
+
 varargout{1} = handles.output;
-
-h_figs=get(0,'children');
-h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
-USER_DATA = get(h_fig, 'UserData');
-par = USER_DATA{1};
-
+[par,spikes, spike_times] = getUserData(1:3);
 clusterIdx = handles.clusterIdx; % define in plot_spikes.
 plotLabelIdx = handles.plotLabelIdx;
 for i = 1:5
@@ -121,45 +114,40 @@ for i = 1:5
     end
 end
 
-USER_DATA{1} = par;
-set(handles.wave_clus_aux, 'userdata', USER_DATA)
-set(h_fig, 'userdata', USER_DATA)
-plot_spikes_aux(handles)
+setUserData(par, 1);
+plot_spikes_aux(handles, par,spikes, spike_times)
 end
 
 % Change nbins
 % -------------------------------------------------------------
-function change_isi_bins(handles, plotIdx)
-    USER_DATA = get(handles.wave_clus_aux,'userdata');
-    par = USER_DATA{1};
+function change_isi_bins(hObject, handles, plotIdx)
+    [par, classes] = getUserData([1, 6]);
     clusterIdx = handles.clusterIdx(plotIdx);
     par.(sprintf('nbins%d', clusterIdx)) = str2double(get(hObject, 'String'));
     par.axes_nr = clusterIdx + 1;
-    classes = USER_DATA{6};
     par.class_to_plot = find(classes==clusterIdx);
-    USER_DATA{1} = par;
-    set(handles.wave_clus_aux,'userdata', USER_DATA);
+    setUserData(par, 1);
     plot_spikes_aux(handles)
 end
 
 function isi4_nbins_Callback(hObject, eventdata, handles)
-    change_isi_bins(handles, 1);
+    change_isi_bins(hObject, handles, 1);
 end
 
 function isi5_nbins_Callback(hObject, eventdata, handles)
-    change_isi_bins(handles, 2);
+    change_isi_bins(hObject, handles, 2);
 end
 
 function isi6_nbins_Callback(hObject, eventdata, handles)
-    change_isi_bins(handles, 3);
+    change_isi_bins(hObject, handles, 3);
 end
 
 function isi7_nbins_Callback(hObject, eventdata, handles)
-    change_isi_bins(handles, 4);
+    change_isi_bins(hObject, handles, 4);
 end
 
 function isi8_nbins_Callback(hObject, eventdata, handles)
-    change_isi_bins(handles, 5);
+    change_isi_bins(hObject, handles, 5);
 end
 % --------------------------------------------------------------------
 
@@ -208,16 +196,9 @@ function reject_buttons(hObject, handles, plotIdx)
     set(hObject, 'value', 1);
     set(handles.(sprintf('isi%d_accept_button', plotLabelIdx)), 'value', 0);
     
-    USER_DATA = get(handles.wave_clus_aux, 'userdata');
-    classes = USER_DATA{6};
+    classes = getUserData(6);
     classes(classes==clusterIdx)=0;
-    USER_DATA{6} = classes;
-    USER_DATA{9} = classes;
-
-    h_figs=get(0,'children');
-    h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
-    set(handles.wave_clus_aux, 'userdata', USER_DATA);
-    set(h_fig, 'userdata', USER_DATA)
+    setUserData(classes, [6, 9]);
     
     axes(handles.(sprintf('spikes%d', plotLabelIdx)));
     cla reset
@@ -277,23 +258,16 @@ function update_fix_button(handles, plotIdx)
     clusterIdx = handles.clusterIdx(plotIdx);
     plotLabelIdx = handles.plotLabelIdx(plotIdx);
 
-    USER_DATA = get(handles.wave_clus_aux, 'userdata');
-    par = USER_DATA{1};
-    classes = USER_DATA{6};
+    [par, classes] = getUserData(1, 6);
     fix_class = find(classes==clusterIdx);
     if get(handles.(sprintf('fix%d_button', plotLabelIdx)), 'value') == 1
-        USER_DATA{23} = fix_class;
         par.(sprintf('fix%d', clusterIdx)) = 1;
     else
-        USER_DATA{23} = [];
+        fix_class = [];
         par.(sprintf('fix%d', clusterIdx)) = 0;
     end
-    USER_DATA{1} = par;
-    h_figs=get(0, 'children');
-    h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
     
-    set(handles.wave_clus_aux, 'userdata', USER_DATA);
-    set(h_fig, 'userdata', USER_DATA)
+    setUserData({par, fix_class}, [1, 23]);
 end
 
 function fix4_button_Callback(hObject, eventdata, handles)
@@ -413,8 +387,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-USER_DATA = get(handles.wave_clus_aux, 'userdata');
 clustersFixedIdx = getFixClusterIndex();
-[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
+[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx);
 plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
 end

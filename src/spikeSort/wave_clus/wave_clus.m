@@ -195,6 +195,9 @@ switch char(handles.datatype)
         [cluster_class, tree, ~, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
+% add more clusters for testing:
+cluster_class(:, 1) = cluster_class(:, 1) + randi([0, 1], 24104, 1) * max(cluster_class(:, 1));
+
 handles.clusterUnitType = int8(ones(1, length(unique(cluster_class(:, 1))) - 1)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
 if size(cluster_class, 2) == 3
     cluster_class_unit_type = unique(cluster_class(:, [1, 3]), 'rows');
@@ -519,8 +522,7 @@ updateFixButtonHandle(hObject, handles);
 % PLOT ALL PROJECTIONS BUTTON
 % --------------------------------------------------------------------
 function Plot_all_projections_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-par = USER_DATA{1};
+par = getUserData(1);
 
 if strcmp(par.filename(1:4), 'poly')
     % do we need this part? Xin.
@@ -629,13 +631,11 @@ set(handles.isi1_reject_button,'value',0);
 % --------------------------------------------------------------------
 function isi1_reject_button_Callback(hObject, eventdata, handles)
 set(hObject, 'value', 1);
-[handles, USER_DATA, tree] = rejectCluster(hObject, handles, 1);
+
+[handles, clustering_results, tree] = rejectCluster(hObject, handles, 1);
 handles = updateHandles(hObject, handles, {'setclus', 'reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
-
-clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(hObject, 'value', 0);
 set(handles.isi1_accept_button, 'value', 1);
@@ -648,13 +648,11 @@ set(handles.isi2_reject_button, 'value', 0);
 % --------------------------------------------------------------------
 function isi2_reject_button_Callback(hObject, eventdata, handles)
 set(hObject, 'value', 1);
-[handles, USER_DATA, tree] = rejectCluster(hObject, handles, 2);
-handles = updateHandles(hObject, handles, {'setclus','reject'}, {'force', 'merge',  'undo'}, 10);
-plot_spikes(handles)
 
-clustering_results = USER_DATA{10};
+[handles, clustering_results, tree] = rejectCluster(hObject, handles, 2);
+handles = updateHandles(hObject, handles, {'setclus', 'reject'}, {'force', 'merge',  'undo'}, 10);
+plot_spikes(handles)
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(hObject, 'value', 0);
 set(handles.isi2_accept_button, 'value', 1);
@@ -667,13 +665,11 @@ set(handles.isi3_reject_button, 'value', 0);
 % --------------------------------------------------------------------
 function isi3_reject_button_Callback(hObject, eventdata, handles)
 set(hObject, 'value', 1);
-[handles, USER_DATA, tree] = rejectCluster(hObject, handles, 3);
+
+[handles, clustering_results, tree] = rejectCluster(hObject, handles, 3);
 handles = updateHandles(hObject, handles, {'setclus', 'reject'}, {'force', 'merge',  'undo'}, 10);
 plot_spikes(handles)
-
-clustering_results = USER_DATA{10};
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
 
 set(hObject, 'value', 0);
 set(handles.isi3_accept_button, 'value', 1);
@@ -682,15 +678,10 @@ set(handles.isi3_accept_button, 'value', 1);
 function undo_button_Callback(hObject, eventdata, handles)
 
 handles = updateHandles(hObject, handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'}, 11);
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-clustering_results_bk = USER_DATA{11};
-USER_DATA{6} = clustering_results_bk(:,2); % old gui classes
-USER_DATA{10} = clustering_results_bk;
-USER_DATA{8} = clustering_results_bk(1,1); % old gui temperatures
-set(handles.wave_clus_figure, 'userdata', USER_DATA)
-plot_spikes(handles) % plot_spikes updates USER_DATA{11}
+[tree, clustering_results_bk] = getUserData([5, 11]);
+setUserData({clustering_results_bk(:,2), clustering_results_bk(1,1), clustering_results_bk}, [6, 8, 10])
+plot_spikes(handles)
 
-tree = USER_DATA{5};
 mark_clusters_temperature_diagram(handles, tree, clustering_results_bk)
 set(handles.min_clus_edit, 'string', num2str(handles.minclus));
 updateFixButtonHandle(hObject, handles)
@@ -701,16 +692,13 @@ function merge_button_Callback(hObject, eventdata, handles)
 handles = updateHandles(hObject, handles, {'merge'}, {'setclus', 'reject', 'force', 'undo'}, 10);
 plot_spikes(handles)
 
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-tree = USER_DATA{5};
-clustering_results = USER_DATA{10};
+[tree, clustering_results] = getUserData([5, 10]);
 mark_clusters_temperature_diagram(handles, tree, clustering_results)
 updateFixButtonHandle(hObject, handles)
 
 % --- Executes on button press in Plot_polytrode_channels_button.
 function Plot_polytrode_button_Callback(hObject, eventdata, handles)
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-par = USER_DATA{1};
+par = getUserData(1);
 if strcmp(par.filename(1:9), 'polytrode')
     Plot_polytrode(handles);
 elseif strcmp(par.filename(1:13), 'C_sim_script_')
@@ -920,10 +908,8 @@ function mahalDistRemoveSpikes_Callback(hObject, eventdata, handles)
 
 fprintf('Removing spikes by Mahalanobis Distance...')
 handles = updateHandles(hObject, handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'}, 11);
+[classes, inspk] = getUserData([6, 7]);
 
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-classes = USER_DATA{6};
-inspk = USER_DATA{7};
 warning('off','MATLAB:nearlySingularMatrix');
 for i=1:max(classes)
     inCluster = classes == i;
@@ -941,8 +927,7 @@ for i=1:max(classes)
     end
 end
 warning('on','MATLAB:nearlySingularMatrix');
-USER_DATA{6} = classes;
-set(handles.wave_clus_figure,'userdata', USER_DATA);
+setUserData(classes, 6);
 plot_spikes(handles)
 fprintf('Finished!\n')
 
@@ -1052,9 +1037,8 @@ function pushbutton27_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
 clustersFixedIdx = getFixClusterIndex();
-[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA);
+[spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx);
 plot_cross_correlogram(spikeTime1, spikeTime2, clustersFixedIdx(1), clustersFixedIdx(2));
 
 

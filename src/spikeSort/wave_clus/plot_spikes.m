@@ -343,7 +343,8 @@ if ~strcmp(char(handles.datatype), 'Sc data') && ~strcmp(char(handles.datatype),
         ymin = min(ylimit(:,1));
         ymax = max(ylimit(:,2));
         for i=1:3
-            eval(['axes(handles.spikes' num2str(i) '); ylim([ymin ymax])'])
+            axes(handles.(['spikes' num2str(i)])); 
+            ylim([ymin ymax]);
         end
     end
 end

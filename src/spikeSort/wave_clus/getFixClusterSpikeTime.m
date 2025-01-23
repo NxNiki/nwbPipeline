@@ -1,12 +1,11 @@
-function [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx, USER_DATA)
+function [spikeTime1, spikeTime2] = getFixClusterSpikeTime(clustersFixedIdx)
 
 if length(clustersFixedIdx) ~= 2
     errordlg('Please select 2 clusters to create cross correlogram!', 'Error');
     return
 end
 
-spike_class = USER_DATA{6};
-spikeTimestamps = USER_DATA{3};
+[spikeTimestamps, spike_class] = getUserData([3, 6]);
 
 spike_class = spike_class(:);
 spikeTimestamps = spikeTimestamps(:)/1000;
