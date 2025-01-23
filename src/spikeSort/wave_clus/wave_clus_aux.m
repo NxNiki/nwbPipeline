@@ -96,7 +96,7 @@ function varargout = wave_clus_aux_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 
 varargout{1} = handles.output;
-[par,spikes, spike_times] = getUserData(1:3);
+[par, spikes, spike_times] = getUserData(1:3);
 clusterIdx = handles.clusterIdx; % define in plot_spikes.
 plotLabelIdx = handles.plotLabelIdx;
 for i = 1:5
@@ -115,7 +115,7 @@ for i = 1:5
 end
 
 setUserData(par, 1);
-plot_spikes_aux(handles, par,spikes, spike_times)
+plot_spikes_aux(handles, par, spikes, spike_times)
 end
 
 % Change nbins
@@ -155,16 +155,12 @@ end
 % Change bin steps
 % -------------------------------------------------------------
 function change_isi_bin_step(hObject, handles, plotIdx)
-    USER_DATA = get(handles.wave_clus_aux,'userdata');
-    par = USER_DATA{1};
+    [par, classes] = getUserData([1, 6]);
     clusterIdx = handles.clusterIdx(plotIdx);
     par.(sprintf('bin_step%d', clusterIdx)) = str2double(get(hObject, 'String'));
     par.axes_nr = clusterIdx+1;
-    classes = USER_DATA{6};
     par.class_to_plot = find(classes==clusterIdx);
-    USER_DATA{1} = par;
-    % USER_DATA{6} = classes;
-    set(handles.wave_clus_aux, 'userdata', USER_DATA);
+    setUserData(par, 1);
     plot_spikes_aux(handles)
 end
 
@@ -258,7 +254,7 @@ function update_fix_button(handles, plotIdx)
     clusterIdx = handles.clusterIdx(plotIdx);
     plotLabelIdx = handles.plotLabelIdx(plotIdx);
 
-    [par, classes] = getUserData(1, 6);
+    [par, classes] = getUserData([1, 6]);
     fix_class = find(classes==clusterIdx);
     if get(handles.(sprintf('fix%d_button', plotLabelIdx)), 'value') == 1
         par.(sprintf('fix%d', clusterIdx)) = 1;

@@ -10,7 +10,7 @@ function varargout = getUserData(index)
     if ~isempty(index)
         varargout = cell(1, length(index));
         for i = 1:length(index)
-            varargout{i} = UserData{index};
+            varargout{i} = UserData{index(i)};
         end
     else
         varargout{1} = UserData;
