@@ -17,24 +17,8 @@ clustering_results = USER_DATA{10};
 classes = classes(:)';
 ls = size(spikes, 2);
 par.to_plot_std = 1;                % # of std from mean to plot
-% merge = handles.merge;
 
-% Close aux figures
-h_figs = get(0, 'children');
-
-% EM: It's inefficient to close all of these if you're just going to open
-% them again shortly. Set to visible off instead.
-aux_figs_label = {'wave_clus_aux', 'wave_clus_aux1', 'wave_clus_aux2', 'wave_clus_aux3', 'wave_clus_aux4', 'wave_clus_aux5'};
-
-for m=1:length(aux_figs_label)
-    aux_fig = findobj(h_figs, 'tag', aux_figs_label{m});
-    if ~isempty(aux_fig)
-        set(0, 'currentFigure', aux_fig);
-        set(aux_fig, 'visible', 'off');
-        ch = get(aux_fig, 'children');
-        arrayfun(@(x)cla(x,'reset'), ch);
-    end
-end
+closeAuxFigures();
 
 % Extract spike features if needed
 if get(handles.spike_shapes_button,'value') == 0
@@ -75,10 +59,10 @@ fix_class2 = [];
 nfix_class = [];
 haveResetClustersAlready = 0;
 
-for m=1:3
-    if get(handles.(['fix',num2str(m),'_button']),'value') ==1
+for i=1:3
+    if get(handles.(['fix',num2str(i),'_button']), 'value') ==1
         nclusters = nclusters +1;
-        fix_class = USER_DATA{19+m}';
+        fix_class = USER_DATA{19+i}';
         if ~haveResetClustersAlready
             classes(classes==nclusters)=0;
             haveResetClustersAlready = 1;
@@ -86,7 +70,7 @@ for m=1:3
         classes(fix_class) = nclusters;
         ifixflag(nclusters)=1;
         fix_class2 = [fix_class2 fix_class];
-        nfix_class = [nfix_class m];
+        nfix_class = [nfix_class i];
     end
 end
 
@@ -315,6 +299,7 @@ for i = 1:nclusters+1
             USER_DATA{1} = par;
             set(handles.wave_clus_figure, 'userdata', USER_DATA)
             
+            % plot addtional spikes in aux UI:
             if i < 10
                 wave_clus_aux;
             else
