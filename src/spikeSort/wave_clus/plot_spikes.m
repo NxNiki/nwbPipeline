@@ -171,7 +171,7 @@ if handles.merge == 1 && ~isempty(nfix_class)
     clustering_results(fix_class2,4) = clustering_results(imerge(1),4);
 end
 clustering_results(:,1) = temp; % GUI temperature
-clustering_results(:,5) = handles.minclus; % GUI minimum cluster
+clustering_results(:,5) = handles.min_clus; % GUI minimum cluster
 
 % Saves new classes and keep fixed classes in 'clustering_results'.
 % Keep the original temperature and cluster number in the fixed spikes.
