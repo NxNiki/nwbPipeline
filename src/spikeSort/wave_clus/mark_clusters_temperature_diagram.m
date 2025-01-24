@@ -91,6 +91,8 @@ switch handles.par.temp_plot
 end
 xlim(handles.temperature_plot, [0 handles.par.maxtemp])
 xlabel('Temperature');
+set(handles.min_clus_edit, 'string', handles.min_clus);
+
 if strcmp(handles.par.temp_plot, 'log')
     set(get(handles.temperature_plot,'ylabel'),'vertical','Cap');
 else

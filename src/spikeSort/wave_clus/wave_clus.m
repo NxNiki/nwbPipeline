@@ -239,7 +239,8 @@ temp = round((temp-handles.par.mintemp)/handles.par.tempstep);
 if temp < 1; temp=1; end                                         %temp should be within the limits
 if temp > handles.par.num_temp; temp=handles.par.num_temp; end
 min_clus = round(aux);
-set(handles.min_clus_edit, 'string', num2str(min_clus));
+
+% set(handles.min_clus_edit, 'string', num2str(min_clus));
 
 [spikes, clu, clustering_results] = getUserData([2, 4, 10]);
 

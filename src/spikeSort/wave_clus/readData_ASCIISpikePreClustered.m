@@ -81,7 +81,7 @@ if exist(manualTimesFile, 'file')
         cluster_class = manualTimesFileObj.cluster_class;
         if ismember('temp', who(manualTimesFileObj))
             temp = manualTimesFileObj.temp;
-            min_clus = manualTimesFileObj.temp;
+            min_clus = manualTimesFileObj.min_clus;
         end
     end
 end
