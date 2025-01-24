@@ -8,7 +8,7 @@ h_figs = get(0, 'children');
 UITags = {'wave_clus_figure', 'wave_clus_aux', 'wave_clus_aux1', 'wave_clus_aux2', 'wave_clus_aux3', 'wave_clus_aux4', 'wave_clus_aux5'};
 
 numClusters = 3;
-cluster_idx_shift = 1;
+cluster_idx_shift = 0;
 plot_idx_shift = 0;
 for ui_idx = 1:length(UITags)
     ui = findobj(h_figs, 'tag', UITags{ui_idx}, 'Visible', 'on');
