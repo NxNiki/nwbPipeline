@@ -25,9 +25,6 @@ end
 %     handles.par.pathname = pathname;
 % end
 
-USER_DATA = getUserData();
-
-set(handles.min_clus_edit, 'string', num2str(handles.par.min_clus));
 % axes(handles.cont_data); EM: removed call to axes.
 cla(handles.cont_data);
 
@@ -83,9 +80,14 @@ if exist(manualTimesFile, 'file')
         cluster_class = manualTimesFileObj.cluster_class;
         if ismember('temp', who(manualTimesFileObj))
             temp = manualTimesFileObj.temp;
+            min_clus = manualTimesFileObj.temp;
         end
     end
 end
+
+handles.par.min_clus = min_clus;
+handles.minclus = min_clus;
+set(handles.min_clus_edit, 'string', num2str(handles.par.min_clus));
 
 spikeTimestamps=cluster_class(:, 2)'; % timestamps of spikes; gets loaded in line above.
 numSpikes = length(spikeTimestamps);
@@ -115,6 +117,7 @@ clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatur
 clustering_results(:,4) = classes'; % original classes
 clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
 
+USER_DATA = getUserData();
 USER_DATA{1} = handles.par;
 USER_DATA{2} = spikes;
 USER_DATA{3} = spikeTimestamps(:)' * 1000;                      % convert from seconds to milliseconds.

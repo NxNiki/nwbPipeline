@@ -312,7 +312,7 @@ function save_clusters_button_Callback(hObject, eventdata, handles)
 fprintf('Saving...')
 reorderSpikeRasters('reset')
 
-[spikes, spikeTimestamps, classes, temp] = getUserData([2, 3, 6, 8]);
+[par, spikes, spikeTimestamps, classes, temp] = getUserData([1, 2, 3, 6, 8]);
 
 % get user name:
 sortedBy = handles.sorterName.String;
@@ -381,6 +381,7 @@ end
 outFileObj.sortedBy = sortedByPrev;
 outFileObj.cluster_class = cluster_class;
 outFileObj.temp = temp;
+outFileObj.min_clus = par.min_clus;
 
 fprintf('Finished!\n')
 
