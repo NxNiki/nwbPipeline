@@ -198,6 +198,8 @@ end
 
 % load unit type:
 handles.clusterUnitType = int8(ones(1, length(unique(cluster_class(:, 1))) - 1)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
+handles.clusterFixed = false(1, length(unique(cluster_class(:, 1))) - 1);
+
 if size(cluster_class, 2) == 3
     cluster_class_unit_type = unique(cluster_class(:, [1, 3]), 'rows');
     radiobuttonLabels = {'22','23','24'; '25', '26', '27'; '28', '29', '30'};
@@ -286,7 +288,8 @@ nClusters = length(unique(clustering_results(:, 2))) - 1;
 handles.clusterUnitType = int8(ones(1, nClusters));
 
 set(handles.fix1_button, 'value', 1);
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Change min_clus_edit
 function min_clus_edit_Callback(hObject, eventdata, handles)
@@ -305,7 +308,8 @@ mark_clusters_temperature_diagram(handles)
 
 set(handles.force_button, 'value', 0);
 set(handles.force_button, 'string', 'Force');
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Executes on button press in save_clusters_button.
 function save_clusters_button_Callback(hObject, eventdata, handles)
@@ -437,7 +441,8 @@ setUserData({classes(:)', inspk}, [6, 7]);
 
 handles = updateHandles(hObject, handles, {'setclus', 'force'}, {'merge', 'reject', 'undo'});
 plot_spikes(handles);
-updateFixButtonHandle(hObject, handles);
+% updateFixButtonHandle(hObject, handles);
+unFixAllClusters();
 
 % PLOT ALL PROJECTIONS BUTTON
 % --------------------------------------------------------------------
@@ -605,7 +610,8 @@ plot_spikes(handles)
 
 mark_clusters_temperature_diagram(handles)
 set(handles.min_clus_edit, 'string', num2str(handles.min_clus));
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Executes on button press in merge_button.
 function merge_button_Callback(hObject, eventdata, handles)
@@ -613,7 +619,8 @@ function merge_button_Callback(hObject, eventdata, handles)
 handles = updateHandles(hObject, handles, {'merge'}, {'setclus', 'reject', 'force', 'undo'});
 plot_spikes(handles)
 mark_clusters_temperature_diagram(handles)
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Executes on button press in Plot_polytrode_channels_button.
 function Plot_polytrode_button_Callback(hObject, eventdata, handles)
