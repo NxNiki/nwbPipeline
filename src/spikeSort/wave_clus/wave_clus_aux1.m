@@ -55,8 +55,7 @@ function wave_clus_aux_OpeningFcn(hObject, eventdata, handles)
 % Choose default command line output for wave_clus_aux
 handles.output = hObject;
 
-USER_DATA = getUserData();
-par = USER_DATA{1};
+par = getUserData(1);
 
 if par.cluster_index <=8
     handles.clusterIdx = 4:8;
@@ -250,21 +249,6 @@ function isi8_reject_button_Callback(hObject, eventdata, handles)
 end
 
 % FIX buttons
-function update_fix_button(handles, plotIdx)
-    clusterIdx = handles.clusterIdx(plotIdx);
-    plotLabelIdx = handles.plotLabelIdx(plotIdx);
-
-    [par, classes] = getUserData([1, 6]);
-    fix_class = find(classes==clusterIdx);
-    if get(handles.(sprintf('fix%d_button', plotLabelIdx)), 'value') == 1
-        par.(sprintf('fix%d', clusterIdx)) = 1;
-    else
-        fix_class = [];
-        par.(sprintf('fix%d', clusterIdx)) = 0;
-    end
-    
-    setUserData({par, fix_class}, [1, 23]);
-end
 
 function fix4_button_Callback(hObject, eventdata, handles)
     update_fix_button(handles, 1);

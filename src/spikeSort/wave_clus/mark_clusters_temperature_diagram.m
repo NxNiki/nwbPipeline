@@ -1,10 +1,12 @@
-function mark_clusters_temperature_diagram(handles, tree, clustering_results, newData)
+function mark_clusters_temperature_diagram(handles, newData)
 % MARK CLUSTERS IN TEMPERATURE DIAGRAM
 % EM: added 'newData' as a var. When we're loading new data, clear the plot
 % and make the diagram, but no need to do so for data that's already been
 % loaded.
 
-handles.par.min.clus = clustering_results(1,5);
+[tree, clustering_results] = getUserData([5, 10]);
+
+% handles.min_clus = clustering_results(1,5);
 temperature = tree(clustering_results(1,1)+1,2);
 
 if ~exist('newData','var')||isempty(newData)
@@ -40,14 +42,12 @@ for i=1:nclasses
     temp_plot(i) = clustering_results(ind(1),3);
 end
 
-
-% colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 
 % draw temperature diagram and mark clusters
 handles.par.num_temp = min(handles.par.num_temp,size(tree,1));
 if newData
-cla(handles.temperature_plot);
+    cla(handles.temperature_plot);
 end
 hold(handles.temperature_plot,'on')
 switch handles.par.temp_plot
@@ -70,7 +70,7 @@ switch handles.par.temp_plot
         if newData
         % draw diagram
          semilogy([handles.par.mintemp handles.par.maxtemp-handles.par.tempstep], ...
-            [handles.par.min.clus handles.par.min.clus],'k:',...
+            [handles.min_clus handles.min_clus],'k:',...
             handles.par.mintemp+(1:handles.par.num_temp)*handles.par.tempstep, ...
             tree(1:handles.par.num_temp,5:size(tree,2)),[temperature temperature],[1 tree(1,5)],'k:',...
             'parent',handles.temperature_plot)
@@ -89,8 +89,10 @@ switch handles.par.temp_plot
         end
         hold off
 end
-xlim(handles.temperature_plot,[0 handles.par.maxtemp])
+xlim(handles.temperature_plot, [0 handles.par.maxtemp])
 xlabel('Temperature');
+set(handles.min_clus_edit, 'string', handles.min_clus);
+
 if strcmp(handles.par.temp_plot, 'log')
     set(get(handles.temperature_plot,'ylabel'),'vertical','Cap');
 else

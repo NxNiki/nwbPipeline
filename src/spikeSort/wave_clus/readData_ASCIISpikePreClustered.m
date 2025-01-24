@@ -1,4 +1,4 @@
-function [cluster_class, tree, clu, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles)
+function [cluster_class, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles)
 % This function read *_spikes.mat file with corresponding times_*.mat,
 
 % As wave_clus also saves result as times_*.mat file. We will check
@@ -20,15 +20,11 @@ for i=4:handles.par.max_clus
     handles.par.(['fix' num2str(i)]) = 0;
 end
 
-try % will fail on initial call, but not when data is being loaded?
-    handles.par.filename = filename;
-    handles.par.pathname = pathname;
-end
+% try % will fail on initial call, but not when data is being loaded?
+%     handles.par.filename = filename;
+%     handles.par.pathname = pathname;
+% end
 
-USER_DATA = get(handles.wave_clus_figure, 'userdata');
-USER_DATA{1} = handles.par;
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
-set(handles.min_clus_edit, 'string', num2str(handles.par.min_clus));
 % axes(handles.cont_data); EM: removed call to axes.
 cla(handles.cont_data);
 
@@ -38,9 +34,10 @@ spikeFileObj = matfile(spikeFile, "Writable", true);
 
 filename = strrep(filename, '_spikes', '');
 timesFile = fullfile(pathname, ['times_', filename]);
+
 if ~exist(timesFile, 'file')
     warning([timesFile, ' does not exist. Move on...'])
-    [cluster_class, tree, clu] = deal([]);
+    cluster_class = [];
     return
 end
 
@@ -48,6 +45,29 @@ timesFileObj = matfile(timesFile);
 cluster_class = timesFileObj.cluster_class;
 manualTimesFile = fullfile(pathname, ['times_manual_' filename]);
 
+spikeFileVars = who(spikeFileObj);
+timesFileVars = who(timesFileObj);
+par = timesFileObj.par;
+par = updateParamForCluster(par, spikeFile);
+
+ipermut = [];
+if ismember('clu', spikeFileVars) && ismember('tree', spikeFileVars)
+    clu = spikeFileObj.clu;
+    tree = spikeFileObj.tree;
+    if ismember('ipermut', timesFileVars)
+        ipermut = timesFileObj.ipermut;
+    end
+else
+    par.inputs = size(timesFileObj.inspk, 2);
+    ipermut = getInspkAux(par, timesFileObj.inspk);
+    [clu, tree] = run_cluster(par);
+    spikeFileObj.clu = clu;
+    spikeFileObj.tree = tree;
+end
+fprintf('sampling rate: %d\n', par.sr);
+
+temp = find_temp2(tree, handles);
+min_clus = handles.par.min_clus;
 if exist(manualTimesFile, 'file')
     message = 'This spike file has been manually sorted, do you want to load the manually sorted result?';
     title = 'Spikes manually sorted already!';
@@ -60,53 +80,58 @@ if exist(manualTimesFile, 'file')
         manualTimesFileObj = matfile(manualTimesFile);
         cluster_class = manualTimesFileObj.cluster_class;
         if ismember('temp', who(manualTimesFileObj))
-            USER_DATA{8} = manualTimesFileObj.temp;
+            temp = manualTimesFileObj.temp;
+            min_clus = manualTimesFileObj.min_clus;
         end
     end
 end
 
+handles.min_clus = min_clus;
+set(handles.min_clus_edit, 'string', num2str(handles.min_clus));
+
 spikeTimestamps=cluster_class(:, 2)'; % timestamps of spikes; gets loaded in line above.
 numSpikes = length(spikeTimestamps);
-
-spikeFileVars = who(spikeFileObj);
-timesFileVars = who(timesFileObj);
-if ismember('clu', spikeFileVars) && ismember('tree', spikeFileVars)
-    clu = spikeFileObj.clu;
-    tree = spikeFileObj.tree;
-    if ismember('ipermut', timesFileVars)
-        ipermut = timesFileObj.ipermut;
-    end
-else
-    par = timesFileObj.par;
-    par = updateParamForCluster(par, spikeFile);
-    par.inputs = size(timesFileObj.inspk, 2);
-
-    ipermut = getInspkAux(par, timesFileObj.inspk);
-    [clu, tree] = run_cluster(par);
-    spikeFileObj.clu = clu;
-    spikeFileObj.tree = tree;
-end
 
 if size(clu, 2) - 2 < numSpikes
     clu = [clu, zeros(size(clu, 1), numSpikes - size(clu, 2) + 2)];
 end
 
-spikes = spikeFileObj.spikes;
-if exist('ipermut', 'var') && ~isempty(ipermut)
+if ~isempty(ipermut)
     clu = permuteClu(clu, ipermut, numSpikes);
-    USER_DATA{12} = ipermut;
 end
 
+spikes = spikeFileObj.spikes;
 if ismember("spikeIdxRejected", who(timesFileObj))
     % times_* file created by automatic clustering:
     spikes(timesFileObj.spikeIdxRejected, :) = [];
 end
 
+classes = cluster_class(:, 1);                               
+classes = rejectPositiveSpikes(spikes, classes(:), handles.par);
+cluster_class(:, 1) = classes;   
+
+clustering_results      = [];
+clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
+clustering_results(:,2) = classes; % GUI classes
+clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
+clustering_results(:,4) = classes'; % original classes
+clustering_results(:,5) = repmat(handles.min_clus, length(classes),1); % minimum number of clusters
+
+USER_DATA = getUserData();
+USER_DATA{1} = handles.par;
 USER_DATA{2} = spikes;
 USER_DATA{3} = spikeTimestamps(:)' * 1000;                      % convert from seconds to milliseconds.
 USER_DATA{4} = clu;
 USER_DATA{5} = tree;
+USER_DATA{6} = classes(:)';
 USER_DATA{7} = timesFileObj.inspk;
-set(handles.wave_clus_figure, 'userdata', USER_DATA)            % I (Xin) really hate this way of passing data to wave_clus, we need to fix this.
+USER_DATA{8} = temp;
+USER_DATA{9} = classes(:)';
+USER_DATA{10} = clustering_results;
+USER_DATA{11} = clustering_results;
+USER_DATA{12} = ipermut;
+USER_DATA{18} = par.sr;
+
+setUserData(USER_DATA);
 
 end
