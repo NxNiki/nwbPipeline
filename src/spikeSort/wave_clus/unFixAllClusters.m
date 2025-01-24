@@ -12,6 +12,7 @@ for i = 1:length(uiHandles)
         % main handle
         startClusterIdx = 1;
         endClusterIdx = 3;
+        handles.clusterFixed(:) = false;
     else
         % aux handles
         startClusterIdx = 4;
