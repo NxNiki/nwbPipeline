@@ -6,7 +6,7 @@ function mark_clusters_temperature_diagram(handles, newData)
 
 [tree, clustering_results] = getUserData([5, 10]);
 
-handles.par.min.clus = clustering_results(1,5);
+% handles.min_clus = clustering_results(1,5);
 temperature = tree(clustering_results(1,1)+1,2);
 
 if ~exist('newData','var')||isempty(newData)
@@ -47,7 +47,7 @@ colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c
 % draw temperature diagram and mark clusters
 handles.par.num_temp = min(handles.par.num_temp,size(tree,1));
 if newData
-cla(handles.temperature_plot);
+    cla(handles.temperature_plot);
 end
 hold(handles.temperature_plot,'on')
 switch handles.par.temp_plot
@@ -70,7 +70,7 @@ switch handles.par.temp_plot
         if newData
         % draw diagram
          semilogy([handles.par.mintemp handles.par.maxtemp-handles.par.tempstep], ...
-            [handles.par.min.clus handles.par.min.clus],'k:',...
+            [handles.min_clus handles.min_clus],'k:',...
             handles.par.mintemp+(1:handles.par.num_temp)*handles.par.tempstep, ...
             tree(1:handles.par.num_temp,5:size(tree,2)),[temperature temperature],[1 tree(1,5)],'k:',...
             'parent',handles.temperature_plot)
@@ -89,7 +89,7 @@ switch handles.par.temp_plot
         end
         hold off
 end
-xlim(handles.temperature_plot,[0 handles.par.maxtemp])
+xlim(handles.temperature_plot, [0 handles.par.maxtemp])
 xlabel('Temperature');
 if strcmp(handles.par.temp_plot, 'log')
     set(get(handles.temperature_plot,'ylabel'),'vertical','Cap');

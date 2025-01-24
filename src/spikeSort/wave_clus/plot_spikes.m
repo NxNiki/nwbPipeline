@@ -12,14 +12,12 @@ classes = USER_DATA{6};
 class_bkup = USER_DATA{9};
 inspk = USER_DATA{7};
 temp = USER_DATA{8};
+clustering_results = USER_DATA{10};
 
 classes = classes(:)';
 ls = size(spikes, 2);
 par.to_plot_std = 1;                % # of std from mean to plot
-
 % merge = handles.merge;
-minclus = handles.minclus;
-clustering_results = USER_DATA{10};
 
 % Close aux figures
 h_figs = get(0, 'children');
@@ -62,11 +60,11 @@ classes = shrinkClassIndex(classes);
 class_bkup(class_bkup > par.max_clus) = 0;
 class_bkup = shrinkClassIndex(class_bkup);
 
-nclusters_bkup = length(find(cluster_sizes(:) >= par.min_clus));
+nclusters_bkup = length(find(cluster_sizes(:) >= handles.min_clus));
 class_bkup(class_bkup > nclusters_bkup)=0;
 
 if handles.setclus == 0 && handles.undo==0 && handles.merge==0 && handles.force==0
-    sizemin_clus = par.min_clus;
+    sizemin_clus = handles.min_clus;
 else
     sizemin_clus = 1;
 end
@@ -173,7 +171,7 @@ if handles.merge == 1 && ~isempty(nfix_class)
     clustering_results(fix_class2,4) = clustering_results(imerge(1),4);
 end
 clustering_results(:,1) = temp; % GUI temperature
-clustering_results(:,5) = minclus; % GUI minimum cluster
+clustering_results(:,5) = handles.minclus; % GUI minimum cluster
 
 % Saves new classes and keep fixed classes in 'clustering_results'.
 % Keep the original temperature and cluster number in the fixed spikes.

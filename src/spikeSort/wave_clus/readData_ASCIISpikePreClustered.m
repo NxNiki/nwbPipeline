@@ -67,6 +67,7 @@ end
 fprintf('sampling rate: %d\n', par.sr);
 
 temp = find_temp2(tree, handles);
+min_clus = handles.par.min_clus;
 if exist(manualTimesFile, 'file')
     message = 'This spike file has been manually sorted, do you want to load the manually sorted result?';
     title = 'Spikes manually sorted already!';
@@ -85,9 +86,8 @@ if exist(manualTimesFile, 'file')
     end
 end
 
-handles.par.min_clus = min_clus;
-handles.minclus = min_clus;
-set(handles.min_clus_edit, 'string', num2str(handles.par.min_clus));
+handles.min_clus = min_clus;
+set(handles.min_clus_edit, 'string', num2str(handles.min_clus));
 
 spikeTimestamps=cluster_class(:, 2)'; % timestamps of spikes; gets loaded in line above.
 numSpikes = length(spikeTimestamps);
@@ -115,7 +115,7 @@ clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
 clustering_results(:,2) = classes; % GUI classes
 clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
-clustering_results(:,5) = repmat(handles.par.min_clus, length(classes),1); % minimum number of clusters
+clustering_results(:,5) = repmat(handles.min_clus, length(classes),1); % minimum number of clusters
 
 USER_DATA = getUserData();
 USER_DATA{1} = handles.par;
@@ -132,6 +132,6 @@ USER_DATA{11} = clustering_results;
 USER_DATA{12} = ipermut;
 USER_DATA{18} = par.sr;
 
-set(handles.wave_clus_figure, 'userdata', USER_DATA);
+setUserData(USER_DATA);
 
 end
