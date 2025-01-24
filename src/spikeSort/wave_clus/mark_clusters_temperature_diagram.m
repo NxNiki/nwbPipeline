@@ -1,8 +1,10 @@
-function mark_clusters_temperature_diagram(handles, tree, clustering_results, newData)
+function mark_clusters_temperature_diagram(handles, newData)
 % MARK CLUSTERS IN TEMPERATURE DIAGRAM
 % EM: added 'newData' as a var. When we're loading new data, clear the plot
 % and make the diagram, but no need to do so for data that's already been
 % loaded.
+
+[tree, clustering_results] = getUserData([5, 10]);
 
 handles.par.min.clus = clustering_results(1,5);
 temperature = tree(clustering_results(1,1)+1,2);
@@ -40,8 +42,6 @@ for i=1:nclasses
     temp_plot(i) = clustering_results(ind(1),3);
 end
 
-
-% colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 colors = ['b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'k' 'b' 'r' 'g' 'c' 'm' 'y' 'b' 'r' 'g' 'c' 'm' 'y' 'b'];
 
 % draw temperature diagram and mark clusters

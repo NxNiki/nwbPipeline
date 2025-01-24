@@ -1,4 +1,5 @@
 function plot_spikes(handles)
+
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
 if isempty(par)
@@ -7,13 +8,12 @@ end
 
 spikes = USER_DATA{2};
 spk_times = USER_DATA{3};
-% clu = USER_DATA{4};
 classes = USER_DATA{6};
-classes = classes(:)';
 class_bkup = USER_DATA{9};
-% class_bkup = class_bkup;
 inspk = USER_DATA{7};
 temp = USER_DATA{8};
+
+classes = classes(:)';
 ls = size(spikes, 2);
 par.to_plot_std = 1;                % # of std from mean to plot
 
@@ -126,7 +126,6 @@ cont=0;
 classDefs = cell(nclusters,1);
 for i=1:nclusters
     class_temp = find(classes==i);
-    %     eval(['class_temp = find(classes==' num2str(i) ');'])
     if ((ifixflag(i)==1) && (~isempty(class_temp)))
         ifixflagc = 1;
     else
@@ -134,13 +133,8 @@ for i=1:nclusters
     end
     if ((length(class_temp) >= sizemin_clus) || (ifixflagc == 1))
         cont=cont+1;
-        %EM: Ugh. Never hard code numbers into variable names. Instead
-        %we'll make classDefs a cell array such that classDefs{1} is what
-        %class1 used to be.
         classDefs{cont} = class_temp;
         clustered = [clustered classDefs{cont}];
-        %         eval(['class' num2str(cont) '= class_temp;'])
-        %         eval(['clustered = [clustered class' num2str(cont) '];'])
     end
 end
 nclusters = cont;
@@ -148,11 +142,8 @@ class0 = setdiff( 1:size(spikes,1), sort(clustered) );
 
 % Redefines classes
 classes = zeros(size(spikes,1),1);
-for i = 1:nclusters%+1 EM, don't need the +1 because we don't need to start at 0 since class0 already has 0s everywhere.
-    % if ~ (isempty(class0) & i==1)
+for i = 1:nclusters
     classes(classDefs{i}) = i;
-    % eval(['classes(class' num2str(i-1) ') = ' num2str(i-1) ';']);
-    % end
 end
 classDefs = [{class0}; classDefs];
 % Saves new classes
