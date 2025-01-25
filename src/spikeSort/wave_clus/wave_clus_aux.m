@@ -95,26 +95,34 @@ function varargout = wave_clus_aux_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 
 varargout{1} = handles.output;
-[par, spikes, spike_times] = getUserData(1:3);
+[par, spikes, spike_times] = getUserData([1, 2, 3]);
 clusterIdx = handles.clusterIdx; % define in plot_spikes.
 plotLabelIdx = handles.plotLabelIdx;
+
+h = guidata(getHandles(1));
+
 for i = 1:5
     set(handles.(sprintf('isi%d_accept_button', plotLabelIdx(i))), 'value', 1);
     set(handles.(sprintf('isi%d_reject_button', plotLabelIdx(i))), 'value', 0);
     set(handles.(sprintf('fix%d_button', plotLabelIdx(i))), 'value', 0);
-    set(handles.(sprintf('isi%d_nbins', plotLabelIdx(i))), 'string', par.(sprintf('nbins%d', clusterIdx(i))));
-    set(handles.(sprintf('isi%d_bin_step', plotLabelIdx(i))), 'string', par.(sprintf('bin_step%d', clusterIdx(i))));
-
-    % That's for passing the fix button settings to plot_spikes.
-    if get(handles.(sprintf('fix%d_button', plotLabelIdx(i))),'value') == 1
-        par.(sprintf('fix%d', clusterIdx(i))) = 1;
-    else
-        par.(sprintf('fix%d', clusterIdx(i))) = 0;
-    end
+    set(handles.(sprintf('isi%d_nbins', plotLabelIdx(i))), 'string', h.(sprintf('nbins%d', clusterIdx(i))));
+    set(handles.(sprintf('isi%d_bin_step', plotLabelIdx(i))), 'string', h.(sprintf('bin_step%d', clusterIdx(i))));
 end
 
-setUserData(par, 1);
-plot_spikes_aux(handles, par, spikes, spike_times)
+class_to_plot = par.class_to_plot;
+spikes = spikes(class_to_plot,:);
+spike_times = spike_times(class_to_plot);
+
+if ~isfield(par,'axes_nr')
+    axes_nr = 5;
+else
+    axes_nr = par.axes_nr;
+end
+
+axesIdx = mod(axes_nr - 5, 5) + 1; % should be in range 1:5.
+plot_spikes_aux(handles, h, par, axesIdx, spikes, spike_times)
+guidata(hObject, handles);
+
 end
 
 % Change nbins

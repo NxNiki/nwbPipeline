@@ -5,11 +5,14 @@ function update_fix_button(handles, plotIdx)
     plotLabelIdx = handles.plotLabelIdx(plotIdx);
     
     mainHandles = getHandles(1);
+    h = guidata(mainHandles);
 
     if get(handles.(sprintf('fix%d_button', plotLabelIdx)), 'value') == 1
-        mainHandles.clusterFixed(clusterIdx) = 1;
+        h.clusterFixed(clusterIdx) = 1;
     else
-        mainHandles.clusterFixed(clusterIdx) = 0;
+        h.clusterFixed(clusterIdx) = 0;
     end
+
+    guidata(mainHandles, h);
     
 end

@@ -7,7 +7,7 @@ function closeAuxFigures()
 aux_figs = getHandles(2:7);
 
 for i=1:length(aux_figs)
-    aux_fig = aux_figs{i};
+    aux_fig = aux_figs(i);
     set(0, 'currentFigure', aux_fig);
     set(aux_fig, 'visible', 'off');
     ch = get(aux_fig, 'children');

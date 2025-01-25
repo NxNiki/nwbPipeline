@@ -10,20 +10,13 @@ function [cluster_class, handles] = readData_ASCIISpikePreClustered(filename, pa
 handles.par = set_joint_parameters_CSC(filename); %EM: Replaced the default wave_clus parameters with those that we've been using
 
 % HISTOGRAM PARAMETERS
-for i=1:handles.par.max_clus + 1
-    handles.par.(['nbins' num2str(i-1)]) = 100;  % # of bins for the ISI histograms
-    handles.par.(['bin_step' num2str(i-1)]) = 1;  % percentage number of bins to plot
+for i=0:handles.par.max_clus
+    handles.(['nbins' num2str(i)]) = 100;  % # of bins for the ISI histograms
+    handles.(['bin_step' num2str(i)]) = 1;  % percentage number of bins to plot
 end
 
-% Sets to zero fix buttons from aux figures
-for i=4:handles.par.max_clus
-    handles.par.(['fix' num2str(i)]) = 0;
-end
-
-% try % will fail on initial call, but not when data is being loaded?
-%     handles.par.filename = filename;
-%     handles.par.pathname = pathname;
-% end
+handles.filename = filename;
+handles.pathname = pathname;
 
 % axes(handles.cont_data); EM: removed call to axes.
 cla(handles.cont_data);
@@ -135,5 +128,8 @@ USER_DATA{12} = ipermut;
 USER_DATA{18} = par.sr;
 
 setUserData(USER_DATA);
+
+handles.clusterUnitType = int8(ones(1, par.max_clus)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
+handles.clusterFixed = false(1, par.max_clus);
 
 end
