@@ -21,7 +21,7 @@ function varargout = wave_clus(varargin)
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
 % Edit the above text to modify the response to help wave_clus
-% Last Modified by GUIDE v2.5 22-Jan-2025 15:12:32
+% Last Modified by GUIDE v2.5 24-Jan-2025 18:31:08
 
 % JMG101208
 % USER_DATA DEFINITIONS
@@ -1007,3 +1007,10 @@ function pushbutton28_Callback(hObject, eventdata, handles)
 unFixAllClusters();
 
 
+% --- Executes on button press in pushbutton29. plot spike amplitudes
+function pushbutton29_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton29 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+plotSpikeAmplitudes(handles);
