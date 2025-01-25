@@ -117,7 +117,15 @@ function varargout = wave_clus_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-clus_colors = [0 0 1; 1 0 0; 0 0.5 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0; 0.25 0.25 0.25];
+clus_colors = [
+    0 0 1; 
+    1 0 0; 
+    0 0.5 0; 
+    0 0.75 0.75; 
+    0.75 0 0.75; 
+    0.75 0.75 0; 
+    0.25 0.25 0.25
+    ];
 set(0,'DefaultAxesColorOrder', clus_colors)
 
 % --- Executes on button press in load_data_button.
@@ -196,8 +204,6 @@ switch char(handles.datatype)
         [cluster_class, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
-% load unit type:
-handles.clusterUnitType = int8(ones(1, length(unique(cluster_class(:, 1))) - 1)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
 if size(cluster_class, 2) == 3
     cluster_class_unit_type = unique(cluster_class(:, [1, 3]), 'rows');
     radiobuttonLabels = {'22','23','24'; '25', '26', '27'; '28', '29', '30'};
@@ -215,8 +221,6 @@ if size(cluster_class, 2) == 3
     end
 end
 
-set(handles.file_name, 'string', fullfile(pathname, filename));
-
 % EM: This is where identification gets set. But really, we want to use the
 % classes from the times_CSC file because in the unsupervised case they
 % already exist, and if we've looked at these spikes before, that is where
@@ -225,6 +229,7 @@ set(handles.file_name, 'string', fullfile(pathname, filename));
 handles = updateHandles(hObject, handles, [], {'setclus', 'force', 'merge', 'undo', 'reject'});
 cla(handles.cont_data)
 
+guidata(hObject, handles);
 plot_spikes(handles);
 mark_clusters_temperature_diagram(handles, 1);
 fprintf('Finished!\n')
@@ -285,8 +290,9 @@ mark_clusters_temperature_diagram(handles, 1)
 nClusters = length(unique(clustering_results(:, 2))) - 1;
 handles.clusterUnitType = int8(ones(1, nClusters));
 
-set(handles.fix1_button, 'value', 1);
-updateFixButtonHandle(hObject, handles)
+% set(handles.fix1_button, 'value', 1);
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Change min_clus_edit
 function min_clus_edit_Callback(hObject, eventdata, handles)
@@ -305,7 +311,8 @@ mark_clusters_temperature_diagram(handles)
 
 set(handles.force_button, 'value', 0);
 set(handles.force_button, 'string', 'Force');
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Executes on button press in save_clusters_button.
 function save_clusters_button_Callback(hObject, eventdata, handles)
@@ -412,7 +419,7 @@ if get(handles.fix3_button,'value') ==1
 end
 % Get fixed clusters from aux figures
 for i=4:par.max_clus
-    if par.(['fix', num2str(i)]) == 1
+    if handles.clusterFixed(i) == 1
         classes(classes==i)=-1;
     end
 end
@@ -437,14 +444,14 @@ setUserData({classes(:)', inspk}, [6, 7]);
 
 handles = updateHandles(hObject, handles, {'setclus', 'force'}, {'merge', 'reject', 'undo'});
 plot_spikes(handles);
-updateFixButtonHandle(hObject, handles);
+% updateFixButtonHandle(hObject, handles);
+unFixAllClusters();
 
 % PLOT ALL PROJECTIONS BUTTON
 % --------------------------------------------------------------------
 function Plot_all_projections_button_Callback(hObject, eventdata, handles)
-par = getUserData(1);
 
-if strcmp(par.filename(1:4), 'poly')
+if strcmp(handles.filename(1:4), 'poly')
     % do we need this part? Xin.
     Plot_amplitudes(handles)
 else
@@ -605,7 +612,8 @@ plot_spikes(handles)
 
 mark_clusters_temperature_diagram(handles)
 set(handles.min_clus_edit, 'string', num2str(handles.min_clus));
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Executes on button press in merge_button.
 function merge_button_Callback(hObject, eventdata, handles)
@@ -613,7 +621,8 @@ function merge_button_Callback(hObject, eventdata, handles)
 handles = updateHandles(hObject, handles, {'merge'}, {'setclus', 'reject', 'force', 'undo'});
 plot_spikes(handles)
 mark_clusters_temperature_diagram(handles)
-updateFixButtonHandle(hObject, handles)
+% updateFixButtonHandle(hObject, handles)
+unFixAllClusters();
 
 % --- Executes on button press in Plot_polytrode_channels_button.
 function Plot_polytrode_button_Callback(hObject, eventdata, handles)

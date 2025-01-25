@@ -4,8 +4,7 @@ function setUserData(data, index)
         index = [];
     end
 
-    h_figs=get(0, 'children');
-    h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
+    h_fig = getHandles(1);
     if isempty(index)
         userData = data;
     else

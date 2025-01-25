@@ -1,4 +1,6 @@
 function plot_spikes(handles)
+% Todo: plot spikes on the specific axes and UI handles.
+% axesIdx, clusterIdx, spikes, spikeTimes
 
 USER_DATA = get(handles.wave_clus_figure, 'userdata');
 par = USER_DATA{1};
@@ -17,24 +19,8 @@ clustering_results = USER_DATA{10};
 classes = classes(:)';
 ls = size(spikes, 2);
 par.to_plot_std = 1;                % # of std from mean to plot
-% merge = handles.merge;
 
-% Close aux figures
-h_figs = get(0, 'children');
-
-% EM: It's inefficient to close all of these if you're just going to open
-% them again shortly. Set to visible off instead.
-aux_figs_label = {'wave_clus_aux', 'wave_clus_aux1', 'wave_clus_aux2', 'wave_clus_aux3', 'wave_clus_aux4', 'wave_clus_aux5'};
-
-for m=1:length(aux_figs_label)
-    aux_fig = findobj(h_figs, 'tag', aux_figs_label{m});
-    if ~isempty(aux_fig)
-        set(0, 'currentFigure', aux_fig);
-        set(aux_fig, 'visible', 'off');
-        ch = get(aux_fig, 'children');
-        arrayfun(@(x)cla(x,'reset'), ch);
-    end
-end
+closeAuxFigures();
 
 % Extract spike features if needed
 if get(handles.spike_shapes_button,'value') == 0
@@ -75,10 +61,10 @@ fix_class2 = [];
 nfix_class = [];
 haveResetClustersAlready = 0;
 
-for m=1:3
-    if get(handles.(['fix',num2str(m),'_button']),'value') ==1
+for i=1:par.max_clus
+    if handles.clusterFixed(i) ==1
         nclusters = nclusters +1;
-        fix_class = USER_DATA{19+m}';
+        fix_class = find(classes==i);
         if ~haveResetClustersAlready
             classes(classes==nclusters)=0;
             haveResetClustersAlready = 1;
@@ -86,27 +72,7 @@ for m=1:3
         classes(fix_class) = nclusters;
         ifixflag(nclusters)=1;
         fix_class2 = [fix_class2 fix_class];
-        nfix_class = [nfix_class m];
-    end
-end
-
-% Get fixed clusters from aux figures
-for i=4:par.max_clus
-    if isfield(par, ['fix', num2str(i)])
-        fixx = par.(['fix', num2str(i)]);
-        if fixx == 1
-            nclusters = nclusters + 1;
-            fix_class = USER_DATA{22+i-3}';
-            if ~haveResetClustersAlready
-                classes(classes==nclusters)=0;
-                haveResetClustersAlready = 1;
-            end
-            classes(fix_class)  = nclusters;
-            ifixflag(nclusters) = 1;
-
-            fix_class2 = [fix_class2 fix_class];
-            nfix_class = [nfix_class i];
-        end
+        nfix_class = [nfix_class i];
     end
 end
 
@@ -148,7 +114,6 @@ classDefs = [{class0}; classDefs];
 USER_DATA{6} = classes;
 USER_DATA{9} = class_bkup;
 
-% updates 'clustering_results_bk'
 clustering_results = [clustering_results; zeros(size(classes, 1) - size(clustering_results, 1), 5)];
 clustering_results_bk = clustering_results;
 
@@ -295,12 +260,12 @@ for i = 1:nclusters+1
             spkTimeDiff = diff(spk_times(classDefs{i}));
             % Calculates # ISIs < 3ms
             bin_step_temp = 1;
-            [N,X]=hist(spkTimeDiff, 0:bin_step_temp:par.(['nbins', num2str(i-1)]));
+            [N,X]=hist(spkTimeDiff, 0:bin_step_temp:handles.(['nbins', num2str(i-1)]));
             multi_isi= sum(N(1:3));
             pct_violations = multi_isi/length(spkTimeDiff);
             % Builds and plots the histogram
             bar(isiAx, X(1:end-1), N(1:end-1))
-            xlim(isiAx, [0 par.(['nbins' num2str(i-1)])])
+            xlim(isiAx, [0 handles.(['nbins' num2str(i-1)])])
             %The following line generates an error in Matlab 7.3
             %eval(['set(get(gca,''children''),''FaceColor'',''' colors(i) ''',''EdgeColor'',''' colors(i) ''',''Linewidth'',0.01);']);
             title(isiAx, [num2str(multi_isi) ' in < 3ms (', num2str(pct_violations*100), '%)'])
@@ -315,6 +280,7 @@ for i = 1:nclusters+1
             USER_DATA{1} = par;
             set(handles.wave_clus_figure, 'userdata', USER_DATA)
             
+            % plot addtional spikes in aux UI:
             if i < 10
                 wave_clus_aux;
             else

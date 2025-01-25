@@ -2,23 +2,25 @@ function unFixAllClusters()
 % get the indices of clusters that the fix button is pressed in the current
 % handle.
 
-h_figs = get(0, 'children');
-UITags = {'wave_clus_figure', 'wave_clus_aux', 'wave_clus_aux1', 'wave_clus_aux2', 'wave_clus_aux3', 'wave_clus_aux4', 'wave_clus_aux5'};
-startClusterIdx = 1;
-endClusterIdx = 3;
-for ui_idx = 1:length(UITags)
-    ui = findobj(h_figs, 'tag', UITags{ui_idx}, 'Visible', 'on');
-    
-    if isempty(ui)
-        continue;
-    end
-    handles = guidata(ui);
+[uiHandles, handlesIndex] = getHandles();
 
-    if ui_idx > 1
+for i = 1:length(uiHandles)
+
+    handles = guidata(uiHandles(i));
+
+    if handlesIndex(i) == 1
+        % main handle
+        startClusterIdx = 1;
+        endClusterIdx = 3;
+        handles.clusterFixed(:) = false;
+    else
+        % aux handles
         startClusterIdx = 4;
         endClusterIdx = 8;
     end
-    for i = startClusterIdx: endClusterIdx
-        set(handles.(['fix' num2str(i), '_button']), 'value', 0);
+    for j = startClusterIdx: endClusterIdx
+        set(handles.(['fix' num2str(j), '_button']), 'value', 0);
     end
+
+    guidata(uiHandles(i), handles);
 end

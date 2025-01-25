@@ -1,10 +1,12 @@
 function varargout = getUserData(index)
+% get elements specified by index from userData
+
     if nargin < 1
+        % get all userData
         index = [];
     end
-
-    h_figs=get(0, 'children');
-    h_fig = findobj(h_figs, 'tag', 'wave_clus_figure');
+    
+    h_fig = getHandles(1);
     userData = get(h_fig, 'UserData'); % 1 by n cell array, see wave_clus.m
     
     if ~isempty(index)
@@ -18,10 +20,10 @@ function varargout = getUserData(index)
     end
 
     function res = getData(index)
+        % set sampling rate if it is empty.
 
         if index > length(userData)
             if index == 18
-                % Add sampling rate to userData:
                 samplingRate = questdlg('What was the sampling rate?', 'SR', '30000', '32000', '40000', '32000');
                 res = eval(samplingRate);
                 userData{18} = res;
