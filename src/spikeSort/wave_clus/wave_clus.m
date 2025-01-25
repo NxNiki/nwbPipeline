@@ -200,6 +200,8 @@ switch char(handles.datatype)
                 return
             end
             filename = timesFile2SpikeFile(filename);
+            handles.filename = filename;
+            handles.pathname = pathname;
         end
         [cluster_class, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
@@ -316,7 +318,7 @@ unFixAllClusters();
 
 % --- Executes on button press in save_clusters_button.
 function save_clusters_button_Callback(hObject, eventdata, handles)
-fprintf('Saving...')
+fprintf('Saving...\n');
 reorderSpikeRasters('reset')
 
 [spikes, spikeTimestamps, classes, temp] = getUserData([2, 3, 6, 8]);
@@ -339,9 +341,8 @@ for i = 1:length(handles.clusterUnitType)
     cluster_class(classes(:)==i, 3) = handles.clusterUnitType(i);
 end
 
-[pathname, fn] = fileparts(get(handles.file_name, 'String'));
-outFileName = strrep(['times_manual_' fn], '_spikes', '');
-outfile = fullfile(pathname, outFileName);
+outFileName = strrep(['times_manual_' handles.filename], '_spikes', '');
+outfile = fullfile(handles.pathname, outFileName);
 
 outFileObj = matfile(outfile, "Writable", true);
 
@@ -362,24 +363,24 @@ switch outFileName(7:9)
 end
 
 h_figs = get(0, 'children');
-saveWaveClusFigure(h_figs, 'wave_clus_figure', pathname, outFileName(startInd:end))
+saveWaveClusFigure(h_figs, 'wave_clus_figure', handles.pathname, outFileName(startInd:end))
 if nClusts>3
-    saveWaveClusFigure(h_figs,  'wave_clus_aux', pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs,  'wave_clus_aux', handles.pathname, outFileName(startInd:end))
 end
 if nClusts>8
-    saveWaveClusFigure(h_figs, 'wave_clus_aux1', pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux1', handles.pathname, outFileName(startInd:end))
 end
 if nClusts>13
-    saveWaveClusFigure(h_figs, 'wave_clus_aux2', pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux2', handles.pathname, outFileName(startInd:end))
 end
 if nClusts>18
-    saveWaveClusFigure(h_figs, 'wave_clus_aux3', pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux3', handles.pathname, outFileName(startInd:end))
 end
 if nClusts>23
-    saveWaveClusFigure(h_figs, 'wave_clus_aux4', pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux4', handles.pathname, outFileName(startInd:end))
 end
 if nClusts>28
-    saveWaveClusFigure(h_figs, 'wave_clus_aux5', pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux5', handles.pathname, outFileName(startInd:end))
 end
 
 outFileObj.sortedBy = sortedByPrev;
@@ -387,7 +388,7 @@ outFileObj.cluster_class = cluster_class;
 outFileObj.temp = temp;
 outFileObj.min_clus = handles.min_clus;
 
-fprintf('Finished!\n')
+fprintf('Cluster saved to: %s!\n', outfile);
 
 % --- Executes on selection change in data_type_popupmenu.
 function data_type_popupmenu_Callback(hObject, eventdata, handles)
