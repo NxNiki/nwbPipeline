@@ -15,9 +15,6 @@ for i=0:handles.par.max_clus
     handles.(['bin_step' num2str(i)]) = 1;  % percentage number of bins to plot
 end
 
-handles.filename = filename;
-handles.pathname = pathname;
-
 % axes(handles.cont_data); EM: removed call to axes.
 cla(handles.cont_data);
 
