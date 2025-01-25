@@ -14,8 +14,7 @@ end
 if ~isempty(par) && length(par.w_pre) == 1
     peakWindow = par.w_pre - 5: par.w_pre + 5;
 else
-    [~, spikePeakIdx] = max(abs(mean(spikes, 1)));
-    peakWindow = spikePeakIdx - 5: spikePeakIdx + 5;
+    peakWindow = getSpikePeakWindow(spikes);
 end
 peakWindow(peakWindow > size(spikes, 2)) = [];
 peakWindow(peakWindow < 1) = [];
