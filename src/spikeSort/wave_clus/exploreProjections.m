@@ -267,10 +267,10 @@ features = xy(axInd,:);
 f = figure('units','normalized','position',[0.1    0.0667    0.9    0.8618]);
 pv = makePosVecFunction(5.5,24);
 ax(1) = axes('parent',f,'units','normalized','position',pv(1,19,1,1)); hold on;
-ax(2) = axes('parent',f,'units','normalized','position',pv(1,19,2,1));hold on;
-ax(3) = axes('parent',f,'units','normalized','position',pv(1,19,3,1));hold on;
-ax(4) = axes('parent',f,'units','normalized','position',pv(1,7,5,2));hold on;
-ax(5) = axes('parent',f,'units','normalized','position',pv(12,7,5,2));hold on;
+ax(2) = axes('parent',f,'units','normalized','position',pv(1,19,2,1)); hold on;
+ax(3) = axes('parent',f,'units','normalized','position',pv(1,19,3,1)); hold on;
+ax(4) = axes('parent',f,'units','normalized','position',pv(1,7,5,2)); hold on;
+ax(5) = axes('parent',f,'units','normalized','position',pv(12,7,5,2)); hold on;
 
 waveClusFig = findobj('tag','wave_clus_figure');
 handles = guidata(waveClusFig);
@@ -426,6 +426,7 @@ end
 function saveChanges(varargin)
 h = guidata(varargin{3});
 toRemove = any(h.toRemove,1) & varargin{4}';
+theseSpikes = varargin{4};
 
 waveClusFig = findobj('tag', 'wave_clus_figure');
 handles = guidata(waveClusFig);
@@ -450,10 +451,10 @@ switch varargin{5}
         classes(toRemove) = 0;
     case 'split'
         maxClass = max(classes);
-        nClusts = size(h.toRemove,1);
+        nClusts = size(h.toRemove, 1);
         for k = 1:nClusts
-            thisClass = maxClass+k;
-            inThis = h.toRemove(k,:) & h.theseSpikes;
+            thisClass = maxClass + k;
+            inThis = h.toRemove(k,:) & theseSpikes;
             classes(inThis) = thisClass;
         end
 end
@@ -461,7 +462,7 @@ end
 USER_DATA{6} = classes;
 set(handles.wave_clus_figure, 'userdata', USER_DATA);
 plot_spikes(handles)
-if strcmp(varargin{5},'split')
+if strcmp(varargin{5}, 'split')
     rejectAndForce(currentClass);
 else
     fprintf('Finished!\n')

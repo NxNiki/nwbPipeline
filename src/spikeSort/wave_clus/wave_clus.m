@@ -200,8 +200,9 @@ switch char(handles.datatype)
                 return
             end
             filename = timesFile2SpikeFile(filename);
-            handles.filename = filename;
-            handles.pathname = pathname;
+            % handles.filename = filename;
+            % handles.pathname = pathname;
+            set(handles.file_name, 'String', fullfile(pathname, filename));
         end
         [cluster_class, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
@@ -341,9 +342,9 @@ for i = 1:length(handles.clusterUnitType)
     cluster_class(classes(:)==i, 3) = handles.clusterUnitType(i);
 end
 
-outFileName = strrep(['times_manual_' handles.filename], '_spikes', '');
-outfile = fullfile(handles.pathname, outFileName);
-
+[pathname, filename] = fileparts(get(handles.file_name, 'String'));
+outFileName = strrep(['times_manual_', filename], '_spikes', '');
+outfile = fullfile(pathname, outFileName);
 outFileObj = matfile(outfile, "Writable", true);
 
 if ~ismember('sortedBy', who(outFileObj)) || ~iscell(outFileObj.sortedBy)
@@ -363,24 +364,24 @@ switch outFileName(7:9)
 end
 
 h_figs = get(0, 'children');
-saveWaveClusFigure(h_figs, 'wave_clus_figure', handles.pathname, outFileName(startInd:end))
+saveWaveClusFigure(h_figs, 'wave_clus_figure', pathname, outFileName(startInd:end))
 if nClusts>3
-    saveWaveClusFigure(h_figs,  'wave_clus_aux', handles.pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux', pathname, outFileName(startInd:end))
 end
 if nClusts>8
-    saveWaveClusFigure(h_figs, 'wave_clus_aux1', handles.pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux1', pathname, outFileName(startInd:end))
 end
 if nClusts>13
-    saveWaveClusFigure(h_figs, 'wave_clus_aux2', handles.pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux2', pathname, outFileName(startInd:end))
 end
 if nClusts>18
-    saveWaveClusFigure(h_figs, 'wave_clus_aux3', handles.pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux3', pathname, outFileName(startInd:end))
 end
 if nClusts>23
-    saveWaveClusFigure(h_figs, 'wave_clus_aux4', handles.pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux4', pathname, outFileName(startInd:end))
 end
 if nClusts>28
-    saveWaveClusFigure(h_figs, 'wave_clus_aux5', handles.pathname, outFileName(startInd:end))
+    saveWaveClusFigure(h_figs, 'wave_clus_aux5', pathname, outFileName(startInd:end))
 end
 
 outFileObj.sortedBy = sortedByPrev;
@@ -452,7 +453,9 @@ unFixAllClusters();
 % --------------------------------------------------------------------
 function Plot_all_projections_button_Callback(hObject, eventdata, handles)
 
-if strcmp(handles.filename(1:4), 'poly')
+[~, filename] = fileparts(get(handles.file_name, 'String'));
+
+if strcmp(filename(1:4), 'poly')
     % do we need this part? Xin.
     Plot_amplitudes(handles)
 else
