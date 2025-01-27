@@ -33,7 +33,7 @@ end
 
 timesFileObj = matfile(timesFile);
 cluster_class = timesFileObj.cluster_class;
-manualTimesFile = fullfile(pathname, ['times_manual_' filename]);
+manualTimesFile = fullfile(pathname, ['times_manual_', filename]);
 
 spikeFileVars = who(spikeFileObj);
 timesFileVars = who(timesFileObj);
@@ -78,8 +78,8 @@ if exist(manualTimesFile, 'file')
     end
 end
 
-handles.min_clus = min_clus;
-set(handles.min_clus_edit, 'string', num2str(handles.min_clus));
+handles.min_clus = min_clus; % Todo: use min_clus_edit instead.
+set(handles.min_clus_edit, 'string', num2str(min_clus));
 
 spikeTimestamps=cluster_class(:, 2)'; % timestamps of spikes; gets loaded in line above.
 numSpikes = length(spikeTimestamps);
@@ -107,7 +107,7 @@ clustering_results(:,1) = repmat(temp, length(classes),1); % GUI temperatures
 clustering_results(:,2) = classes; % GUI classes
 clustering_results(:,3) = repmat(temp, length(classes),1); % original temperatures
 clustering_results(:,4) = classes'; % original classes
-clustering_results(:,5) = repmat(handles.min_clus, length(classes),1); % minimum number of clusters
+clustering_results(:,5) = repmat(min_clus, length(classes),1); % minimum number of clusters
 
 USER_DATA = getUserData();
 USER_DATA{1} = handles.par;
