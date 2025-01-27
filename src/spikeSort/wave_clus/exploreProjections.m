@@ -437,7 +437,7 @@ USER_DATA = get(handles.wave_clus_figure,'userdata');
 % handles.reject = 0;
 % clustering_results_bk = USER_DATA{11};
 % handles.minclus = clustering_results_bk(1,5);
-handles = updateHandles([], handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'}, 11);
+handles = updateHandles([], handles, {'undo'}, {'setclus', 'reject', 'force', 'merge'});
 
 classes = USER_DATA{6};
 currentClass = unique(classes(toRemove));
