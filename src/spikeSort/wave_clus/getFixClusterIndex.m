@@ -1,4 +1,5 @@
 function clustersFixedIdx = getFixClusterIndex()
 
 mainHandle = getHandles(1);
-clustersFixedIdx = find(mainHandle.clustersFixed);
+mainHandle = guidata(mainHandle);
+clustersFixedIdx = find(mainHandle.clusterFixed);
