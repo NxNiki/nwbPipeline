@@ -130,7 +130,7 @@ set(0,'DefaultAxesColorOrder', clus_colors)
 
 % --- Executes on button press in load_data_button.
 function load_data_button_Callback(hObject, eventdata, handles)
-fprintf('Loading ')
+fprintf('Loading ');
 
 set(handles.isi0_nbins,'string','Auto');
 set(handles.isi0_bin_step,'string','Auto');
@@ -194,7 +194,7 @@ switch char(handles.datatype)
     case 'ASCII spikes'
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
-        if isempty(fullfile(pathname, filename))
+        if isempty(filename)
             [filename, pathname] = uigetfile([pathname, filesep, 'times_*.mat'], 'Select file');
             if ~filename
                 return
