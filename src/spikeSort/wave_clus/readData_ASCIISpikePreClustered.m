@@ -99,7 +99,10 @@ if ismember("spikeIdxRejected", who(timesFileObj))
 end
 
 classes = cluster_class(:, 1);                               
-classes = rejectPositiveSpikes(spikes, classes(:), handles.par);
+% sometimes manual curation add spikes with opposite directions so do not
+% reject positive spikes. rejectPositiveSpikes was applied in automatic
+% clustering so also do not need to do it here.
+% classes = rejectPositiveSpikes(spikes, classes(:), handles.par); 
 cluster_class(:, 1) = classes;   
 
 clustering_results      = [];
