@@ -194,19 +194,17 @@ switch char(handles.datatype)
     case 'ASCII spikes'
         cluster_class = readData_ASCIISpikes(filename, handles);
     case 'ASCII spikes (pre-clustered)'
-        if isempty(filename)
+        if isempty(fullfile(pathname, filename))
             [filename, pathname] = uigetfile([pathname, filesep, 'times_*.mat'], 'Select file');
             if ~filename
                 return
             end
             filename = timesFile2SpikeFile(filename);
-            % handles.filename = filename;
-            % handles.pathname = pathname;
-            set(handles.file_name, 'String', fullfile(pathname, filename));
         end
         [cluster_class, handles] = readData_ASCIISpikePreClustered(filename, pathname, handles);
 end
 
+set(handles.file_name, 'String', fullfile(pathname, filename));
 if size(cluster_class, 2) == 3
     cluster_class_unit_type = unique(cluster_class(:, [1, 3]), 'rows');
     radiobuttonLabels = {'22','23','24'; '25', '26', '27'; '28', '29', '30'};
