@@ -25,7 +25,7 @@ manualValidation = 0;
 outputPath = fullfile(fileparts(macroPath), 'sleep_score');
 disp('automated sleep scoring...')
 tic
-sleepScoring_iEEG_wrapper(macroFiles(channel_index, :), macroTimestampFiles, outputPath, manualValidation); 
+sleep_score_vec = sleepScoring_iEEG_wrapper(macroFiles(channel_index, :), macroTimestampFiles, outputPath, manualValidation); 
 toc
 disp('automated sleep scoring finished!')
 

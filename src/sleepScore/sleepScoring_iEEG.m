@@ -11,8 +11,8 @@ classdef sleepScoring_iEEG < handle
         rippleRangeMin = 70; % consistent with hamming window in John's jupyter notebook: 
         rippleRangeMax = 180;
         
-        % flimits = [0 30]';
-        flimits = [0 200]';
+        flimits = [0 30]';
+        flimitsRipple = [0 200]';
         fDisplayLimits = [0, 30];
         samplingRate = 2000;
         sub_sampleRate = 200; % this is not used?
@@ -36,41 +36,19 @@ classdef sleepScoring_iEEG < handle
     methods
         
         function [sleep_score_vec] = evaluateDelta(obj, data, LocalHeader, outputPath)
-            data(isnan(data)) = 0;
+            % sleep_score_vec has same FS as data (2000 Hz for macro data).
 
+            data(isnan(data)) = 0;
             sleepScoreFile = fullfile(outputPath, sprintf('sleepScore_%s.mat', LocalHeader.origName));
             
             % remove extremely noisy data segments (like around stimulation
             % that shift the power to higher frequencies)
             if obj.EXTREME_NOISE
-                fprintf('remove extreme noise...\n');
-                timeWin = 10*obj.samplingRate;
-                dataL = size(data,2);
-                nTimeWins = floor(dataL/timeWin);
-                dataLmin = dataL/obj.samplingRate/60;
-                
-                for iTimeWin=1:nTimeWins
-                    normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
-                end
-                
-                stdsNorms = std(normsTimeWin(:));
-                skewNorms = skewness(normsTimeWin(:));
-                kurtNorms = kurtosis(normsTimeWin(:));
-                
-                medStd = nanmedian(stdsNorms);
-                medSkew = nanmedian(skewNorms);
-                medKurt = nanmedian(kurtNorms);
-                
-                for iTimeWin=1:nTimeWins
-                    % normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
-                    if normsTimeWin(1,iTimeWin)  > medStd
-                        data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin) = 0;
-                    end
-                end
+                data = removeNoise(obj, data);
             end
             %%
             
-            window = obj.scoringEpochDuration*obj.samplingRate;
+            window = obj.scoringEpochDuration * obj.samplingRate;
             [~,F,T,P]  = spectrogram(data, window, 0, [0.5:0.2:obj.flimits(2)], obj.samplingRate, 'yaxis');
             diffSamples = obj.minDistBetweenEvents/diff(T(1:2)); %samples
             P_delta = movsum(sum(P(F > obj.deltaRangeMin & F < obj.deltaRangeMax,:)), 7);
@@ -99,7 +77,7 @@ classdef sleepScoring_iEEG < handle
             set(gcf, 'DefaultAxesFontSize', 14);
             axes('position', [0.1,0.5,0.8,0.3])
 
-            P_ripple = movsum(sum(P(F > obj.rippleRangeMin & F < obj.rippleRangeMax, :)), 5);
+            P_ripple = getRipplePower(obj, data);
             
             P2 = P/max(max(P));
             P2 = (10*log10(abs(P2+obj.scaling_factor_delta_log)))';
@@ -112,7 +90,7 @@ classdef sleepScoring_iEEG < handle
             fitToWin3 = obj.fDisplayLimits(2)/max(P_ripple);
 
             plot(T, P_delta * fitToWin1, 'k-', 'linewidth', 1);
-            plot(T, (P_sp - min(P_sp)) * fitToWin2, '-', 'linewidth', 1, 'color', [0.8,0.8,0.8]);
+            plot(T, (P_sp - min(P_sp)) * fitToWin2, '-', 'linewidth', 1, 'color', [0.1,0.8,0.8]);
             plot(T, (P_ripple - min(P_ripple)) * fitToWin3, '-', 'linewidth', 1, 'color', [0.8,0.8,0.1]);
             line(get(gca,'xlim'), thSleepInclusion * fitToWin1 * ones(1,2), 'color', 'k', 'linewidth', 3);
             line(get(gca,'xlim'), thREMInclusion * fitToWin1 * ones(1,2), 'color', 'k', 'linewidth', 3);
@@ -389,6 +367,39 @@ classdef sleepScoring_iEEG < handle
             
         end
 
+        function data = removeNoise(obj, data)
+            fprintf('remove extreme noise...\n');
+                timeWin = 10*obj.samplingRate;
+                dataL = size(data,2);
+                nTimeWins = floor(dataL/timeWin);
+                % dataLmin = dataL/obj.samplingRate/60;
+                
+                for iTimeWin=1:nTimeWins
+                    normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
+                end
+                
+                stdsNorms = std(normsTimeWin(:));
+                skewNorms = skewness(normsTimeWin(:));
+                kurtNorms = kurtosis(normsTimeWin(:));
+                
+                medStd = nanmedian(stdsNorms);
+                medSkew = nanmedian(skewNorms);
+                medKurt = nanmedian(kurtNorms);
+                
+                for iTimeWin=1:nTimeWins
+                    % normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
+                    if normsTimeWin(1,iTimeWin) > medStd
+                        data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin) = 0;
+                    end
+                end
+        end
+
+
+        function P_ripple = getRipplePower(obj, data)
+            window = obj.scoringEpochDuration*obj.samplingRate;
+            [~,F,T,P]  = spectrogram(data, window, 0, [0.5:0.2:obj.flimitsRipple(2)], obj.samplingRate, 'yaxis');
+            P_ripple = movsum(sum(P(F > obj.rippleRangeMin & F < obj.rippleRangeMax, :)), 5);
+        end
 
         function [f, psdx] = getPS(obj,segment)
             %an help method to calcualte the power spectrum of a segment
