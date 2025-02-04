@@ -7,8 +7,8 @@ license = "MIT"
 readme = "README.md"
 
 packages = [
-    { include = "utils", from = "src" },
-    { include = "nwb_utils", from = "src" }
+    { include = "nwb_pipeline", from = "src" },
+    { include = "sleepScore", from = "src" }
 ]
 
 [tool.poetry.dependencies]
