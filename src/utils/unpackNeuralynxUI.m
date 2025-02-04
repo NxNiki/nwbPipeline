@@ -43,6 +43,7 @@ expNameList = {
     'MovieParadigm';
     'Screening';
     'ABCD';
+    'GoldmineGems';
     };
 
 
