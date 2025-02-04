@@ -6,13 +6,12 @@ import numpy as np
 from debugpy.common.log import warning
 from hdmf.data_utils import DataChunkIterator
 from pynwb import NWBHDF5IO
-from pynwb.base import TimeSeries
 from pynwb.core import DynamicTableRegion
 from pynwb.ecephys import ElectricalSeries, FilteredEphys
 from pynwb.file import ProcessingModule
 from scipy.io import loadmat
 
-from nwb_utils.nwb_exporter import NWBExporter
+from nwb_pipeline.nwb_utils.nwb_exporter import NWBExporter
 
 
 def save_lfp_to_nwb(

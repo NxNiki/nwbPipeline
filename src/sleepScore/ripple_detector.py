@@ -1,12 +1,4 @@
-from os import times
 from typing import Tuple, List
-import numpy.typing as npt
-import pandas as pd
-import numpy as np
-import sys
-import os
-import matplotlib.pyplot as plt
-from copy import copy
 
 from mne.io import RawArray
 # from ptsa.data.timeseries import TimeSeries
@@ -25,20 +17,12 @@ staresina is staresina
 
 """
 
-from numpy.core.defchararray import endswith
-from scipy import stats
-from scipy.stats import zscore
-import pickle
-from scipy import stats,signal,io
-import time
-import mat73 # this loads .mat files as dicts
-import warnings # neuralynx_io gives annoying warnings but seems to work fine
-from utils.SWRmodule import *
-from utils.general import *
-from utils.csc_reader import read_csc, combine_csc
+from sleepScore.SWRmodule import *
+from sleepScore.general import *
+from nwb_pipeline.csc_reader import combine_csc
 
 import mne
-from scipy.signal import firwin, filtfilt, kaiserord
+from scipy.signal import firwin, filtfilt
 
 # warnings.filterwarnings("ignore")
 
