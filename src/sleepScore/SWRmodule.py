@@ -1,14 +1,11 @@
 import pandas as pd
-import numpy as np
 import sys
-import os
 import matplotlib.pyplot as plt
 from copy import copy
 import functools
 import datetime
-import scipy
 
-from utils.general import *
+from sleepScore.general import *
 
 # all the unique sub names for FR tasks in df. Need fixed list so can do 40/60 data split
 # note that for FR1 this was before localization.pairs pipeline was added.
@@ -642,9 +639,7 @@ def get_recall_clustering(recall_cluster_values, recalls_serial_pos):
 def pd_temp_fact(df, skip_first_n=0):
     
     import pybeh
-    from pybeh.temp_fact import temp_fact
-    from pybeh.make_recalls_matrix import make_recalls_matrix
-    
+
     """Expects as input a dataframe (df) for one subject"""
     pres_itemnos, rec_itemnos, _, _ = get_itemno_matrices(df)
     recalls = pybeh.make_recalls_matrix.make_recalls_matrix(pres_itemnos, rec_itemnos)
@@ -661,9 +656,7 @@ def pd_semantic_fact(df, dist_mat, skip_first_n=0):
     # word list used across ALL catFR1. Would have to reindex the 300 words in each pool
     # to 461 or recalculate the word2vec for every session which is a pain
     import pybeh
-    from pybeh.dist_fact import dist_fact
-    from pybeh.make_recalls_matrix import make_recalls_matrix
-    
+
     """Expects as input a dataframe (df) for one subject"""
     pres_itemnos, rec_itemnos, _, _ = get_itemno_matrices(df)
 #     recalls = pybeh.make_recalls_matrix.make_recalls_matrix(pres_itemnos, rec_itemnos)

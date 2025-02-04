@@ -14,7 +14,7 @@ skipExist = 1;
 disp('sleep hypnogram...')
 tic
 outputPath = fullfile(fileparts(macroPath), 'hypnogram');
-create_sleepHypnogram_per_pt(macroFiles(1:3:end, :), macroTimestampFiles, outputPath, skipExist)
+% create_sleepHypnogram_per_pt(macroFiles(1:3:end, :), macroTimestampFiles, outputPath, skipExist)
 toc
 disp('sleep hypnogram finished!')
 
@@ -25,7 +25,7 @@ manualValidation = 0;
 outputPath = fullfile(fileparts(macroPath), 'sleep_score');
 disp('automated sleep scoring...')
 tic
-sleepScoring_iEEG_wrapper(macroFiles(channel_index, :), macroTimestampFiles, outputPath, manualValidation); 
+sleep_score_vec = sleepScoring_iEEG_wrapper(macroFiles(channel_index, :), macroTimestampFiles, outputPath, manualValidation); 
 toc
 disp('automated sleep scoring finished!')
 

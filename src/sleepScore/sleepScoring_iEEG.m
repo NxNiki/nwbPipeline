@@ -8,65 +8,47 @@ classdef sleepScoring_iEEG < handle
         deltaRangeMax = 4;
         spRangeMin = 9;
         spRangeMax = 15;
+        rippleRangeMin = 70; % consistent with hamming window in John's jupyter notebook: 
+        rippleRangeMax = 180;
         
         flimits = [0 30]';
+        flimitsRipple = [0 200]';
+        fDisplayLimits = [0, 30];
         samplingRate = 2000;
-        sub_sampleRate = 200;
+        sub_sampleRate = 200; % this is not used?
         
         REMprctile = 20;
         NREMprctile = 55;
-        minDistBetweenEvents = 60; % sec
+        minDistBetweenEvents = 60;  % sec
         
         PLOT_FIG = 1;
-        scaling_factor_delta_log = 2*10^-4; % Additive Factor to be used when computing the Spectrogram on a log scale
-        useClustering_for_scoring = 0; % this should be used for naps w/o REM sleep
+        scaling_factor_delta_log = 2*10^-4;  % Additive Factor to be used when computing the Spectrogram on a log scale
+        useClustering_for_scoring = 0;  % this should be used for naps w/o REM sleep
         
-        scoringEpochDuration = 30; % sec
+        scoringEpochDuration = 30;  % sec
         NREM_CODE = 1;
         REM_CODE = -1;
         
-        EXTREME_NOISE = 0; % support in cases of extreme background noise (This was added to make scoring possible for p544)
+        EXTREME_NOISE = 0;  % support in cases of extreme background noise (This was added to make scoring possible for p544)
         
     end
     
     methods
         
         function [sleep_score_vec] = evaluateDelta(obj, data, LocalHeader, outputPath)
-            data(isnan(data)) = 0;
+            % sleep_score_vec has same FS as data (2000 Hz for macro data).
 
+            data(isnan(data)) = 0;
             sleepScoreFile = fullfile(outputPath, sprintf('sleepScore_%s.mat', LocalHeader.origName));
             
             % remove extremely noisy data segments (like around stimulation
             % that shift the power to higher frequencies)
             if obj.EXTREME_NOISE
-                fprintf('remove extreme noise...\n');
-                timeWin = 10*obj.samplingRate;
-                dataL = size(data,2);
-                nTimeWins = floor(dataL/timeWin);
-                dataLmin = dataL/obj.samplingRate/60;
-                
-                for iTimeWin=1:nTimeWins
-                    normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
-                end
-                
-                stdsNorms = std(normsTimeWin(:));
-                skewNorms = skewness(normsTimeWin(:));
-                kurtNorms = kurtosis(normsTimeWin(:));
-                
-                medStd = nanmedian(stdsNorms);
-                medSkew = nanmedian(skewNorms);
-                medKurt = nanmedian(kurtNorms);
-                
-                for iTimeWin=1:nTimeWins
-                    % normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
-                    if normsTimeWin(1,iTimeWin)  > medStd
-                        data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin) = 0;
-                    end
-                end
+                data = removeNoise(obj, data);
             end
             %%
             
-            window = obj.scoringEpochDuration*obj.samplingRate;
+            window = obj.scoringEpochDuration * obj.samplingRate;
             [~,F,T,P]  = spectrogram(data, window, 0, [0.5:0.2:obj.flimits(2)], obj.samplingRate, 'yaxis');
             diffSamples = obj.minDistBetweenEvents/diff(T(1:2)); %samples
             P_delta = movsum(sum(P(F > obj.deltaRangeMin & F < obj.deltaRangeMax,:)), 7);
@@ -94,25 +76,31 @@ classdef sleepScoring_iEEG < handle
             colormap('jet');
             set(gcf, 'DefaultAxesFontSize', 14);
             axes('position', [0.1,0.5,0.8,0.3])
+
+            P_ripple = getRipplePower(obj, data);
             
             P2 = P/max(max(P));
             P2 = (10*log10(abs(P2+obj.scaling_factor_delta_log)))';
             P2 = [P2(:,2) P2 P2(:,end)];
             ah1 = imagesc(T,F,P2',[-40,-5]); axis xy;
             hold on
-            fitToWin1 = 30/max(P_delta);
-            fitToWin2 = 30/max(P_sp);
-            plot(T, P_delta * fitToWin1, 'k-', 'linewidth', 1)
-            plot(T, P_sp * fitToWin2 - min(P_sp) * fitToWin2, '-', 'linewidth', 1, 'color', [0.8,0.8,0.8])
-            line(get(gca,'xlim'), thSleepInclusion * fitToWin1 * ones(1,2), 'color', 'k', 'linewidth', 3)
-            line(get(gca,'xlim'), thREMInclusion * fitToWin1 * ones(1,2), 'color', 'k', 'linewidth', 3)
+
+            fitToWin1 = obj.fDisplayLimits(2)/max(P_delta);
+            fitToWin2 = obj.fDisplayLimits(2)/max(P_sp);
+            fitToWin3 = obj.fDisplayLimits(2)/max(P_ripple);
+
+            plot(T, P_delta * fitToWin1, 'k-', 'linewidth', 1);
+            plot(T, (P_sp - min(P_sp)) * fitToWin2, '-', 'linewidth', 1, 'color', [0.1,0.8,0.8]);
+            plot(T, (P_ripple - min(P_ripple)) * fitToWin3, '-', 'linewidth', 1, 'color', [0.8,0.8,0.1]);
+            line(get(gca,'xlim'), thSleepInclusion * fitToWin1 * ones(1,2), 'color', 'k', 'linewidth', 3);
+            line(get(gca,'xlim'), thREMInclusion * fitToWin1 * ones(1,2), 'color', 'k', 'linewidth', 3);
             
             xlabel('ms')
             ylabel('F(Hz)')
             XLIM = get(gca, 'xlim');
             YLIM = get(gca, 'ylim'); 
-            text(XLIM(2)+diff(XLIM)/35, thSleepInclusion*fitToWin1, 'NREM TH')
-            text(XLIM(2)+diff(XLIM)/35, thREMInclusion*fitToWin1, 'REM TH')
+            text(XLIM(2)+diff(XLIM)/35, thSleepInclusion * fitToWin1, 'NREM TH');
+            text(XLIM(2)+diff(XLIM)/35, thREMInclusion * fitToWin1, 'REM TH');
             
             %% Compare threshold-based sleep-scoring to a data-driven cluster approach
             D1 = [P_delta(:), P_sp(:)];
@@ -120,6 +108,7 @@ classdef sleepScoring_iEEG < handle
             P = posterior(gm, D1);
             C1 = find(P(:,1)>P(:,2));
             C2 = find(P(:,2)>P(:,1));
+
             Svec = zeros(1,length(D1));
             if gm.mu(1) > gm.mu(2)
                 Svec(C1) = 1;
@@ -130,7 +119,7 @@ classdef sleepScoring_iEEG < handle
             hold on
             plot(T(pointsPassedSleepThresh),25,'.','markersize',5,'color','w')
             plot(T(logical(Svec)),20,'.','markersize',5,'color','r')
-            legend('P delta','P spindle','TH1','TH2', 'Location', 'bestoutside');
+            legend('P delta','P spindle', 'P ripple', 'TH1','TH2', 'Location', 'bestoutside');
             title(sprintf('white - sleep scoring based on delta TH, red - based on clustering delta+spindle, diff = %2.2f%%',...
                 100*sum(pointsPassedSleepThresh - Svec)/length(Svec)))
             
@@ -241,9 +230,7 @@ classdef sleepScoring_iEEG < handle
                 elseif ii_a == 2
                     pointsPassedREMThresh = data_merge;
                 end
-                
-            end
-            
+            end            
             
             sleep_score_vec = zeros(1,length(data));
             sleep_score_vec(1:T(1)*obj.samplingRate) = pointsPassedSleepThresh(1);
@@ -261,7 +248,7 @@ classdef sleepScoring_iEEG < handle
             if obj.PLOT_FIG
                 
                 figure_name_out = fullfile(outputPath, sprintf('sleepScore_%s.png', LocalHeader.origName));
-                figure('Name', figure_name_out,'NumberTitle','off');
+                figure('Name', figure_name_out, 'NumberTitle', 'off');
                 % set(gcf,'PaperUnits','centimeters','PaperPosition',[0.2 0.2 21 30]); % this size is the maximal to fit on an A4 paper when printing to PDF
                 set(gcf,'PaperUnits','centimeters','PaperPosition',[0.2 0.2 41 30]);
                 set(gcf,'PaperOrientation','portrait');
@@ -296,7 +283,7 @@ classdef sleepScoring_iEEG < handle
                 set(gca,'ytick',[0.5,10,20])
                 datetick('x','HH:MM PM','keeplimits')
                 
-                yticks = obj.flimits(1):5:obj.flimits(2);
+                yticks = obj.fDisplayLimits(1):5:obj.fDisplayLimits(2);
                 colorbar
                 title_str = sprintf('sleep scoring - NREM (red), Wake/REM (black)');
                 axis([get(gca,'xlim'),[0.5,30]])
@@ -334,24 +321,24 @@ classdef sleepScoring_iEEG < handle
                     a_data = a_data - mean(a_data);
                     freq = 0:obj.samplingRate/2;
                     WIN = min(500,length(a_data));
-                    NOVERLAP = min(400,WIN/2);
-                    [pxx1, f1] = pwelch(a_data,WIN,NOVERLAP,freq,obj.samplingRate);
+                    NOVERLAP = min(400, WIN/2);
+                    [pxx1, f1] = pwelch(a_data, WIN, NOVERLAP, freq, obj.samplingRate);
                     SLEEP_properties{ii_a}.pxx1 = pxx1;
                     SLEEP_properties{ii_a}.pxx1 = f1;
                     
                     hold on
                     if ii_a == 1
-                        plot(f1,10*log10(pxx1),'b')
+                        plot(f1,10*log10(pxx1), 'b')
                         hold on
                     elseif ii_a == 2
-                        plot(f1,10*log10(pxx1),'g')
+                        plot(f1,10*log10(pxx1), 'g')
                     elseif ii_a == 3
-                        plot(f1,10*log10(pxx1),'color',[0.8 0.8 0.8])
+                        plot(f1,10*log10(pxx1), 'color', [0.8 0.8 0.8])
                     end
                     
                 end
                 
-                axis([0 25,0,inf])
+                axis([0 25, 0, inf])
                 xlabel('f(Hz)')
                 ylabel('dB')
                 legend('NREM','REM*','Wake*')
@@ -361,26 +348,59 @@ classdef sleepScoring_iEEG < handle
                 IDX.sleep_length_min = 1;
                 IDX.NREM_length_min = 2;
                 IDX.REM_length_min = 3;
+
                 SLEEP_properties_stats.IDX = IDX;
                 SLEEP_properties_stats.STATS(IDX.sleep_length_min) = (endInd-startInd)/(60*obj.samplingRate *60);
                 SLEEP_properties_stats.STATS(IDX.NREM_length_min) = 100*sum(sleep_score_vec == obj.NREM_CODE)/(endInd-startInd);
                 SLEEP_properties_stats.STATS(IDX.REM_length_min) = 100*sum(sleep_score_vec == obj.REM_CODE)/(endInd-startInd);
                 
-                text(0,0.6,sprintf('sleep length = %2.2fh',SLEEP_properties_stats.STATS(IDX.sleep_length_min)))
-                text(0,0.5,sprintf('NREM = %2.2f%%',SLEEP_properties_stats.STATS(IDX.NREM_length_min)))
-                text(0,0.4,sprintf('REM = ~%2.2f%%',SLEEP_properties_stats.STATS(IDX.REM_length_min)))
+                text(0,0.6,sprintf('sleep length = %2.2fh', SLEEP_properties_stats.STATS(IDX.sleep_length_min)))
+                text(0,0.5,sprintf('NREM = %2.2f%%', SLEEP_properties_stats.STATS(IDX.NREM_length_min)))
+                text(0,0.4,sprintf('REM = ~%2.2f%%', SLEEP_properties_stats.STATS(IDX.REM_length_min)))
                 axis off
                 
                 filename = sprintf('sleepScore_%s_stats', LocalHeader.origName);
-                save(fullfile(outputPath, filename),'SLEEP_properties_IDX','SLEEP_properties');
+                save(fullfile(outputPath, filename), 'SLEEP_properties_IDX', 'SLEEP_properties');
                 saveas(gcf, figure_name_out);
                 % PrintActiveFigs(figure_folder)
             end
             
         end
-        
-        
-        %% help functions
+
+        function data = removeNoise(obj, data)
+            fprintf('remove extreme noise...\n');
+                timeWin = 10*obj.samplingRate;
+                dataL = size(data,2);
+                nTimeWins = floor(dataL/timeWin);
+                % dataLmin = dataL/obj.samplingRate/60;
+                
+                for iTimeWin=1:nTimeWins
+                    normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
+                end
+                
+                stdsNorms = std(normsTimeWin(:));
+                skewNorms = skewness(normsTimeWin(:));
+                kurtNorms = kurtosis(normsTimeWin(:));
+                
+                medStd = nanmedian(stdsNorms);
+                medSkew = nanmedian(skewNorms);
+                medKurt = nanmedian(kurtNorms);
+                
+                for iTimeWin=1:nTimeWins
+                    % normsTimeWin(1,iTimeWin) = sqrt(nansum(data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin).^2));
+                    if normsTimeWin(1,iTimeWin) > medStd
+                        data((iTimeWin-1)*timeWin+1:iTimeWin*timeWin) = 0;
+                    end
+                end
+        end
+
+
+        function P_ripple = getRipplePower(obj, data)
+            window = obj.scoringEpochDuration*obj.samplingRate;
+            [~,F,T,P]  = spectrogram(data, window, 0, [0.5:0.2:obj.flimitsRipple(2)], obj.samplingRate, 'yaxis');
+            P_ripple = movsum(sum(P(F > obj.rippleRangeMin & F < obj.rippleRangeMax, :)), 5);
+        end
+
         function [f, psdx] = getPS(obj,segment)
             %an help method to calcualte the power spectrum of a segment
             

@@ -3,7 +3,6 @@ check the length of csc data to make sure they are same across channels.
 check length of signal, timestamps and number of NaNs.
 """
 import os.path
-import warnings
 from collections import defaultdict
 
 import glob
@@ -13,7 +12,7 @@ from typing import List
 from functools import partial
 import concurrent.futures
 
-from src.utils.csc_reader import check_var_length
+from nwb_pipeline.csc_reader import check_var_length
 import logging
 
 
