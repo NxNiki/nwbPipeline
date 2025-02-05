@@ -3,9 +3,11 @@ function channelName = extractChannelName(filename, regPattern)
 % 'GA1-RA1_001.mat' -> 'GA1_RA1' with regPattern: '.*(?=_\d+)';
 
     if nargin < 2
-        % just remove '.mat' by default:
-        regPattern = '\w+(?=.mat)';
+        % remove post fix digits by default:
+        regPattern = '\w+(?=_\d+)';
     end
+
+    [~, filename] = fileparts(filename);
 
     channelName = regexp(filename, regPattern, 'match', 'once');
 
