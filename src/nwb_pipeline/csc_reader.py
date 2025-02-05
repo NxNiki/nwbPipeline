@@ -16,7 +16,7 @@ def combine_csc(
     signal_files: Optional[List[str]] = None,
     max_gap_duration: float = np.inf,
     use_single_precision: bool = True,
-) -> Tuple[npt.NDArray[np.float_], Optional[npt.NDArray[np.float_]], float, float]:
+) -> Tuple[npt.NDArray[np.float64], Optional[npt.NDArray[np.float64]], float, float]:
     """
     Combine CSC signals, filling gaps with NaNs if the gap between segments is larger than a threshold.
     Set signal_files to empty to only process timestamp_files.
@@ -66,9 +66,9 @@ def combine_csc(
 def read_data(
     timestamp_files: List[str], signal_files: Optional[List[str]]
 ) -> Tuple[
-    List[npt.NDArray[np.float_]],
-    npt.NDArray[np.float_],
-    Optional[List[npt.NDArray[np.float_]]],
+    List[npt.NDArray[np.float64]],
+    npt.NDArray[np.float64],
+    Optional[List[npt.NDArray[np.float64]]],
 ]:
     num_files = len(timestamp_files)
     if signal_files is None or len(signal_files) == 0:
@@ -101,7 +101,7 @@ def read_data(
     return timestamps_to_combine, sampling_intervals, signal_to_combine
 
 
-def check_sampling_intervals(sampling_intervals: npt.NDArray[np.float_]) -> float:
+def check_sampling_intervals(sampling_intervals: npt.NDArray[np.float64]) -> float:
     unique_intervals = np.unique(sampling_intervals[~np.isnan(sampling_intervals)])
     if len(unique_intervals) > 1:
         raise ValueError("Sampling intervals do not match across files!")
@@ -109,8 +109,8 @@ def check_sampling_intervals(sampling_intervals: npt.NDArray[np.float_]) -> floa
 
 
 def process_timestamps(
-    timestamps: npt.NDArray[np.float_], use_single_precision: bool
-) -> Tuple[npt.NDArray[np.float_], float]:
+    timestamps: npt.NDArray[np.float64], use_single_precision: bool
+) -> Tuple[npt.NDArray[np.float64], float]:
     """
     convert timestamps form unix time to relative time with start time.
     :param timestamps:
@@ -130,8 +130,8 @@ def process_timestamps(
 
 
 def check_data_length(
-    timestamps_to_combine: List[npt.NDArray[np.float_]],
-    signals_to_combine: Optional[List[npt.NDArray[np.float_]]],
+    timestamps_to_combine: List[npt.NDArray[np.float64]],
+    signals_to_combine: Optional[List[npt.NDArray[np.float64]]],
 ) -> None:
     """
     check if length of timestamps and signal match for each segment.
@@ -153,11 +153,11 @@ def check_data_length(
 
 
 def fill_gaps(
-    timestamps: List[npt.NDArray[np.float_]],
-    signals: Optional[List[npt.NDArray[np.float_]]],
+    timestamps: List[npt.NDArray[np.float64]],
+    signals: Optional[List[npt.NDArray[np.float64]]],
     max_gap_duration: float,
     sampling_interval_seconds: float,
-) -> Tuple[npt.NDArray[np.float_], Optional[npt.NDArray[np.float_]]]:
+) -> Tuple[npt.NDArray[np.float64], Optional[npt.NDArray[np.float64]]]:
     """
     Fill gaps between experiments/segments with NaNs.
     :param timestamps:
@@ -208,7 +208,7 @@ def fill_gaps(
     return combined_timestamps, combined_signal
 
 
-def read_timestamps(filename: str) -> Tuple[npt.NDArray[np.float_], float, float]:
+def read_timestamps(filename: str) -> Tuple[npt.NDArray[np.float64], float, float]:
     """
     Read timestamps from a .mat file. Handles different versions where the samplingInterval may or may not exist
     and can be a duration object or a float (in seconds). The function will return the sampling interval as a float
@@ -234,7 +234,7 @@ def read_timestamps(filename: str) -> Tuple[npt.NDArray[np.float_], float, float
     return timestamps, duration, sampling_interval_seconds
 
 
-def read_csc(filename: str) -> Tuple[npt.NDArray[np.float_], float]:
+def read_csc(filename: str) -> Tuple[npt.NDArray[np.float64], float]:
     """
     Read CSC signal from a .mat file and convert the samplingInterval to seconds.
 
