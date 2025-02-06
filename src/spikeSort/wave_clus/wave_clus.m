@@ -340,10 +340,8 @@ for i = 1:length(handles.clusterUnitType)
     cluster_class(classes(:)==i, 3) = handles.clusterUnitType(i);
 end
 
-[pathname, filename] = fileparts(get(handles.file_name, 'String'));
-outFileName = strrep(['times_manual_', filename], '_spikes', '');
-outfile = fullfile(pathname, outFileName);
-outFileObj = matfile(outfile, "Writable", true);
+[pathname, outFileName] = fileparts(handles.manualTimesFile);
+outFileObj = matfile(handles.manualTimesFile, "Writable", true);
 
 if ~ismember('sortedBy', who(outFileObj)) || ~iscell(outFileObj.sortedBy)
     sortedByPrev = [];
@@ -351,6 +349,11 @@ else
     sortedByPrev = outFileObj.sortedBy;
 end
 sortedByPrev = [sortedByPrev; {sortedBy, char(datetime("now"))}];
+
+outFileObj.sortedBy = sortedByPrev;
+outFileObj.cluster_class = cluster_class;
+outFileObj.temp = temp;
+outFileObj.min_clus = handles.min_clus;
 
 %Save figures
 nClusts = max(cluster_class(:,1));
@@ -382,12 +385,7 @@ if nClusts>28
     saveWaveClusFigure(h_figs, 'wave_clus_aux5', pathname, outFileName(startInd:end))
 end
 
-outFileObj.sortedBy = sortedByPrev;
-outFileObj.cluster_class = cluster_class;
-outFileObj.temp = temp;
-outFileObj.min_clus = handles.min_clus;
-
-fprintf('Cluster saved to: %s!\n', outfile);
+fprintf('Cluster saved to: %s!\n', handles.manualTimesFile);
 
 % --- Executes on selection change in data_type_popupmenu.
 function data_type_popupmenu_Callback(hObject, eventdata, handles)
