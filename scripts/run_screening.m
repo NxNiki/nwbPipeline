@@ -38,7 +38,7 @@ ttlLogFiles = {
 imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D580/Screening2/trial1';
 
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
-spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
+spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes_removePLI-0_CAR-1_rejectNoiseSpikes-1'];
 outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
 
 
@@ -76,10 +76,10 @@ end
 %%
 % generate rasters plots by units for image and audio stimuli:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath);
-% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath);
 
 % generate raster plots by units for video stimuli:
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
 % rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
 % generate raster plots organized by image:
@@ -87,6 +87,6 @@ rasters_by_image(patient, expFilePath, imageDirectory, targetLabel, outputPath);
 
 % generate raster plots with response time as onset:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath);
-% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath);
 
 %%

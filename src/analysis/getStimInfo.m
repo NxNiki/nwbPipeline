@@ -28,5 +28,14 @@ stimTag = regexp({stimDir.name}, '.*?(?=_id)', 'match', 'once');
 stimTag = stimTag(:);
 stimId = regexp({stimDir.name}, '(?<=_id)\d+', 'match', 'once');
 stimId = stimId(:);
+
+if any(isempty(stimTag))
+    warning('empty tags in stimuli folder!')
+    empty_idx = isempty(stimTag);
+    stimName(empty_idx) = [];
+    stimId(empty_idx) = [];
+    stimTag(empty_idx) = [];
+end
+
 stimId = cellfun(@str2num, stimId);
 
