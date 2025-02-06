@@ -6,7 +6,7 @@ clear
 % the main path for extracted data here -
 % for the given example, it's in the same folder as this code:
 
-base_path = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/566_MovieParadigm/Experiment-8/';
+base_path = '/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/MovieParadigm/561_MovieParadigm/Experiment-4/';
 data_p_path = fullfile(base_path, 'CSC_macro');
 outputFolder = fullfile(base_path, 'Spindles');
 
@@ -14,11 +14,11 @@ if ~exist(outputFolder, "dir")
     mkdir(outputFolder);
 end
 
-sleepScoringFileName = fullfile(base_path, 'sleep_score/sleepScore_ROF2_001.mat');
+sleepScoringFileName = fullfile(base_path, 'sleep_score/sleepScore_LAC4_001.mat');
 
 [macroFiles, macroTimestampFiles] = readCSCFilePath(data_p_path);
 
-channel_index = 69;
+channel_index = 25;
 
 
 %% an example for detecting spindles directly using SpindleDetectorClass (it's the same thing the wrapper below does in batch)
