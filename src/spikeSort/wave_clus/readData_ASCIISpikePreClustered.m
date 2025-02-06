@@ -58,6 +58,7 @@ fprintf('sampling rate: %d\n', par.sr);
 
 temp = find_temp2(tree, handles);
 min_clus = handles.par.min_clus;
+
 if exist(manualTimesFile, 'file')
     message = 'This spike file has been manually sorted, do you want to load the manually sorted result?';
     title = 'Spikes manually sorted already!';
@@ -76,6 +77,9 @@ if exist(manualTimesFile, 'file')
             min_clus = manualTimesFileObj.min_clus;
         end
     end
+else
+    manualTimesFileObj = matfile(manualTimesFile, "Writable", true);
+    manualTimesFileObj.timestampsStart = timesFileObj.timestampsStart;
 end
 
 handles.min_clus = min_clus; % Todo: use min_clus_edit instead.
@@ -129,6 +133,7 @@ USER_DATA{18} = par.sr;
 
 setUserData(USER_DATA);
 
+handles.manualTimesFile = manualTimesFile;
 handles.clusterUnitType = int8(ones(1, par.max_clus)); % default is 1: single unit. other options 2: multi unit, 3: noise unit.
 handles.clusterFixed = false(1, par.max_clus);
 
