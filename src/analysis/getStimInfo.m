@@ -18,6 +18,8 @@ stimDir = stimDir(~[stimDir.isdir]);
 
 if isempty(stimDir)
     warning('no stimuli found with extention: %s', ext);
+    [stimTag, stimId, stimName] = deal([]);
+    return
 end
 
 stimName = {stimDir.name};

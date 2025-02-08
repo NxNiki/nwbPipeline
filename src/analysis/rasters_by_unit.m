@@ -153,7 +153,7 @@ parfor i = 1:numPages
 
         stimTag = stimTags{stimLookupIdx};
         stimTag = stimTag(1: min(20, length(stimTag)));
-        axesTitle = [strrep(stimTag, '_', '\_'), sprintf(': (%.1f), %d ms', clusterInfo{unitsToPlot(j), 'score'}, round(responseOnset))];
+        axesTitle = [strrep(stimTag, '_', '\_'), sprintf(': (%.2f), %d ms', clusterInfo{unitsToPlot(j), 'score'}, round(responseOnset))];
         title(stimAxes, axesTitle, 'FontSize', 8,'Interpreter','tex');
 
         % plot rasters:

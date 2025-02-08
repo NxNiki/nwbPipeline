@@ -4,8 +4,10 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
-patient = 579;
-expId = [4];
+
+patient = 580;
+expId = [3];
+
 filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening', patient);
 skipExist = [1, 1, 1];
 
@@ -30,10 +32,11 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
-    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening_2_Behavioural/579-12-Dec-2024-11-22-26/from laptop/ttlLog579-12-Dec-2024-11-22-26.mat';
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D580/Screening2/580-06-Feb-2025-16-13-47/from laptop/ttlLog580-06-Feb-2025-16-13-47.mat';
     };
 
-imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D579/Screening 2 Stimuli';
+imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D580/Screening2/trial1';
+
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes'];
 outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
@@ -80,7 +83,7 @@ rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, o
 % rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
 % generate raster plots organized by image:
-rasters_by_image(patient, expFilePath, imageDirectory, outputPath);
+rasters_by_image(patient, expFilePath, imageDirectory, targetLabel, outputPath);
 
 % generate raster plots with response time as onset:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath);
