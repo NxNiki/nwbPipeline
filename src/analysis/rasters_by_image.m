@@ -25,9 +25,11 @@ if height(clustersToPlot) < 1
     return
 end
 
+fprintf('raster by image...\n');
+
 numImages = length(clustersToPlot{1, 'stim'}{1});
 numClusters = height(clustersToPlot);
-pagesPerImage = ceil(numClusters/plotsPerPage);%7*ones(size(responsiveClusters, 1), 1);%
+pagesPerImage = ceil(numClusters/plotsPerPage); %7*ones(size(responsiveClusters, 1), 1);%
 numPages = numImages*pagesPerImage;
 
 % reorganize cluster information by stimuli:
@@ -85,9 +87,14 @@ parfor i = 1:numPages
     xTicks = -500:500:1000;
     stimName = stimNames{stimIds==stimId};
     if endsWith(stimName, '.jpg')
-        image = imread(fullfile(stimDirectory, stimName));
-        imageAxes = axes(gcf, 'Position', [.425, .8 .15 .15]);
-        imshow(image, 'Parent', imageAxes);
+        try
+            image = imread(fullfile(stimDirectory, stimName));
+            imageAxes = axes(gcf, 'Position', [.425, .8 .15 .15]);
+            imshow(image, 'Parent', imageAxes);
+        catch
+            warning('image: %s is not load successfully\n', fullfile(stimDirectory, stimName));
+        end
+
     elseif endsWith(stimName, '.aiff')
         xLimit = [-500, 1500]; 
         xTicks = -500:1000:1500;
@@ -145,10 +152,10 @@ parfor i = 1:numPages
     end
 
     thisTitle = [strrep(imageCharacteristics{stimIndex, 'name'}{1}, '_', '\_')];
-    annotation('textbox', [0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', ...
+    annotation('textbox',[0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', ...
         'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold', 'interpreter', 'tex');
 
-    xtickangle(findobj(gcf, 'type', 'axes'), 0)
+    % xtickangle(findobj(gcf, 'type', 'axes'), 0)
     print(gcf, '-dpdf', '-r100', '-vector', figNames{i})
 end
 
