@@ -144,8 +144,25 @@ parfor i = 1:numPages
         hold(rasterAxes, 'off');
     end
 
+<<<<<<< Updated upstream
     thisTitle = [strrep(imageCharacteristics{stimIndex, 'name'}{1}, '_', '\_')];
     annotation('textbox', [0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', ...
+=======
+    imageAxes = axes(gcf, 'Position', [.425, .8 .15 .15]);
+    thisImageTrialTag = imageCharacteristics{imageToPlot, 'name'}{1};
+    lookupIdx = find(strcmp(allImageTrialTags, thisImageTrialTag), 1);
+    if ~isempty(lookupIdx)
+        try
+            image = imread(fullfile(imageDirectory, allImageDir(lookupIdx).name));
+            imshow(image, 'Parent', imageAxes);
+        catch
+            warning('image: %s is not load successfully\n', fullfile(imageDirectory, allImageDir(lookupIdx).name));
+        end
+    end
+
+    thisTitle = [strrep(imageCharacteristics{imageToPlot, 'name'}{1}, '_', '\_')];
+    annotation('textbox',[0 .9625 1 .025], 'units', 'normalized', 'String', thisTitle, 'EdgeColor', 'none', ...
+>>>>>>> Stashed changes
         'HorizontalAlignment', 'center', 'FontSize', 15, 'FontWeight', 'bold', 'interpreter', 'tex');
 
     xtickangle(findobj(gcf, 'type', 'axes'), 0)

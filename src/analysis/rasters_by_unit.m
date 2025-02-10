@@ -122,22 +122,30 @@ parfor i = 1:numPages
 
         stimName = stimNames{stimLookupIdx}; % this will return the first stim if multiple stim with stimId found (which should not happen)
         stimFile = fullfile(stimDirectory, stimName);
-        fprintf('stimulus: %s\n', stimName)
+
+        if isempty(stimName)
+            continue
+        end
+        fprintf('stimulus (%d): %s\n', find(stimLookupIdx), stimName)
         
         % plot stim (image/sound wave) at the top of each rectangle
         % position:
         stimAxes = axes(gcf, 'Position', getAxisRect(j, 1, rasterNCol, rasterNRow));
         if endsWith(stimName, '.jpg') || endsWith(stimName, '.png')
-            image = imread(stimFile);
-            image = imresize(image, .2);
-            imshow(image, 'Parent', stimAxes);
+            try
+                image = imread(stimFile);
+                image = imresize(image, .2);
+                imshow(image, 'Parent', stimAxes);
+            catch
+                warning('image: %s is not load successfully\n', stimFile);
+            end
         else
             try
                 [y, Fs] = audioread(stimFile);
                 plot(stimAxes, 1000/Fs*(1:length(y)), y(:, 1));
                 xlim(stimAxes, [stimLimits(1), stimLimits(end)]);
             catch
-                warning('audio is not loaded successfully: %s', fullfile(stimDirectory, stimName))
+                warning('audio is not loaded successfully: %s\n', stimFile)
             end
         end
 

@@ -4,10 +4,15 @@ clear
 scriptDir = fileparts(mfilename('fullpath'));
 addpath(genpath(fileparts(scriptDir)));
 
+<<<<<<< Updated upstream
 
 patient = 580;
 expId = [3];
 
+=======
+patient = 581;
+expId = [1];
+>>>>>>> Stashed changes
 filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening', patient);
 skipExist = [1, 1, 1];
 
@@ -32,11 +37,18 @@ checkResponseRaster = true;
 % some reason, multiple files are craeted. Make sure log files are ordered
 % correctly:
 ttlLogFiles = {
+<<<<<<< Updated upstream
     '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D580/Screening2/580-06-Feb-2025-16-13-47/from laptop/ttlLog580-06-Feb-2025-16-13-47.mat';
     };
 
 imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D580/Screening2/trial1';
 
+=======
+    '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D581/Screening1/581-10-Feb-2025-7-19-36/from laptop/ttlLog581-10-Feb-2025-7-19-36.mat';
+    };
+
+imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D581/Screening1/trial1';
+>>>>>>> Stashed changes
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes_removePLI-0_CAR-1_rejectNoiseSpikes-1'];
 outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
@@ -75,8 +87,8 @@ end
 
 %%
 % generate rasters plots by units for image and audio stimuli:
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath);
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath);
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath);
+% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath);
 
 % generate raster plots by units for video stimuli:
 % rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);

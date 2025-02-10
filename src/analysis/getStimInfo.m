@@ -23,6 +23,12 @@ if isempty(stimDir)
 end
 
 stimName = {stimDir.name};
+
+if isempty(stimName)
+    [stimTag, stimId, stimName] = deal([]);
+    return
+end
+
 stimName = stimName(:);
 stimTag = regexp({stimDir.name}, '.*?(?=_id)', 'match', 'once');
 stimTag = stimTag(:);
