@@ -39,7 +39,9 @@ spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spi
 outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
 
 % make sure not skip step 3 if spikeFilePath is changed.  
-skipExist = [1, 1, 0];
+skipExist = [1, 1, 1];
+
+maxNumCompThreads = 5;
 
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
@@ -73,15 +75,15 @@ end
 
 %%
 % generate rasters plots by units for image and audio stimuli:
-rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath);
-rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath);
+% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'stim', targetLabel, outputPath);
+% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'stim', targetLabel, outputPath);
 
 % generate raster plots by units for video stimuli:
 % rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'video', targetLabel, outputPath);
 % rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
 % generate raster plots organized by image:
-rasters_by_image(patient, expFilePath, imageDirectory, targetLabel, outputPath);
+% rasters_by_image(patient, expFilePath, imageDirectory, targetLabel, outputPath);
 
 % generate raster plots with response time as onset:
 rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath);
