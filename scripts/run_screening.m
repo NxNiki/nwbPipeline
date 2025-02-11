@@ -8,7 +8,6 @@ patient = 581;
 expId = [1];
 
 filePath = sprintf('/Users/XinNiuAdmin/HoffmanMount/data/PIPELINE_vc/ANALYSIS/Screening/%d_Screening', patient);
-skipExist = [1, 1, 1];
 
 % set target local for each micro channel:
 targetLabel.GA1 = ''; 
@@ -36,13 +35,16 @@ ttlLogFiles = {
 
 imageDirectory = '/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening/D581/Screening1/trial1';
 expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
-spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes_removePLI-0_CAR-1_rejectNoiseSpikes-1'];
+spikeFilePath = [filePath, '/Experiment', sprintf('-%d', expId), '/CSC_micro_spikes_removePLI-1_CAR-1_rejectNoiseSpikes-1'];
 outputPath = [sprintf('/Users/XinNiuAdmin/Library/CloudStorage/Box-Box/Screening Rasters/Patient%d/screening_exp', patient), sprintf('-%d', expId)];
 
+% make sure not skip step 3 if spikeFilePath is changed.  
+skipExist = [1, 1, 1];
+
+maxNumCompThreads = 5;
 
 %% parse TTLs:
 % this will create TTL.mat and trialStruct.mat
-% expFilePath = [filePath, '/Experiment', sprintf('-%d', expId)];
 
 if ~exist(fullfile(expFilePath, 'TTLs.mat'), "file") || ~skipExist(1)
     eventFile = fullfile(expFilePath, 'CSC_events/Events_001.mat');
@@ -81,10 +83,10 @@ end
 % rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'video', targetLabel, outputPath);
 
 % generate raster plots organized by image:
-rasters_by_image(patient, expFilePath, imageDirectory, targetLabel, outputPath);
+% rasters_by_image(patient, expFilePath, imageDirectory, targetLabel, outputPath);
 
 % generate raster plots with response time as onset:
-% rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath);
-% rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 1, 'response', targetLabel, outputPath);
+rasters_by_unit(patient, expFilePath, imageDirectory, 0, 'response', targetLabel, outputPath);
 
 %%

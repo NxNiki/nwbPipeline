@@ -7,14 +7,17 @@ function generatePegasusConfigFile(patientNum, macroList, macroNumChannels,...
 macroNumChannels = macroNumChannels(:)';
 
 if ~exist('savePath','var')|| isempty(savePath)
-    savePath = sprintf('%d_InitialGuess.cfg',patientNum);
+    savePath = sprintf('%d_InitialGuess.cfg', patientNum);
 end
 
 if ~exist('miscMacros','var')|| isempty(miscMacros)
-    miscMacros = {'C3','C4','PZ','Ez',...% used to include 'GlobalMicroRef'but decided to remove
+    miscMacros = {
+        'C3','C4','PZ','Ez',... % used to include 'GlobalMicroRef'but decided to remove
         'EOG1','EOG2','EMG1','EMG2','A1','A2',...
-        'MICROPHONE','HR_Ref','HR','TTLRef','TTLSync',...
-        'Analogue1','Analogue2'};
+        ... 'MICROPHONE',...
+        'HR_Ref','HR','TTLRef','TTLSync',...
+        'Analogue2','Analogue3'
+        };
 end
 
 if ~exist('microsToDuplicateList', 'var')||isempty(microsToDuplicateList)
@@ -43,7 +46,7 @@ if ~isempty(macroList)
         addMacrosToConfig(fid2, startsAt(i), macroList{i}, macroNumChannels(i));
     end
 
-    miscStart = startsAt(end)+macroNumChannels(end);
+    miscStart = startsAt(end) + macroNumChannels(end);
     for i=1:length(miscMacros)
         addMiscToConfig(fid, miscStart+i-1, miscMacros{i});
     end
@@ -54,7 +57,9 @@ end
 % end
 
 for i=1:length(microList)
-    addSpikesToConfig(fid, i, microList{i}, allPossibleMicros{i});
+    if ~isempty(microList{i})
+        addSpikesToConfig(fid, i, microList{i}, allPossibleMicros{i});
+    end
 end
 
 addFinalPointsToConfig(fid, 1);
@@ -63,12 +68,14 @@ addFinalPointsToConfig(fid2, 1);
 % Micro Window
 setUpTimeWindow(fid,'Micro Window');
 for i=1:length(microList)
-    addCSCtoPlotWindow(fid, microList{i}, allPossibleMicros{i});
+    if ~isempty(microList{i})
+        addCSCtoPlotWindow(fid, microList{i}, allPossibleMicros{i});
+    end
 end
 
 setUpTimeWindow(fid,'Alternate Reference Micro Window');
 for i=1:length(microList)
-    if ismember(microList{i}, microsToDuplicateList)
+    if ~isempty(microList{i}) && ismember(microList{i}, microsToDuplicateList)
         addCSCtoPlotWindow(fid, microList{i}, 'AltRef');
     end
 end
@@ -93,7 +100,9 @@ for i=1:length(sleepMacros)
 end
 
 % Microphone etc
-extraPlots = {'MICROPHONE','TTLSync','HR'};
+% extraPlots = {'MICROPHONE','TTLSync','HR'};
+extraPlots = {'TTLSync', 'HR'};
+
 setUpTimeWindow(fid, 'Additional Plots')
 for i=1:length(extraPlots)
     addCSCtoPlotWindow(fid, extraPlots{i}, 'Additional Plots');
@@ -101,24 +110,27 @@ end
 
 setUpSpikeWindow(fid);
 for i=1:length(microList)
-    addToSpikeWindow(fid,microList{i},allPossibleMicros{i});
+    if ~isempty(microList{i})
+        addToSpikeWindow(fid, microList{i}, allPossibleMicros{i});
+    end
 end
-addFinalPointsToConfig(fid,2);
-addFinalPointsToConfig(fid2,2);
+addFinalPointsToConfig(fid, 2);
+addFinalPointsToConfig(fid2, 2);
 fclose(fid);
 fclose(fid2);
 
-function makeBaseOfConfigFile(fid,patientNum)
+
+function makeBaseOfConfigFile(fid, patientNum)
 
 fprintf(fid,'#Pegasus system setup file\n');
 fprintf(fid,'#Generated using Emily''s Generator\n');
-fprintf(fid,'#File Generation Date:(yyyy/mm/dd hh:mm:ss) %s\n',datestr(now,'yyyy/mm/dd HH:MM:SS'));
+fprintf(fid,'#File Generation Date:(yyyy/mm/dd hh:mm:ss) %s\n', datestr(now, 'yyyy/mm/dd HH:MM:SS'));
 fprintf(fid,'\n');
 fprintf(fid,'#System Options Setup\n');
 fprintf(fid,'-SetSystemIdentifier "CNLNEURALYNX"\n');
 fprintf(fid,'\n');
 fprintf(fid,'#Acquisition Control Setup\n');
-fprintf(fid,'-SetDataDirectory "E:\\ATLASData\\D%d\\"\n',patientNum);
+fprintf(fid,'-SetDataDirectory "E:\\ATLASData\\D%d\\"\n', patientNum);
 fprintf(fid,'-SetCreateNewFilesPerRecording True\n');
 fprintf(fid,'-SetMaxFileLength 2\n');
 fprintf(fid,'\n');
@@ -241,8 +253,8 @@ function addMacrosToConfig(fid,startAt,macroName,maxCh)
 
 for i=1:maxCh
     thisChannel = startAt+i-1;
-    thisStr = sprintf('%s%d',macroName,i);
-    thisRef = floor(thisChannel/32);%floor(thisChannel/32)*2+1;
+    thisStr = sprintf('%s%d', macroName, i);
+    thisRef = floor(thisChannel/32); %floor(thisChannel/32)*2+1;
     fprintf(fid,'#Acquisition Entity creation and setup for: "%s"\n',thisStr);
     fprintf(fid,'-CreateCscAcqEnt "%s" "AcqSystem1"\n',thisStr);
     fprintf(fid,'-SetAcqEntProcessingEnabled "%s" True\n',thisStr);
@@ -262,7 +274,7 @@ for i=1:maxCh
     fprintf(fid,'\n');
 end
 
-function addMiscToConfig(fid,thisChannel,miscName)
+function addMiscToConfig(fid, thisChannel, miscName)
 
 %     miscMacros = {'C3','C4','PZ','Ez','GlobalMicroRef',...
 %         'EOG1','EOG2','EMG1','EMG2','A1','A2',...
@@ -270,10 +282,12 @@ function addMiscToConfig(fid,thisChannel,miscName)
 %         'Analogue1','Analogue2'};
 
 switch miscName
-    case 'Analogue1'
-        thisChannel = 224;
+    % case 'Analogue1'
+    %     thisChannel = 224;
     case 'Analogue2'
         thisChannel = 225;
+    case 'Analogue3'
+        thisChannel = 226;
     otherwise
         %nothing to do, thisChannel is as was sent to the function
 end
@@ -281,16 +295,16 @@ end
 thisRef = floor(thisChannel/32);%*2+1;
 
 
-fprintf(fid,'#Acquisition Entity creation and setup for: "%s"\n',miscName);
-fprintf(fid,'-CreateCscAcqEnt "%s" "AcqSystem1"\n',miscName);
+fprintf(fid,'#Acquisition Entity creation and setup for: "%s"\n', miscName);
+fprintf(fid,'-CreateCscAcqEnt "%s" "AcqSystem1"\n', miscName);
 if ismember(miscName,...
-        {'Analogue1','Analogue2','EOG1','EOG2','EMG1','EMG2',...
+        {'Analogue2','Analogue3','EOG1','EOG2','EMG1','EMG2',...
         'A1','A2','TTLSync','TTLRef'}) %HR2, TTLRef
-    fprintf(fid,'-SetAcqEntProcessingEnabled "%s" False\n',miscName);
+    fprintf(fid,'-SetAcqEntProcessingEnabled "%s" False\n', miscName);
 else
-    fprintf(fid,'-SetAcqEntProcessingEnabled "%s" True\n',miscName);
+    fprintf(fid,'-SetAcqEntProcessingEnabled "%s" True\n', miscName);
 end
-fprintf(fid,'-SetChannelNumber "%s" %d\n',miscName,thisChannel);
+fprintf(fid,'-SetChannelNumber "%s" %d\n', miscName, thisChannel);
 
 switch miscName
     case 'MICROPHONE'
@@ -304,7 +318,10 @@ end
 if ismember(miscName,{'MICROPHONE','GlobalMicroRef'})
     fprintf(fid,'-SetInputRange "%s" 5000\n',miscName);
     fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
-elseif ismember(miscName,{'Analogue1','Analogue2'})
+elseif ismember(miscName,{'Analogue2'})
+    fprintf(fid,'-SetInputRange "%s" 800\n',miscName);
+    fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
+elseif ismember(miscName,{'Analogue3'})
     fprintf(fid,'-SetInputRange "%s" 1500\n',miscName);
     fprintf(fid,'-SetSubSamplingInterleave "%s" 1\n',miscName);
 else
@@ -315,7 +332,7 @@ fprintf(fid,'-SetDspLowCutFilterEnabled "%s" True\n',miscName);
 fprintf(fid,'-SetDspLowCutFrequency "%s" 0.1\n',miscName);
 fprintf(fid,'-SetDspLowCutNumberTaps "%s" 0\n',miscName);
 fprintf(fid,'-SetDspHighCutFilterEnabled "%s" True\n',miscName);
-if ismember(miscName,{'MICROPHONE','GlobalMicroRef','Analogue1','Analogue2'})
+if ismember(miscName,{'MICROPHONE', 'GlobalMicroRef', 'Analogue2', 'Analogue3'})
     fprintf(fid,'-SetDspHighCutFrequency "%s" 8000\n',miscName);
 else
     fprintf(fid,'-SetDspHighCutFrequency "%s" 500\n',miscName);
@@ -521,9 +538,9 @@ fprintf(fid,'-SetPlotWindowShowTitleBar "Spike Window 1" True\n');
 fprintf(fid,'\n');
 fprintf(fid,'# Plot addition and setup for "Spike Window 1"\n');
 
-function addToSpikeWindow(fid,microName,microID)
+function addToSpikeWindow(fid,microName, microID)
 for i=1:8
-    thisStr = sprintf('SE%s-%s%d',microID,microName,i);
+    thisStr = sprintf('SE%s-%s%d', microID, microName, i);
     fprintf(fid,'-AddPlot "Spike Window 1" "%s"\n',thisStr);
     fprintf(fid,'-SetPlotEnabled "Spike Window 1" "%s" True\n',thisStr);
     for d = 0:31

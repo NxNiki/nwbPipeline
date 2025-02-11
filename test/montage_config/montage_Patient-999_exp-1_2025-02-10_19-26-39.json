@@ -1,0 +1,101 @@
+{
+  "PatientID": "999",
+  "ExperimentID": "1",
+  "Headstages": {
+    "GA": {
+      "Port1": {
+        "Micros": 8,
+        "BrainLabel": "LA"
+      },
+      "Port2": {
+        "Micros": 8,
+        "BrainLabel": "LAC"
+      },
+      "Port3": {
+        "Micros": 8,
+        "BrainLabel": "LACd"
+      },
+      "Port4": {
+        "Micros": 0,
+        "BrainLabel": "LA"
+      }
+    },
+    "GB": {
+      "Port1": {
+        "Micros": 8,
+        "BrainLabel": "RA"
+      },
+      "Port2": {
+        "Micros": 8,
+        "BrainLabel": "LAC"
+      },
+      "Port3": {
+        "Micros": 0,
+        "BrainLabel": "LA"
+      },
+      "Port4": {
+        "Micros": 0,
+        "BrainLabel": "LA"
+      }
+    },
+    "GC": {
+      "Port1": {
+        "Micros": 8,
+        "BrainLabel": "LMC"
+      },
+      "Port2": {
+        "Micros": 8,
+        "BrainLabel": "LOF"
+      },
+      "Port3": {
+        "Micros": 0,
+        "BrainLabel": "LA"
+      },
+      "Port4": {
+        "Micros": 0,
+        "BrainLabel": "LA"
+      }
+    },
+    "GD": {}
+  },
+  "macroChannels": [
+    [
+      "LA",
+      1,
+      7
+    ],
+    [
+      "RA",
+      8,
+      15
+    ],
+    [
+      "LOF",
+      16,
+      23
+    ],
+    [
+      "ROF",
+      24,
+      24
+    ]
+  ],
+  "miscChannels": [
+    [
+      "A1",
+      114
+    ],
+    [
+      "A2",
+      115
+    ],
+    [
+      "Analogue2",
+      117
+    ],
+    [
+      "Analogue3",
+      118
+    ]
+  ]
+}
