@@ -7,7 +7,7 @@ function generatePegasusConfigFile(patientNum, macroList, macroNumChannels,...
 macroNumChannels = macroNumChannels(:)';
 
 if ~exist('savePath','var')|| isempty(savePath)
-    savePath = sprintf('%d_InitialGuess.cfg',patientNum);
+    savePath = sprintf('%d_InitialGuess.cfg', patientNum);
 end
 
 if ~exist('miscMacros','var')|| isempty(miscMacros)

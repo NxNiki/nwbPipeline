@@ -383,7 +383,7 @@ function MontageConfigUI()
                     if str2double(micros) > 0
                         microChannels = [microChannels, {brainLabel}];
                     else
-                        microChannels = [microChannels, {""}];
+                        microChannels = [microChannels, {''}];
                     end
                 end
             end
