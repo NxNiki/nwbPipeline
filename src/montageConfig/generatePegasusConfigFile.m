@@ -54,7 +54,9 @@ end
 % end
 
 for i=1:length(microList)
-    addSpikesToConfig(fid, i, microList{i}, allPossibleMicros{i});
+    if ~isempty(microList{i})
+        addSpikesToConfig(fid, i, microList{i}, allPossibleMicros{i});
+    end
 end
 
 addFinalPointsToConfig(fid, 1);
@@ -63,12 +65,14 @@ addFinalPointsToConfig(fid2, 1);
 % Micro Window
 setUpTimeWindow(fid,'Micro Window');
 for i=1:length(microList)
-    addCSCtoPlotWindow(fid, microList{i}, allPossibleMicros{i});
+    if ~isempty(microList{i})
+        addCSCtoPlotWindow(fid, microList{i}, allPossibleMicros{i});
+    end
 end
 
 setUpTimeWindow(fid,'Alternate Reference Micro Window');
 for i=1:length(microList)
-    if ismember(microList{i}, microsToDuplicateList)
+    if ~isempty(microList{i}) && ismember(microList{i}, microsToDuplicateList)
         addCSCtoPlotWindow(fid, microList{i}, 'AltRef');
     end
 end
@@ -101,7 +105,9 @@ end
 
 setUpSpikeWindow(fid);
 for i=1:length(microList)
-    addToSpikeWindow(fid,microList{i},allPossibleMicros{i});
+    if ~isempty(microList{i})
+        addToSpikeWindow(fid,microList{i},allPossibleMicros{i});
+    end
 end
 addFinalPointsToConfig(fid,2);
 addFinalPointsToConfig(fid2,2);
