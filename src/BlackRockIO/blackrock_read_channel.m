@@ -21,17 +21,19 @@ outputFilePath = fileparts(electrodeInfoFile);
 electrodeInfoObj = matfile(electrodeInfoFile);
 NSx = electrodeInfoObj.NSx;
 channelId = NSx.MetaTags.ChannelID;
-channelIdx = channelId <= 256;
+% channelIdx = channelId <= 256;
+channelIdx = channelId <= inf;
+
+% trailing null characters (ASCII code 0) are often used in C-style strings
+% to indicate the end of the string but can be problematic in MATLAB.
+outFiles = cellfun(@(x)fullfile(outputFilePath, [x(double(x) ~= 0), '.mat']), {NSx.ElectrodesInfo(channelIdx).Label}, 'UniformOutput', false);
 
 if ~isempty(channelNames)
-    outFiles = cellfun(@(x)fullfile(outputFilePath, [x, '.mat']), channelNames, 'UniformOutput', false);
-else
-    % trailing null characters (ASCII code 0) are often used in C-style strings
-    % to indicate the end of the string but can be problematic in MATLAB.
-    outFiles = cellfun(@(x)fullfile(outputFilePath, [x(double(x) ~= 0), '.mat']), {NSx.ElectrodesInfo(channelIdx).Label}, 'UniformOutput', false);
+    outFilesRename = cellfun(@(x)fullfile(outputFilePath, [x, '.mat']), channelNames, 'UniformOutput', false);
+    outFiles(1:length(outFilesRename)) = outFilesRename;
 end
 
-writecell(outFiles, fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
+writecell(outFiles(:), fullfile(fileparts(outFiles{1}), 'outFileNames.csv'));
 
 nchan = length(outFiles);
 pattern = 'G[A-D][1-4]-(.*?)[1-9]';
